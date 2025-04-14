@@ -15,6 +15,10 @@ interface CastAndCrewSectionProps {
 }
 
 const CastAndCrewSection = ({ director, cast }: CastAndCrewSectionProps) => {
+  // Add console logs for debugging
+  console.log('Director:', director);
+  console.log('Cast:', cast);
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium mb-3">Besetzung</h3>
@@ -66,4 +70,3 @@ const CastAndCrewSection = ({ director, cast }: CastAndCrewSectionProps) => {
 };
 
 export default CastAndCrewSection;
-
