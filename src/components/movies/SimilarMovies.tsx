@@ -33,7 +33,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
   return (
     <div className="container-custom mt-16">
       <div className="glass-card overflow-hidden rounded-xl p-8">
-        <div className="grid gap-8">
+        <div className="grid grid-cols-[1fr,auto] gap-8">
           <div className="space-y-4">
             <Link 
               to="/discover" 
@@ -45,6 +45,19 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             <p className="text-gray-600">
               Entdecke weitere Filme, die dir gefallen könnten. Basierend auf deinem aktuellen Film haben wir eine Auswahl an ähnlichen Titeln zusammengestellt.
             </p>
+            <div className="flex flex-col gap-4">
+              <div className="flex gap-2">
+                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handlePrevClick}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+              <Button variant="outline" className="w-fit">
+                Neuer Tipp
+              </Button>
+            </div>
           </div>
 
           <Carousel
@@ -54,20 +67,11 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               dragFree: true,
               skipSnaps: true,
             }}
-            className="w-full"
+            className="w-[450px]"
           >
-            <div className="flex gap-2 mb-4">
-              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handlePrevClick}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <CarouselContent className="-ml-6">
+            <CarouselContent className="-ml-4">
               {movies.map((movie) => (
-                <CarouselItem key={movie.id} className="pl-6 basis-1/4 md:basis-1/4 lg:basis-1/5">
+                <CarouselItem key={movie.id} className="pl-4 basis-1/2">
                   <MovieCard movie={movie} size="small" />
                 </CarouselItem>
               ))}
