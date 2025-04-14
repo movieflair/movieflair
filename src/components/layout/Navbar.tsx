@@ -1,5 +1,6 @@
+
 import { Link } from 'react-router-dom';
-import { Search, User, Video, PlayCircle } from 'lucide-react';
+import { Search, User, Video, PlayCircle, Menu as MenuIcon } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
@@ -49,7 +50,7 @@ const Navbar = () => {
             className="md:hidden text-white/80 hover:text-white transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            <Menu className="w-5 h-5" />
+            <MenuIcon className="w-5 h-5" />
           </button>
         </div>
       </div>

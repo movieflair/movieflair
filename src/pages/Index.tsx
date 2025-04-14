@@ -6,8 +6,8 @@ import FeaturedMovies from '@/components/movies/FeaturedMovies';
 const Index = () => {
   return (
     <MainLayout>
-      {/* Hero Section */}
-      <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50 to-white">
+      {/* Hero Section - Using a lighter, friendlier background */}
+      <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50/50 to-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-12">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-gray-900">
