@@ -13,6 +13,7 @@ import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import FreeMovies from "./pages/FreeMovies";
 import Trailers from "./pages/Trailers";
+import QuickTipp from "./pages/QuickTipp";
 
 const queryClient = new QueryClient();
 
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/free-movies" element={<FreeMovies />} />
             <Route path="/trailers" element={<Trailers />} />
+            <Route path="/quick-tipp" element={<QuickTipp />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

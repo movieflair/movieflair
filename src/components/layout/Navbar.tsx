@@ -1,5 +1,6 @@
+
 import { Link } from 'react-router-dom';
-import { Search, User, Video, PlayCircle, Menu as MenuIcon } from 'lucide-react';
+import { Search, User, Video, PlayCircle, Menu as MenuIcon, Zap } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
@@ -29,6 +30,10 @@ const Navbar = () => {
           <Link to="/trailers" className="text-white/80 hover:text-white transition-colors flex items-center">
             <PlayCircle className="w-4 h-4 mr-1" />
             Neue Trailer
+          </Link>
+          <Link to="/quick-tipp" className="text-white/80 hover:text-white transition-colors flex items-center">
+            <Zap className="w-4 h-4 mr-1" />
+            Quick Tipp
           </Link>
           <Link to="/about" className="text-white/80 hover:text-white transition-colors">
             About
@@ -80,6 +85,14 @@ const Navbar = () => {
             >
               <PlayCircle className="w-4 h-4 mr-1" />
               Neue Trailer
+            </Link>
+            <Link 
+              to="/quick-tipp" 
+              className="block text-white/80 hover:text-white transition-colors flex items-center"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Zap className="w-4 h-4 mr-1" />
+              Quick Tipp
             </Link>
             <Link 
               to="/about" 
