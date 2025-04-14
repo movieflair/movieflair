@@ -108,7 +108,7 @@ const QuickTipp = () => {
                   onClick={getRandomMovie}
                   disabled={loading}
                 >
-                  <Zap className="w-6 h-6 mr-2" />
+                  <Sparkles className="w-6 h-6 mr-2" />
                   {loading ? "Filme werden geladen..." : "Zeige mir einen Quick Tipp!"}
                 </Button>
               </div>
@@ -203,7 +203,7 @@ const QuickTipp = () => {
             <div className="grid md:grid-cols-3 gap-6">
               <div className="p-6 bg-gray-50 rounded-lg">
                 <div className="w-12 h-12 flex items-center justify-center bg-[#ea384c]/10 rounded-full mb-4">
-                  <Zap className="w-6 h-6 text-[#ea384c]" />
+                  <Sparkles className="w-6 h-6 text-[#ea384c]" />
                 </div>
                 <h3 className="text-lg font-medium mb-2">Entdecke Neues</h3>
                 <p className="text-gray-600">Finde Filme, die du vielleicht sonst übersehen hättest.</p>
