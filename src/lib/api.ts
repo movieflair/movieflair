@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface Genre {
@@ -30,6 +31,7 @@ export interface MovieDetail extends MovieOrShow {
   tagline?: string;
   homepage?: string;
   cast?: CastMember[];
+  crew?: CastMember[];
   videos?: {
     results: {
       key: string;
@@ -125,6 +127,7 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
     media_type: 'movie',
     videos: { results: videos.results },
     cast: credits.cast?.slice(0, 10),
+    crew: credits.crew, // Adding the crew information
     hasTrailer: videos.results?.some((v: any) => v.type === 'Trailer'),
   };
 };
@@ -141,6 +144,7 @@ export const getTvShowById = async (id: number): Promise<MovieDetail> => {
     media_type: 'tv',
     videos: { results: videos.results },
     cast: credits.cast?.slice(0, 10),
+    crew: credits.crew, // Adding the crew information
     hasTrailer: videos.results?.some((v: any) => v.type === 'Trailer'),
   };
 };

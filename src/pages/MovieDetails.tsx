@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -43,6 +44,8 @@ const MovieDetails = () => {
     );
   }
 
+  // Find the director from the crew
+  const director = movie.crew?.find(person => person.job === 'Director');
   const year = movie.release_date ? new Date(movie.release_date).getFullYear() : undefined;
   
   const getAmazonUrl = (title: string) => {
@@ -152,7 +155,7 @@ const MovieDetails = () => {
                 {/* Cast and Crew Section */}
                 <div className="mt-8">
                   <CastAndCrewSection 
-                    director={movie.cast?.find(person => person.job === 'Director')}
+                    director={director}
                     cast={movie.cast?.filter(person => person.character)}
                   />
                 </div>
