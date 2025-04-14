@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -90,7 +89,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               )}
             </div>
             {!showRandomMovie && (
-              <div className="mt-2">
+              <div className="mt-8">
                 <Button 
                   variant="outline" 
                   className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
