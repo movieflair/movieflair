@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { ArrowRight, Star, Calendar, Clock } from 'lucide-react';
 import { MovieDetail } from '@/lib/api';
@@ -13,7 +14,7 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
   
   return (
     <div className="glass-card overflow-hidden rounded-xl">
-      <div className="md:flex">
+      <div className="md:flex h-full">
         <div className="w-full md:w-[300px] h-[450px] flex-shrink-0">
           {movie.poster_path ? (
             <img
