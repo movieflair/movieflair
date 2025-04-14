@@ -7,7 +7,7 @@ import SearchBox from '../search/SearchBox';
 
 const Navbar = () => {
   const location = useLocation();
-  const isTrailersPage = location.pathname === '/trailers';
+  const hideSearch = ['/trailers', '/search'].includes(location.pathname);
 
   return (
     <nav className="bg-black">
@@ -17,7 +17,7 @@ const Navbar = () => {
         </Link>
 
         <div className="flex items-center space-x-6">
-          {!isTrailersPage && (
+          {!hideSearch && (
             <SearchBox variant="navbar" />
           )}
           

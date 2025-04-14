@@ -1,20 +1,15 @@
-
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import SearchBox from '@/components/search/SearchBox';
 
-/**
- * This component will extend the Navbar with search functionality.
- * It will be added to MainLayout.
- */
 const NavbarSearchExtender = () => {
   const navbarRef = useRef<HTMLElement | null>(null);
   const location = useLocation();
-  const isTrailersPage = location.pathname === '/trailers';
+  const hideSearch = ['/trailers', '/search'].includes(location.pathname);
   
   useEffect(() => {
-    if (isTrailersPage) return; // Don't add search on trailers page
+    if (hideSearch) return; // Don't add search on specified pages
     
     // Find the navbar element
     const navbar = document.querySelector('nav');
@@ -64,7 +59,7 @@ const NavbarSearchExtender = () => {
         searchContainer.remove();
       }
     };
-  }, [isTrailersPage]);
+  }, [hideSearch]);
   
   return null; // This component doesn't render anything
 };

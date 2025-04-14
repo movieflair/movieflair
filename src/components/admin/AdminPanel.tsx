@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart, ExternalLink, Link as LinkIcon, BarChart, Pencil } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -190,10 +189,10 @@ const AdminPanel = () => {
     
     const updatedMovie = {
       ...selectedMovie,
-      hasStream,
-      streamUrl: hasStream ? streamUrl : '',
-      hasTrailer,
-      trailerUrl: hasTrailer ? trailerUrl : '',
+      hasStream: isFreeMovie, // Set hasStream based on isFreeMovie
+      streamUrl: isFreeMovie ? streamUrl : '',
+      hasTrailer: isNewTrailer, // Set hasTrailer based on isNewTrailer
+      trailerUrl: isNewTrailer ? trailerUrl : '',
       isFreeMovie,
       isNewTrailer
     };
@@ -839,88 +838,4 @@ const AdminPanel = () => {
                               ? "Füge hier die Embed-URL für den Stream ein. Für YouTube-Videos nutze das Format: https://www.youtube.com/embed/VIDEO_ID" 
                               : "Füge hier einen direkten Link ein, zu dem Benutzer weitergeleitet werden sollen."
                             }
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                    
-                    {hasTrailer && (
-                      <div className="md:col-span-2">
-                        <Label htmlFor="trailerUrl">Trailer URL (YouTube Embed)</Label>
-                        <Input 
-                          id="trailerUrl" 
-                          placeholder="https://www.youtube.com/embed/..." 
-                          className="mt-1"
-                          value={trailerUrl}
-                          onChange={(e) => setTrailerUrl(e.target.value)}
-                        />
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Füge hier die YouTube Embed-URL für den Trailer ein, z.B. https://www.youtube.com/embed/VIDEO_ID
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex justify-end mt-6">
-                    <Button onClick={handleSaveTvShow}>Speichern</Button>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'tags' && (
-                <div className="bg-muted/30 rounded-lg p-8 text-center">
-                  <FileEdit className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h2 className="text-lg font-medium mb-2">Tag-Verwaltung</h2>
-                  <p className="text-muted-foreground max-w-md mx-auto">
-                    Hier können Sie Tags verwalten und erstellen.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="stats">
-          <div className="bg-card rounded-lg shadow-sm p-6">
-            <AdminStats />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="visitors">
-          <div className="bg-card rounded-lg shadow-sm p-6">
-            <AdminVisitorStats />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="settings">
-          <div className="bg-card rounded-lg shadow-sm p-6">
-            <h2 className="text-xl font-medium mb-6">Globale Einstellungen</h2>
-            
-            <div className="max-w-xl">
-              <div className="mb-6">
-                <Label htmlFor="amazonId">Amazon Affiliate ID</Label>
-                <div className="flex mt-1">
-                  <Input 
-                    id="amazonId" 
-                    value={amazonAffiliateId} 
-                    onChange={(e) => setAmazonAffiliateId(e.target.value)}
-                    placeholder="movieflair-21" 
-                    className="flex-grow" 
-                  />
-                  <button onClick={saveSettings} className="button-primary ml-2">
-                    Speichern
-                  </button>
-                </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Diese ID wird für alle Amazon Affiliate Links verwendet.
-                </p>
-              </div>
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
-    </div>
-  );
-};
-
-export default AdminPanel;
+                          </p
