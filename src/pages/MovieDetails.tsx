@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play } from 'lucide-react';
@@ -163,7 +163,7 @@ const MovieDetails = () => {
                     href={getAmazonUrl(movie.title || '')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-[#D3E4FD] text-[#121621] px-6 py-2 rounded-md hover:bg-[#D3E4FD]/90 transition-colors flex items-center gap-2"
+                    className="bg-[rgba(26,152,255,255)] text-white px-6 py-2 rounded-md hover:bg-[rgba(26,152,255,255)]/90 transition-colors flex items-center gap-2"
                   >
                     <Play className="w-4 h-4" />
                     Prime Video
