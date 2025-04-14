@@ -192,6 +192,7 @@ const TvShowDetails = () => {
                   rating={tvShow.vote_average}
                   seasons={tvShow.number_of_seasons}
                   episodes={tvShow.number_of_episodes}
+                  mediaType="tv"
                 />
 
                 <div className="flex flex-wrap gap-2 my-6">

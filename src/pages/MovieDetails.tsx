@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
@@ -78,14 +77,11 @@ const MovieDetails = () => {
     }
   };
   
-  // Bestimme die richtige Trailer-URL
   const getTrailerUrl = () => {
-    // Priorisiere die benutzerdefinierte Trailer-URL
     if (movie.trailerUrl) {
       return movie.trailerUrl;
     }
     
-    // Ansonsten verwende den ersten YouTube-Trailer aus den API-Daten
     if (movie.videos?.results?.length > 0) {
       const firstTrailer = movie.videos.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
       if (firstTrailer) {
@@ -93,7 +89,6 @@ const MovieDetails = () => {
       }
     }
     
-    // Wenn keine URL gefunden wurde, verwende den Stream als Fallback
     if (isEmbedUrl) {
       return movie.streamUrl;
     }
@@ -155,6 +150,7 @@ const MovieDetails = () => {
                   year={year?.toString()}
                   rating={movie.vote_average}
                   duration={movie.runtime}
+                  mediaType="movie"
                 />
 
                 <div className="flex flex-wrap gap-2 my-6">
