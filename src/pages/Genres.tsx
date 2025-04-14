@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getGenres, Genre, getRecommendationByFilters, MovieOrShow } from '@/lib/api';
@@ -55,7 +56,7 @@ const Genres = () => {
               onClick={() => handleGenreClick(genre.id)}
               className={`px-4 py-2 rounded-full ${
                 selectedGenre === genre.id
-                  ? 'bg-theme-accent-red text-white'
+                  ? 'bg-red-500 text-white'
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
               }`}
             >

@@ -1,10 +1,14 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { List, Play, PlayCircle, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import SearchBox from '../search/SearchBox';
 
 const Navbar = () => {
+  const location = useLocation();
+  const isTrailersPage = location.pathname === '/trailers';
+
   return (
     <nav className="bg-black">
       <div className="container-custom flex items-center justify-between py-4">
@@ -13,6 +17,10 @@ const Navbar = () => {
         </Link>
 
         <div className="flex items-center space-x-6">
+          {!isTrailersPage && (
+            <SearchBox variant="navbar" />
+          )}
+          
           <Link to="/genres" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <List className="w-5 h-5" />
             <span>Genres</span>

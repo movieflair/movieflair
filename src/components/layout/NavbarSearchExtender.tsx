@@ -1,5 +1,7 @@
 
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
+import { createRoot } from 'react-dom/client';
 import SearchBox from '@/components/search/SearchBox';
 
 /**
@@ -8,8 +10,12 @@ import SearchBox from '@/components/search/SearchBox';
  */
 const NavbarSearchExtender = () => {
   const navbarRef = useRef<HTMLElement | null>(null);
+  const location = useLocation();
+  const isTrailersPage = location.pathname === '/trailers';
   
   useEffect(() => {
+    if (isTrailersPage) return; // Don't add search on trailers page
+    
     // Find the navbar element
     const navbar = document.querySelector('nav');
     if (navbar) {
@@ -58,7 +64,7 @@ const NavbarSearchExtender = () => {
         searchContainer.remove();
       }
     };
-  }, []);
+  }, [isTrailersPage]);
   
   return null; // This component doesn't render anything
 };
