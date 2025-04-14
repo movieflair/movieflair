@@ -11,9 +11,24 @@ interface MovieRatingFeedbackProps {
 
 const MovieRatingFeedback = ({ movieId }: MovieRatingFeedbackProps) => {
   const [hasVoted, setHasVoted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleVote = async (isHelpful: boolean) => {
     try {
+      setIsSubmitting(true);
+      
+      // Prüfen Sie, ob der Benutzer ein Admin ist - vermeiden Sie das Tracking von Admin-Aufrufen
+      const isAdmin = localStorage.getItem('isAdminLoggedIn') === 'true';
+      if (isAdmin) {
+        // Wenn Admin, zeigen Sie eine spezielle Nachricht
+        toast({
+          title: "Admin-Feedback",
+          description: "Admin-Feedback wird nicht in der Statistik erfasst.",
+        });
+        setHasVoted(true);
+        return;
+      }
+
       const { error } = await supabase
         .from('quick_tipp_ratings')
         .insert([
@@ -36,6 +51,8 @@ const MovieRatingFeedback = ({ movieId }: MovieRatingFeedbackProps) => {
         description: "Dein Feedback konnte nicht gespeichert werden.",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -55,6 +72,7 @@ const MovieRatingFeedback = ({ movieId }: MovieRatingFeedbackProps) => {
         size="sm" 
         className="flex items-center gap-1"
         onClick={() => handleVote(true)}
+        disabled={isSubmitting}
       >
         <ThumbsUp className="w-4 h-4" />
         Ja
@@ -64,6 +82,7 @@ const MovieRatingFeedback = ({ movieId }: MovieRatingFeedbackProps) => {
         size="sm" 
         className="flex items-center gap-1"
         onClick={() => handleVote(false)}
+        disabled={isSubmitting}
       >
         <ThumbsDown className="w-4 h-4" />
         Nein

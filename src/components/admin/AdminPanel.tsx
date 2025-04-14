@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart, ExternalLink, Link as LinkIcon } from 'lucide-react';
+import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart, ExternalLink, Link as LinkIcon, BarChart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getPopularMovies, MovieOrShow } from '@/lib/api';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import AdminStats from './AdminStats';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('movies');
@@ -111,6 +112,7 @@ const AdminPanel = () => {
       <Tabs defaultValue="content" className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="content">Inhalte</TabsTrigger>
+          <TabsTrigger value="stats">Statistiken</TabsTrigger>
           <TabsTrigger value="settings">Einstellungen</TabsTrigger>
         </TabsList>
         
@@ -389,6 +391,12 @@ const AdminPanel = () => {
                 </div>
               )}
             </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="stats">
+          <div className="bg-card rounded-lg shadow-sm p-6">
+            <AdminStats />
           </div>
         </TabsContent>
         

@@ -14,6 +14,8 @@ const AdminPage = () => {
   }, []);
   
   const handleLogin = () => {
+    // Set admin login status in localStorage
+    localStorage.setItem('isAdminLoggedIn', 'true');
     setIsLoggedIn(true);
   };
   
