@@ -45,48 +45,49 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             <p className="text-gray-600">
               Entdecke weitere Filme, die dir gefallen könnten. Basierend auf deinem aktuellen Film haben wir eine Auswahl an ähnlichen Titeln zusammengestellt.
             </p>
-            <div className="space-y-4">
-              <div className="flex gap-2">
-                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handlePrevClick}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-              <Button 
-                variant="outline" 
-                className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Neuer Tipp
+            <div className="flex gap-2 mb-4">
+              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handlePrevClick}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
+                <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
 
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-              dragFree: true,
-              skipSnaps: true,
-            }}
-            className="w-[450px]"
-          >
-            <CarouselContent className="-ml-4">
-              {movies.map((movie) => (
-                <CarouselItem key={movie.id} className="pl-4 basis-1/2">
-                  <MovieCard movie={movie} size="small" />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            
-            {/* Hidden carousel controls that will be triggered by our custom buttons */}
-            <div className="hidden">
-              <CarouselPrevious className="embla__prev" />
-              <CarouselNext className="embla__next" />
-            </div>
-          </Carousel>
+          <div className="flex flex-col">
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+                dragFree: true,
+                skipSnaps: true,
+              }}
+              className="w-[450px] mb-4"
+            >
+              <CarouselContent className="-ml-4">
+                {movies.map((movie) => (
+                  <CarouselItem key={movie.id} className="pl-4 basis-1/2">
+                    <MovieCard movie={movie} size="small" />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              
+              {/* Hidden carousel controls that will be triggered by our custom buttons */}
+              <div className="hidden">
+                <CarouselPrevious className="embla__prev" />
+                <CarouselNext className="embla__next" />
+              </div>
+            </Carousel>
+
+            <Button 
+              variant="outline" 
+              className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0 self-end"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              Quick Tipp
+            </Button>
+          </div>
         </div>
       </div>
     </div>
