@@ -1,5 +1,5 @@
 
-import { Share, Copy, Facebook, Twitter } from "lucide-react";
+import { Share, Copy, Facebook, Twitter, Mail, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -25,9 +25,10 @@ const ShareButton = ({ movieTitle, className }: ShareButtonProps) => {
     }
   };
 
-  const shareToFacebook = () => {
+  const shareToWhatsApp = () => {
+    const text = `Schau dir "${movieTitle}" an!\n${currentUrl}`;
     window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`,
+      `https://wa.me/?text=${encodeURIComponent(text)}`,
       "_blank"
     );
   };
@@ -37,6 +38,26 @@ const ShareButton = ({ movieTitle, className }: ShareButtonProps) => {
       `https://twitter.com/intent/tweet?url=${encodeURIComponent(currentUrl)}&text=${encodeURIComponent(`Schau dir "${movieTitle}" an!`)}`,
       "_blank"
     );
+  };
+
+  const shareToFacebook = () => {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`,
+      "_blank"
+    );
+  };
+
+  const shareToReddit = () => {
+    window.open(
+      `https://reddit.com/submit?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(movieTitle)}`,
+      "_blank"
+    );
+  };
+
+  const shareToEmail = () => {
+    const subject = encodeURIComponent(`Film-Empfehlung: ${movieTitle}`);
+    const body = encodeURIComponent(`Schau dir "${movieTitle}" an!\n\n${currentUrl}`);
+    window.open(`mailto:?subject=${subject}&body=${body}`);
   };
 
   return (
@@ -63,6 +84,22 @@ const ShareButton = ({ movieTitle, className }: ShareButtonProps) => {
           <Button
             variant="ghost"
             className="w-full justify-start"
+            onClick={shareToWhatsApp}
+          >
+            <Share2 className="mr-2 h-4 w-4" />
+            WhatsApp
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={shareToTwitter}
+          >
+            <Twitter className="mr-2 h-4 w-4" />
+            X
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
             onClick={shareToFacebook}
           >
             <Facebook className="mr-2 h-4 w-4" />
@@ -71,10 +108,18 @@ const ShareButton = ({ movieTitle, className }: ShareButtonProps) => {
           <Button
             variant="ghost"
             className="w-full justify-start"
-            onClick={shareToTwitter}
+            onClick={shareToReddit}
           >
-            <Twitter className="mr-2 h-4 w-4" />
-            Twitter
+            <Share2 className="mr-2 h-4 w-4" />
+            Reddit
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={shareToEmail}
+          >
+            <Mail className="mr-2 h-4 w-4" />
+            Email
           </Button>
         </div>
       </PopoverContent>
