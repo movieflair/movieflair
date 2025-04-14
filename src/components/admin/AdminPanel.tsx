@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart, ExternalLink, Link as LinkIcon, BarChart, Pencil } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import AdminStats from './AdminStats';
 import AdminVisitorStats from './AdminVisitorStats';
+import MovieCategories from './MovieCategories';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('movies');
@@ -590,60 +590,22 @@ const AdminPanel = () => {
                       />
                     </div>
                     
-                    <div className="flex flex-col md:col-span-2">
-                      <div className="text-lg font-medium mb-2">Einstellungen</div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="hasStream" 
-                            checked={hasStream}
-                            onCheckedChange={(checked) => setHasStream(checked as boolean)}
-                          />
-                          <Label htmlFor="hasStream" className="flex items-center gap-1">
-                            <PlayCircle className="w-4 h-4" /> 
-                            Stream verfügbar
-                          </Label>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="hasTrailer" 
-                            checked={hasTrailer}
-                            onCheckedChange={(checked) => setHasTrailer(checked as boolean)}
-                          />
-                          <Label htmlFor="hasTrailer" className="flex items-center gap-1">
-                            <Video className="w-4 h-4" /> 
-                            Als Trailer anzeigen
-                          </Label>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="isFreeMovie" 
-                            checked={isFreeMovie}
-                            onCheckedChange={(checked) => setIsFreeMovie(checked as boolean)}
-                          />
-                          <Label htmlFor="isFreeMovie" className="flex items-center gap-1">
-                            <ShoppingCart className="w-4 h-4" /> 
-                            Als kostenlos markieren
-                          </Label>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="isNewTrailer" 
-                            checked={isNewTrailer}
-                            onCheckedChange={(checked) => setIsNewTrailer(checked as boolean)}
-                          />
-                          <Label htmlFor="isNewTrailer" className="flex items-center gap-1">
-                            <Tag className="w-4 h-4" /> 
-                            Als neuen Trailer markieren
-                          </Label>
-                        </div>
-                      </div>
+                    <div className="md:col-span-2">
+                      <MovieCategories 
+                        isNewTrailer={isNewTrailer}
+                        isFreeMovie={isFreeMovie}
+                        onTrailerChange={(checked) => {
+                          setIsNewTrailer(checked);
+                          setHasTrailer(checked);
+                        }}
+                        onFreeMovieChange={(checked) => {
+                          setIsFreeMovie(checked);
+                          setHasStream(checked);
+                        }}
+                      />
                     </div>
                     
-                    {hasStream && (
+                    {isFreeMovie && (
                       <div className="md:col-span-2 space-y-4">
                         <div>
                           <Label className="mb-2 block">Stream URL Typ</Label>
@@ -683,17 +645,11 @@ const AdminPanel = () => {
                             value={streamUrl}
                             onChange={(e) => setStreamUrl(e.target.value)}
                           />
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {streamType === 'embed' 
-                              ? "Füge hier die Embed-URL für den Stream ein. Für YouTube-Videos nutze das Format: https://www.youtube.com/embed/VIDEO_ID" 
-                              : "Füge hier einen direkten Link ein, zu dem Benutzer weitergeleitet werden sollen."
-                            }
-                          </p>
                         </div>
                       </div>
                     )}
                     
-                    {hasTrailer && (
+                    {isNewTrailer && (
                       <div className="md:col-span-2">
                         <Label htmlFor="trailerUrl">Trailer URL (YouTube Embed)</Label>
                         <Input 
@@ -703,9 +659,6 @@ const AdminPanel = () => {
                           value={trailerUrl}
                           onChange={(e) => setTrailerUrl(e.target.value)}
                         />
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Füge hier die YouTube Embed-URL für den Trailer ein, z.B. https://www.youtube.com/embed/VIDEO_ID
-                        </p>
                       </div>
                     )}
                   </div>
@@ -834,12 +787,6 @@ const AdminPanel = () => {
                             value={streamUrl}
                             onChange={(e) => setStreamUrl(e.target.value)}
                           />
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {streamType === 'embed' 
-                              ? "Füge hier die Embed-URL für den Stream ein. Für YouTube-Videos nutze das Format: https://www.youtube.com/embed/VIDEO_ID" 
-                              : "Füge hier einen direkten Link ein, zu dem Benutzer weitergeleitet werden sollen."
-                            }
-                          </p>
                         </div>
                       </div>
                     )}
@@ -854,9 +801,6 @@ const AdminPanel = () => {
                           value={trailerUrl}
                           onChange={(e) => setTrailerUrl(e.target.value)}
                         />
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Füge hier die YouTube Embed-URL für den Trailer ein, z.B. https://www.youtube.com/embed/VIDEO_ID
-                        </p>
                       </div>
                     )}
                   </div>
