@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -70,7 +71,7 @@ const MovieDetails = () => {
           )}
         </div>
 
-        <div className="container-custom -mt-40 relative z-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-40 relative z-20">
           <div className="grid md:grid-cols-[300px,1fr] gap-8">
             {/* Poster */}
             <div>
