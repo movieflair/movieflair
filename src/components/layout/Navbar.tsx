@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
   return (
-    <nav className="bg-theme-accent-dark">
+    <nav className="bg-black">
       <div className="container-custom flex items-center justify-between py-4">
         <Link to="/" className="flex items-center text-xl font-semibold text-white">
           Movie<span className="text-theme-accent-red">Flair</span>
