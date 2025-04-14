@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/components/ui/use-toast';
-import { ArrowLeft, Play, FileText, ThumbsUp, ThumbsDown, Sparkles } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
+import { ArrowLeft, Play, FileText, Sparkles } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { getPopularMovies } from '@/lib/api';
 import type { MovieOrShow } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
+import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
 
 const QuickTipp = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
@@ -192,17 +193,7 @@ const QuickTipp = () => {
                     </Button>
                   </div>
                   
-                  <div className="flex items-center gap-4 mt-6">
-                    <p className="text-gray-600">War dieser Vorschlag hilfreich?</p>
-                    <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                      <ThumbsUp className="w-4 h-4" />
-                      Ja
-                    </Button>
-                    <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                      <ThumbsDown className="w-4 h-4" />
-                      Nein
-                    </Button>
-                  </div>
+                  <MovieRatingFeedback movieId={randomMovie.id} />
                 </div>
               </div>
             </div>
