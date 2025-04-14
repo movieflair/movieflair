@@ -14,32 +14,36 @@ import NotFound from "./pages/NotFound";
 import FreeMovies from "./pages/FreeMovies";
 import Trailers from "./pages/Trailers";
 import QuickTipp from "./pages/QuickTipp";
+import { useState } from "react";
 
-const queryClient = new QueryClient();
+const App = () => {
+  // Create a new QueryClient instance for each render cycle
+  const [queryClient] = useState(() => new QueryClient());
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AdminSettingsProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/movie/:id" element={<MovieDetails />} />
-            <Route path="/tv/:id" element={<TvShowDetails />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/free-movies" element={<FreeMovies />} />
-            <Route path="/trailers" element={<Trailers />} />
-            <Route path="/quick-tipp" element={<QuickTipp />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AdminSettingsProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AdminSettingsProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/movie/:id" element={<MovieDetails />} />
+              <Route path="/tv/:id" element={<TvShowDetails />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/free-movies" element={<FreeMovies />} />
+              <Route path="/trailers" element={<Trailers />} />
+              <Route path="/quick-tipp" element={<QuickTipp />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AdminSettingsProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
