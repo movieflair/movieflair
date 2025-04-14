@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Menu, Search, Film, User } from 'lucide-react';
+import { Menu, Search, Film, User, Video, PlayCircle } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
@@ -12,7 +12,7 @@ const Navbar = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2">
           <Film className="w-6 h-6 text-theme-accent-blue" />
-          <span className="font-semibold text-lg">ScreenPick</span>
+          <span className="font-semibold text-lg">MovieFlair</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -20,8 +20,13 @@ const Navbar = () => {
           <Link to="/" className="text-foreground/80 hover:text-foreground transition-colors">
             Home
           </Link>
-          <Link to="/discover" className="text-foreground/80 hover:text-foreground transition-colors">
-            Discover
+          <Link to="/free-movies" className="text-foreground/80 hover:text-foreground transition-colors flex items-center">
+            <Video className="w-4 h-4 mr-1" />
+            Kostenlos
+          </Link>
+          <Link to="/trailers" className="text-foreground/80 hover:text-foreground transition-colors flex items-center">
+            <PlayCircle className="w-4 h-4 mr-1" />
+            Neue Trailer
           </Link>
           <Link to="/about" className="text-foreground/80 hover:text-foreground transition-colors">
             About
@@ -59,11 +64,20 @@ const Navbar = () => {
               Home
             </Link>
             <Link 
-              to="/discover" 
-              className="block text-foreground/80 hover:text-foreground transition-colors"
+              to="/free-movies" 
+              className="block text-foreground/80 hover:text-foreground transition-colors flex items-center"
               onClick={() => setIsMenuOpen(false)}
             >
-              Discover
+              <Video className="w-4 h-4 mr-1" />
+              Kostenlos
+            </Link>
+            <Link 
+              to="/trailers" 
+              className="block text-foreground/80 hover:text-foreground transition-colors flex items-center"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <PlayCircle className="w-4 h-4 mr-1" />
+              Neue Trailer
             </Link>
             <Link 
               to="/about" 
@@ -71,6 +85,13 @@ const Navbar = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               About
+            </Link>
+            <Link 
+              to="/admin" 
+              className="block text-foreground/80 hover:text-foreground transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Admin
             </Link>
           </div>
         </div>
