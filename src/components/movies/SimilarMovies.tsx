@@ -20,6 +20,16 @@ interface SimilarMoviesProps {
 const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
   if (!movies.length) return null;
 
+  const handlePrevClick = () => {
+    const prevButton = document.querySelector('.embla__prev') as HTMLElement;
+    if (prevButton) prevButton.click();
+  };
+
+  const handleNextClick = () => {
+    const nextButton = document.querySelector('.embla__next') as HTMLElement;
+    if (nextButton) nextButton.click();
+  };
+
   return (
     <div className="container-custom mt-16">
       <div className="glass-card overflow-hidden rounded-xl p-8">
@@ -47,10 +57,10 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             className="w-full"
           >
             <div className="flex gap-2 mb-4">
-              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={() => document.querySelector('.embla__prev')?.click()}>
+              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handlePrevClick}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={() => document.querySelector('.embla__next')?.click()}>
+              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
