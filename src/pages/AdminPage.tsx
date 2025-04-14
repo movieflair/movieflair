@@ -4,6 +4,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import AdminLogin from '@/components/admin/AdminLogin';
 import AdminPanel from '@/components/admin/AdminPanel';
 import { trackPageVisit } from '@/lib/api';
+import { AdminSettingsProvider } from '@/hooks/useAdminSettings';
 
 const AdminPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -27,7 +28,9 @@ const AdminPage = () => {
     <MainLayout>
       <div className="py-12">
         {isLoggedIn ? (
-          <AdminPanel />
+          <AdminSettingsProvider>
+            <AdminPanel />
+          </AdminSettingsProvider>
         ) : (
           <div className="container-custom max-w-md">
             <AdminLogin onLogin={handleLogin} />
