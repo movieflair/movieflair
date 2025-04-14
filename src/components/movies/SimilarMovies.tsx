@@ -52,14 +52,14 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="outline" 
-                className="ml-4 w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Quick Tipp
-              </Button>
             </div>
+            <Button 
+              variant="outline" 
+              className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              Quick Tipp
+            </Button>
           </div>
 
           <Carousel
