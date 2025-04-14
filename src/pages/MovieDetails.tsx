@@ -7,6 +7,7 @@ import type { MovieDetail as MovieDetailType } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play } from 'lucide-react';
+import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 
 const MovieDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -162,37 +163,10 @@ const MovieDetails = () => {
                 </TabsList>
                 
                 <TabsContent value="details" className="mt-6">
-                  <div className="grid gap-y-8">
-                    <div>
-                      <h3 className="text-xl font-semibold mb-4 text-gray-800">Regie</h3>
-                      <p className="text-gray-600">Lee Unkrich</p>
-                    </div>
-                    
-                    <div>
-                      <h3 className="text-xl font-semibold mb-4 text-gray-800">Cast</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                        {movie.cast?.map((person) => (
-                          <div key={person.id} className="text-center">
-                            <div className="w-full aspect-[2/3] rounded-lg overflow-hidden mb-2 bg-gray-100">
-                              {person.profile_path ? (
-                                <img
-                                  src={`https://image.tmdb.org/t/p/w185${person.profile_path}`}
-                                  alt={person.name}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                                  <span className="text-gray-400">No Image</span>
-                                </div>
-                              )}
-                            </div>
-                            <h4 className="text-sm font-medium text-gray-800">{person.name}</h4>
-                            <p className="text-xs text-gray-500">{person.character}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                  <CastAndCrewSection 
+                    director={movie.cast?.find(person => person.job === 'Director')}
+                    cast={movie.cast?.filter(person => person.character)}
+                  />
                 </TabsContent>
               </Tabs>
             </div>
