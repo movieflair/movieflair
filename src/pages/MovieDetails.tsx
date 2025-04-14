@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
@@ -198,9 +197,7 @@ const MovieDetails = () => {
         </div>
       </div>
 
-      <div className="container-custom pb-16">
-        <SimilarMovies movies={similarMovies} />
-      </div>
+      <SimilarMovies movies={similarMovies} />
 
       {showTrailer && ((movie.videos?.results[0]?.key || (movie.streamUrl && isEmbedUrl))) && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">

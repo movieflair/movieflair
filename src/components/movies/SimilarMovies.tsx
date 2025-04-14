@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Film } from 'lucide-react';
 import MovieCard from './MovieCard';
 import {
   Carousel,
@@ -20,13 +20,14 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
   if (!movies.length) return null;
 
   return (
-    <div className="mt-16">
+    <div className="container-custom mt-16 glass-card p-8 rounded-xl">
       <div className="grid grid-cols-[400px,1fr] gap-8">
         <div className="space-y-4">
           <Link 
             to="/discover" 
-            className="text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
+            className="flex items-center gap-2 text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
           >
+            <Film className="w-6 h-6" />
             Ähnliche Filme
           </Link>
           <p className="text-gray-600">
