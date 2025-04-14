@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
-import { Zap, ChevronLeft, ChevronRight, Sparkles, X, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, X, FileText, Play } from 'lucide-react';
 import MovieCard from './MovieCard';
 import {
   Carousel,
@@ -20,6 +19,7 @@ interface SimilarMoviesProps {
 const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
   const [randomMovie, setRandomMovie] = useState<MovieOrShow | null>(null);
   const [showRandomMovie, setShowRandomMovie] = useState(false);
+  const [showTrailer, setShowTrailer] = useState(false);
 
   if (!movies.length) return null;
 
@@ -61,8 +61,15 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               to="/discover" 
               className="flex items-center gap-2 text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
             >
-              <Zap className="w-6 h-6" />
-              {showRandomMovie ? randomMovie?.title : "Ähnliche Filme"}
+              <Sparkles className="w-6 h-6" />
+              {showRandomMovie ? (
+                <div className="flex flex-col">
+                  <span>{randomMovie?.title}</span>
+                  {year && <span className="text-sm text-gray-500">{year}</span>}
+                </div>
+              ) : (
+                "Ähnliche Filme"
+              )}
             </Link>
             <p className="text-gray-600">
               {showRandomMovie 
@@ -90,17 +97,28 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               )}
             </div>
             {showRandomMovie && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="mt-2 w-full"
-                asChild
-              >
-                <Link to={`/movie/${randomMovie!.id}`} className="flex items-center justify-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  Details anzeigen
-                </Link>
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="w-auto"
+                  asChild
+                >
+                  <Link to={`/movie/${randomMovie!.id}`} className="flex items-center justify-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Details
+                  </Link>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="w-auto"
+                  onClick={() => setShowTrailer(true)}
+                >
+                  <Play className="w-4 h-4" />
+                  Trailer
+                </Button>
+              </div>
             )}
           </div>
 
@@ -147,10 +165,17 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                         backgroundSize: 'cover',
                         backgroundPosition: 'center right',
                         backgroundRepeat: 'no-repeat',
+                        height: '300px',
                       }}
                     />
                   )}
-                  <MovieCard movie={randomMovie!} size="small" />
+                  <div className="relative">
+                    <MovieCard 
+                      movie={randomMovie!} 
+                      size="small" 
+                      hideDetails={true}
+                    />
+                  </div>
                 </div>
               </div>
             )}

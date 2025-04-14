@@ -6,9 +6,10 @@ import { MovieOrShow } from '@/lib/api';
 interface MovieCardProps {
   movie: MovieOrShow;
   size?: 'small' | 'medium' | 'large';
+  hideDetails?: boolean;
 }
 
-const MovieCard = ({ movie, size = 'medium' }: MovieCardProps) => {
+const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardProps) => {
   const title = movie.title || movie.name || 'Unknown Title';
   const releaseDate = movie.release_date || movie.first_air_date;
   const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
@@ -49,12 +50,15 @@ const MovieCard = ({ movie, size = 'medium' }: MovieCardProps) => {
         </div>
       </div>
       
-      <div className="p-3">
-        <h3 className={`font-medium ${textSizes[size]} truncate`}>{title}</h3>
-        {year && <p className="text-sm text-muted-foreground mt-1">{year}</p>}
-      </div>
+      {!hideDetails && (
+        <div className="p-3">
+          <h3 className={`font-medium ${textSizes[size]} truncate`}>{title}</h3>
+          {year && <p className="text-sm text-muted-foreground mt-1">{year}</p>}
+        </div>
+      )}
     </Link>
   );
 };
 
 export default MovieCard;
+
