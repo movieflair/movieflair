@@ -42,7 +42,7 @@ const HomeFilterBox = () => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg max-w-[1000px] mx-auto">
+    <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg max-w-[800px] mx-auto">
       <h2 className="text-xl font-medium mb-4">Finde deinen nächsten Film</h2>
       
       <div className="space-y-4">
