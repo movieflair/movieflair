@@ -6,7 +6,7 @@ import { getMovieById } from '@/lib/api';
 import type { MovieDetail as MovieDetailType } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { Play } from 'lucide-react';
+import { Play, ShoppingCart } from 'lucide-react'; // Updated imports
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 
 const MovieDetails = () => {
@@ -120,7 +120,7 @@ const MovieDetails = () => {
                   {movie.overview}
                 </p>
 
-                <div className="flex gap-4 mb-8">
+                <div className="flex flex-wrap gap-3 mb-8">
                   {movie.videos?.results.length > 0 && (
                     <button
                       onClick={() => setShowTrailer(true)}
@@ -134,14 +134,10 @@ const MovieDetails = () => {
                     href={getAmazonUrl(movie.title || '')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    className="bg-[#FF9900] text-white rounded-full px-5 py-2.5 font-medium transition-all hover:bg-[#FF9900]/90 flex items-center"
                   >
-                    <img 
-                      src="/prime-video-icon.png" 
-                      alt="Prime Video" 
-                      className="w-5 h-5"
-                    />
-                    Bei Prime Video ansehen
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Bei Amazon Prime ansehen
                   </a>
                   {movie.hasStream && (
                     <button
