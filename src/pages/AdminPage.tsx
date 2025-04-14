@@ -5,6 +5,10 @@ import AdminLogin from '@/components/admin/AdminLogin';
 import AdminPanel from '@/components/admin/AdminPanel';
 import { trackPageVisit } from '@/lib/api';
 import { AdminSettingsProvider } from '@/hooks/useAdminSettings';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Create a new query client instance
+const queryClient = new QueryClient();
 
 const AdminPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -28,9 +32,11 @@ const AdminPage = () => {
     <MainLayout>
       <div className="py-12">
         {isLoggedIn ? (
-          <AdminSettingsProvider>
-            <AdminPanel />
-          </AdminSettingsProvider>
+          <QueryClientProvider client={queryClient}>
+            <AdminSettingsProvider>
+              <AdminPanel />
+            </AdminSettingsProvider>
+          </QueryClientProvider>
         ) : (
           <div className="container-custom max-w-md">
             <AdminLogin onLogin={handleLogin} />
