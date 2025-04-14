@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
@@ -7,6 +6,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { getPopularMovies } from '@/lib/api';
 import type { MovieOrShow } from '@/lib/api';
+import MovieMeta from '@/components/movies/MovieMeta';
 
 const QuickTipp = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
@@ -77,7 +77,22 @@ const QuickTipp = () => {
   return (
     <MainLayout>
       <div className="min-h-screen bg-white">
-        <div className="container-custom py-10">
+        <div className="relative h-[400px] overflow-hidden">
+          {randomMovie?.backdrop_path ? (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
+              <img
+                src={`https://image.tmdb.org/t/p/original${randomMovie.backdrop_path}`}
+                alt={randomMovie.title}
+                className="w-full h-full object-cover"
+              />
+            </>
+          ) : (
+            <div className="w-full h-full bg-gray-100" />
+          )}
+        </div>
+
+        <div className="container-custom -mt-40 relative z-20">
           <div className="flex items-center mb-8">
             <Button 
               variant="ghost" 
@@ -92,16 +107,16 @@ const QuickTipp = () => {
               Quick Tipp
             </h1>
           </div>
-          
-          <div className="glass-card rounded-xl p-8 mb-8">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-semibold mb-4">Finde deinen nächsten Lieblingsfilm</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Nicht sicher, was du als nächstes schauen sollst? Unser Quick Tipp Feature wählt zufällig einen Film aus unserer Sammlung beliebter Titel aus. Klicke einfach auf den Button unten und lass dich überraschen!
-              </p>
-            </div>
-            
-            {!randomMovie && !showAnimation && (
+
+          {!randomMovie && !showAnimation && (
+            <div className="glass-card rounded-xl p-8 mb-8">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-semibold mb-4">Finde deinen nächsten Lieblingsfilm</h2>
+                <p className="text-gray-600 max-w-2xl mx-auto">
+                  Nicht sicher, was du als nächstes schauen sollst? Unser Quick Tipp Feature wählt zufällig einen Film aus unserer Sammlung beliebter Titel aus. Klicke einfach auf den Button unten und lass dich überraschen!
+                </p>
+              </div>
+              
               <div className="flex justify-center my-10">
                 <Button 
                   className="bg-[#ea384c] hover:bg-[#ea384c]/90 text-white text-lg px-8 py-6 rounded-lg shadow-lg transform transition-transform hover:scale-105"
@@ -112,58 +127,54 @@ const QuickTipp = () => {
                   {loading ? "Filme werden geladen..." : "Zeige mir einen Quick Tipp!"}
                 </Button>
               </div>
-            )}
-            
-            {showAnimation && (
+            </div>
+          )}
+          
+          {showAnimation && (
+            <div className="glass-card rounded-xl p-8 mb-8">
               <div className="flex flex-col items-center justify-center my-16">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#ea384c] mb-4"></div>
                 <p className="text-gray-600">Suche einen Film für dich...</p>
               </div>
-            )}
-            
-            {randomMovie && !showAnimation && (
-              <div className="grid md:grid-cols-[300px,1fr] gap-8 mt-8">
-                <div className="relative">
-                  <div className="rounded-lg overflow-hidden shadow-xl">
-                    {randomMovie.poster_path ? (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w500${randomMovie.poster_path}`}
-                        alt={randomMovie.title}
-                        className="w-full"
-                      />
-                    ) : (
-                      <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400">Kein Poster</span>
-                      </div>
-                    )}
+            </div>
+          )}
+          
+          {randomMovie && !showAnimation && (
+            <div className="glass-card overflow-hidden rounded-xl">
+              <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
+                <div className="space-y-4">
+                  <div className="relative">
+                    <div className="rounded-lg overflow-hidden shadow-xl">
+                      {randomMovie.poster_path ? (
+                        <img
+                          src={`https://image.tmdb.org/t/p/w500${randomMovie.poster_path}`}
+                          alt={randomMovie.title}
+                          className="w-full"
+                        />
+                      ) : (
+                        <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
+                          <span className="text-gray-400">Kein Poster</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-                
+
                 <div className="text-gray-800">
                   <div className="flex items-center gap-2">
                     <h3 className="text-3xl font-semibold">{randomMovie.title}</h3>
                   </div>
                   
-                  {year && (
-                    <p className="text-lg text-gray-500 mt-2">
-                      {year}
-                    </p>
-                  )}
-                  
-                  <div className="flex items-center mt-2 mb-4">
-                    <div className="flex items-center bg-yellow-100 px-2 py-1 rounded-md">
-                      <svg className="w-4 h-4 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                      </svg>
-                      <span className="font-medium">{randomMovie.vote_average?.toFixed(1)}</span>
-                    </div>
-                  </div>
-                  
-                  <p className="text-gray-600 mb-8 leading-relaxed">
+                  <MovieMeta
+                    year={year?.toString()}
+                    rating={randomMovie.vote_average}
+                  />
+
+                  <p className="text-gray-600 mb-8 leading-relaxed mt-6">
                     {randomMovie.overview}
                   </p>
-                  
-                  <div className="flex flex-wrap gap-3 mb-6">
+
+                  <div className="flex flex-wrap gap-3 mb-8">
                     <Button 
                       className="bg-[#8E9196] hover:bg-[#8E9196]/90 text-white flex items-center gap-2"
                       onClick={handleViewDetails}
@@ -194,9 +205,9 @@ const QuickTipp = () => {
                   </div>
                 </div>
               </div>
-            )}
-          </div>
-          
+            </div>
+          )}
+
           <div className="glass-card rounded-xl p-8">
             <h2 className="text-xl font-semibold mb-4">Warum Quick Tipp?</h2>
             <div className="grid md:grid-cols-3 gap-6">
