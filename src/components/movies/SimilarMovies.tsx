@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -45,13 +44,22 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             <p className="text-gray-600">
               Entdecke weitere Filme, die dir gefallen könnten. Basierend auf deinem aktuellen Film haben wir eine Auswahl an ähnlichen Titeln zusammengestellt.
             </p>
-            <div className="flex gap-2 mb-2">
+            <div className="flex gap-2 mb-2 relative">
               <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handlePrevClick}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
+              <div className="absolute left-0 bottom-[-30px]">
+                <Button 
+                  variant="outline" 
+                  className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Quick Tipp
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -78,16 +86,6 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 <CarouselNext className="embla__next" />
               </div>
             </Carousel>
-
-            <div className="absolute bottom-[-20px] left-[-20px]">
-              <Button 
-                variant="outline" 
-                className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Quick Tipp
-              </Button>
-            </div>
           </div>
         </div>
       </div>
