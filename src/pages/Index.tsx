@@ -2,11 +2,12 @@
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
 import FeaturedMovies from '@/components/movies/FeaturedMovies';
+import SearchBox from '@/components/search/SearchBox';
 
 const Index = () => {
   return (
     <MainLayout>
-      {/* Hero Section - Using a lighter, friendlier background */}
+      {/* Hero Section */}
       <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50/50 to-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-12">
@@ -16,6 +17,9 @@ const Index = () => {
             <p className="text-lg md:text-xl text-gray-600 mb-12">
               Entdecke den perfekten Film für jeden Moment. Lass dich von deiner Stimmung leiten.
             </p>
+            <div className="max-w-2xl mx-auto">
+              <SearchBox variant="page" />
+            </div>
           </div>
           <HomeFilterBox />
         </div>

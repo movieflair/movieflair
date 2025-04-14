@@ -8,6 +8,7 @@ import FreeMovies from './pages/FreeMovies';
 import AdminPage from './pages/AdminPage';
 import Search from './pages/Search';
 import Genres from './pages/Genres';
+import QuickTipp from './pages/QuickTipp';
 import { AdminSettingsProvider } from './hooks/useAdminSettings';
 
 const App = () => {
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/search" element={<Search />} />
         <Route path="/genres" element={<Genres />} />
+        <Route path="/quick-tipp" element={<QuickTipp />} />
       </Routes>
     </Router>
   );
