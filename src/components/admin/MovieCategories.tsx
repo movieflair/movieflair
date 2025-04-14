@@ -22,11 +22,11 @@ const MovieCategories = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex items-center space-x-2">
           <Checkbox 
-            id="isTrailer" 
+            id="isNewTrailer" 
             checked={isNewTrailer}
             onCheckedChange={(checked) => onTrailerChange(checked as boolean)}
           />
-          <Label htmlFor="isTrailer" className="flex items-center gap-1">
+          <Label htmlFor="isNewTrailer" className="flex items-center gap-1">
             <Video className="w-4 h-4" /> 
             Trailer
           </Label>
@@ -34,11 +34,11 @@ const MovieCategories = ({
         
         <div className="flex items-center space-x-2">
           <Checkbox 
-            id="isStream" 
+            id="isFreeMovie" 
             checked={isFreeMovie}
             onCheckedChange={(checked) => onFreeMovieChange(checked as boolean)}
           />
-          <Label htmlFor="isStream" className="flex items-center gap-1">
+          <Label htmlFor="isFreeMovie" className="flex items-center gap-1">
             <PlayCircle className="w-4 h-4" /> 
             Stream
           </Label>

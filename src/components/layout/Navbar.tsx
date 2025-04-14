@@ -7,7 +7,7 @@ import SearchBox from '../search/SearchBox';
 
 const Navbar = () => {
   const location = useLocation();
-  const hideSearch = ['/trailers', '/search'].includes(location.pathname);
+  const hideSearch = ['/trailers', '/search', '/free-movies'].includes(location.pathname);
 
   return (
     <nav className="bg-black">

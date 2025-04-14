@@ -165,7 +165,9 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     };
   });
   
-  return movies.filter(movie => movie.isNewTrailer === true);
+  const trailerMovies = movies.filter(movie => movie.isNewTrailer === true);
+  console.log('Trailer movies filtered:', trailerMovies);
+  return trailerMovies;
 };
 
 export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
@@ -186,7 +188,7 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
     };
   });
   
-  return movies.filter(movie => savedSettings[movie.id]?.isFreeMovie === true);
+  return movies.filter(movie => movie.isFreeMovie === true);
 };
 
 const getAdminMovieSettings = async () => {

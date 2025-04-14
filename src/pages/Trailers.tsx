@@ -17,6 +17,7 @@ const Trailers = () => {
       try {
         setIsLoading(true);
         const data = await getTrailerMovies();
+        console.log('Fetched trailer movies:', data);
         setMovies(data);
       } catch (error) {
         console.error('Error fetching trailers:', error);
