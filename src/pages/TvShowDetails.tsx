@@ -184,7 +184,7 @@ const TvShowDetails = () => {
                   href={getAmazonUrl(tvShow.name || '')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#00A8E1] text-white px-6 py-2 rounded-md hover:bg-[#00A8E1]/90 transition-colors flex items-center gap-2"
+                  className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
                 >
                   <img 
                     src="/lovable-uploads/21997cbe-dbef-4485-93e8-b61a66eb7375.png"
