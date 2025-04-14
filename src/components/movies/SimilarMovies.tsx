@@ -90,9 +90,9 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                   variant="ghost" 
                   size="icon" 
                   onClick={handleClose}
-                  className="absolute right-0 top-0"
+                  className="absolute right-4 top-[-60px] h-8 w-8"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-6 w-6 text-[#ea384c]" />
                 </Button>
               )}
             </div>
@@ -125,6 +125,15 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             ) : (
               <div className="w-[450px]">
                 <MovieCard movie={randomMovie!} size="small" />
+                <div className="flex gap-2 mt-4">
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    asChild
+                  >
+                    <Link to={`/movie/${randomMovie!.id}`}>Details anzeigen</Link>
+                  </Button>
+                </div>
               </div>
             )}
           </div>
