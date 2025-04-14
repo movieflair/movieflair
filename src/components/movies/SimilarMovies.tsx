@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -54,7 +53,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               </Button>
             </div>
             
-            <div className="mt-16">
+            <div className="mt-32">
               <Button 
                 variant="outline" 
                 className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
@@ -82,7 +81,6 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               ))}
             </CarouselContent>
             
-            {/* Hidden carousel controls that will be triggered by our custom buttons */}
             <div className="hidden">
               <CarouselPrevious className="embla__prev" />
               <CarouselNext className="embla__next" />
