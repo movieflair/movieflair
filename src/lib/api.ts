@@ -1,3 +1,4 @@
+import { supabase } from '@/integrations/supabase/client';
 
 export interface Genre {
   id: number;
@@ -48,7 +49,7 @@ export interface FilterOptions {
   moods?: string[];
 }
 
-export const moodToGenres: Record<string, number[]> = {
+const moodToGenres: Record<string, number[]> = {
   happy: [35, 10751, 12], // Comedy, Family, Adventure
   sad: [18, 10749], // Drama, Romance
   thrilling: [28, 53, 27], // Action, Thriller, Horror
@@ -62,155 +63,100 @@ export const moodToGenres: Record<string, number[]> = {
   lighthearted: [35, 10751, 16], // Comedy, Family, Animation
 };
 
-const genres: Genre[] = [
-  { id: 28, name: "Action" },
-  { id: 12, name: "Adventure" },
-  { id: 16, name: "Animation" },
-  { id: 35, name: "Comedy" },
-  { id: 80, name: "Crime" },
-  { id: 99, name: "Documentary" },
-  { id: 18, name: "Drama" },
-  { id: 10751, name: "Family" },
-  { id: 14, name: "Fantasy" },
-  { id: 36, name: "History" },
-  { id: 27, name: "Horror" },
-  { id: 10402, name: "Music" },
-  { id: 9648, name: "Mystery" },
-  { id: 10749, name: "Romance" },
-  { id: 878, name: "Science Fiction" },
-  { id: 53, name: "Thriller" }
-];
+async function callTMDB(path: string, searchParams = {}) {
+  const { data, error } = await supabase.functions.invoke('tmdb', {
+    body: { path, searchParams },
+  });
 
-interface CastMember {
-  id: number;
-  name: string;
-  character?: string;
-  job?: string;
-  profile_path?: string;
+  if (error) throw error;
+  return data;
 }
 
-const sampleMovies: MovieDetail[] = [
-  {
-    id: 550,
-    title: 'Fight Club',
-    poster_path: '/8kSerJrwkeaRfMt8DwMk1yemQAu.jpg',
-    overview: 'An insomniac office worker and a devil-may-care soapmaker form an underground fight club that evolves into something much, much more.',
-    vote_average: 8.4,
-    release_date: '1999-10-15',
-    genre_ids: [18],
-    media_type: 'movie',
-    hasStream: true,
-    streamUrl: 'https://www.youtube.com/embed/BdJKm16Co6M',
-    videos: {
-      results: [
-        {
-          key: 'BdJKm16Co6M',
-          name: 'Fight Club Trailer',
-          type: 'Trailer',
-          site: 'YouTube'
-        }
-      ]
-    }
-  },
-  {
-    id: 157336,
-    title: 'Interstellar',
-    poster_path: '/gEU2QniE6E77NUeztxU4eNNSGaV.jpg',
-    overview: 'The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar expedition.',
-    vote_average: 8.4,
-    release_date: '2014-11-05',
-    genre_ids: [878, 12],
-    media_type: 'movie',
-    hasTrailer: true,
-    videos: {
-      results: [
-        {
-          key: 'zSWdZVtXT7E',
-          name: 'Interstellar Trailer',
-          type: 'Trailer',
-          site: 'YouTube'
-        }
-      ]
-    }
-  },
-  {
-    id: 238,
-    title: 'The Godfather',
-    poster_path: '/3bhkrj58Vtu7enYsRolq1fllbFh.jpg',
-    overview: 'Spanning the years 1945 to 1955, a chronicle of the fictional Italian-American Corleone crime family.',
-    vote_average: 8.7,
-    release_date: '1972-03-14',
-    genre_ids: [18, 28],
-    media_type: 'movie',
-    videos: {
-      results: [
-        {
-          key: 'sY1S34973zA',
-          name: 'The Godfather Trailer',
-          type: 'Trailer',
-          site: 'YouTube'
-        }
-      ]
-    }
-  },
-  {
-    id: 680,
-    title: 'Pulp Fiction',
-    poster_path: '/fITmhPr4tAB09eP3rr4Uqh3Qc79.jpg',
-    overview: 'A burger-loving hit man, his philosophical partner, a song-and-dance man and a washed-up boxer converge in this sprawling, comedic crime caper.',
-    vote_average: 8.5,
-    release_date: '1994-09-10',
-    genre_ids: [35, 18, 28],
-    media_type: 'movie',
-    hasStream: true,
-    streamUrl: 'https://www.youtube.com/embed/5ZAhzsi1ybM',
-    videos: {
-      results: [
-        {
-          key: 's7EdQ4FqbhY',
-          name: 'Pulp Fiction Trailer',
-          type: 'Trailer',
-          site: 'YouTube'
-        }
-      ]
-    }
-  }
-];
-
 export const getGenres = async (): Promise<Genre[]> => {
-  return genres;
+  const data = await callTMDB('/genre/movie/list');
+  return data.genres;
 };
 
 export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
-  return sampleMovies;
+  const data = await callTMDB('/movie/popular');
+  return data.results.map((movie: any) => ({
+    ...movie,
+    media_type: 'movie',
+  }));
 };
 
 export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
-  return sampleMovies.filter(movie => movie.hasTrailer || (movie.videos?.results.length ?? 0) > 0);
+  const data = await callTMDB('/movie/now_playing');
+  return data.results.map((movie: any) => ({
+    ...movie,
+    media_type: 'movie',
+    hasTrailer: true,
+  }));
 };
 
 export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
-  return sampleMovies.filter(movie => movie.hasStream);
+  const data = await callTMDB('/movie/popular');
+  return data.results
+    .map((movie: any) => ({
+      ...movie,
+      media_type: 'movie',
+      hasStream: Math.random() > 0.5,
+    }))
+    .filter((movie: MovieOrShow) => movie.hasStream);
 };
 
 export const getMovieById = async (id: number): Promise<MovieDetail> => {
-  const movie = sampleMovies.find(m => m.id === id);
-  if (!movie) throw new Error('Movie not found');
-  
+  const [movieData, videos, credits] = await Promise.all([
+    callTMDB(`/movie/${id}`, { append_to_response: 'videos' }),
+    callTMDB(`/movie/${id}/videos`),
+    callTMDB(`/movie/${id}/credits`),
+  ]);
+
   return {
-    ...movie,
-    runtime: 120,
-    genres: movie.genre_ids.map(id => genres.find(g => g.id === id)).filter(Boolean) as Genre[],
-    tagline: "Ein beispielhafter Tagline",
-    homepage: "https://example.com"
+    ...movieData,
+    media_type: 'movie',
+    videos: { results: videos.results },
+    cast: credits.cast?.slice(0, 10),
+    hasTrailer: videos.results?.some((v: any) => v.type === 'Trailer'),
   };
 };
 
 export const getTvShowById = async (id: number): Promise<MovieDetail> => {
-  throw new Error('TV Show not found');
+  const [showData, videos, credits] = await Promise.all([
+    callTMDB(`/tv/${id}`),
+    callTMDB(`/tv/${id}/videos`),
+    callTMDB(`/tv/${id}/credits`),
+  ]);
+
+  return {
+    ...showData,
+    media_type: 'tv',
+    videos: { results: videos.results },
+    cast: credits.cast?.slice(0, 10),
+    hasTrailer: videos.results?.some((v: any) => v.type === 'Trailer'),
+  };
 };
 
 export const getRecommendationByFilters = async (filters: FilterOptions): Promise<MovieOrShow[]> => {
-  const movies = await getPopularMovies();
-  return [movies[Math.floor(Math.random() * movies.length)]];
+  const { genres, decades } = filters;
+  
+  let params: Record<string, string> = {
+    sort_by: 'popularity.desc',
+  };
+  
+  if (genres && genres.length > 0) {
+    params.with_genres = genres.join(',');
+  }
+  
+  if (decades && decades.length > 0) {
+    const decade = parseInt(decades[0]);
+    params.primary_release_date_gte = `${decade}-01-01`;
+    params.primary_release_date_lte = `${decade + 9}-12-31`;
+  }
+  
+  const data = await callTMDB('/discover/movie', params);
+  return data.results.map((movie: any) => ({
+    ...movie,
+    media_type: 'movie',
+  }));
 };
