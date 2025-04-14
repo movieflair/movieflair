@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
@@ -21,6 +22,20 @@ const TvShowDetails = () => {
       try {
         setIsLoading(true);
         const data = await getTvShowById(parseInt(id));
+        
+        // Check if we have saved any custom data for this show in localStorage
+        const savedShows = localStorage.getItem('adminShows');
+        if (savedShows) {
+          const parsedShows = JSON.parse(savedShows);
+          const savedShow = parsedShows.find((s: any) => s.id === data.id);
+          if (savedShow) {
+            // Override API data with saved data
+            data.hasStream = savedShow.hasStream;
+            data.streamUrl = savedShow.streamUrl;
+            data.hasTrailer = savedShow.hasTrailer;
+          }
+        }
+        
         setTvShow(data);
       } catch (error) {
         console.error('Error fetching TV show details:', error);
@@ -48,6 +63,26 @@ const TvShowDetails = () => {
     const formattedTitle = encodeURIComponent(title);
     const tag = amazonAffiliateId || 'movieflair-21'; // Default tag if not set
     return `https://www.amazon.de/s?k=${formattedTitle}&tag=${tag}`;
+  };
+
+  // Check if the stream URL is an embed URL or a direct link
+  const isEmbedUrl = tvShow?.streamUrl && (
+    tvShow.streamUrl.includes('embed') || 
+    tvShow.streamUrl.includes('iframe') ||
+    tvShow.streamUrl.includes('player')
+  );
+
+  // Handle stream button click based on URL type
+  const handleStreamClick = () => {
+    if (!tvShow?.streamUrl) return;
+    
+    if (isEmbedUrl) {
+      // Show embedded player in modal
+      setShowTrailer(true);
+    } else {
+      // Open direct link in new tab
+      window.open(tvShow.streamUrl, '_blank');
+    }
   };
 
   if (isLoading) {
@@ -193,9 +228,19 @@ const TvShowDetails = () => {
                   />
                   Bei Amazon Prime ansehen
                 </a>
+                
+                {tvShow.streamUrl && (
+                  <button
+                    onClick={handleStreamClick}
+                    className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
+                  >
+                    <PlayCircle className="w-4 h-4 mr-2" />
+                    Stream ansehen
+                  </button>
+                )}
               </div>
               
-              {tvShow.streamUrl && (
+              {tvShow.streamUrl && isEmbedUrl && (
                 <div className="mt-8">
                   <h2 className="text-xl font-medium mb-4">Stream ansehen</h2>
                   <div className="aspect-video w-full max-w-3xl bg-black rounded-lg overflow-hidden">
@@ -214,7 +259,7 @@ const TvShowDetails = () => {
         </div>
       </div>
       
-      {showTrailer && trailerKey && (
+      {showTrailer && (trailerKey || (tvShow.streamUrl && isEmbedUrl)) && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-4xl">
             <button
@@ -225,7 +270,7 @@ const TvShowDetails = () => {
             </button>
             <div className="aspect-video">
               <iframe
-                src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
+                src={isEmbedUrl ? tvShow.streamUrl : `https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
                 title="Trailer"
                 className="w-full h-full"
                 allowFullScreen

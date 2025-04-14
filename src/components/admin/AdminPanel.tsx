@@ -1,14 +1,16 @@
 
 import { useState, useEffect } from 'react';
-import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart } from 'lucide-react';
+import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart, ExternalLink, Link as LinkIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { useQuery } from '@tanstack/react-query';
 import { getPopularMovies, MovieOrShow } from '@/lib/api';
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('movies');
@@ -22,9 +24,11 @@ const AdminPanel = () => {
   const [hasStream, setHasStream] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<MovieOrShow | null>(null);
   const [filteredMovies, setFilteredMovies] = useState<MovieOrShow[]>([]);
+  const [streamType, setStreamType] = useState<'embed' | 'link'>('embed');
+  const [hasTrailer, setHasTrailer] = useState(false);
 
   // Fetch movies for admin panel
-  const { data: movies = [] } = useQuery({
+  const { data: movies = [], refetch } = useQuery({
     queryKey: ['admin-movies'],
     queryFn: getPopularMovies
   });
@@ -58,6 +62,38 @@ const AdminPanel = () => {
     setSelectedMovie(movie);
     setHasStream(!!movie.hasStream);
     setStreamUrl(movie.streamUrl || '');
+    setStreamType(movie.streamUrl?.includes('embed') ? 'embed' : 'link');
+    setHasTrailer(!!movie.hasTrailer);
+  };
+
+  const handleSaveMovie = () => {
+    if (!selectedMovie) return;
+
+    // Create a copy of the movies array
+    const updatedMovies = movies.map(movie => {
+      if (movie.id === selectedMovie.id) {
+        // Update the movie with the edited values
+        return {
+          ...movie,
+          hasStream: hasStream,
+          streamUrl: hasStream ? streamUrl : undefined,
+          hasTrailer: hasTrailer
+        };
+      }
+      return movie;
+    });
+
+    // Save to localStorage to persist changes
+    localStorage.setItem('adminMovies', JSON.stringify(updatedMovies));
+    
+    // Refresh the movie list
+    refetch();
+    
+    // Show success message
+    toast.success("Änderungen gespeichert");
+    
+    // Go back to movie list
+    setSelectedMovie(null);
   };
 
   return (
@@ -186,11 +222,18 @@ const AdminPanel = () => {
                               <p className="text-sm text-muted-foreground">
                                 {movie.release_date?.substring(0, 4) || 'Unbekanntes Jahr'}
                               </p>
-                              {movie.hasStream && (
-                                <span className="inline-block mt-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                                  Stream verfügbar
-                                </span>
-                              )}
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {movie.hasStream && (
+                                  <span className="inline-block text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                                    Stream verfügbar
+                                  </span>
+                                )}
+                                {movie.hasTrailer && (
+                                  <span className="inline-block text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                    Als Trailer markiert
+                                  </span>
+                                )}
+                              </div>
                             </div>
                             <Button variant="ghost" size="icon" className="text-muted-foreground">
                               <FileEdit className="w-4 h-4" />
@@ -269,31 +312,66 @@ const AdminPanel = () => {
                       <div className="flex items-center space-x-2">
                         <Checkbox 
                           id="hasTrailer" 
-                          checked={selectedMovie.hasTrailer || false}
+                          checked={hasTrailer}
+                          onCheckedChange={(checked) => setHasTrailer(checked as boolean)}
                         />
                         <Label htmlFor="hasTrailer">Als Trailer anzeigen</Label>
                       </div>
                     </div>
                     
                     {hasStream && (
-                      <div className="md:col-span-2">
-                        <Label htmlFor="streamUrl">Stream URL (Embed)</Label>
-                        <Input 
-                          id="streamUrl" 
-                          placeholder="https://www.youtube.com/embed/..." 
-                          className="mt-1"
-                          value={streamUrl}
-                          onChange={(e) => setStreamUrl(e.target.value)}
-                        />
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Füge hier die Embed-URL für den Stream ein. Für YouTube-Videos nutze das Format: https://www.youtube.com/embed/VIDEO_ID
-                        </p>
+                      <div className="md:col-span-2 space-y-4">
+                        <div>
+                          <Label className="mb-2 block">Stream URL Typ</Label>
+                          <RadioGroup 
+                            value={streamType} 
+                            onValueChange={(value) => setStreamType(value as 'embed' | 'link')}
+                            className="flex gap-4"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="embed" id="embed" />
+                              <Label htmlFor="embed" className="flex items-center gap-1">
+                                <PlayCircle className="w-4 h-4" /> 
+                                Embed Code (Video Player)
+                              </Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <RadioGroupItem value="link" id="link" />
+                              <Label htmlFor="link" className="flex items-center gap-1">
+                                <LinkIcon className="w-4 h-4" /> 
+                                Direkt-Link (Weiterleitung)
+                              </Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="streamUrl">
+                            {streamType === 'embed' ? 'Stream URL (Embed Code)' : 'Stream URL (Direktlink)'}
+                          </Label>
+                          <Input 
+                            id="streamUrl" 
+                            placeholder={streamType === 'embed' 
+                              ? "https://www.youtube.com/embed/..." 
+                              : "https://www.example.com/watch?..."
+                            }
+                            className="mt-1"
+                            value={streamUrl}
+                            onChange={(e) => setStreamUrl(e.target.value)}
+                          />
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {streamType === 'embed' 
+                              ? "Füge hier die Embed-URL für den Stream ein. Für YouTube-Videos nutze das Format: https://www.youtube.com/embed/VIDEO_ID" 
+                              : "Füge hier einen direkten Link ein, zu dem Benutzer weitergeleitet werden sollen."
+                            }
+                          </p>
+                        </div>
                       </div>
                     )}
                   </div>
                   
                   <div className="flex justify-end mt-6">
-                    <Button>Speichern</Button>
+                    <Button onClick={handleSaveMovie}>Speichern</Button>
                   </div>
                 </div>
               )}

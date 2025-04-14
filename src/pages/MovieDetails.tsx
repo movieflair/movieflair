@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
@@ -23,6 +24,20 @@ const MovieDetails = () => {
       try {
         setIsLoading(true);
         const data = await getMovieById(parseInt(id));
+        
+        // Check if we have saved any custom data for this movie in localStorage
+        const savedMovies = localStorage.getItem('adminMovies');
+        if (savedMovies) {
+          const parsedMovies = JSON.parse(savedMovies);
+          const savedMovie = parsedMovies.find((m: any) => m.id === data.id);
+          if (savedMovie) {
+            // Override API data with saved data
+            data.hasStream = savedMovie.hasStream;
+            data.streamUrl = savedMovie.streamUrl;
+            data.hasTrailer = savedMovie.hasTrailer;
+          }
+        }
+        
         setMovie(data);
       } catch (error) {
         console.error('Error fetching movie details:', error);
@@ -51,6 +66,26 @@ const MovieDetails = () => {
     const formattedTitle = encodeURIComponent(title);
     const tag = amazonAffiliateId || 'movieflair-21';
     return `https://www.amazon.de/gp/video/search?phrase=${formattedTitle}&tag=${tag}`;
+  };
+
+  // Check if the stream URL is an embed URL or a direct link
+  const isEmbedUrl = movie.streamUrl && (
+    movie.streamUrl.includes('embed') || 
+    movie.streamUrl.includes('iframe') ||
+    movie.streamUrl.includes('player')
+  );
+
+  // Handle stream button click based on URL type
+  const handleStreamClick = () => {
+    if (!movie.streamUrl) return;
+    
+    if (isEmbedUrl) {
+      // Show embedded player in modal
+      setShowTrailer(true);
+    } else {
+      // Open direct link in new tab
+      window.open(movie.streamUrl, '_blank');
+    }
   };
 
   return (
@@ -146,7 +181,7 @@ const MovieDetails = () => {
                   {movie.streamUrl && (
                     <button
                       className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
-                      onClick={() => setShowTrailer(true)}
+                      onClick={handleStreamClick}
                     >
                       <Play className="w-4 h-4" />
                       Stream ansehen
@@ -166,7 +201,7 @@ const MovieDetails = () => {
         </div>
       </div>
 
-      {showTrailer && (movie.videos?.results[0]?.key || movie.streamUrl) && (
+      {showTrailer && ((movie.videos?.results[0]?.key || (movie.streamUrl && isEmbedUrl))) && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-4xl">
             <button
@@ -177,7 +212,7 @@ const MovieDetails = () => {
             </button>
             <div className="aspect-video">
               <iframe
-                src={movie.streamUrl || `https://www.youtube.com/embed/${movie.videos.results[0].key}`}
+                src={isEmbedUrl ? movie.streamUrl : `https://www.youtube.com/embed/${movie.videos?.results[0]?.key}`}
                 title={`${movie.title} Stream`}
                 className="w-full h-full"
                 allowFullScreen
