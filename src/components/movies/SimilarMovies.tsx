@@ -69,7 +69,10 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               <Zap className="w-6 h-6" />
               {showRandomMovie ? (
                 <div className="flex flex-col">
-                  <span>{randomMovie?.title}</span>
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-5 h-5" />
+                    <span>{randomMovie?.title}</span>
+                  </div>
                   {year && <span className="text-sm text-gray-500">{year}</span>}
                 </div>
               ) : (
