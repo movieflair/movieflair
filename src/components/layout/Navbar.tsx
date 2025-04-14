@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Search, User, Video, PlayCircle, Menu as MenuIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -14,7 +13,7 @@ const Navbar = () => {
           <img 
             src="/lovable-uploads/9a009d9a-af92-4fd1-9d0a-89e1e81258ee.png" 
             alt="MovieFlair" 
-            className="h-12"
+            className="h-10"
           />
         </Link>
 
