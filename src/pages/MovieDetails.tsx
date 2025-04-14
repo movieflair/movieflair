@@ -121,7 +121,7 @@ const MovieDetails = () => {
                     href={getAmazonUrl(movie.title || '')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[90%] bg-[#1EAEDB] text-white px-4 py-2.5 rounded-lg hover:bg-[#33C3F0] transition-colors flex items-center justify-center gap-2 shadow-lg"
+                    className="block w-full bg-[#1EAEDB] text-white px-4 py-2.5 rounded-b-lg hover:bg-[#33C3F0] transition-colors flex items-center justify-center gap-2 shadow-lg -mt-2"
                   >
                     <img 
                       src="/lovable-uploads/21997cbe-dbef-4485-93e8-b61a66eb7375.png"
@@ -173,19 +173,6 @@ const MovieDetails = () => {
                       Trailer
                     </button>
                   )}
-                  <a
-                    href={getAmazonUrl(movie.title || '')}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
-                  >
-                    <img 
-                      src="/lovable-uploads/21997cbe-dbef-4485-93e8-b61a66eb7375.png"
-                      alt="Play"
-                      className="w-4 h-4"
-                    />
-                    Bei Prime Video ansehen
-                  </a>
                   {movie.streamUrl && (
                     <button
                       className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
