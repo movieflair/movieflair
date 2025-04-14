@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
-import { Film, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Zap, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import MovieCard from './MovieCard';
 import {
   Carousel,
@@ -39,13 +39,13 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               to="/discover" 
               className="flex items-center gap-2 text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
             >
-              <Film className="w-6 h-6" />
+              <Zap className="w-6 h-6" />
               Ähnliche Filme
             </Link>
             <p className="text-gray-600">
               Entdecke weitere Filme, die dir gefallen könnten. Basierend auf deinem aktuellen Film haben wir eine Auswahl an ähnlichen Titeln zusammengestellt.
             </p>
-            <div className="flex flex-col gap-4">
+            <div className="space-y-4">
               <div className="flex gap-2">
                 <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handlePrevClick}>
                   <ChevronLeft className="h-4 w-4" />
@@ -54,35 +54,42 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
-              <Button variant="outline" className="w-fit">
-                Neuer Tipp
-              </Button>
             </div>
           </div>
 
-          <Carousel
-            opts={{
-              align: "start",
-              loop: true,
-              dragFree: true,
-              skipSnaps: true,
-            }}
-            className="w-[450px]"
-          >
-            <CarouselContent className="-ml-4">
-              {movies.map((movie) => (
-                <CarouselItem key={movie.id} className="pl-4 basis-1/2">
-                  <MovieCard movie={movie} size="small" />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            
-            {/* Hidden carousel controls that will be triggered by our custom buttons */}
-            <div className="hidden">
-              <CarouselPrevious className="embla__prev" />
-              <CarouselNext className="embla__next" />
-            </div>
-          </Carousel>
+          <div className="flex flex-col justify-between">
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+                dragFree: true,
+                skipSnaps: true,
+              }}
+              className="w-[450px]"
+            >
+              <CarouselContent className="-ml-4">
+                {movies.map((movie) => (
+                  <CarouselItem key={movie.id} className="pl-4 basis-1/2">
+                    <MovieCard movie={movie} size="small" />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              
+              {/* Hidden carousel controls that will be triggered by our custom buttons */}
+              <div className="hidden">
+                <CarouselPrevious className="embla__prev" />
+                <CarouselNext className="embla__next" />
+              </div>
+            </Carousel>
+
+            <Button 
+              variant="outline" 
+              className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
+            >
+              <Sparkles className="w-4 h-4" />
+              Neuer Tipp
+            </Button>
+          </div>
         </div>
       </div>
     </div>
