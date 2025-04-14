@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -44,9 +43,9 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               }}
               className="w-full"
             >
-              <CarouselContent className="-ml-4">
+              <CarouselContent className="-ml-6">
                 {movies.map((movie) => (
-                  <CarouselItem key={movie.id} className="pl-4 basis-1/2 md:basis-1/3 lg:basis-1/4">
+                  <CarouselItem key={movie.id} className="pl-6 basis-1/3 md:basis-1/3 lg:basis-1/4">
                     <MovieCard movie={movie} size="small" />
                   </CarouselItem>
                 ))}
@@ -62,4 +61,3 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
 };
 
 export default SimilarMovies;
-

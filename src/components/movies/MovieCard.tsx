@@ -14,7 +14,7 @@ const MovieCard = ({ movie, size = 'medium' }: MovieCardProps) => {
   const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
   
   const imageSizes = {
-    small: 'h-[225px] w-[150px]',
+    small: 'h-[300px] w-[200px]',
     medium: 'h-[300px] w-[200px]',
     large: 'h-[450px] w-[300px]'
   };
@@ -28,17 +28,17 @@ const MovieCard = ({ movie, size = 'medium' }: MovieCardProps) => {
   return (
     <Link 
       to={`/${movie.media_type}/${movie.id}`} 
-      className="group block overflow-hidden card-hover rounded-lg"
+      className="group block overflow-hidden rounded-xl"
     >
-      <div className={`relative ${imageSizes[size]} bg-muted overflow-hidden`}>
+      <div className={`relative ${imageSizes[size]} bg-muted overflow-hidden rounded-xl`}>
         {movie.poster_path ? (
           <img
             src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
             alt={title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-muted">
+          <div className="w-full h-full flex items-center justify-center bg-muted rounded-xl">
             <span className="text-muted-foreground">No Image</span>
           </div>
         )}
