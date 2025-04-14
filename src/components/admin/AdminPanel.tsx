@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { Search, FileEdit, Film } from 'lucide-react';
+
+import { useState, useEffect } from 'react';
+import { Search, FileEdit, Film, Pencil, Tv } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 

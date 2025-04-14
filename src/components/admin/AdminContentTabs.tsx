@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { List, Play, PlayCircle, Gift, Tag, Video, Tv } from 'lucide-react';
+import { List, Play, PlayCircle, Gift, Tag, Video, Tv, Film } from 'lucide-react';
 
 interface AdminContentTabsProps {
   activeTab: string;
