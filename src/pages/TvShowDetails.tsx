@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { Star, Calendar, ArrowLeft, ExternalLink, PlayCircle } from 'lucide-react';
+import { Star, Calendar, ArrowLeft, ExternalLink, PlayCircle, Play } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getTvShowById, MovieDetail } from '@/lib/api';
 
@@ -23,13 +22,11 @@ const TvShowDetails = () => {
         setIsLoading(true);
         const data = await getTvShowById(parseInt(id));
         
-        // Check if we have saved any custom data for this show in localStorage
         const savedShows = localStorage.getItem('adminShows');
         if (savedShows) {
           const parsedShows = JSON.parse(savedShows);
           const savedShow = parsedShows.find((s: any) => s.id === data.id);
           if (savedShow) {
-            // Override API data with saved data
             data.hasStream = savedShow.hasStream;
             data.streamUrl = savedShow.streamUrl;
             data.hasTrailer = savedShow.hasTrailer;
@@ -65,22 +62,18 @@ const TvShowDetails = () => {
     return `https://www.amazon.de/s?k=${formattedTitle}&tag=${tag}`;
   };
 
-  // Check if the stream URL is an embed URL or a direct link
   const isEmbedUrl = tvShow?.streamUrl && (
     tvShow.streamUrl.includes('embed') || 
     tvShow.streamUrl.includes('iframe') ||
     tvShow.streamUrl.includes('player')
   );
 
-  // Handle stream button click based on URL type
   const handleStreamClick = () => {
     if (!tvShow?.streamUrl) return;
     
     if (isEmbedUrl) {
-      // Show embedded player in modal
       setShowTrailer(true);
     } else {
-      // Open direct link in new tab
       window.open(tvShow.streamUrl, '_blank');
     }
   };
@@ -219,23 +212,19 @@ const TvShowDetails = () => {
                   href={getAmazonUrl(tvShow.name || '')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
+                  className="bg-[#D3E4FD] text-[#121621] px-6 py-2 rounded-md hover:bg-[#D3E4FD]/90 transition-colors flex items-center gap-2"
                 >
-                  <img 
-                    src="/lovable-uploads/21997cbe-dbef-4485-93e8-b61a66eb7375.png"
-                    alt="Play"
-                    className="w-4 h-4"
-                  />
-                  Bei Amazon Prime ansehen
+                  <Play className="w-4 h-4" />
+                  Prime Video
                 </a>
                 
                 {tvShow.streamUrl && (
                   <button
                     onClick={handleStreamClick}
-                    className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    className="bg-[#ea384c] text-white px-6 py-2 rounded-md hover:bg-[#ea384c]/90 transition-colors flex items-center gap-2"
                   >
                     <PlayCircle className="w-4 h-4 mr-2" />
-                    Stream ansehen
+                    Kostenlos
                   </button>
                 )}
               </div>
