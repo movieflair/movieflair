@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -153,23 +152,13 @@ const MovieDetails = () => {
                 )}
               </div>
 
-              <Tabs defaultValue="details" className="w-full">
-                <TabsList className="border-b border-gray-200 w-full justify-start h-auto p-0 bg-transparent">
-                  <TabsTrigger 
-                    value="details"
-                    className="px-6 py-2 text-gray-600 data-[state=active]:text-gray-900 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none bg-transparent"
-                  >
-                    Regie & Cast
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="details" className="mt-6">
-                  <CastAndCrewSection 
-                    director={movie.cast?.find(person => person.job === 'Director')}
-                    cast={movie.cast?.filter(person => person.character)}
-                  />
-                </TabsContent>
-              </Tabs>
+              {/* Cast and Crew Section */}
+              <div className="mt-8">
+                <CastAndCrewSection 
+                  director={movie.cast?.find(person => person.job === 'Director')}
+                  cast={movie.cast?.filter(person => person.character)}
+                />
+              </div>
             </div>
           </div>
         </div>
