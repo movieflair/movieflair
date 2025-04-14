@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -32,7 +33,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
   return (
     <div className="container-custom mt-16">
       <div className="glass-card overflow-hidden rounded-xl p-8">
-        <div className="grid grid-cols-[1fr,auto] gap-8">
+        <div className="grid grid-cols-[1fr,auto] gap-8 relative">
           <div className="space-y-4">
             <Link 
               to="/discover" 
@@ -50,16 +51,6 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               </Button>
               <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
                 <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <div className="mt-64">
-              <Button 
-                variant="outline" 
-                className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Quick Tipp
               </Button>
             </div>
           </div>
@@ -86,6 +77,16 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               <CarouselNext className="embla__next" />
             </div>
           </Carousel>
+
+          <div className="absolute bottom-[-100px] left-0 w-full">
+            <Button 
+              variant="outline" 
+              className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              Quick Tipp
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -93,3 +94,4 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
 };
 
 export default SimilarMovies;
+
