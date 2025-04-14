@@ -12,9 +12,9 @@ const Navbar = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center">
           <img 
-            src="/movieflair-logo.png" 
+            src="/lovable-uploads/9a009d9a-af92-4fd1-9d0a-89e1e81258ee.png" 
             alt="MovieFlair" 
-            className="h-6"
+            className="h-8"
           />
         </Link>
 
