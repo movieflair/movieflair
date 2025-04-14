@@ -1,10 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import MainLayout from '@/components/layout/MainLayout';
-import { Star, Calendar, ArrowLeft, ExternalLink, PlayCircle, ShoppingCart } from 'lucide-react';
-import { getTvShowById, MovieDetail as TvShowDetailType } from '@/lib/api';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
+import { Star, Calendar, ArrowLeft, ExternalLink, PlayCircle } from 'lucide-react';
 
 const TvShowDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -186,9 +183,13 @@ const TvShowDetails = () => {
                   href={getAmazonUrl(tvShow.name || '')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#FF9900] text-white rounded-full px-5 py-2.5 font-medium transition-all hover:bg-[#FF9900]/90 flex items-center"
+                  className="bg-[#00A8E1] text-white rounded-full px-5 py-2.5 font-medium transition-all hover:bg-[#00A8E1]/90 flex items-center"
                 >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  <img 
+                    src="/lovable-uploads/c4d7e6e9-6a36-44ee-91ca-018e1542ddb6.png"
+                    alt="Prime Video"
+                    className="mr-2 h-5 w-5"
+                  />
                   Bei Amazon Prime ansehen
                 </a>
               </div>

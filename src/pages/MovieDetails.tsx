@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
+import { Play, CirclePlay } from 'lucide-react';
+import Tabs, { TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import MainLayout from '@/components/layout/MainLayout';
 import { getMovieById } from '@/lib/api';
 import type { MovieDetail as MovieDetailType } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
-import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { Play, CirclePlay, ShoppingCart } from 'lucide-react';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import ShareButton from '@/components/movies/ShareButton';
 
@@ -44,7 +44,6 @@ const MovieDetails = () => {
     );
   }
 
-  // Find the director from the crew
   const director = movie.crew?.find(person => person.job === 'Director');
   const year = movie.release_date ? new Date(movie.release_date).getFullYear() : undefined;
   
@@ -57,7 +56,6 @@ const MovieDetails = () => {
   return (
     <MainLayout>
       <div className="min-h-screen bg-white">
-        {/* Hero Section with Backdrop */}
         <div className="relative h-[400px] overflow-hidden">
           {movie.backdrop_path ? (
             <>
@@ -76,7 +74,6 @@ const MovieDetails = () => {
         <div className="container-custom -mt-40 relative z-20">
           <div className="glass-card overflow-hidden rounded-xl">
             <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
-              {/* Poster */}
               <div className="space-y-4">
                 <div className="rounded-lg overflow-hidden shadow-xl">
                   {movie.poster_path ? (
@@ -94,7 +91,6 @@ const MovieDetails = () => {
                 <ShareButton movieTitle={movie.title} />
               </div>
 
-              {/* Content */}
               <div className="text-gray-800">
                 <h1 className="text-4xl font-semibold mb-2">{movie.title}</h1>
                 {movie.tagline && (
@@ -138,9 +134,13 @@ const MovieDetails = () => {
                     href={getAmazonUrl(movie.title || '')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    className="bg-[#00A8E1] text-white rounded-full px-5 py-2.5 font-medium transition-all hover:bg-[#00A8E1]/90 flex items-center"
                   >
-                    <CirclePlay className="w-5 h-5 mr-2" />
+                    <img 
+                      src="/lovable-uploads/c4d7e6e9-6a36-44ee-91ca-018e1542ddb6.png"
+                      alt="Prime Video"
+                      className="mr-2 h-5 w-5"
+                    />
                     Bei Prime Video ansehen
                   </a>
                   {movie.hasStream && (
@@ -153,7 +153,6 @@ const MovieDetails = () => {
                   )}
                 </div>
 
-                {/* Cast and Crew Section */}
                 <div className="mt-8">
                   <CastAndCrewSection 
                     director={director}
@@ -166,7 +165,6 @@ const MovieDetails = () => {
         </div>
       </div>
 
-      {/* Trailer Modal */}
       {showTrailer && (movie.videos?.results[0]?.key || movie.streamUrl) && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-4xl">
