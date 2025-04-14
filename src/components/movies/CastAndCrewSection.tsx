@@ -39,8 +39,8 @@ const CastAndCrewSection = ({ director, cast }: CastAndCrewSectionProps) => {
           </div>
         )}
 
-        {/* Cast Section */}
-        {cast && cast.slice(0, 5).map((actor) => (
+        {/* Cast Section - limited to 4 members */}
+        {cast && cast.slice(0, 4).map((actor) => (
           <div key={actor.id} className="text-center w-16 md:w-20">
             <Avatar className="w-14 h-14 md:w-16 md:h-16 mx-auto mb-1">
               {actor.profile_path ? (
