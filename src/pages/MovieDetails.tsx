@@ -121,14 +121,14 @@ const MovieDetails = () => {
                     href={getAmazonUrl(movie.title || '')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full bg-[#1EAEDB] text-white px-4 py-2.5 rounded-b-lg hover:bg-[#33C3F0] transition-colors flex items-center justify-center gap-2 shadow-lg -mt-2"
+                    className="block w-full bg-[#1B2838] text-white px-4 py-3 rounded-b-lg hover:bg-[#1B2838]/90 transition-colors flex items-center justify-center gap-2 -mt-2"
                   >
                     <img 
                       src="/lovable-uploads/21997cbe-dbef-4485-93e8-b61a66eb7375.png"
                       alt="Prime Video"
                       className="w-5 h-5"
                     />
-                    <span className="text-sm font-medium">Bei Prime Video</span>
+                    <span className="font-medium">Als Stream verfügbar</span>
                   </a>
                 </div>
                 <ShareButton movieTitle={movie.title} />
