@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
@@ -13,9 +14,9 @@ const MovieCard = ({ movie, size = 'medium' }: MovieCardProps) => {
   const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
   
   const imageSizes = {
-    small: 'h-[150px] w-[100px]',
-    medium: 'h-[260px] w-[170px]',
-    large: 'h-[300px] w-[200px]'
+    small: 'h-[225px] w-[150px]',
+    medium: 'h-[300px] w-[200px]',
+    large: 'h-[450px] w-[300px]'
   };
   
   const textSizes = {
