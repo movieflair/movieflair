@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
-import { ChevronLeft, ChevronRight, Zap, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, FileText } from 'lucide-react';
 import MovieCard from './MovieCard';
 import {
   Carousel,
@@ -39,7 +39,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               to="/discover" 
               className="flex items-center gap-2 text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
             >
-              <Zap className="w-6 h-6" />
+              <Sparkles className="w-6 h-6" />
               Ähnliche Filme
             </Link>
             <p className="text-gray-600">
@@ -52,7 +52,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 asChild
               >
                 <Link to="/quick-tipp">
-                  <Zap className="w-4 h-4 mr-2" />
+                  <Sparkles className="w-4 h-4 mr-2" />
                   Quick Tipp
                 </Link>
               </Button>
