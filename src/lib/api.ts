@@ -49,6 +49,14 @@ export interface FilterOptions {
   moods?: string[];
 }
 
+export interface CastMember {
+  id: number;
+  name: string;
+  character?: string;
+  profile_path?: string;
+  job?: string;
+}
+
 const moodToGenres: Record<string, number[]> = {
   happy: [35, 10751, 12], // Comedy, Family, Adventure
   sad: [18, 10749], // Drama, Romance

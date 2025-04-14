@@ -16,26 +16,26 @@ interface CastAndCrewSectionProps {
 
 const CastAndCrewSection = ({ director, cast }: CastAndCrewSectionProps) => {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Director Section */}
       {director && (
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Regie</h2>
-          <div className="flex flex-wrap gap-4">
-            <div className="flex flex-col items-center">
-              <Avatar className="w-24 h-24 mb-2">
-                {director.profile_path ? (
-                  <AvatarImage 
-                    src={`https://image.tmdb.org/t/p/w185${director.profile_path}`}
-                    alt={director.name}
-                  />
-                ) : (
-                  <AvatarFallback className="text-lg">
-                    {director.name.charAt(0)}
-                  </AvatarFallback>
-                )}
-              </Avatar>
-              <span className="text-sm font-medium text-center">{director.name}</span>
+          <h3 className="text-lg font-medium mb-3">Regie</h3>
+          <div className="flex items-center">
+            <Avatar className="w-16 h-16">
+              {director.profile_path ? (
+                <AvatarImage 
+                  src={`https://image.tmdb.org/t/p/w185${director.profile_path}`}
+                  alt={director.name}
+                />
+              ) : (
+                <AvatarFallback className="text-sm">
+                  {director.name.charAt(0)}
+                </AvatarFallback>
+              )}
+            </Avatar>
+            <div className="ml-3">
+              <p className="font-medium">{director.name}</p>
             </div>
           </div>
         </div>
@@ -44,24 +44,26 @@ const CastAndCrewSection = ({ director, cast }: CastAndCrewSectionProps) => {
       {/* Cast Section */}
       {cast && cast.length > 0 && (
         <div>
-          <h2 className="text-2xl font-semibold mb-4">Besetzung</h2>
-          <div className="flex flex-wrap gap-4">
-            {cast.map((actor) => (
-              <div key={actor.id} className="flex flex-col items-center">
-                <Avatar className="w-24 h-24 mb-2">
+          <h3 className="text-lg font-medium mb-3">Besetzung</h3>
+          <div className="grid grid-cols-4 gap-4">
+            {cast.slice(0, 4).map((actor) => (
+              <div key={actor.id} className="text-center">
+                <Avatar className="w-16 h-16 mx-auto mb-2">
                   {actor.profile_path ? (
                     <AvatarImage 
                       src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
                       alt={actor.name}
                     />
                   ) : (
-                    <AvatarFallback className="text-lg">
+                    <AvatarFallback className="text-sm">
                       {actor.name.charAt(0)}
                     </AvatarFallback>
                   )}
                 </Avatar>
-                <span className="text-sm font-medium text-center">{actor.name}</span>
-                {actor.character && <span className="text-xs text-gray-500 text-center">{actor.character}</span>}
+                <p className="text-sm font-medium truncate">{actor.name}</p>
+                {actor.character && (
+                  <p className="text-xs text-gray-500 truncate">{actor.character}</p>
+                )}
               </div>
             ))}
           </div>

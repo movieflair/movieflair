@@ -14,9 +14,9 @@ const MovieCard = ({ movie, size = 'medium' }: MovieCardProps) => {
   const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
   
   const imageSizes = {
-    small: 'h-[180px]',
-    medium: 'h-[260px]',
-    large: 'h-[320px]'
+    small: 'h-[150px]',
+    medium: 'h-[200px]',
+    large: 'h-[250px]'
   };
   
   const textSizes = {
