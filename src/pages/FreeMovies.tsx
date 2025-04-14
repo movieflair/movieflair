@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import MainLayout from '@/components/layout/MainLayout';
+import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { Gift } from 'lucide-react';
@@ -28,7 +29,7 @@ const FreeMovies = () => {
   }, []);
 
   return (
-    <MainLayout>
+    <EnhancedLayout>
       <div className="container-custom py-12">
         <div className="flex items-center mb-8">
           <Gift className="w-6 h-6 text-red-500 mr-2" />
@@ -61,7 +62,7 @@ const FreeMovies = () => {
           </div>
         )}
       </div>
-    </MainLayout>
+    </EnhancedLayout>
   );
 };
 
