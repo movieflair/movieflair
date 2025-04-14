@@ -54,42 +54,39 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
+              <Button 
+                variant="outline" 
+                className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Neuer Tipp
+              </Button>
             </div>
           </div>
 
-          <div className="flex flex-col justify-between">
-            <Carousel
-              opts={{
-                align: "start",
-                loop: true,
-                dragFree: true,
-                skipSnaps: true,
-              }}
-              className="w-[450px]"
-            >
-              <CarouselContent className="-ml-4">
-                {movies.map((movie) => (
-                  <CarouselItem key={movie.id} className="pl-4 basis-1/2">
-                    <MovieCard movie={movie} size="small" />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              
-              {/* Hidden carousel controls that will be triggered by our custom buttons */}
-              <div className="hidden">
-                <CarouselPrevious className="embla__prev" />
-                <CarouselNext className="embla__next" />
-              </div>
-            </Carousel>
-
-            <Button 
-              variant="outline" 
-              className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
-            >
-              <Sparkles className="w-4 h-4" />
-              Neuer Tipp
-            </Button>
-          </div>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+              dragFree: true,
+              skipSnaps: true,
+            }}
+            className="w-[450px]"
+          >
+            <CarouselContent className="-ml-4">
+              {movies.map((movie) => (
+                <CarouselItem key={movie.id} className="pl-4 basis-1/2">
+                  <MovieCard movie={movie} size="small" />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            
+            {/* Hidden carousel controls that will be triggered by our custom buttons */}
+            <div className="hidden">
+              <CarouselPrevious className="embla__prev" />
+              <CarouselNext className="embla__next" />
+            </div>
+          </Carousel>
         </div>
       </div>
     </div>
