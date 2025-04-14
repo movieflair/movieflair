@@ -7,6 +7,7 @@ import Trailers from './pages/Trailers';
 import FreeMovies from './pages/FreeMovies';
 import AdminPage from './pages/AdminPage';
 import Search from './pages/Search';
+import Genres from './pages/Genres';
 import { AdminSettingsProvider } from './hooks/useAdminSettings';
 
 const App = () => {
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/free-movies" element={<FreeMovies />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/genres" element={<Genres />} />
       </Routes>
     </Router>
   );
