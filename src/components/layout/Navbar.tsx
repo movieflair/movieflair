@@ -1,117 +1,42 @@
-
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Search, User, Video, PlayCircle, Menu as MenuIcon, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { Home, List, Search, User } from 'lucide-react';
+import SearchBox from '@/components/search/SearchBox';
 
-const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+interface NavbarProps {
+  isLoggedIn: boolean;
+}
 
+const Navbar = ({ isLoggedIn }: NavbarProps) => {
   return (
-    <header className="sticky top-0 z-50 bg-[#121621] border-b border-gray-800">
-      <div className="container-custom flex items-center justify-between h-20">
-        {/* Logo */}
-        <Link to="/" className="flex items-center">
-          <img 
-            src="/lovable-uploads/9a009d9a-af92-4fd1-9d0a-89e1e81258ee.png" 
-            alt="MovieFlair" 
-            className="h-10"
-          />
+    <nav className="bg-white shadow">
+      <div className="container-custom flex items-center justify-between py-4">
+        <Link to="/" className="flex items-center text-xl font-semibold">
+          Movie<span className="text-theme-accent-blue">Flair</span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          <Link to="/" className="text-white/80 hover:text-white transition-colors">
-            Home
-          </Link>
-          <Link to="/free-movies" className="text-white/80 hover:text-white transition-colors flex items-center">
-            <Video className="w-4 h-4 mr-1" />
-            Kostenlos
-          </Link>
-          <Link to="/trailers" className="text-white/80 hover:text-white transition-colors flex items-center">
-            <PlayCircle className="w-4 h-4 mr-1" />
-            Neue Trailer
-          </Link>
-          <Link to="/quick-tipp" className="text-white/80 hover:text-white transition-colors flex items-center">
-            <Zap className="w-4 h-4 mr-1" />
-            Quick Tipp
-          </Link>
-          <Link to="/about" className="text-white/80 hover:text-white transition-colors">
-            About
-          </Link>
-        </nav>
+        <div className="flex items-center space-x-6">
+          <SearchBox variant="navbar" />
 
-        {/* Search and User Actions */}
-        <div className="flex items-center space-x-4">
-          <button className="text-white/80 hover:text-white transition-colors">
-            <Search className="w-5 h-5" />
-          </button>
-          <Link to="/admin" className="text-white/80 hover:text-white transition-colors">
-            <User className="w-5 h-5" />
+          <Link to="/" className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors">
+            <Home className="w-5 h-5" />
+            <span>Home</span>
           </Link>
-          
-          {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-white/80 hover:text-white transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <MenuIcon className="w-5 h-5" />
-          </button>
+
+          <Link to="/genres" className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors">
+            <List className="w-5 h-5" />
+            <span>Genres</span>
+          </Link>
+
+          {isLoggedIn ? (
+            <Link to="/admin" className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors">
+              <User className="w-5 h-5" />
+              <span>Admin</span>
+            </Link>
+          ) : null}
         </div>
       </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-gray-900 border-b border-gray-800">
-          <div className="container-custom py-4 space-y-4">
-            <Link 
-              to="/" 
-              className="block text-white/80 hover:text-white transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Home
-            </Link>
-            <Link 
-              to="/free-movies" 
-              className="block text-white/80 hover:text-white transition-colors flex items-center"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <Video className="w-4 h-4 mr-1" />
-              Kostenlos
-            </Link>
-            <Link 
-              to="/trailers" 
-              className="block text-white/80 hover:text-white transition-colors flex items-center"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <PlayCircle className="w-4 h-4 mr-1" />
-              Neue Trailer
-            </Link>
-            <Link 
-              to="/quick-tipp" 
-              className="block text-white/80 hover:text-white transition-colors flex items-center"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <Zap className="w-4 h-4 mr-1" />
-              Quick Tipp
-            </Link>
-            <Link 
-              to="/about" 
-              className="block text-white/80 hover:text-white transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link 
-              to="/admin" 
-              className="block text-white/80 hover:text-white transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Admin
-            </Link>
-          </div>
-        </div>
-      )}
-    </header>
+    </nav>
   );
 };
 

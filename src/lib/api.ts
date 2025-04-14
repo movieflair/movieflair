@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface Genre {
@@ -88,7 +87,6 @@ export const moodToGenres: Record<string, number[]> = {
 };
 
 async function callTMDB(path: string, searchParams = {}) {
-  // Füge immer language=de-DE zu den Suchanfragen hinzu
   const params = {
     ...searchParams,
     language: 'de-DE'
@@ -110,7 +108,6 @@ export const getGenres = async (): Promise<Genre[]> => {
 export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/movie/popular');
   
-  // Lade gespeicherte Filmeinstellungen
   const savedSettings = await getAdminMovieSettings();
   
   return data.results.map((movie: any) => {
@@ -133,7 +130,6 @@ export const searchMovies = async (query: string): Promise<MovieOrShow[]> => {
   
   const data = await callTMDB('/search/movie', { query });
   
-  // Lade gespeicherte Filmeinstellungen
   const savedSettings = await getAdminMovieSettings();
   
   return data.results.map((movie: any) => {
@@ -155,7 +151,6 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/movie/now_playing');
   const savedSettings = await getAdminMovieSettings();
   
-  // Nur Filme zurückgeben, die explizit als neue Trailer markiert wurden
   const movies = data.results.map((movie: any) => {
     const savedMovie = savedSettings[movie.id] || {};
     return {
@@ -170,14 +165,13 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     };
   });
   
-  return movies.filter(movie => savedSettings[movie.id]?.isNewTrailer === true);
+  return movies.filter(movie => movie.isNewTrailer === true);
 };
 
 export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/movie/popular');
   const savedSettings = await getAdminMovieSettings();
   
-  // Nur Filme zurückgeben, die explizit als kostenlos markiert wurden
   const movies = data.results.map((movie: any) => {
     const savedMovie = savedSettings[movie.id] || {};
     return {
@@ -195,14 +189,12 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
   return movies.filter(movie => savedSettings[movie.id]?.isFreeMovie === true);
 };
 
-// Hilfsfunktion zum Laden gespeicherter Filmeinstellungen
 const getAdminMovieSettings = async () => {
   const savedMoviesJson = localStorage.getItem('adminMovies');
   if (!savedMoviesJson) return {};
   
   try {
     const savedMovies = JSON.parse(savedMoviesJson);
-    // Konvertiere Array in ein Objekt mit Film-ID als Schlüssel
     return savedMovies.reduce((acc: Record<number, any>, movie: MovieOrShow) => {
       if (movie.id) {
         acc[movie.id] = movie;
@@ -215,14 +207,12 @@ const getAdminMovieSettings = async () => {
   }
 };
 
-// Hilfsfunktion zum Laden gespeicherter Serieneinstellungen
 const getAdminTvShowSettings = async () => {
   const savedShowsJson = localStorage.getItem('adminShows');
   if (!savedShowsJson) return {};
   
   try {
     const savedShows = JSON.parse(savedShowsJson);
-    // Konvertiere Array in ein Objekt mit Serien-ID als Schlüssel
     return savedShows.reduce((acc: Record<number, any>, show: MovieOrShow) => {
       if (show.id) {
         acc[show.id] = show;
@@ -242,10 +232,9 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
     callTMDB(`/movie/${id}/credits`),
   ]);
 
-  // Überprüfen, ob der Film in den admin Einstellungen gespeichert ist
   const savedMoviesJson = localStorage.getItem('adminMovies');
-  let adminSettings: Record<string, any> = {}; // Initialize with an empty object with defined type
-  
+  let adminSettings: Record<string, any> = {};
+
   if (savedMoviesJson) {
     try {
       const savedMovies = JSON.parse(savedMoviesJson);
@@ -283,10 +272,9 @@ export const getTvShowById = async (id: number): Promise<MovieDetail> => {
     callTMDB(`/tv/${id}/credits`),
   ]);
 
-  // Überprüfen, ob die Serie in den admin Einstellungen gespeichert ist
   const savedShowsJson = localStorage.getItem('adminShows');
-  let adminSettings: Record<string, any> = {}; // Initialize with an empty object with defined type
-  
+  let adminSettings: Record<string, any> = {};
+
   if (savedShowsJson) {
     try {
       const savedShows = JSON.parse(savedShowsJson);
@@ -318,7 +306,6 @@ export const getTvShowById = async (id: number): Promise<MovieDetail> => {
 export const getRecommendationByFilters = async (filters: FilterOptions): Promise<MovieOrShow[]> => {
   const { genres, decades, mediaType = 'movie', rating = 0 } = filters;
   
-  // Entscheide, ob nach Filmen, Serien oder beiden gesucht wird
   const endpoint = mediaType === 'tv' ? '/discover/tv' : '/discover/movie';
   
   let params: Record<string, string> = {
@@ -346,7 +333,6 @@ export const getRecommendationByFilters = async (filters: FilterOptions): Promis
   
   const data = await callTMDB(endpoint, params);
   
-  // Lade gespeicherte Einstellungen
   const savedMovieSettings = await getAdminMovieSettings();
   const savedTvSettings = await getAdminTvShowSettings();
   
@@ -371,7 +357,6 @@ export const getRecommendationByFilters = async (filters: FilterOptions): Promis
 export const getSimilarMovies = async (movieId: number): Promise<MovieOrShow[]> => {
   const data = await callTMDB(`/movie/${movieId}/similar`);
   
-  // Lade gespeicherte Filmeinstellungen
   const savedSettings = await getAdminMovieSettings();
   
   return data.results.map((movie: any) => {
@@ -392,7 +377,6 @@ export const getSimilarMovies = async (movieId: number): Promise<MovieOrShow[]> 
 export const getPopularTvShows = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/tv/popular');
   
-  // Lade gespeicherte Serieneinstellungen
   const savedSettings = await getAdminTvShowSettings();
   
   return data.results.map((show: any) => {
@@ -413,7 +397,6 @@ export const searchTvShows = async (query: string): Promise<MovieOrShow[]> => {
   
   const data = await callTMDB('/search/tv', { query });
   
-  // Lade gespeicherte Serieneinstellungen
   const savedSettings = await getAdminTvShowSettings();
   
   return data.results.map((show: any) => {
@@ -430,14 +413,12 @@ export const searchTvShows = async (query: string): Promise<MovieOrShow[]> => {
 };
 
 export const trackPageVisit = async (page: string) => {
-  // Prüfen, ob der Benutzer ein Admin ist - keine Aufrufe von Admins tracken
   const isAdmin = localStorage.getItem('isAdminLoggedIn') === 'true';
   if (isAdmin) return;
   
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD Format
+  const today = new Date().toISOString().split('T')[0];
   
   try {
-    // Bestehende Daten laden
     const visitsJson = localStorage.getItem('pageVisits');
     let visits: VisitorStat[] = [];
     
@@ -445,20 +426,15 @@ export const trackPageVisit = async (page: string) => {
       visits = JSON.parse(visitsJson);
     }
     
-    // Suchen, ob für heute und diese Seite bereits ein Eintrag existiert
     const existingIndex = visits.findIndex(v => v.date === today && v.page === page);
     
     if (existingIndex >= 0) {
-      // Inkrementieren des bestehenden Eintrags
       visits[existingIndex].count += 1;
     } else {
-      // Neuen Eintrag hinzufügen
       visits.push({ date: today, count: 1, page });
     }
     
-    // Daten speichern
     localStorage.setItem('pageVisits', JSON.stringify(visits));
-    
   } catch (error) {
     console.error('Error tracking page visit:', error);
   }
