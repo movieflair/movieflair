@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import MainLayout from '@/components/layout/MainLayout';
 import { getMovieById } from '@/lib/api';
 import type { MovieDetail as MovieDetailType } from '@/lib/api';
@@ -117,15 +116,6 @@ const MovieDetails = () => {
                       </div>
                     )}
                   </div>
-                  <a
-                    href={getAmazonUrl(movie.title || '')}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full bg-[#D3E4FD] text-[#121621] px-4 py-3 rounded-b-lg hover:bg-[#D3E4FD]/90 transition-colors flex items-center justify-center gap-2 -mt-2"
-                  >
-                    <Play className="w-5 h-5 text-white" />
-                    <span className="font-medium">Bei Prime Video ansehen</span>
-                  </a>
                 </div>
                 <ShareButton movieTitle={movie.title} />
               </div>
@@ -173,7 +163,7 @@ const MovieDetails = () => {
                     href={getAmazonUrl(movie.title || '')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    className="bg-[#D3E4FD] text-[#121621] px-6 py-2 rounded-md hover:bg-[#D3E4FD]/90 transition-colors flex items-center gap-2"
                   >
                     <Play className="w-4 h-4" />
                     Prime Video
