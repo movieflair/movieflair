@@ -1,0 +1,227 @@
+
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import MainLayout from '@/components/layout/MainLayout';
+import FilterSelector from '@/components/filter/FilterSelector';
+import RecommendationCard from '@/components/movies/RecommendationCard';
+import { Shuffle } from 'lucide-react';
+import { 
+  Genre, 
+  getGenres, 
+  moodToGenres,
+  FilterOptions,
+  getRecommendationByFilters,
+  getMovieById,
+  getTvShowById,
+  MovieDetail,
+  MovieOrShow
+} from '@/lib/api';
+
+const moods = [
+  'happy', 'sad', 'thrilling', 'thoughtful', 'relaxing',
+  'inspiring', 'romantic', 'exciting', 'nostalgic', 'suspenseful', 'lighthearted'
+];
+
+const decades = [
+  '1970', '1980', '1990', '2000', '2010', '2020'
+];
+
+const Discover = () => {
+  const navigate = useNavigate();
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
+  const [selectedDecades, setSelectedDecades] = useState<string[]>([]);
+  const [recommendation, setRecommendation] = useState<MovieDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  useEffect(() => {
+    // Fetch genres when component mounts
+    const fetchGenres = async () => {
+      try {
+        const genresList = await getGenres();
+        setGenres(genresList);
+      } catch (error) {
+        console.error('Error fetching genres:', error);
+      }
+    };
+
+    fetchGenres();
+  }, []);
+
+  const handleMoodSelection = (mood: string) => {
+    setSelectedMoods(prev => 
+      prev.includes(mood) 
+        ? prev.filter(m => m !== mood) 
+        : [...prev, mood]
+    );
+  };
+
+  const handleGenreSelection = (genreId: number) => {
+    setSelectedGenres(prev => 
+      prev.includes(genreId) 
+        ? prev.filter(g => g !== genreId) 
+        : [...prev, genreId]
+    );
+  };
+
+  const handleDecadeSelection = (decade: string) => {
+    setSelectedDecades(prev => 
+      prev.includes(decade) 
+        ? prev.filter(d => d !== decade) 
+        : [...prev, decade]
+    );
+  };
+
+  const handleGetRecommendation = async () => {
+    setIsLoading(true);
+    setHasSearched(true);
+    
+    try {
+      // Combine all genres from selected moods
+      const genresFromMoods = selectedMoods.flatMap(mood => moodToGenres[mood] || []);
+      
+      // Combine with directly selected genres and remove duplicates
+      const allGenres = [...new Set([...genresFromMoods, ...selectedGenres])];
+      
+      // Use the first selected decade if any
+      const decade = selectedDecades.length > 0 ? selectedDecades[0] : undefined;
+      
+      const filters: FilterOptions = {
+        genres: allGenres.length > 0 ? allGenres : undefined,
+        decade: decade
+      };
+      
+      // Get a recommendation based on filters
+      const result = await getRecommendationByFilters(filters);
+      
+      // Get full details for the recommendation
+      const detailedResult = 
+        result.media_type === 'movie' 
+          ? await getMovieById(result.id) 
+          : await getTvShowById(result.id);
+      
+      setRecommendation(detailedResult);
+    } catch (error) {
+      console.error('Error getting recommendation:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleTryAgain = () => {
+    handleGetRecommendation();
+  };
+
+  const handleViewDetails = () => {
+    if (recommendation) {
+      navigate(`/${recommendation.media_type}/${recommendation.id}`);
+    }
+  };
+
+  return (
+    <MainLayout>
+      <div className="container-custom py-12">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-semibold mb-8 text-center">Discover What to Watch</h1>
+          
+          <div className="bg-card rounded-xl shadow-sm overflow-hidden mb-12">
+            <div className="p-6">
+              <h2 className="text-xl font-medium mb-6">Select your preferences</h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium mb-2">How are you feeling?</label>
+                  <FilterSelector 
+                    title="Select mood" 
+                    options={moods}
+                    onSelect={(mood) => handleMoodSelection(mood as string)}
+                    selectedValues={selectedMoods}
+                    type="mood"
+                    maxSelections={3}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Choose genres (optional)</label>
+                  <FilterSelector 
+                    title="Select genres" 
+                    options={genres}
+                    onSelect={(genreId) => handleGenreSelection(genreId as number)}
+                    selectedValues={selectedGenres}
+                    type="genre"
+                    maxSelections={2}
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">Select decade (optional)</label>
+                  <FilterSelector 
+                    title="Select decade" 
+                    options={decades}
+                    onSelect={(decade) => handleDecadeSelection(decade as string)}
+                    selectedValues={selectedDecades}
+                    type="decade"
+                    maxSelections={1}
+                  />
+                </div>
+              </div>
+              
+              <div className="mt-8">
+                <button 
+                  onClick={handleGetRecommendation}
+                  disabled={isLoading || (selectedMoods.length === 0 && selectedGenres.length === 0)}
+                  className="button-primary w-full py-3"
+                >
+                  {isLoading ? 'Finding the perfect match...' : 'Get Recommendation'}
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          {hasSearched && (
+            <div className="animate-fade">
+              {recommendation ? (
+                <div>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-semibold">Your Recommendation</h2>
+                    <button 
+                      onClick={handleTryAgain}
+                      className="button-secondary flex items-center"
+                    >
+                      <Shuffle className="w-4 h-4 mr-2" />
+                      Try Another
+                    </button>
+                  </div>
+                  
+                  <RecommendationCard movie={recommendation} />
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-muted/30 rounded-lg">
+                  <h2 className="text-xl font-medium mb-2">No Recommendations Found</h2>
+                  <p className="text-muted-foreground mb-6">
+                    Try different filters or moods to get a recommendation.
+                  </p>
+                  <button 
+                    onClick={() => {
+                      setSelectedMoods([]);
+                      setSelectedGenres([]);
+                      setSelectedDecades([]);
+                      setHasSearched(false);
+                    }}
+                    className="button-secondary"
+                  >
+                    Reset Filters
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </MainLayout>
+  );
+};
+
+export default Discover;

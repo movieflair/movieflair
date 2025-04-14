@@ -1,0 +1,80 @@
+
+import { Link } from 'react-router-dom';
+
+const Footer = () => {
+  return (
+    <footer className="bg-secondary mt-auto py-12">
+      <div className="container-custom">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <h3 className="text-lg font-medium mb-4">ScreenPick</h3>
+            <p className="text-muted-foreground">
+              Find the perfect movie or show based on your mood and preferences.
+            </p>
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-medium mb-4">Links</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link to="/discover" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Discover
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Admin
+                </Link>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-medium mb-4">Legal</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <a 
+                  href="https://www.themoviedb.org/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  TMDB Attribution
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div className="mt-8 pt-8 border-t border-border text-center text-muted-foreground">
+          <p>&copy; {new Date().getFullYear()} ScreenPick. All rights reserved.</p>
+          <p className="mt-2 text-sm">
+            This product uses the TMDB API but is not endorsed or certified by TMDB.
+          </p>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
