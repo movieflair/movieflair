@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart, ExternalLink, Link as LinkIcon, BarChart, Pencil } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -838,4 +839,77 @@ const AdminPanel = () => {
                               ? "Füge hier die Embed-URL für den Stream ein. Für YouTube-Videos nutze das Format: https://www.youtube.com/embed/VIDEO_ID" 
                               : "Füge hier einen direkten Link ein, zu dem Benutzer weitergeleitet werden sollen."
                             }
-                          </p
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {hasTrailer && (
+                      <div className="md:col-span-2">
+                        <Label htmlFor="trailerUrl">Trailer URL (YouTube Embed)</Label>
+                        <Input 
+                          id="trailerUrl" 
+                          placeholder="https://www.youtube.com/embed/..." 
+                          className="mt-1"
+                          value={trailerUrl}
+                          onChange={(e) => setTrailerUrl(e.target.value)}
+                        />
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Füge hier die YouTube Embed-URL für den Trailer ein, z.B. https://www.youtube.com/embed/VIDEO_ID
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex justify-end mt-6">
+                    <Button onClick={handleSaveTvShow}>Speichern</Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="stats">
+          <AdminStats />
+        </TabsContent>
+        
+        <TabsContent value="visitors">
+          <AdminVisitorStats />
+        </TabsContent>
+        
+        <TabsContent value="settings">
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 mb-4">
+              <FileEdit className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-semibold">Einstellungen</h2>
+            </div>
+            
+            <div className="border border-border rounded-md p-6">
+              <h3 className="text-lg font-medium mb-4">Amazon Affiliate</h3>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="amazonAffiliateId">Amazon Affiliate ID</Label>
+                  <Input 
+                    id="amazonAffiliateId" 
+                    placeholder="dein-20" 
+                    className="max-w-md mt-1"
+                    value={amazonAffiliateId}
+                    onChange={(e) => setAmazonAffiliateId(e.target.value)}
+                  />
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Deine Amazon Affiliate ID, die für Amazon-Links verwendet wird.
+                  </p>
+                </div>
+
+                <Button onClick={saveSettings}>Einstellungen speichern</Button>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+};
+
+export default AdminPanel;
