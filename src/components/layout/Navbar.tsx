@@ -6,7 +6,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-gray-900 border-b border-gray-800">
+    <header className="sticky top-0 z-50 bg-[#1A1F2C] border-b border-gray-800">
       <div className="container-custom flex items-center justify-between h-20">
         {/* Logo */}
         <Link to="/" className="flex items-center">
