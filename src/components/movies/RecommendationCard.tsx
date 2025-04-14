@@ -15,15 +15,17 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
   return (
     <div className="glass-card overflow-hidden rounded-xl">
       <div className="md:flex">
-        <div className="md:w-1/4 lg:w-1/5">
+        <div className="md:w-1/4 lg:w-1/5 flex-shrink-0">
           {movie.poster_path ? (
-            <img
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-              alt={title}
-              className="w-full h-[300px] md:h-full object-cover"
-            />
+            <div className="aspect-[2/3] h-auto overflow-hidden">
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                alt={title}
+                className="w-full h-full object-cover"
+              />
+            </div>
           ) : (
-            <div className="w-full h-[300px] md:h-full flex items-center justify-center bg-muted">
+            <div className="aspect-[2/3] h-auto flex items-center justify-center bg-muted">
               <span className="text-muted-foreground">No Image</span>
             </div>
           )}
@@ -81,4 +83,3 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
 };
 
 export default RecommendationCard;
-
