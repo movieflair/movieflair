@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { getVisitorStats, VisitorStat } from '@/lib/api';
-import { BarChart2, CalendarIcon, EyeIcon, PieChart, TrendingUp } from 'lucide-react';
+import { BarChart2, CalendarIcon, EyeIcon, PieChart, TrendingUp, Clock, Users, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { 
   LineChart, 
@@ -9,13 +9,17 @@ import {
   XAxis, 
   YAxis, 
   CartesianGrid, 
-  Tooltip, 
+  Tooltip as RechartsTooltip, 
   Legend, 
   ResponsiveContainer,
   BarChart,
-  Bar
+  Bar,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell
 } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PageTotals {
   [key: string]: number;
@@ -27,12 +31,25 @@ interface DailyVisits {
   pages: PageTotals;
 }
 
+interface HourlyDistribution {
+  hour: string;
+  count: number;
+  percentage: number;
+}
+
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088fe', '#00C49F', '#FFBB28', '#FF8042'];
+
 const AdminVisitorStats = () => {
   const [stats, setStats] = useState<VisitorStat[]>([]);
   const [dailyData, setDailyData] = useState<DailyVisits[]>([]);
   const [totalVisits, setTotalVisits] = useState(0);
   const [pageVisits, setPageVisits] = useState<PageTotals>({});
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('7d');
+  const [comparisonPeriod, setComparisonPeriod] = useState<'prev' | 'week' | 'month'>('prev');
+  const [trendPercentage, setTrendPercentage] = useState(0);
+  const [hourlyDistribution, setHourlyDistribution] = useState<HourlyDistribution[]>([]);
+  const [deviceDistribution, setDeviceDistribution] = useState<{name: string, value: number}[]>([]);
+  const [averageSessionDuration, setAverageSessionDuration] = useState(0);
 
   useEffect(() => {
     // Besucherstatistiken laden
@@ -79,6 +96,42 @@ const AdminVisitorStats = () => {
     );
     
     setDailyData(sortedDaily);
+    
+    // Berechne Trend im Vergleich zum vorherigen Zeitraum
+    if (sortedDaily.length > 0) {
+      const currentPeriodVisits = sortedDaily.slice(-7).reduce((sum, day) => sum + day.count, 0);
+      const previousPeriodVisits = sortedDaily.slice(-14, -7).reduce((sum, day) => sum + day.count, 0);
+      
+      if (previousPeriodVisits > 0) {
+        const trend = ((currentPeriodVisits - previousPeriodVisits) / previousPeriodVisits) * 100;
+        setTrendPercentage(Math.round(trend));
+      }
+    }
+    
+    // Simuliere stündliche Verteilung (in einer realen App würde dies aus den tatsächlichen Daten kommen)
+    const hours = Array.from({ length: 24 }, (_, i) => {
+      const hour = i < 10 ? `0${i}:00` : `${i}:00`;
+      const count = Math.floor(Math.random() * 100) + 1; // Simulierte Daten
+      return { hour, count, percentage: 0 };
+    });
+    
+    const totalHourlyVisits = hours.reduce((sum, hour) => sum + hour.count, 0);
+    hours.forEach(hour => {
+      hour.percentage = Math.round((hour.count / totalHourlyVisits) * 100);
+    });
+    
+    setHourlyDistribution(hours);
+    
+    // Simuliere Geräteverteilung
+    setDeviceDistribution([
+      { name: 'Desktop', value: 65 },
+      { name: 'Mobile', value: 30 },
+      { name: 'Tablet', value: 5 }
+    ]);
+    
+    // Simuliere durchschnittliche Sitzungsdauer (in Sekunden)
+    setAverageSessionDuration(183); // 3 Minuten und 3 Sekunden
+    
   }, []);
 
   // Filtere nach Zeitraum
@@ -109,6 +162,7 @@ const AdminVisitorStats = () => {
     switch(page) {
       case '/': return 'Startseite';
       case 'movie-details': return 'Filmdetails';
+      case 'tv-details': return 'Seriendetails';
       case 'quick-tipp': return 'Quick Tipp';
       case 'free-movies': return 'Kostenlose Filme';
       case 'trailers': return 'Neue Trailer';
@@ -126,107 +180,204 @@ const AdminVisitorStats = () => {
     ...item,
     date: formatDate(item.date)
   }));
+  
+  const formatTime = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds}s`;
+  };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 mb-4">
-        <BarChart2 className="h-5 w-5 text-primary" />
-        <h2 className="text-xl font-semibold">Besucherstatistik</h2>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <BarChart2 className="h-5 w-5 text-primary" />
+          <h2 className="text-xl font-semibold">Besucherstatistik</h2>
+        </div>
+        
+        <div className="flex gap-2">
+          <Select value={timeRange} onValueChange={(v) => setTimeRange(v as '7d' | '30d' | 'all')}>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Zeitraum" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">7 Tage</SelectItem>
+              <SelectItem value="30d">30 Tage</SelectItem>
+              <SelectItem value="all">Alle Zeit</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={comparisonPeriod} onValueChange={(v) => setComparisonPeriod(v as 'prev' | 'week' | 'month')}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Vergleich" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="prev">Vorheriger Zeitraum</SelectItem>
+              <SelectItem value="week">Vorherige Woche</SelectItem>
+              <SelectItem value="month">Vorheriger Monat</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="p-4 flex flex-col items-center">
-          <div className="text-3xl font-bold text-primary">{totalVisits}</div>
-          <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
-            <EyeIcon className="h-4 w-4" />
-            <span>Gesamtbesuche</span>
+        <Card className="p-4 flex flex-col">
+          <div className="flex items-center justify-between mb-2">
+            <div className="text-sm text-muted-foreground flex items-center gap-1">
+              <EyeIcon className="h-4 w-4" />
+              <span>Gesamtbesuche</span>
+            </div>
+            <div className={`text-xs px-2 py-1 rounded-full flex items-center ${
+              trendPercentage >= 0 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-red-100 text-red-800'
+            }`}>
+              {trendPercentage >= 0 
+                ? <ArrowUpRight className="h-3 w-3 mr-1" /> 
+                : <ArrowDownRight className="h-3 w-3 mr-1" />
+              }
+              {Math.abs(trendPercentage)}%
+            </div>
           </div>
+          <div className="text-3xl font-bold">{totalVisits}</div>
         </Card>
         
-        <Card className="p-4 flex flex-col items-center">
-          <div className="text-3xl font-bold">{getTopPages()[0]?.name || 'N/A'}</div>
-          <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
+        <Card className="p-4 flex flex-col">
+          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
             <TrendingUp className="h-4 w-4" />
             <span>Beliebteste Seite</span>
           </div>
+          <div className="text-3xl font-bold">{getTopPages()[0]?.name || 'N/A'}</div>
         </Card>
         
-        <Card className="p-4 flex flex-col items-center">
-          <div className="text-3xl font-bold">{dailyData.length}</div>
-          <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
-            <CalendarIcon className="h-4 w-4" />
-            <span>Aktive Tage</span>
+        <Card className="p-4 flex flex-col">
+          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+            <Clock className="h-4 w-4" />
+            <span>Durchschn. Sitzungsdauer</span>
           </div>
+          <div className="text-3xl font-bold">{formatTime(averageSessionDuration)}</div>
         </Card>
         
-        <Card className="p-4 flex flex-col items-center">
+        <Card className="p-4 flex flex-col">
+          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+            <Users className="h-4 w-4" />
+            <span>Besuche pro Tag</span>
+          </div>
           <div className="text-3xl font-bold">
             {dailyData.length > 0
               ? Math.round(totalVisits / dailyData.length)
               : 0
             }
           </div>
-          <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
-            <PieChart className="h-4 w-4" />
-            <span>Besuche pro Tag</span>
-          </div>
         </Card>
       </div>
       
-      <div className="my-6 flex justify-end">
-        <Tabs value={timeRange} onValueChange={(v) => setTimeRange(v as '7d' | '30d' | 'all')}>
-          <TabsList>
-            <TabsTrigger value="7d">7 Tage</TabsTrigger>
-            <TabsTrigger value="30d">30 Tage</TabsTrigger>
-            <TabsTrigger value="all">Alle</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      
-      <Card className="p-6">
-        <h3 className="text-lg font-medium mb-4">Besuchertrend</h3>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              data={chartData}
-              margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="count" 
-                name="Besuche" 
-                stroke="#4f46e5" 
-                activeDot={{ r: 8 }} 
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
-      
-      <Card className="p-6">
-        <h3 className="text-lg font-medium mb-4">Beliebteste Seiten</h3>
-        <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={getTopPages()}
-              margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
-              layout="vertical"
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="name" type="category" width={100} />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="value" name="Besuche" fill="#4f46e5" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Übersicht</TabsTrigger>
+          <TabsTrigger value="pages">Seitenaufrufe</TabsTrigger>
+          <TabsTrigger value="time">Zeitverteilung</TabsTrigger>
+          <TabsTrigger value="devices">Geräte</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview">
+          <Card className="p-6">
+            <h3 className="text-lg font-medium mb-4">Besuchertrend</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={chartData}
+                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="count" 
+                    name="Besuche" 
+                    stroke="#4f46e5" 
+                    activeDot={{ r: 8 }} 
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="pages">
+          <Card className="p-6">
+            <h3 className="text-lg font-medium mb-4">Beliebteste Seiten</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={getTopPages()}
+                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
+                  layout="vertical"
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={100} />
+                  <RechartsTooltip />
+                  <Legend />
+                  <Bar dataKey="value" name="Besuche" fill="#4f46e5" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="time">
+          <Card className="p-6">
+            <h3 className="text-lg font-medium mb-4">Tageszeit der Besuche</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={hourlyDistribution}
+                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="hour" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Legend />
+                  <Bar dataKey="count" name="Besuche" fill="#4f46e5" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="devices">
+          <Card className="p-6">
+            <h3 className="text-lg font-medium mb-4">Geräteverteilung</h3>
+            <div className="h-72 flex items-center justify-center">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartsPieChart>
+                  <Pie
+                    data={deviceDistribution}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={true}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {deviceDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Legend />
+                  <RechartsTooltip />
+                </RechartsPieChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

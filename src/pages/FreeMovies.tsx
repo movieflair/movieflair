@@ -1,14 +1,18 @@
 
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
-import { getFreeMovies, MovieOrShow } from '@/lib/api';
+import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
+import { ShoppingCart } from 'lucide-react';
 
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Seiten-Aufruf tracken
+    trackPageVisit('free-movies');
+    
     const fetchMovies = async () => {
       try {
         setIsLoading(true);
@@ -27,7 +31,10 @@ const FreeMovies = () => {
   return (
     <MainLayout>
       <div className="container-custom py-12">
-        <h1 className="text-3xl font-semibold mb-8">Kostenlose Filme</h1>
+        <div className="flex items-center mb-8">
+          <ShoppingCart className="w-6 h-6 text-green-500 mr-2" />
+          <h1 className="text-3xl font-semibold">Kostenlose Filme</h1>
+        </div>
         
         {isLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -41,7 +48,7 @@ const FreeMovies = () => {
           </div>
         ) : movies.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Keine kostenlosen Filme gefunden.</p>
+            <p className="text-muted-foreground">Keine kostenlosen Filme gefunden. Bitte markiere Filme im Admin-Bereich als kostenlos.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">

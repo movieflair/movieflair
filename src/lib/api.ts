@@ -52,6 +52,8 @@ export interface FilterOptions {
   genres?: number[];
   decades?: string[];
   moods?: string[];
+  mediaType?: 'movie' | 'tv' | 'all';
+  rating?: number;
 }
 
 export interface CastMember {
@@ -148,13 +150,13 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/movie/now_playing');
   const savedSettings = await getAdminMovieSettings();
   
-  // Filtere Filme, die als Trailer markiert sind, oder falls keine vorhanden, verwende alle
+  // Nur Filme zurückgeben, die explizit als neue Trailer markiert wurden
   const movies = data.results.map((movie: any) => {
     const savedMovie = savedSettings[movie.id] || {};
     return {
       ...movie,
       media_type: 'movie',
-      hasTrailer: savedMovie.hasTrailer || true,
+      hasTrailer: savedMovie.hasTrailer || false,
       hasStream: savedMovie.hasStream || false,
       streamUrl: savedMovie.streamUrl || '',
       isFreeMovie: savedMovie.isFreeMovie || false,
@@ -162,15 +164,14 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     };
   });
   
-  const markedTrailers = movies.filter(movie => savedSettings[movie.id]?.isNewTrailer);
-  return markedTrailers.length > 0 ? markedTrailers : movies;
+  return movies.filter(movie => savedSettings[movie.id]?.isNewTrailer === true);
 };
 
 export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/movie/popular');
   const savedSettings = await getAdminMovieSettings();
   
-  // Filtere Filme, die als kostenlos markiert sind
+  // Nur Filme zurückgeben, die explizit als kostenlos markiert wurden
   const movies = data.results.map((movie: any) => {
     const savedMovie = savedSettings[movie.id] || {};
     return {
@@ -184,8 +185,7 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
     };
   });
   
-  const markedFreeMovies = movies.filter(movie => savedSettings[movie.id]?.isFreeMovie);
-  return markedFreeMovies.length > 0 ? markedFreeMovies : movies.filter(() => false);
+  return movies.filter(movie => savedSettings[movie.id]?.isFreeMovie === true);
 };
 
 // Hilfsfunktion zum Laden gespeicherter Filmeinstellungen
@@ -266,7 +266,10 @@ export const getTvShowById = async (id: number): Promise<MovieDetail> => {
 };
 
 export const getRecommendationByFilters = async (filters: FilterOptions): Promise<MovieOrShow[]> => {
-  const { genres, decades } = filters;
+  const { genres, decades, mediaType = 'movie', rating = 0 } = filters;
+  
+  // Entscheide, ob nach Filmen, Serien oder beiden gesucht wird
+  const endpoint = mediaType === 'tv' ? '/discover/tv' : '/discover/movie';
   
   let params: Record<string, string> = {
     sort_by: 'popularity.desc',
@@ -278,14 +281,23 @@ export const getRecommendationByFilters = async (filters: FilterOptions): Promis
   
   if (decades && decades.length > 0) {
     const decade = parseInt(decades[0]);
-    params.primary_release_date_gte = `${decade}-01-01`;
-    params.primary_release_date_lte = `${decade + 9}-12-31`;
+    if (mediaType === 'movie') {
+      params.primary_release_date_gte = `${decade}-01-01`;
+      params.primary_release_date_lte = `${decade + 9}-12-31`;
+    } else {
+      params.first_air_date_gte = `${decade}-01-01`;
+      params.first_air_date_lte = `${decade + 9}-12-31`;
+    }
   }
   
-  const data = await callTMDB('/discover/movie', params);
-  return data.results.map((movie: any) => ({
-    ...movie,
-    media_type: 'movie',
+  if (rating > 0) {
+    params.vote_average_gte = rating.toString();
+  }
+  
+  const data = await callTMDB(endpoint, params);
+  return data.results.map((item: any) => ({
+    ...item,
+    media_type: mediaType === 'all' ? (item.first_air_date ? 'tv' : 'movie') : mediaType,
   }));
 };
 
@@ -297,7 +309,26 @@ export const getSimilarMovies = async (movieId: number): Promise<MovieOrShow[]> 
   }));
 };
 
-// Neue Funktionen für die Besucherstatistik
+export const getPopularTvShows = async (): Promise<MovieOrShow[]> => {
+  const data = await callTMDB('/tv/popular');
+  
+  return data.results.map((show: any) => ({
+    ...show,
+    media_type: 'tv',
+  }));
+};
+
+export const searchTvShows = async (query: string): Promise<MovieOrShow[]> => {
+  if (!query) return [];
+  
+  const data = await callTMDB('/search/tv', { query });
+  
+  return data.results.map((show: any) => ({
+    ...show,
+    media_type: 'tv',
+  }));
+};
+
 export const trackPageVisit = async (page: string) => {
   // Prüfen, ob der Benutzer ein Admin ist - keine Aufrufe von Admins tracken
   const isAdmin = localStorage.getItem('isAdminLoggedIn') === 'true';

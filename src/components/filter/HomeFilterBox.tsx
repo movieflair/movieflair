@@ -1,10 +1,14 @@
+
 import { useState } from 'react';
 import FilterSelector from './FilterSelector';
 import { Button } from '../ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { getGenres, getRecommendationByFilters, MovieOrShow } from '@/lib/api';
-import { Search } from 'lucide-react';
+import { Search, Film, Tv, Star } from 'lucide-react';
 import RecommendationCard from '../movies/RecommendationCard';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 
 const moods = [
   'happy', 'sad', 'thrilling', 'thoughtful', 'relaxing',
@@ -17,6 +21,8 @@ const HomeFilterBox = () => {
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [selectedDecades, setSelectedDecades] = useState<string[]>([]);
+  const [mediaType, setMediaType] = useState<'movie' | 'tv' | 'all'>('movie');
+  const [rating, setRating] = useState<number>(5);
   const [recommendation, setRecommendation] = useState<MovieOrShow | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,6 +38,8 @@ const HomeFilterBox = () => {
         moods: selectedMoods,
         genres: selectedGenres,
         decades: selectedDecades,
+        mediaType,
+        rating
       });
       setRecommendation(results[0]); // Zeige den ersten empfohlenen Film
     } catch (error) {
@@ -43,9 +51,39 @@ const HomeFilterBox = () => {
 
   return (
     <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg max-w-[800px] mx-auto">
-      <h2 className="text-xl font-medium mb-4">Finde deinen nächsten Film</h2>
+      <h2 className="text-xl font-medium mb-4">Finde deinen nächsten Film oder Serie</h2>
       
       <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">Medientyp</label>
+          <RadioGroup 
+            value={mediaType} 
+            onValueChange={(value) => setMediaType(value as 'movie' | 'tv' | 'all')}
+            className="flex flex-wrap gap-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="movie" id="movie" />
+              <Label htmlFor="movie" className="flex items-center gap-2 cursor-pointer">
+                <Film className="h-4 w-4" />
+                Filme
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="tv" id="tv" />
+              <Label htmlFor="tv" className="flex items-center gap-2 cursor-pointer">
+                <Tv className="h-4 w-4" />
+                Serien
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="all" id="all" />
+              <Label htmlFor="all" className="cursor-pointer">
+                Beides
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+
         <div>
           <label className="block text-sm font-medium mb-2">Stimmung</label>
           <FilterSelector
@@ -98,6 +136,20 @@ const HomeFilterBox = () => {
             }}
             selectedValues={selectedDecades}
             type="decade"
+          />
+        </div>
+        
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <Star className="h-4 w-4 text-amber-500" />
+            <label className="block text-sm font-medium">Mindestbewertung: {rating}/10</label>
+          </div>
+          <Slider
+            value={[rating]}
+            min={0}
+            max={10}
+            step={1}
+            onValueChange={(values) => setRating(values[0])}
           />
         </div>
 

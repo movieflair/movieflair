@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart, ExternalLink, Link as LinkIcon, BarChart, EyeIcon, PieChartIcon, CalendarIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -34,20 +33,17 @@ const AdminPanel = () => {
   
   const queryClient = useQueryClient();
 
-  // Fetch movies for admin panel
   const { data: movies = [], refetch, isLoading: isLoadingMovies } = useQuery({
     queryKey: ['admin-movies'],
     queryFn: getPopularMovies
   });
   
-  // Suche nach Filmen
   const { data: searchResults = [], isLoading: isSearchLoading, refetch: refetchSearch } = useQuery({
     queryKey: ['search-movies', searchQuery],
     queryFn: () => searchMovies(searchQuery),
-    enabled: false, // Nicht automatisch ausführen
+    enabled: false,
   });
 
-  // Filter movies whenever search query changes or when switching tabs
   useEffect(() => {
     if (activeTab === 'movies' && !isSearching) {
       if (!searchQuery.trim()) {
@@ -83,18 +79,17 @@ const AdminPanel = () => {
 
   const handleEditMovie = (movie: MovieOrShow) => {
     setSelectedMovie(movie);
-    setHasStream(!!movie.hasStream);
+    setHasStream(movie.hasStream || false);
     setStreamUrl(movie.streamUrl || '');
     setStreamType(movie.streamUrl?.includes('embed') ? 'embed' : 'link');
-    setHasTrailer(!!movie.hasTrailer);
-    setIsFreeMovie(!!movie.isFreeMovie);
-    setIsNewTrailer(!!movie.isNewTrailer);
+    setHasTrailer(movie.hasTrailer || false);
+    setIsFreeMovie(movie.isFreeMovie || false);
+    setIsNewTrailer(movie.isNewTrailer || false);
   };
 
   const handleSaveMovie = () => {
     if (!selectedMovie) return;
 
-    // Get the existing saved movies from localStorage
     const savedMoviesJson = localStorage.getItem('adminMovies');
     let savedMovies: MovieOrShow[] = [];
     
@@ -106,10 +101,8 @@ const AdminPanel = () => {
       }
     }
     
-    // Check if the movie is already in the saved list
     const existingIndex = savedMovies.findIndex(m => m.id === selectedMovie.id);
     
-    // Create the updated movie object
     const updatedMovie = {
       ...selectedMovie,
       hasStream,
@@ -119,24 +112,19 @@ const AdminPanel = () => {
       isNewTrailer
     };
     
-    // Update or add the movie in the saved list
     if (existingIndex >= 0) {
       savedMovies[existingIndex] = updatedMovie;
     } else {
       savedMovies.push(updatedMovie);
     }
     
-    // Save to localStorage
     localStorage.setItem('adminMovies', JSON.stringify(savedMovies));
     
-    // Invalidate queries to refetch fresh data
     queryClient.invalidateQueries({ queryKey: ['admin-movies'] });
     queryClient.invalidateQueries({ queryKey: ['search-movies'] });
     
-    // Show success message
     toast.success("Änderungen gespeichert");
     
-    // Go back to movie list
     setSelectedMovie(null);
   };
 
@@ -241,7 +229,6 @@ const AdminPanel = () => {
                 </button>
               </form>
 
-              {/* Movies Tab: Search Results */}
               {activeTab === 'movies' && !selectedMovie && (
                 <div className="mt-6">
                   <h3 className="text-lg font-medium mb-4">
@@ -321,7 +308,6 @@ const AdminPanel = () => {
                 </div>
               )}
 
-              {/* Film Edit Form Preview */}
               {activeTab === 'movies' && selectedMovie && (
                 <div className="border border-border rounded-md p-6 mb-6">
                   <div className="flex justify-between items-center mb-4">
@@ -480,7 +466,6 @@ const AdminPanel = () => {
                 </div>
               )}
 
-              {/* Default placeholder for other tabs */}
               {activeTab !== 'movies' && (
                 <div className="bg-muted/30 rounded-lg p-8 text-center">
                   <FileEdit className="w-12 h-12 text-muted-foreground mx-auto mb-4" />

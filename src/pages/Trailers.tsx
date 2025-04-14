@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
-import { getTrailerMovies, MovieOrShow } from '@/lib/api';
+import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { PlayCircle } from 'lucide-react';
 
@@ -10,6 +10,9 @@ const Trailers = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Seiten-Aufruf tracken
+    trackPageVisit('trailers');
+    
     const fetchMovies = async () => {
       try {
         setIsLoading(true);
@@ -45,7 +48,7 @@ const Trailers = () => {
           </div>
         ) : movies.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Keine neuen Trailer gefunden.</p>
+            <p className="text-muted-foreground">Keine neuen Trailer gefunden. Bitte markiere Filme im Admin-Bereich als neue Trailer.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
