@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
-import { Zap, ChevronLeft, ChevronRight, Sparkles, Play, X } from 'lucide-react';
+import { Zap, ChevronLeft, ChevronRight, Sparkles, Play, X, FileText } from 'lucide-react';
 import MovieCard from './MovieCard';
 import {
   Carousel,
@@ -46,6 +45,11 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
   const year = randomMovie?.release_date 
     ? new Date(randomMovie.release_date).getFullYear() 
     : undefined;
+
+  const truncateText = (text: string, maxLength: number) => {
+    if (!text) return '';
+    return text.length > maxLength ? text.slice(0, maxLength) + '...' : text;
+  };
 
   return (
     <div className="container-custom mt-16">
@@ -124,14 +128,21 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               </Carousel>
             ) : (
               <div className="w-[450px]">
-                <MovieCard movie={randomMovie!} size="small" />
-                <div className="flex gap-2 mt-4">
+                <div className="space-y-4">
+                  <MovieCard movie={randomMovie!} size="small" />
+                  <p className="text-sm text-gray-600 line-clamp-3">
+                    {truncateText(randomMovie?.overview || '', 150)}
+                  </p>
                   <Button 
                     variant="outline" 
+                    size="sm"
                     className="w-full"
                     asChild
                   >
-                    <Link to={`/movie/${randomMovie!.id}`}>Details anzeigen</Link>
+                    <Link to={`/movie/${randomMovie!.id}`} className="flex items-center justify-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Details anzeigen
+                    </Link>
                   </Button>
                 </div>
               </div>
@@ -144,4 +155,3 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
 };
 
 export default SimilarMovies;
-
