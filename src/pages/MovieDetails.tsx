@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { Play, CirclePlay } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import MainLayout from '@/components/layout/MainLayout';
 import { getMovieById } from '@/lib/api';
@@ -169,13 +169,22 @@ const MovieDetails = () => {
                       Trailer
                     </button>
                   )}
+                  <a
+                    href={getAmazonUrl(movie.title || '')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
+                  >
+                    <Play className="w-4 h-4" />
+                    Prime Video
+                  </a>
                   {movie.streamUrl && (
                     <button
-                      className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
+                      className="bg-[#ea384c] text-white px-6 py-2 rounded-md hover:bg-[#ea384c]/90 transition-colors flex items-center gap-2"
                       onClick={handleStreamClick}
                     >
                       <Play className="w-4 h-4" />
-                      Stream ansehen
+                      Kostenlos
                     </button>
                   )}
                 </div>
