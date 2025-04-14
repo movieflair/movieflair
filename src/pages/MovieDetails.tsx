@@ -93,22 +93,6 @@ const MovieDetails = () => {
                 alt={movie.title}
                 className="w-full h-full object-cover"
               />
-              
-              <div className="absolute bottom-4 left-4 z-20">
-                <a
-                  href={getAmazonUrl(movie.title || '')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#1EAEDB] text-white px-6 py-2 rounded-full hover:bg-[#33C3F0] transition-colors flex items-center gap-2 shadow-lg"
-                >
-                  <img 
-                    src="/lovable-uploads/21997cbe-dbef-4485-93e8-b61a66eb7375.png"
-                    alt="Prime Video"
-                    className="w-5 h-5"
-                  />
-                  Bei Prime Video
-                </a>
-              </div>
             </>
           ) : (
             <div className="w-full h-full bg-gray-100" />
@@ -119,18 +103,33 @@ const MovieDetails = () => {
           <div className="glass-card overflow-hidden rounded-xl">
             <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
               <div className="space-y-4">
-                <div className="rounded-lg overflow-hidden shadow-xl">
-                  {movie.poster_path ? (
-                    <img
-                      src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                      alt={movie.title}
-                      className="w-full"
+                <div className="relative">
+                  <div className="rounded-lg overflow-hidden shadow-xl">
+                    {movie.poster_path ? (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                        alt={movie.title}
+                        className="w-full"
+                      />
+                    ) : (
+                      <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400">Kein Poster</span>
+                      </div>
+                    )}
+                  </div>
+                  <a
+                    href={getAmazonUrl(movie.title || '')}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-[90%] bg-[#1EAEDB] text-white px-4 py-2.5 rounded-lg hover:bg-[#33C3F0] transition-colors flex items-center justify-center gap-2 shadow-lg"
+                  >
+                    <img 
+                      src="/lovable-uploads/21997cbe-dbef-4485-93e8-b61a66eb7375.png"
+                      alt="Prime Video"
+                      className="w-5 h-5"
                     />
-                  ) : (
-                    <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
-                      <span className="text-gray-400">Kein Poster</span>
-                    </div>
-                  )}
+                    <span className="text-sm font-medium">Bei Prime Video</span>
+                  </a>
                 </div>
                 <ShareButton movieTitle={movie.title} />
               </div>
