@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import FilterSelector from './FilterSelector';
 import { Button } from '../ui/button';
@@ -43,7 +42,7 @@ const HomeFilterBox = () => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg max-w-2xl mx-auto">
+    <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg max-w-[1000px] mx-auto">
       <h2 className="text-xl font-medium mb-4">Finde deinen nächsten Film</h2>
       
       <div className="space-y-4">
