@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
@@ -25,13 +24,11 @@ const MovieDetails = () => {
         setIsLoading(true);
         const data = await getMovieById(parseInt(id));
         
-        // Check if we have saved any custom data for this movie in localStorage
         const savedMovies = localStorage.getItem('adminMovies');
         if (savedMovies) {
           const parsedMovies = JSON.parse(savedMovies);
           const savedMovie = parsedMovies.find((m: any) => m.id === data.id);
           if (savedMovie) {
-            // Override API data with saved data
             data.hasStream = savedMovie.hasStream;
             data.streamUrl = savedMovie.streamUrl;
             data.hasTrailer = savedMovie.hasTrailer;
@@ -68,22 +65,18 @@ const MovieDetails = () => {
     return `https://www.amazon.de/gp/video/search?phrase=${formattedTitle}&tag=${tag}`;
   };
 
-  // Check if the stream URL is an embed URL or a direct link
   const isEmbedUrl = movie.streamUrl && (
     movie.streamUrl.includes('embed') || 
     movie.streamUrl.includes('iframe') ||
     movie.streamUrl.includes('player')
   );
 
-  // Handle stream button click based on URL type
   const handleStreamClick = () => {
     if (!movie.streamUrl) return;
     
     if (isEmbedUrl) {
-      // Show embedded player in modal
       setShowTrailer(true);
     } else {
-      // Open direct link in new tab
       window.open(movie.streamUrl, '_blank');
     }
   };
@@ -100,6 +93,22 @@ const MovieDetails = () => {
                 alt={movie.title}
                 className="w-full h-full object-cover"
               />
+              
+              <div className="absolute bottom-4 left-4 z-20">
+                <a
+                  href={getAmazonUrl(movie.title || '')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#1EAEDB] text-white px-6 py-2 rounded-full hover:bg-[#33C3F0] transition-colors flex items-center gap-2 shadow-lg"
+                >
+                  <img 
+                    src="/lovable-uploads/21997cbe-dbef-4485-93e8-b61a66eb7375.png"
+                    alt="Prime Video"
+                    className="w-5 h-5"
+                  />
+                  Bei Prime Video
+                </a>
+              </div>
             </>
           ) : (
             <div className="w-full h-full bg-gray-100" />
