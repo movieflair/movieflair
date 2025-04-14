@@ -79,7 +79,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               </div>
             </Carousel>
 
-            <div className="absolute bottom-0 left-0">
+            <div className="absolute bottom-[-20px] left-[-20px]">
               <Button 
                 variant="outline" 
                 className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
