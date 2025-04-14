@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
-import { Zap, ChevronLeft, ChevronRight, Sparkles, Play, X, FileText } from 'lucide-react';
+import { Zap, ChevronLeft, ChevronRight, Sparkles, X, FileText } from 'lucide-react';
 import MovieCard from './MovieCard';
 import {
   Carousel,
@@ -68,7 +68,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 ? randomMovie?.overview 
                 : "Entdecke weitere Filme, die dir gefallen könnten. Basierend auf deinem aktuellen Film haben wir eine Auswahl an ähnlichen Titeln zusammengestellt."}
             </p>
-            <div className="flex gap-2 mb-2 relative">
+            <div className="flex items-center gap-2 mt-2">
               {!showRandomMovie && (
                 <>
                   <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handlePrevClick}>
@@ -77,29 +77,30 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                   <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
                     <ChevronRight className="h-4 w-4" />
                   </Button>
-                  <div className="absolute left-0 bottom-[-120px]">
-                    <Button 
-                      variant="outline" 
-                      className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
-                      onClick={getRandomMovie}
-                    >
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Quick Tipp
-                    </Button>
-                  </div>
+                  <Button 
+                    variant="outline" 
+                    className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
+                    onClick={getRandomMovie}
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Quick Tipp
+                  </Button>
                 </>
               )}
-              {showRandomMovie && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={handleClose}
-                  className="absolute right-4 top-[-60px] h-8 w-8"
-                >
-                  <X className="h-6 w-6 text-[#ea384c]" />
-                </Button>
-              )}
             </div>
+            {showRandomMovie && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="mt-2 w-full"
+                asChild
+              >
+                <Link to={`/movie/${randomMovie!.id}`} className="flex items-center justify-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Details anzeigen
+                </Link>
+              </Button>
+            )}
           </div>
 
           <div className="relative">
@@ -127,24 +128,16 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 </div>
               </Carousel>
             ) : (
-              <div className="w-[450px]">
-                <div className="space-y-4">
-                  <MovieCard movie={randomMovie!} size="small" />
-                  <p className="text-sm text-gray-600 line-clamp-3">
-                    {truncateText(randomMovie?.overview || '', 150)}
-                  </p>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="w-full"
-                    asChild
-                  >
-                    <Link to={`/movie/${randomMovie!.id}`} className="flex items-center justify-center gap-2">
-                      <FileText className="w-4 h-4" />
-                      Details anzeigen
-                    </Link>
-                  </Button>
-                </div>
+              <div className="relative w-[450px]">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleClose}
+                  className="absolute -top-10 right-0 h-8 w-8"
+                >
+                  <X className="h-6 w-6 text-[#ea384c]" />
+                </Button>
+                <MovieCard movie={randomMovie!} size="small" />
               </div>
             )}
           </div>
