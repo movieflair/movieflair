@@ -171,3 +171,11 @@ export const getRecommendationByFilters = async (filters: FilterOptions): Promis
     media_type: 'movie',
   }));
 };
+
+export const getSimilarMovies = async (movieId: number): Promise<MovieOrShow[]> => {
+  const data = await callTMDB(`/movie/${movieId}/similar`);
+  return data.results.map((movie: any) => ({
+    ...movie,
+    media_type: 'movie',
+  }));
+};

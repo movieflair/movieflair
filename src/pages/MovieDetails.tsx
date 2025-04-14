@@ -8,12 +8,15 @@ import type { MovieDetail as MovieDetailType } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import ShareButton from '@/components/movies/ShareButton';
+import { getSimilarMovies } from '@/lib/api';
+import SimilarMovies from '@/components/movies/SimilarMovies';
 
 const MovieDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [movie, setMovie] = useState<MovieDetailType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
+  const [similarMovies, setSimilarMovies] = useState<MovieOrShow[]>([]);
   const { amazonAffiliateId } = useAdminSettings();
 
   useEffect(() => {
@@ -21,20 +24,24 @@ const MovieDetails = () => {
       if (!id) return;
       try {
         setIsLoading(true);
-        const data = await getMovieById(parseInt(id));
+        const [movieData, similars] = await Promise.all([
+          getMovieById(parseInt(id)),
+          getSimilarMovies(parseInt(id))
+        ]);
         
         const savedMovies = localStorage.getItem('adminMovies');
         if (savedMovies) {
           const parsedMovies = JSON.parse(savedMovies);
-          const savedMovie = parsedMovies.find((m: any) => m.id === data.id);
+          const savedMovie = parsedMovies.find((m: any) => m.id === movieData.id);
           if (savedMovie) {
-            data.hasStream = savedMovie.hasStream;
-            data.streamUrl = savedMovie.streamUrl;
-            data.hasTrailer = savedMovie.hasTrailer;
+            movieData.hasStream = savedMovie.hasStream;
+            movieData.streamUrl = savedMovie.streamUrl;
+            movieData.hasTrailer = savedMovie.hasTrailer;
           }
         }
         
-        setMovie(data);
+        setMovie(movieData);
+        setSimilarMovies(similars);
       } catch (error) {
         console.error('Error fetching movie details:', error);
       } finally {
@@ -189,6 +196,10 @@ const MovieDetails = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="container-custom pb-16">
+        <SimilarMovies movies={similarMovies} />
       </div>
 
       {showTrailer && ((movie.videos?.results[0]?.key || (movie.streamUrl && isEmbedUrl))) && (
