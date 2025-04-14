@@ -57,7 +57,7 @@ export interface CastMember {
   job?: string;
 }
 
-const moodToGenres: Record<string, number[]> = {
+export const moodToGenres: Record<string, number[]> = {
   happy: [35, 10751, 12], // Comedy, Family, Adventure
   sad: [18, 10749], // Drama, Romance
   thrilling: [28, 53, 27], // Action, Thriller, Horror

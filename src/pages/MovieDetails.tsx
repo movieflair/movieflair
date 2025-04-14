@@ -70,94 +70,96 @@ const MovieDetails = () => {
           )}
         </div>
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 -mt-40 relative z-20">
-          <div className="grid md:grid-cols-[300px,1fr] gap-8">
-            {/* Poster */}
-            <div>
-              <div className="rounded-lg overflow-hidden shadow-xl">
-                {movie.poster_path ? (
-                  <img
-                    src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                    alt={movie.title}
-                    className="w-full"
-                  />
-                ) : (
-                  <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
-                    <span className="text-gray-400">Kein Poster</span>
-                  </div>
+        <div className="container-custom -mt-40 relative z-20">
+          <div className="glass-card overflow-hidden rounded-xl">
+            <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
+              {/* Poster */}
+              <div>
+                <div className="rounded-lg overflow-hidden shadow-xl">
+                  {movie.poster_path ? (
+                    <img
+                      src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                      alt={movie.title}
+                      className="w-full"
+                    />
+                  ) : (
+                    <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
+                      <span className="text-gray-400">Kein Poster</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="text-gray-800">
+                <h1 className="text-4xl font-semibold mb-2">{movie.title}</h1>
+                {movie.tagline && (
+                  <p className="text-xl text-gray-500 mb-4 italic">
+                    {movie.tagline}
+                  </p>
                 )}
-              </div>
-            </div>
 
-            {/* Content */}
-            <div className="text-gray-800">
-              <h1 className="text-4xl font-semibold mb-2">{movie.title}</h1>
-              {movie.tagline && (
-                <p className="text-xl text-gray-500 mb-4 italic">
-                  {movie.tagline}
+                <MovieMeta
+                  year={year?.toString()}
+                  rating={movie.vote_average}
+                  duration={movie.runtime}
+                />
+
+                <div className="flex flex-wrap gap-2 my-6">
+                  {movie.genres?.map((genre) => (
+                    <span
+                      key={genre.id}
+                      className="px-4 py-1 bg-gray-100 text-gray-700 rounded-md"
+                    >
+                      {genre.name}
+                    </span>
+                  ))}
+                </div>
+
+                <p className="text-gray-600 mb-8 leading-relaxed">
+                  {movie.overview}
                 </p>
-              )}
 
-              <MovieMeta
-                year={year?.toString()}
-                rating={movie.vote_average}
-                duration={movie.runtime}
-              />
-
-              <div className="flex flex-wrap gap-2 my-6">
-                {movie.genres?.map((genre) => (
-                  <span
-                    key={genre.id}
-                    className="px-4 py-1 bg-gray-100 text-gray-700 rounded-md"
-                  >
-                    {genre.name}
-                  </span>
-                ))}
-              </div>
-
-              <p className="text-gray-600 mb-8 leading-relaxed">
-                {movie.overview}
-              </p>
-
-              <div className="flex gap-4 mb-8">
-                {movie.videos?.results.length > 0 && (
-                  <button
-                    onClick={() => setShowTrailer(true)}
+                <div className="flex gap-4 mb-8">
+                  {movie.videos?.results.length > 0 && (
+                    <button
+                      onClick={() => setShowTrailer(true)}
+                      className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    >
+                      <Play className="w-4 h-4" />
+                      Trailer
+                    </button>
+                  )}
+                  <a
+                    href={getAmazonUrl(movie.title || '')}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
                   >
-                    <Play className="w-4 h-4" />
-                    Trailer
-                  </button>
-                )}
-                <a
-                  href={getAmazonUrl(movie.title || '')}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
-                >
-                  <img 
-                    src="/prime-video-icon.png" 
-                    alt="Prime Video" 
-                    className="w-5 h-5"
-                  />
-                  Bei Prime Video ansehen
-                </a>
-                {movie.hasStream && (
-                  <button
-                    className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors"
-                    onClick={() => setShowTrailer(true)}
-                  >
-                    Stream ansehen
-                  </button>
-                )}
-              </div>
+                    <img 
+                      src="/prime-video-icon.png" 
+                      alt="Prime Video" 
+                      className="w-5 h-5"
+                    />
+                    Bei Prime Video ansehen
+                  </a>
+                  {movie.hasStream && (
+                    <button
+                      className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors"
+                      onClick={() => setShowTrailer(true)}
+                    >
+                      Stream ansehen
+                    </button>
+                  )}
+                </div>
 
-              {/* Cast and Crew Section */}
-              <div className="mt-8">
-                <CastAndCrewSection 
-                  director={movie.cast?.find(person => person.job === 'Director')}
-                  cast={movie.cast?.filter(person => person.character)}
-                />
+                {/* Cast and Crew Section */}
+                <div className="mt-8">
+                  <CastAndCrewSection 
+                    director={movie.cast?.find(person => person.job === 'Director')}
+                    cast={movie.cast?.filter(person => person.character)}
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -8,13 +8,13 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-gray-900 border-b border-gray-800">
-      <div className="container-custom flex items-center justify-between h-16">
+      <div className="container-custom flex items-center justify-between h-20">
         {/* Logo */}
         <Link to="/" className="flex items-center">
           <img 
             src="/lovable-uploads/9a009d9a-af92-4fd1-9d0a-89e1e81258ee.png" 
             alt="MovieFlair" 
-            className="h-8"
+            className="h-12"
           />
         </Link>
 
