@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { Play } from 'lucide-react';
+import { Zap, Play } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getMovieById, getSimilarMovies } from '@/lib/api';
 import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/api';
@@ -127,7 +127,10 @@ const MovieDetails = () => {
               </div>
 
               <div className="text-gray-800">
-                <h1 className="text-4xl font-semibold mb-2">{movie.title}</h1>
+                <div className="flex items-center gap-2">
+                  <Zap className="w-6 h-6 text-[#ea384c]" />
+                  <h1 className="text-4xl font-semibold mb-2">{movie.title}</h1>
+                </div>
                 {movie.tagline && (
                   <p className="text-xl text-gray-500 mb-4 italic">
                     {movie.tagline}
