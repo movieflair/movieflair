@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play, CirclePlay } from 'lucide-react';
-import Tabs, { TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import MainLayout from '@/components/layout/MainLayout';
 import { getMovieById } from '@/lib/api';
 import type { MovieDetail as MovieDetailType } from '@/lib/api';

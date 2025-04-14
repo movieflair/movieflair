@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Star, Calendar, ArrowLeft, ExternalLink, PlayCircle } from 'lucide-react';
+import MainLayout from '@/components/layout/MainLayout';
+import { getTvShowById, MovieDetail } from '@/lib/api';
+
+// Create a type alias for TvShowDetailType
+type TvShowDetailType = MovieDetail;
 
 const TvShowDetails = () => {
   const { id } = useParams<{ id: string }>();
