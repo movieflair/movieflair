@@ -1,10 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart, ExternalLink, Link as LinkIcon, BarChart, Pencil } from 'lucide-react';
+import { useState } from 'react';
+import { Search, FileEdit, Film } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
@@ -20,7 +17,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import AdminStats from './AdminStats';
 import AdminVisitorStats from './AdminVisitorStats';
-import MovieCategories from './MovieCategories';
+import AdminContentTabs from './AdminContentTabs';
+import MovieEditForm from './MovieEditForm';
+import TvShowEditForm from './TvShowEditForm';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('movies');
@@ -46,7 +45,6 @@ const AdminPanel = () => {
   
   const queryClient = useQueryClient();
 
-  // Movie queries
   const { data: movies = [], isLoading: isLoadingMovies } = useQuery({
     queryKey: ['admin-movies'],
     queryFn: getPopularMovies
@@ -292,76 +290,12 @@ const AdminPanel = () => {
         
         <TabsContent value="content">
           <div className="bg-card rounded-lg shadow-sm overflow-hidden">
-            <div className="flex border-b border-border overflow-x-auto">
-              <button
-                className={`px-4 py-3 text-sm font-medium flex items-center whitespace-nowrap ${
-                  activeTab === 'movies'
-                    ? 'border-b-2 border-primary text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                onClick={() => {
-                  setActiveTab('movies');
-                  setCurrentView('all');
-                  setIsSearching(false);
-                }}
-              >
-                <Film className="w-4 h-4 mr-2" />
-                Filme
-              </button>
-              <button
-                className={`px-4 py-3 text-sm font-medium flex items-center whitespace-nowrap ${
-                  activeTab === 'shows'
-                    ? 'border-b-2 border-primary text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                onClick={() => {
-                  setActiveTab('shows');
-                  setIsSearching(false);
-                }}
-              >
-                <Tv className="w-4 h-4 mr-2" />
-                Serien
-              </button>
-              <button
-                className={`px-4 py-3 text-sm font-medium flex items-center whitespace-nowrap ${
-                  activeTab === 'movies' && currentView === 'free'
-                    ? 'border-b-2 border-primary text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                onClick={() => {
-                  setActiveTab('movies');
-                  handleViewChange('free');
-                }}
-              >
-                <Video className="w-4 h-4 mr-2" />
-                Kostenlose Filme
-              </button>
-              <button
-                className={`px-4 py-3 text-sm font-medium flex items-center whitespace-nowrap ${
-                  activeTab === 'movies' && currentView === 'trailers'
-                    ? 'border-b-2 border-primary text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                onClick={() => {
-                  setActiveTab('movies');
-                  handleViewChange('trailers');
-                }}
-              >
-                <PlayCircle className="w-4 h-4 mr-2" />
-                Neue Trailer
-              </button>
-              <button
-                className={`px-4 py-3 text-sm font-medium flex items-center whitespace-nowrap ${
-                  activeTab === 'tags'
-                    ? 'border-b-2 border-primary text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                onClick={() => setActiveTab('tags')}
-              >
-                <Tag className="w-4 h-4 mr-2" />
-                Tags
-              </button>
-            </div>
+            <AdminContentTabs 
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              currentView={currentView}
+              handleViewChange={handleViewChange}
+            />
 
             <div className="p-4">
               <form onSubmit={handleSearch} className="flex max-w-md mb-6">
@@ -384,7 +318,48 @@ const AdminPanel = () => {
                 </button>
               </form>
 
-              {/* Film-Verwaltung */}
+              {activeTab === 'movies' && selectedMovie && (
+                <MovieEditForm
+                  selectedMovie={selectedMovie}
+                  isNewTrailer={isNewTrailer}
+                  isFreeMovie={isFreeMovie}
+                  streamUrl={streamUrl}
+                  streamType={streamType}
+                  trailerUrl={trailerUrl}
+                  onTrailerChange={(checked) => {
+                    setIsNewTrailer(checked);
+                    setHasTrailer(checked);
+                  }}
+                  onFreeMovieChange={(checked) => {
+                    setIsFreeMovie(checked);
+                    setHasStream(checked);
+                  }}
+                  setStreamType={setStreamType}
+                  setStreamUrl={setStreamUrl}
+                  setTrailerUrl={setTrailerUrl}
+                  onSave={handleSaveMovie}
+                  onCancel={() => setSelectedMovie(null)}
+                />
+              )}
+
+              {activeTab === 'shows' && selectedTvShow && (
+                <TvShowEditForm
+                  selectedTvShow={selectedTvShow}
+                  hasStream={hasStream}
+                  hasTrailer={hasTrailer}
+                  streamUrl={streamUrl}
+                  streamType={streamType}
+                  trailerUrl={trailerUrl}
+                  setHasStream={setHasStream}
+                  setHasTrailer={setHasTrailer}
+                  setStreamType={setStreamType}
+                  setStreamUrl={setStreamUrl}
+                  setTrailerUrl={setTrailerUrl}
+                  onSave={handleSaveTvShow}
+                  onCancel={() => setSelectedTvShow(null)}
+                />
+              )}
+
               {activeTab === 'movies' && !selectedMovie && (
                 <div className="mt-6">
                   <h3 className="text-lg font-medium mb-4">
@@ -471,7 +446,6 @@ const AdminPanel = () => {
                 </div>
               )}
 
-              {/* Serien-Verwaltung */}
               {activeTab === 'shows' && !selectedTvShow && (
                 <div className="mt-6">
                   <h3 className="text-lg font-medium mb-4">
@@ -538,276 +512,6 @@ const AdminPanel = () => {
                       {searchQuery ? 'Keine Serien gefunden.' : 'Keine Serien verfügbar.'}
                     </div>
                   )}
-                </div>
-              )}
-
-              {/* Film-Bearbeitung */}
-              {activeTab === 'movies' && selectedMovie && (
-                <div className="border border-border rounded-md p-6 mb-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium">Film bearbeiten</h3>
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => setSelectedMovie(null)}
-                      className="text-sm"
-                    >
-                      Zurück zur Liste
-                    </Button>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="title">Titel</Label>
-                      <Input 
-                        id="title" 
-                        placeholder="Fight Club" 
-                        className="mt-1" 
-                        value={selectedMovie.title || ''}
-                        readOnly
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="year">Jahr</Label>
-                      <Input 
-                        id="year" 
-                        placeholder="1999" 
-                        className="mt-1" 
-                        value={selectedMovie.release_date?.substring(0, 4) || ''}
-                        readOnly
-                      />
-                    </div>
-                    
-                    <div className="md:col-span-2">
-                      <Label htmlFor="description">Beschreibung</Label>
-                      <textarea 
-                        id="description"
-                        rows={3}
-                        className="w-full mt-1 p-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                        placeholder="Film Beschreibung..."
-                        value={selectedMovie.overview || ''}
-                        readOnly
-                      />
-                    </div>
-                    
-                    <div className="md:col-span-2">
-                      <MovieCategories 
-                        isNewTrailer={isNewTrailer}
-                        isFreeMovie={isFreeMovie}
-                        onTrailerChange={(checked) => {
-                          setIsNewTrailer(checked);
-                          setHasTrailer(checked);
-                        }}
-                        onFreeMovieChange={(checked) => {
-                          setIsFreeMovie(checked);
-                          setHasStream(checked);
-                        }}
-                      />
-                    </div>
-                    
-                    {isFreeMovie && (
-                      <div className="md:col-span-2 space-y-4">
-                        <div>
-                          <Label className="mb-2 block">Stream URL Typ</Label>
-                          <RadioGroup 
-                            value={streamType} 
-                            onValueChange={(value) => setStreamType(value as 'embed' | 'link')}
-                            className="flex gap-4"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="embed" id="embed" />
-                              <Label htmlFor="embed" className="flex items-center gap-1">
-                                <PlayCircle className="w-4 h-4" /> 
-                                Embed Code (Video Player)
-                              </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="link" id="link" />
-                              <Label htmlFor="link" className="flex items-center gap-1">
-                                <LinkIcon className="w-4 h-4" /> 
-                                Direkt-Link (Weiterleitung)
-                              </Label>
-                            </div>
-                          </RadioGroup>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="streamUrl">
-                            {streamType === 'embed' ? 'Stream URL (Embed Code)' : 'Stream URL (Direktlink)'}
-                          </Label>
-                          <Input 
-                            id="streamUrl" 
-                            placeholder={streamType === 'embed' 
-                              ? "https://www.youtube.com/embed/..." 
-                              : "https://www.example.com/watch?..."
-                            }
-                            className="mt-1"
-                            value={streamUrl}
-                            onChange={(e) => setStreamUrl(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {isNewTrailer && (
-                      <div className="md:col-span-2">
-                        <Label htmlFor="trailerUrl">Trailer URL (YouTube Embed)</Label>
-                        <Input 
-                          id="trailerUrl" 
-                          placeholder="https://www.youtube.com/embed/..." 
-                          className="mt-1"
-                          value={trailerUrl}
-                          onChange={(e) => setTrailerUrl(e.target.value)}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex justify-end mt-6">
-                    <Button onClick={handleSaveMovie}>Speichern</Button>
-                  </div>
-                </div>
-              )}
-              
-              {/* Serien-Bearbeitung */}
-              {activeTab === 'shows' && selectedTvShow && (
-                <div className="border border-border rounded-md p-6 mb-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-medium">Serie bearbeiten</h3>
-                    <Button 
-                      variant="ghost" 
-                      onClick={() => setSelectedTvShow(null)}
-                      className="text-sm"
-                    >
-                      Zurück zur Liste
-                    </Button>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <Label htmlFor="title">Titel</Label>
-                      <Input 
-                        id="title" 
-                        placeholder="Breaking Bad" 
-                        className="mt-1" 
-                        value={selectedTvShow.name || ''}
-                        readOnly
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="year">Erscheinungsjahr</Label>
-                      <Input 
-                        id="year" 
-                        placeholder="2008" 
-                        className="mt-1" 
-                        value={selectedTvShow.first_air_date?.substring(0, 4) || ''}
-                        readOnly
-                      />
-                    </div>
-                    
-                    <div className="md:col-span-2">
-                      <Label htmlFor="description">Beschreibung</Label>
-                      <textarea 
-                        id="description"
-                        rows={3}
-                        className="w-full mt-1 p-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                        placeholder="Serien-Beschreibung..."
-                        value={selectedTvShow.overview || ''}
-                        readOnly
-                      />
-                    </div>
-                    
-                    <div className="flex flex-col md:col-span-2">
-                      <div className="text-lg font-medium mb-2">Einstellungen</div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="hasStream" 
-                            checked={hasStream}
-                            onCheckedChange={(checked) => setHasStream(checked as boolean)}
-                          />
-                          <Label htmlFor="hasStream" className="flex items-center gap-1">
-                            <PlayCircle className="w-4 h-4" /> 
-                            Stream verfügbar
-                          </Label>
-                        </div>
-                        
-                        <div className="flex items-center space-x-2">
-                          <Checkbox 
-                            id="hasTrailer" 
-                            checked={hasTrailer}
-                            onCheckedChange={(checked) => setHasTrailer(checked as boolean)}
-                          />
-                          <Label htmlFor="hasTrailer" className="flex items-center gap-1">
-                            <Video className="w-4 h-4" /> 
-                            Als Trailer anzeigen
-                          </Label>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {hasStream && (
-                      <div className="md:col-span-2 space-y-4">
-                        <div>
-                          <Label className="mb-2 block">Stream URL Typ</Label>
-                          <RadioGroup 
-                            value={streamType} 
-                            onValueChange={(value) => setStreamType(value as 'embed' | 'link')}
-                            className="flex gap-4"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="embed" id="embed" />
-                              <Label htmlFor="embed" className="flex items-center gap-1">
-                                <PlayCircle className="w-4 h-4" /> 
-                                Embed Code (Video Player)
-                              </Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="link" id="link" />
-                              <Label htmlFor="link" className="flex items-center gap-1">
-                                <LinkIcon className="w-4 h-4" /> 
-                                Direkt-Link (Weiterleitung)
-                              </Label>
-                            </div>
-                          </RadioGroup>
-                        </div>
-
-                        <div>
-                          <Label htmlFor="streamUrl">
-                            {streamType === 'embed' ? 'Stream URL (Embed Code)' : 'Stream URL (Direktlink)'}
-                          </Label>
-                          <Input 
-                            id="streamUrl" 
-                            placeholder={streamType === 'embed' 
-                              ? "https://www.youtube.com/embed/..." 
-                              : "https://www.example.com/watch?..."
-                            }
-                            className="mt-1"
-                            value={streamUrl}
-                            onChange={(e) => setStreamUrl(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                    )}
-                    
-                    {hasTrailer && (
-                      <div className="md:col-span-2">
-                        <Label htmlFor="trailerUrl">Trailer URL (YouTube Embed)</Label>
-                        <Input 
-                          id="trailerUrl" 
-                          placeholder="https://www.youtube.com/embed/..." 
-                          className="mt-1"
-                          value={trailerUrl}
-                          onChange={(e) => setTrailerUrl(e.target.value)}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex justify-end mt-6">
-                    <Button onClick={handleSaveTvShow}>Speichern</Button>
-                  </div>
                 </div>
               )}
             </div>
