@@ -35,18 +35,6 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             <p className="text-gray-600">
               Entdecke weitere Filme, die dir gefallen könnten. Basierend auf deinem aktuellen Film haben wir eine Auswahl an ähnlichen Titeln zusammengestellt.
             </p>
-            <div className="flex gap-2">
-              <CarouselPrevious asChild>
-                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0">
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-              </CarouselPrevious>
-              <CarouselNext asChild>
-                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0">
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </CarouselNext>
-            </div>
           </div>
 
           <Carousel
@@ -58,6 +46,19 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             }}
             className="w-full"
           >
+            <div className="flex gap-2 mb-4">
+              <CarouselPrevious asChild>
+                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0">
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              </CarouselPrevious>
+              <CarouselNext asChild>
+                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0">
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </CarouselNext>
+            </div>
+            
             <CarouselContent className="-ml-6">
               {movies.map((movie) => (
                 <CarouselItem key={movie.id} className="pl-6 basis-1/4 md:basis-1/4 lg:basis-1/5">
