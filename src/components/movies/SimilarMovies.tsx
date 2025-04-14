@@ -76,6 +76,11 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 "Ähnliche Filme"
               )}
             </Link>
+            <p className="text-gray-600">
+              {showRandomMovie 
+                ? randomMovie?.overview 
+                : "Entdecke weitere Filme, die dir gefallen könnten. Basierend auf deinem aktuellen Film haben wir eine Auswahl an ähnlichen Titeln zusammengestellt."}
+            </p>
             {!showRandomMovie && (
               <div className="absolute bottom-32 left-8">
                 <Button 
