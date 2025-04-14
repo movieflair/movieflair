@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -137,7 +138,20 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 >
                   <X className="h-6 w-6 text-[#ea384c]" />
                 </Button>
-                <MovieCard movie={randomMovie!} size="small" />
+                <div className="relative">
+                  {randomMovie?.backdrop_path && (
+                    <div 
+                      className="absolute inset-0 right-[-100px] opacity-20"
+                      style={{
+                        backgroundImage: `url(https://image.tmdb.org/t/p/w500${randomMovie.backdrop_path})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center right',
+                        backgroundRepeat: 'no-repeat',
+                      }}
+                    />
+                  )}
+                  <MovieCard movie={randomMovie!} size="small" />
+                </div>
               </div>
             )}
           </div>
