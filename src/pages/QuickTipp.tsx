@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
-import { Zap, ArrowLeft, Play, FileText, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Sparkles, ArrowLeft, Play, FileText, ThumbsUp, ThumbsDown } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { getPopularMovies } from '@/lib/api';
@@ -88,7 +88,7 @@ const QuickTipp = () => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Zap className="h-8 w-8 text-[#ea384c]" />
+              <Sparkles className="h-8 w-8 text-[#ea384c]" />
               Quick Tipp
             </h1>
           </div>
@@ -141,7 +141,7 @@ const QuickTipp = () => {
                 
                 <div className="text-gray-800">
                   <div className="flex items-center gap-2">
-                    <Zap className="w-6 h-6 text-[#ea384c]" />
+                    <Sparkles className="w-6 h-6 text-[#ea384c]" />
                     <h3 className="text-3xl font-semibold">{randomMovie.title}</h3>
                   </div>
                   
@@ -166,7 +166,7 @@ const QuickTipp = () => {
                   
                   <div className="flex flex-wrap gap-3 mb-6">
                     <Button 
-                      className="bg-[rgba(26,152,255,255)] hover:bg-[rgba(26,152,255,255)]/90 text-white flex items-center gap-2"
+                      className="bg-[#8E9196] hover:bg-[#8E9196]/90 text-white flex items-center gap-2"
                       onClick={handleViewDetails}
                     >
                       <FileText className="w-4 h-4" />
@@ -174,10 +174,10 @@ const QuickTipp = () => {
                     </Button>
                     <Button 
                       variant="outline" 
-                      className="flex items-center gap-2"
+                      className="bg-[#ea384c] hover:bg-[#ea384c]/90 text-white flex items-center gap-2 border-0"
                       onClick={handleGetNewTipp}
                     >
-                      <Zap className="w-4 h-4" />
+                      <Sparkles className="w-4 h-4" />
                       Neuer Vorschlag
                     </Button>
                   </div>
