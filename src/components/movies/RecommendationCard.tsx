@@ -15,21 +15,21 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
   return (
     <div className="glass-card overflow-hidden rounded-xl">
       <div className="md:flex">
-        <div className="md:w-1/3 lg:w-1/4">
+        <div className="md:w-1/4 lg:w-1/5">
           {movie.poster_path ? (
             <img
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
               alt={title}
-              className="w-full h-full object-cover aspect-[2/3]"
+              className="w-full h-[300px] md:h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full aspect-[2/3] flex items-center justify-center bg-muted">
+            <div className="w-full h-[300px] md:h-full flex items-center justify-center bg-muted">
               <span className="text-muted-foreground">No Image</span>
             </div>
           )}
         </div>
         
-        <div className="p-6 md:w-2/3 lg:w-3/4 flex flex-col">
+        <div className="p-6 md:w-3/4 lg:w-4/5 flex flex-col">
           <div className="flex items-start justify-between mb-2">
             <h2 className="text-2xl font-semibold">{title}</h2>
             <div className="flex items-center bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
@@ -62,7 +62,7 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
           </div>
           
           <p className="text-muted-foreground mb-6 line-clamp-3">
-            {movie.overview || 'No description available.'}
+            {movie.overview || 'Keine Beschreibung verfügbar.'}
           </p>
           
           <div className="mt-auto">
@@ -70,7 +70,7 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
               to={`/${movie.media_type}/${movie.id}`}
               className="button-primary inline-flex items-center"
             >
-              See Details
+              Details ansehen
               <ArrowRight className="ml-2 w-4 h-4" />
             </Link>
           </div>
@@ -81,3 +81,4 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
 };
 
 export default RecommendationCard;
+
