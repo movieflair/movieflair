@@ -1,4 +1,3 @@
-
 export interface Genre {
   id: number;
   name: string;
@@ -9,6 +8,7 @@ export interface MovieOrShow {
   title?: string;
   name?: string;
   poster_path: string;
+  backdrop_path?: string;
   overview: string;
   vote_average: number;
   release_date?: string;
@@ -21,12 +21,16 @@ export interface MovieDetail extends MovieOrShow {
   runtime?: number;
   number_of_episodes?: number;
   number_of_seasons?: number;
-}
-
-export interface FilterOptions {
-  moods?: string[];
-  genres?: number[];
-  decades?: string[];
+  genres?: Genre[];
+  tagline?: string;
+  homepage?: string;
+  videos?: {
+    results: {
+      key: string;
+      name: string;
+      type: string;
+    }[];
+  };
 }
 
 export const moodToGenres: Record<string, number[]> = {
@@ -116,7 +120,16 @@ export const getMovieById = async (id: string): Promise<MovieDetail> => {
   const movies = await getPopularMovies();
   const movie = movies.find(m => m.id === parseInt(id));
   if (!movie) throw new Error('Movie not found');
-  return { ...movie, runtime: 120 };
+  return { 
+    ...movie, 
+    runtime: 120,
+    genres: movie.genre_ids.map(id => genres.find(g => g.id === id)).filter(Boolean) as Genre[],
+    tagline: "Ein beispielhafter Tagline",
+    homepage: "https://example.com",
+    videos: {
+      results: []
+    }
+  };
 };
 
 export const getTvShowById = async (id: string): Promise<MovieDetail> => {
@@ -124,6 +137,6 @@ export const getTvShowById = async (id: string): Promise<MovieDetail> => {
 };
 
 export const getRecommendationByFilters = async (filters: FilterOptions): Promise<MovieOrShow[]> => {
-  return getPopularMovies();
+  const movies = await getPopularMovies();
+  return [movies[Math.floor(Math.random() * movies.length)]];
 };
-
