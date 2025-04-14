@@ -1,5 +1,5 @@
 
-import { Share, Copy, Facebook, Twitter, WhatsApp } from "lucide-react";
+import { Share, Copy, Facebook, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -73,7 +73,8 @@ const ShareButton = ({ movieTitle, className }: ShareButtonProps) => {
             className="w-full justify-start"
             onClick={shareToWhatsApp}
           >
-            <WhatsApp className="mr-2 h-4 w-4" />
+            {/* Using emoji for WhatsApp since the icon isn't available */}
+            <span className="mr-2 text-green-500 font-bold text-xl" style={{ lineHeight: 0 }}>&#x1F4AC;</span>
             WhatsApp
           </Button>
           <Button
@@ -99,4 +100,3 @@ const ShareButton = ({ movieTitle, className }: ShareButtonProps) => {
 };
 
 export default ShareButton;
-
