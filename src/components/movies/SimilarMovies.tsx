@@ -47,16 +47,12 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             className="w-full"
           >
             <div className="flex gap-2 mb-4">
-              <CarouselPrevious asChild>
-                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0">
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-              </CarouselPrevious>
-              <CarouselNext asChild>
-                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0">
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </CarouselNext>
+              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={() => document.querySelector('.embla__prev')?.click()}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={() => document.querySelector('.embla__next')?.click()}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
             
             <CarouselContent className="-ml-6">
@@ -66,6 +62,12 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 </CarouselItem>
               ))}
             </CarouselContent>
+            
+            {/* Hidden carousel controls that will be triggered by our custom buttons */}
+            <div className="hidden">
+              <CarouselPrevious className="embla__prev" />
+              <CarouselNext className="embla__next" />
+            </div>
           </Carousel>
         </div>
       </div>
