@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export interface Genre {
@@ -20,6 +21,7 @@ export interface MovieOrShow {
   hasStream?: boolean;
   streamUrl?: string;
   hasTrailer?: boolean;
+  trailerUrl?: string;
   isFreeMovie?: boolean;
   isNewTrailer?: boolean;
 }
@@ -44,6 +46,7 @@ export interface MovieDetail extends MovieOrShow {
   hasStream?: boolean;
   streamUrl?: string;
   hasTrailer?: boolean;
+  trailerUrl?: string;
   isFreeMovie?: boolean;
   isNewTrailer?: boolean;
 }
@@ -118,6 +121,7 @@ export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
       hasStream: savedMovie.hasStream || false,
       streamUrl: savedMovie.streamUrl || '',
       hasTrailer: savedMovie.hasTrailer || false,
+      trailerUrl: savedMovie.trailerUrl || '',
       isFreeMovie: savedMovie.isFreeMovie || false,
       isNewTrailer: savedMovie.isNewTrailer || false,
     };
@@ -140,6 +144,7 @@ export const searchMovies = async (query: string): Promise<MovieOrShow[]> => {
       hasStream: savedMovie.hasStream || false,
       streamUrl: savedMovie.streamUrl || '',
       hasTrailer: savedMovie.hasTrailer || false,
+      trailerUrl: savedMovie.trailerUrl || '',
       isFreeMovie: savedMovie.isFreeMovie || false,
       isNewTrailer: savedMovie.isNewTrailer || false,
     };
@@ -157,6 +162,7 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       ...movie,
       media_type: 'movie',
       hasTrailer: savedMovie.hasTrailer || false,
+      trailerUrl: savedMovie.trailerUrl || '',
       hasStream: savedMovie.hasStream || false,
       streamUrl: savedMovie.streamUrl || '',
       isFreeMovie: savedMovie.isFreeMovie || false,
@@ -180,6 +186,7 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
       hasStream: savedMovie.hasStream || false,
       streamUrl: savedMovie.streamUrl || '',
       hasTrailer: savedMovie.hasTrailer || false,
+      trailerUrl: savedMovie.trailerUrl || '',
       isFreeMovie: savedMovie.isFreeMovie || false,
       isNewTrailer: savedMovie.isNewTrailer || false,
     };
@@ -208,6 +215,26 @@ const getAdminMovieSettings = async () => {
   }
 };
 
+// Hilfsfunktion zum Laden gespeicherter Serieneinstellungen
+const getAdminTvShowSettings = async () => {
+  const savedShowsJson = localStorage.getItem('adminShows');
+  if (!savedShowsJson) return {};
+  
+  try {
+    const savedShows = JSON.parse(savedShowsJson);
+    // Konvertiere Array in ein Objekt mit Serien-ID als Schlüssel
+    return savedShows.reduce((acc: Record<number, any>, show: MovieOrShow) => {
+      if (show.id) {
+        acc[show.id] = show;
+      }
+      return acc;
+    }, {});
+  } catch (e) {
+    console.error('Error parsing saved shows:', e);
+    return {};
+  }
+};
+
 export const getMovieById = async (id: number): Promise<MovieDetail> => {
   const [movieData, videos, credits] = await Promise.all([
     callTMDB(`/movie/${id}`, { append_to_response: 'videos' }),
@@ -228,6 +255,7 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
           hasStream: savedMovie.hasStream || false,
           streamUrl: savedMovie.streamUrl || '',
           hasTrailer: savedMovie.hasTrailer || false,
+          trailerUrl: savedMovie.trailerUrl || '',
           isFreeMovie: savedMovie.isFreeMovie || false,
           isNewTrailer: savedMovie.isNewTrailer || false,
         };
@@ -255,13 +283,35 @@ export const getTvShowById = async (id: number): Promise<MovieDetail> => {
     callTMDB(`/tv/${id}/credits`),
   ]);
 
+  // Überprüfen, ob die Serie in den admin Einstellungen gespeichert ist
+  const savedShowsJson = localStorage.getItem('adminShows');
+  let adminSettings: Record<string, any> = {}; // Initialize with an empty object with defined type
+  
+  if (savedShowsJson) {
+    try {
+      const savedShows = JSON.parse(savedShowsJson);
+      const savedShow = savedShows.find((s: any) => s.id === id);
+      if (savedShow) {
+        adminSettings = {
+          hasStream: savedShow.hasStream || false,
+          streamUrl: savedShow.streamUrl || '',
+          hasTrailer: savedShow.hasTrailer || false,
+          trailerUrl: savedShow.trailerUrl || '',
+        };
+      }
+    } catch (e) {
+      console.error('Error parsing saved shows:', e);
+    }
+  }
+
   return {
     ...showData,
     media_type: 'tv',
     videos: { results: videos.results },
     cast: credits.cast?.slice(0, 10),
     crew: credits.crew,
-    hasTrailer: videos.results?.some((v: any) => v.type === 'Trailer'),
+    hasTrailer: adminSettings.hasTrailer ?? videos.results?.some((v: any) => v.type === 'Trailer'),
+    ...adminSettings,
   };
 };
 
@@ -295,27 +345,67 @@ export const getRecommendationByFilters = async (filters: FilterOptions): Promis
   }
   
   const data = await callTMDB(endpoint, params);
-  return data.results.map((item: any) => ({
-    ...item,
-    media_type: mediaType === 'all' ? (item.first_air_date ? 'tv' : 'movie') : mediaType,
-  }));
+  
+  // Lade gespeicherte Einstellungen
+  const savedMovieSettings = await getAdminMovieSettings();
+  const savedTvSettings = await getAdminTvShowSettings();
+  
+  return data.results.map((item: any) => {
+    const isMovie = mediaType === 'all' ? !item.first_air_date : mediaType === 'movie';
+    const itemId = item.id;
+    const savedSettings = isMovie ? savedMovieSettings[itemId] || {} : savedTvSettings[itemId] || {};
+    
+    return {
+      ...item,
+      media_type: isMovie ? 'movie' : 'tv',
+      hasStream: savedSettings.hasStream || false,
+      streamUrl: savedSettings.streamUrl || '',
+      hasTrailer: savedSettings.hasTrailer || false,
+      trailerUrl: savedSettings.trailerUrl || '',
+      isFreeMovie: isMovie ? savedSettings.isFreeMovie || false : false,
+      isNewTrailer: isMovie ? savedSettings.isNewTrailer || false : false,
+    };
+  });
 };
 
 export const getSimilarMovies = async (movieId: number): Promise<MovieOrShow[]> => {
   const data = await callTMDB(`/movie/${movieId}/similar`);
-  return data.results.map((movie: any) => ({
-    ...movie,
-    media_type: 'movie',
-  }));
+  
+  // Lade gespeicherte Filmeinstellungen
+  const savedSettings = await getAdminMovieSettings();
+  
+  return data.results.map((movie: any) => {
+    const savedMovie = savedSettings[movie.id] || {};
+    return {
+      ...movie,
+      media_type: 'movie',
+      hasStream: savedMovie.hasStream || false,
+      streamUrl: savedMovie.streamUrl || '',
+      hasTrailer: savedMovie.hasTrailer || false,
+      trailerUrl: savedMovie.trailerUrl || '',
+      isFreeMovie: savedMovie.isFreeMovie || false,
+      isNewTrailer: savedMovie.isNewTrailer || false,
+    };
+  });
 };
 
 export const getPopularTvShows = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/tv/popular');
   
-  return data.results.map((show: any) => ({
-    ...show,
-    media_type: 'tv',
-  }));
+  // Lade gespeicherte Serieneinstellungen
+  const savedSettings = await getAdminTvShowSettings();
+  
+  return data.results.map((show: any) => {
+    const savedShow = savedSettings[show.id] || {};
+    return {
+      ...show,
+      media_type: 'tv',
+      hasStream: savedShow.hasStream || false,
+      streamUrl: savedShow.streamUrl || '',
+      hasTrailer: savedShow.hasTrailer || false,
+      trailerUrl: savedShow.trailerUrl || '',
+    };
+  });
 };
 
 export const searchTvShows = async (query: string): Promise<MovieOrShow[]> => {
@@ -323,10 +413,20 @@ export const searchTvShows = async (query: string): Promise<MovieOrShow[]> => {
   
   const data = await callTMDB('/search/tv', { query });
   
-  return data.results.map((show: any) => ({
-    ...show,
-    media_type: 'tv',
-  }));
+  // Lade gespeicherte Serieneinstellungen
+  const savedSettings = await getAdminTvShowSettings();
+  
+  return data.results.map((show: any) => {
+    const savedShow = savedSettings[show.id] || {};
+    return {
+      ...show,
+      media_type: 'tv',
+      hasStream: savedShow.hasStream || false,
+      streamUrl: savedShow.streamUrl || '',
+      hasTrailer: savedShow.hasTrailer || false,
+      trailerUrl: savedShow.trailerUrl || '',
+    };
+  });
 };
 
 export const trackPageVisit = async (page: string) => {

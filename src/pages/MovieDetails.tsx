@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
@@ -76,6 +77,31 @@ const MovieDetails = () => {
       window.open(movie.streamUrl, '_blank');
     }
   };
+  
+  // Bestimme die richtige Trailer-URL
+  const getTrailerUrl = () => {
+    // Priorisiere die benutzerdefinierte Trailer-URL
+    if (movie.trailerUrl) {
+      return movie.trailerUrl;
+    }
+    
+    // Ansonsten verwende den ersten YouTube-Trailer aus den API-Daten
+    if (movie.videos?.results?.length > 0) {
+      const firstTrailer = movie.videos.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+      if (firstTrailer) {
+        return `https://www.youtube.com/embed/${firstTrailer.key}`;
+      }
+    }
+    
+    // Wenn keine URL gefunden wurde, verwende den Stream als Fallback
+    if (isEmbedUrl) {
+      return movie.streamUrl;
+    }
+    
+    return null;
+  };
+  
+  const trailerUrl = getTrailerUrl();
 
   return (
     <MainLayout>
@@ -147,7 +173,7 @@ const MovieDetails = () => {
                 </p>
 
                 <div className="flex flex-wrap gap-3 mb-8">
-                  {movie.videos?.results.length > 0 && (
+                  {movie.hasTrailer && trailerUrl && (
                     <button
                       onClick={() => setShowTrailer(true)}
                       className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
@@ -190,7 +216,7 @@ const MovieDetails = () => {
 
       <SimilarMovies movies={similarMovies} />
 
-      {showTrailer && ((movie.videos?.results[0]?.key || (movie.streamUrl && isEmbedUrl))) && (
+      {showTrailer && trailerUrl && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-4xl">
             <button
@@ -201,7 +227,7 @@ const MovieDetails = () => {
             </button>
             <div className="aspect-video">
               <iframe
-                src={isEmbedUrl ? movie.streamUrl : `https://www.youtube.com/embed/${movie.videos?.results[0]?.key}`}
+                src={trailerUrl}
                 title={`${movie.title} Stream`}
                 className="w-full h-full"
                 allowFullScreen
