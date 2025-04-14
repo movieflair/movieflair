@@ -151,15 +151,15 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   
   // Filtere Filme, die als Trailer markiert sind, oder falls keine vorhanden, verwende alle
   const movies = data.results.map((movie: any) => {
-    const savedMovie = savedSettings[movie.id];
+    const savedMovie = savedSettings[movie.id] || {};
     return {
       ...movie,
       media_type: 'movie',
-      hasTrailer: savedMovie?.hasTrailer || true,
-      hasStream: savedMovie?.hasStream || false,
-      streamUrl: savedMovie?.streamUrl || '',
-      isFreeMovie: savedMovie?.isFreeMovie || false,
-      isNewTrailer: savedMovie?.isNewTrailer || false,
+      hasTrailer: savedMovie.hasTrailer || true,
+      hasStream: savedMovie.hasStream || false,
+      streamUrl: savedMovie.streamUrl || '',
+      isFreeMovie: savedMovie.isFreeMovie || false,
+      isNewTrailer: savedMovie.isNewTrailer || false,
     };
   });
   
@@ -173,15 +173,15 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
   
   // Filtere Filme, die als kostenlos markiert sind
   const movies = data.results.map((movie: any) => {
-    const savedMovie = savedSettings[movie.id];
+    const savedMovie = savedSettings[movie.id] || {};
     return {
       ...movie,
       media_type: 'movie',
-      hasStream: savedMovie?.hasStream || false,
-      streamUrl: savedMovie?.streamUrl || '',
-      hasTrailer: savedMovie?.hasTrailer || false,
-      isFreeMovie: savedMovie?.isFreeMovie || false,
-      isNewTrailer: savedMovie?.isNewTrailer || false,
+      hasStream: savedMovie.hasStream || false,
+      streamUrl: savedMovie.streamUrl || '',
+      hasTrailer: savedMovie.hasTrailer || false,
+      isFreeMovie: savedMovie.isFreeMovie || false,
+      isNewTrailer: savedMovie.isNewTrailer || false,
     };
   });
   
