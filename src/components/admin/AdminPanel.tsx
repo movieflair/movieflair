@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +14,8 @@ const AdminPanel = () => {
     setAmazonAffiliateId, 
     saveSettings 
   } = useAdminSettings();
+  const [streamUrl, setStreamUrl] = useState('');
+  const [hasStream, setHasStream] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('isAdminLoggedIn');
@@ -144,7 +145,11 @@ const AdminPanel = () => {
                     
                     <div className="flex space-x-6 items-start">
                       <div className="flex items-center space-x-2">
-                        <Checkbox id="hasStream" />
+                        <Checkbox 
+                          id="hasStream" 
+                          checked={hasStream}
+                          onCheckedChange={(checked) => setHasStream(checked as boolean)}
+                        />
                         <Label htmlFor="hasStream">Stream verfügbar</Label>
                       </div>
                       
@@ -154,10 +159,21 @@ const AdminPanel = () => {
                       </div>
                     </div>
                     
-                    <div>
-                      <Label htmlFor="streamUrl">Stream URL (Embed)</Label>
-                      <Input id="streamUrl" placeholder="https://www.youtube.com/embed/..." className="mt-1" />
-                    </div>
+                    {hasStream && (
+                      <div className="md:col-span-2">
+                        <Label htmlFor="streamUrl">Stream URL (Embed)</Label>
+                        <Input 
+                          id="streamUrl" 
+                          placeholder="https://www.youtube.com/embed/..." 
+                          className="mt-1"
+                          value={streamUrl}
+                          onChange={(e) => setStreamUrl(e.target.value)}
+                        />
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Füge hier die Embed-URL für den Stream ein. Für YouTube-Videos nutze das Format: https://www.youtube.com/embed/VIDEO_ID
+                        </p>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex justify-end mt-6">
