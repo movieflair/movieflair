@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -11,6 +12,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
 
 interface SimilarMoviesProps {
   movies: MovieOrShow[];
@@ -37,6 +39,10 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
     const randomIndex = Math.floor(Math.random() * movies.length);
     setRandomMovie(movies[randomIndex]);
     setShowRandomMovie(true);
+    toast({
+      title: "Quick Tipp",
+      description: `Wir haben "${movies[randomIndex].title}" für dich ausgewählt!`,
+    });
   };
 
   const handleClose = () => {
@@ -89,10 +95,10 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               )}
             </div>
             {!showRandomMovie && (
-              <div className="mt-16">
+              <div className="absolute bottom-8 left-8">
                 <Button 
                   variant="outline" 
-                  className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
+                  className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0 shadow-lg"
                   onClick={getRandomMovie}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
