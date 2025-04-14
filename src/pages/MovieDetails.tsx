@@ -1,10 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
-import { Star, Calendar, Clock, ArrowLeft, ExternalLink, PlayCircle, ShoppingCart } from 'lucide-react';
+import { Star, Calendar, Clock, ArrowLeft, PlayCircle, ShoppingCart } from 'lucide-react';
 import { getMovieById, MovieDetail as MovieDetailType } from '@/lib/api';
-import { Button } from '@/components/ui/button';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 
 const MovieDetails = () => {
@@ -46,8 +44,8 @@ const MovieDetails = () => {
   
   const getAmazonUrl = (title: string) => {
     const formattedTitle = encodeURIComponent(title);
-    const tag = amazonAffiliateId || 'movieflair-21'; // Default tag if not set
-    return `https://www.amazon.de/s?k=${formattedTitle}&tag=${tag}`;
+    const tag = amazonAffiliateId || 'movieflair-21';
+    return `https://www.amazon.de/gp/video/search?phrase=${formattedTitle}&tag=${tag}`;
   };
 
   if (isLoading) {
@@ -167,37 +165,58 @@ const MovieDetails = () => {
                 </p>
               </div>
               
+              <div className="mb-8">
+                <h2 className="text-xl font-medium mb-3">Cast & Crew</h2>
+                {movie.cast ? (
+                  <div className="flex flex-wrap gap-4">
+                    {movie.cast.map((person) => (
+                      <div key={person.id} className="text-center">
+                        <div className="w-20 h-20 rounded-lg overflow-hidden mb-2">
+                          {person.profile_path ? (
+                            <img 
+                              src={`https://image.tmdb.org/t/p/w185${person.profile_path}`}
+                              alt={person.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-xs text-gray-500">No Image</span>
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-sm font-medium">{person.name}</p>
+                        <p className="text-xs text-muted-foreground">{person.character || person.job}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">Keine Cast-Informationen verfügbar.</p>
+                )}
+              </div>
+              
               <div className="flex flex-wrap gap-3 mb-8">
                 {trailerKey && (
                   <button
                     onClick={() => setShowTrailer(true)}
-                    className="button-primary flex items-center"
+                    className="bg-primary text-white rounded px-5 py-2.5 font-medium transition-all hover:bg-primary/90 flex items-center"
                   >
                     <PlayCircle className="w-5 h-5 mr-2" />
                     Trailer ansehen
                   </button>
                 )}
                 
-                {movie.homepage && (
-                  <a
-                    href={movie.homepage}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="button-secondary flex items-center"
-                  >
-                    <ExternalLink className="w-5 h-5 mr-2" />
-                    Offizielle Website
-                  </a>
-                )}
-                
                 <a
                   href={getAmazonUrl(movie.title || '')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#FF9900] text-white rounded-full px-5 py-2.5 font-medium transition-all hover:bg-[#FF9900]/90 flex items-center"
+                  className="bg-[#00A8E1] text-white rounded px-5 py-2.5 font-medium transition-all hover:bg-[#00A8E1]/90 flex items-center"
                 >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  Bei Amazon Prime ansehen
+                  <img 
+                    src="/prime-video-icon.png" 
+                    alt="Prime Video" 
+                    className="w-5 h-5 mr-2"
+                  />
+                  Bei Prime Video ansehen
                 </a>
               </div>
               

@@ -7,13 +7,13 @@ const Index = () => {
   return (
     <MainLayout>
       {/* Hero Section */}
-      <section className="py-24 md:py-32 bg-gradient-to-b from-theme-accent-dark to-background">
+      <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50 to-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-white">
-              MovieFlair
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-gray-900">
+              Entdecke deine Filme
             </h1>
-            <p className="text-lg md:text-xl text-white/80 mb-12">
+            <p className="text-lg md:text-xl text-gray-600 mb-12">
               Entdecke den perfekten Film für jeden Moment. Lass dich von deiner Stimmung leiten.
             </p>
           </div>

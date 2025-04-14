@@ -1,4 +1,3 @@
-
 export interface Genre {
   id: number;
   name: string;
@@ -16,7 +15,6 @@ export interface MovieOrShow {
   first_air_date?: string;
   genre_ids: number[];
   media_type: 'movie' | 'tv';
-  // New fields
   hasStream?: boolean;
   streamUrl?: string;
   hasTrailer?: boolean;
@@ -29,6 +27,7 @@ export interface MovieDetail extends MovieOrShow {
   genres?: Genre[];
   tagline?: string;
   homepage?: string;
+  cast?: CastMember[];
   videos?: {
     results: {
       key: string;
@@ -37,7 +36,6 @@ export interface MovieDetail extends MovieOrShow {
       site?: string;
     }[];
   };
-  // New fields
   hasStream?: boolean;
   streamUrl?: string;
   hasTrailer?: boolean;
@@ -81,6 +79,14 @@ const genres: Genre[] = [
   { id: 878, name: "Science Fiction" },
   { id: 53, name: "Thriller" }
 ];
+
+interface CastMember {
+  id: number;
+  name: string;
+  character?: string;
+  job?: string;
+  profile_path?: string;
+}
 
 // Some example movies with trailers and streaming
 const sampleMovies: MovieDetail[] = [
