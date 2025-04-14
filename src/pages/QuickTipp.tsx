@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
-import { Sparkles, ArrowLeft, Play, FileText, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ArrowLeft, Play, FileText, ThumbsUp, ThumbsDown } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { getPopularMovies } from '@/lib/api';
@@ -141,7 +140,6 @@ const QuickTipp = () => {
                 
                 <div className="text-gray-800">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-6 h-6 text-[#ea384c]" />
                     <h3 className="text-3xl font-semibold">{randomMovie.title}</h3>
                   </div>
                   
