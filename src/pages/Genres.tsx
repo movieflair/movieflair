@@ -65,7 +65,7 @@ const Genres = () => {
         </div>
         
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {[...Array(4)].map((_, index) => (
               <div key={index} className="aspect-[2/3]">
                 <div className="animate-pulse h-full">
@@ -81,7 +81,7 @@ const Genres = () => {
             <p className="text-muted-foreground">Keine Filme für dieses Genre gefunden.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {movies.map((movie) => (
               <div key={movie.id} className="aspect-[2/3]">
                 <MovieCard movie={movie} />

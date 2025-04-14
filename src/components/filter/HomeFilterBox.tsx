@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import FilterSelector from './FilterSelector';
 import { Button } from '../ui/button';
@@ -155,7 +154,7 @@ const HomeFilterBox = () => {
 
         <Button 
           onClick={handleSearch}
-          className="w-full"
+          className="w-full bg-red-500 hover:bg-red-600 text-white"
           size="lg"
           disabled={isLoading}
         >

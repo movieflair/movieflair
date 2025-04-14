@@ -45,12 +45,12 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
           placeholder="Filme & Serien suchen..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-12 pr-4 py-3 w-full bg-white rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-lg"
+          className="pl-12 pr-4 py-3 w-full bg-white rounded-lg border border-gray-200 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-lg"
           autoFocus
         />
         <button 
           type="submit" 
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-4 py-1.5 rounded-md hover:bg-blue-600 transition-colors"
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-500 text-white px-4 py-1.5 rounded-md hover:bg-red-600 transition-colors"
         >
           Suchen
         </button>

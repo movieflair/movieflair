@@ -9,6 +9,7 @@ import Search from './pages/Search';
 import Genres from './pages/Genres';
 import QuickTipp from './pages/QuickTipp';
 import { AdminSettingsProvider } from './hooks/useAdminSettings';
+import AdminPage from './pages/AdminPage';
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/search" element={<Search />} />
         <Route path="/genres" element={<Genres />} />
         <Route path="/quick-tipp" element={<QuickTipp />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </Router>
   );
