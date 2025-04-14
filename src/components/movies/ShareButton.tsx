@@ -1,5 +1,5 @@
 
-import { Share, Copy, Facebook, Twitter, Mail, Share2 } from "lucide-react";
+import { Share, Copy, Facebook, Twitter, WhatsApp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -47,19 +47,6 @@ const ShareButton = ({ movieTitle, className }: ShareButtonProps) => {
     );
   };
 
-  const shareToReddit = () => {
-    window.open(
-      `https://reddit.com/submit?url=${encodeURIComponent(currentUrl)}&title=${encodeURIComponent(movieTitle)}`,
-      "_blank"
-    );
-  };
-
-  const shareToEmail = () => {
-    const subject = encodeURIComponent(`Film-Empfehlung: ${movieTitle}`);
-    const body = encodeURIComponent(`Schau dir "${movieTitle}" an!\n\n${currentUrl}`);
-    window.open(`mailto:?subject=${subject}&body=${body}`);
-  };
-
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -86,7 +73,7 @@ const ShareButton = ({ movieTitle, className }: ShareButtonProps) => {
             className="w-full justify-start"
             onClick={shareToWhatsApp}
           >
-            <Share2 className="mr-2 h-4 w-4" />
+            <WhatsApp className="mr-2 h-4 w-4" />
             WhatsApp
           </Button>
           <Button
@@ -105,22 +92,6 @@ const ShareButton = ({ movieTitle, className }: ShareButtonProps) => {
             <Facebook className="mr-2 h-4 w-4" />
             Facebook
           </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={shareToReddit}
-          >
-            <Share2 className="mr-2 h-4 w-4" />
-            Reddit
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-            onClick={shareToEmail}
-          >
-            <Mail className="mr-2 h-4 w-4" />
-            Email
-          </Button>
         </div>
       </PopoverContent>
     </Popover>
@@ -128,3 +99,4 @@ const ShareButton = ({ movieTitle, className }: ShareButtonProps) => {
 };
 
 export default ShareButton;
+
