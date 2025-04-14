@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { ArrowRight, Star, Calendar, Clock } from 'lucide-react';
 import { MovieDetail } from '@/lib/api';
@@ -15,20 +14,18 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
   return (
     <div className="glass-card overflow-hidden rounded-xl">
       <div className="md:flex">
-        <div className="md:w-[300px] flex-shrink-0">
-          <div className="rounded-lg overflow-hidden">
-            {movie.poster_path ? (
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
-                <span className="text-gray-400">Kein Poster</span>
-              </div>
-            )}
-          </div>
+        <div className="w-full md:w-[300px] h-[450px] flex-shrink-0">
+          {movie.poster_path ? (
+            <img
+              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+              alt={title}
+              className="w-full h-full object-cover rounded-t-xl md:rounded-l-xl md:rounded-tr-none"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
+              <span className="text-gray-400">Kein Poster</span>
+            </div>
+          )}
         </div>
         
         <div className="p-6 md:w-3/4 lg:w-4/5 flex flex-col">
