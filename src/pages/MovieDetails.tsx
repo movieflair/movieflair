@@ -143,11 +143,12 @@ const MovieDetails = () => {
                     />
                     Bei Prime Video ansehen
                   </a>
-                  {movie.hasStream && (
+                  {movie.streamUrl && (
                     <button
-                      className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors"
+                      className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
                       onClick={() => setShowTrailer(true)}
                     >
+                      <Play className="w-4 h-4" />
                       Stream ansehen
                     </button>
                   )}

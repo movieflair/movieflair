@@ -195,7 +195,7 @@ const TvShowDetails = () => {
                 </a>
               </div>
               
-              {tvShow.hasStream && tvShow.streamUrl && (
+              {tvShow.streamUrl && (
                 <div className="mt-8">
                   <h2 className="text-xl font-medium mb-4">Stream ansehen</h2>
                   <div className="aspect-video w-full max-w-3xl bg-black rounded-lg overflow-hidden">
