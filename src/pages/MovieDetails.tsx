@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
@@ -135,12 +134,12 @@ const MovieDetails = () => {
                     href={getAmazonUrl(movie.title || '')}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-[#00A8E1] text-white rounded-full px-5 py-2.5 font-medium transition-all hover:bg-[#00A8E1]/90 flex items-center"
+                    className="bg-[#00A8E1] text-white px-6 py-2 rounded-md hover:bg-[#00A8E1]/90 transition-colors flex items-center gap-2"
                   >
                     <img 
-                      src="/lovable-uploads/c4d7e6e9-6a36-44ee-91ca-018e1542ddb6.png"
-                      alt="Prime Video"
-                      className="mr-2 h-5 w-5"
+                      src="/lovable-uploads/21997cbe-dbef-4485-93e8-b61a66eb7375.png"
+                      alt="Play"
+                      className="w-4 h-4"
                     />
                     Bei Prime Video ansehen
                   </a>

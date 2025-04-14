@@ -5,7 +5,6 @@ import { Star, Calendar, ArrowLeft, ExternalLink, PlayCircle } from 'lucide-reac
 import MainLayout from '@/components/layout/MainLayout';
 import { getTvShowById, MovieDetail } from '@/lib/api';
 
-// Create a type alias for TvShowDetailType
 type TvShowDetailType = MovieDetail;
 
 const TvShowDetails = () => {
@@ -83,7 +82,6 @@ const TvShowDetails = () => {
 
   return (
     <MainLayout>
-      {/* Hero Section with Backdrop */}
       <div className="relative">
         {tvShow.backdrop_path ? (
           <div className="w-full h-[500px] overflow-hidden">
@@ -100,7 +98,6 @@ const TvShowDetails = () => {
         
         <div className="container-custom relative z-10 -mt-32 pb-12">
           <div className="flex flex-col md:flex-row gap-8">
-            {/* Poster */}
             <div className="md:w-1/3 lg:w-1/4 flex-shrink-0">
               <div className="rounded-lg overflow-hidden shadow-lg">
                 {tvShow.poster_path ? (
@@ -117,7 +114,6 @@ const TvShowDetails = () => {
               </div>
             </div>
             
-            {/* Details */}
             <div className="md:w-2/3 lg:w-3/4 pt-36">
               <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors mb-4">
                 <ArrowLeft className="w-4 h-4 mr-1" />
@@ -188,18 +184,17 @@ const TvShowDetails = () => {
                   href={getAmazonUrl(tvShow.name || '')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#00A8E1] text-white rounded-full px-5 py-2.5 font-medium transition-all hover:bg-[#00A8E1]/90 flex items-center"
+                  className="bg-[#00A8E1] text-white px-6 py-2 rounded-md hover:bg-[#00A8E1]/90 transition-colors flex items-center gap-2"
                 >
                   <img 
-                    src="/lovable-uploads/c4d7e6e9-6a36-44ee-91ca-018e1542ddb6.png"
-                    alt="Prime Video"
-                    className="mr-2 h-5 w-5"
+                    src="/lovable-uploads/21997cbe-dbef-4485-93e8-b61a66eb7375.png"
+                    alt="Play"
+                    className="w-4 h-4"
                   />
                   Bei Amazon Prime ansehen
                 </a>
               </div>
               
-              {/* Stream Section - Only shown if hasStream is true */}
               {tvShow.hasStream && tvShow.streamUrl && (
                 <div className="mt-8">
                   <h2 className="text-xl font-medium mb-4">Stream ansehen</h2>
@@ -219,7 +214,6 @@ const TvShowDetails = () => {
         </div>
       </div>
       
-      {/* Trailer Modal */}
       {showTrailer && trailerKey && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-4xl">
