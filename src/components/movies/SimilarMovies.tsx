@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
-import { ChevronLeft, ChevronRight, Sparkles, X, FileText, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Zap, X, FileText, Play } from 'lucide-react';
 import MovieCard from './MovieCard';
 import {
   Carousel,
@@ -66,7 +66,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               to="/discover" 
               className="flex items-center gap-2 text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
             >
-              <Sparkles className="w-6 h-6" />
+              <Zap className="w-6 h-6" />
               {showRandomMovie ? (
                 <div className="flex flex-col">
                   <span>{randomMovie?.title}</span>
@@ -76,23 +76,6 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 "Ähnliche Filme"
               )}
             </Link>
-            <p className="text-gray-600">
-              {showRandomMovie 
-                ? randomMovie?.overview 
-                : "Entdecke weitere Filme, die dir gefallen könnten. Basierend auf deinem aktuellen Film haben wir eine Auswahl an ähnlichen Titeln zusammengestellt."}
-            </p>
-            <div className="flex items-center gap-2 mt-2">
-              {!showRandomMovie && (
-                <>
-                  <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handlePrevClick}>
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </>
-              )}
-            </div>
             {!showRandomMovie && (
               <div className="absolute bottom-32 left-8">
                 <Button 
@@ -100,8 +83,18 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                   className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0 shadow-lg"
                   onClick={getRandomMovie}
                 >
-                  <Sparkles className="w-4 h-4 mr-2" />
+                  <Zap className="w-4 h-4 mr-2" />
                   Quick Tipp
+                </Button>
+              </div>
+            )}
+            {!showRandomMovie && (
+              <div className="flex items-center gap-2 mt-2">
+                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handlePrevClick}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
+                  <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
             )}
