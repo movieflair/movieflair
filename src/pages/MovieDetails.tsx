@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -9,6 +8,7 @@ import MovieMeta from '@/components/movies/MovieMeta';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play, CirclePlay, ShoppingCart } from 'lucide-react';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
+import ShareButton from '@/components/movies/ShareButton';
 
 const MovieDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -77,7 +77,7 @@ const MovieDetails = () => {
           <div className="glass-card overflow-hidden rounded-xl">
             <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
               {/* Poster */}
-              <div>
+              <div className="space-y-4">
                 <div className="rounded-lg overflow-hidden shadow-xl">
                   {movie.poster_path ? (
                     <img
@@ -91,6 +91,7 @@ const MovieDetails = () => {
                     </div>
                   )}
                 </div>
+                <ShareButton movieTitle={movie.title} />
               </div>
 
               {/* Content */}
