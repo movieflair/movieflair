@@ -1,10 +1,14 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAdminSettings } from '@/hooks/useAdminSettings';
+import { useQuery } from '@tanstack/react-query';
+import { getPopularMovies, MovieOrShow } from '@/lib/api';
+import { Button } from "@/components/ui/button";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('movies');
@@ -16,10 +20,44 @@ const AdminPanel = () => {
   } = useAdminSettings();
   const [streamUrl, setStreamUrl] = useState('');
   const [hasStream, setHasStream] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState<MovieOrShow | null>(null);
+  const [filteredMovies, setFilteredMovies] = useState<MovieOrShow[]>([]);
+
+  // Fetch movies for admin panel
+  const { data: movies = [] } = useQuery({
+    queryKey: ['admin-movies'],
+    queryFn: getPopularMovies
+  });
+
+  // Filter movies whenever search query changes
+  useEffect(() => {
+    if (activeTab === 'movies' && movies.length > 0) {
+      if (!searchQuery.trim()) {
+        setFilteredMovies(movies);
+      } else {
+        const query = searchQuery.toLowerCase().trim();
+        const filtered = movies.filter(movie => 
+          (movie.title?.toLowerCase() || '').includes(query)
+        );
+        setFilteredMovies(filtered);
+      }
+    }
+  }, [searchQuery, movies, activeTab]);
 
   const handleLogout = () => {
     localStorage.removeItem('isAdminLoggedIn');
     window.location.reload();
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Search is already handled by the useEffect
+  };
+
+  const handleEditMovie = (movie: MovieOrShow) => {
+    setSelectedMovie(movie);
+    setHasStream(!!movie.hasStream);
+    setStreamUrl(movie.streamUrl || '');
   };
 
   return (
@@ -101,7 +139,7 @@ const AdminPanel = () => {
             </div>
 
             <div className="p-4">
-              <div className="flex max-w-md mb-6">
+              <form onSubmit={handleSearch} className="flex max-w-md mb-6">
                 <div className="relative flex-grow">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
@@ -112,25 +150,98 @@ const AdminPanel = () => {
                     className="w-full pl-9 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
-                <button className="button-primary ml-2">
+                <button type="submit" className="button-primary ml-2">
                   Suchen
                 </button>
-              </div>
+              </form>
+
+              {/* Movies Tab: Search Results */}
+              {activeTab === 'movies' && !selectedMovie && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-medium mb-4">Suchergebnisse</h3>
+                  {filteredMovies.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredMovies.map(movie => (
+                        <div 
+                          key={movie.id} 
+                          className="border border-border rounded-md p-4 hover:bg-muted/30 cursor-pointer transition-colors"
+                          onClick={() => handleEditMovie(movie)}
+                        >
+                          <div className="flex items-start">
+                            <div className="w-16 h-24 bg-muted rounded overflow-hidden">
+                              {movie.poster_path ? (
+                                <img 
+                                  src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} 
+                                  alt={movie.title} 
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-muted">
+                                  <Film className="w-8 h-8 text-muted-foreground" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="ml-4 flex-grow">
+                              <h4 className="font-medium">{movie.title}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {movie.release_date?.substring(0, 4) || 'Unbekanntes Jahr'}
+                              </p>
+                              {movie.hasStream && (
+                                <span className="inline-block mt-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                                  Stream verfügbar
+                                </span>
+                              )}
+                            </div>
+                            <Button variant="ghost" size="icon" className="text-muted-foreground">
+                              <FileEdit className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      {searchQuery ? 'Keine Filme gefunden.' : 'Lade Filme...'}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Film Edit Form Preview */}
-              {activeTab === 'movies' && (
+              {activeTab === 'movies' && selectedMovie && (
                 <div className="border border-border rounded-md p-6 mb-6">
-                  <h3 className="text-lg font-medium mb-4">Film bearbeiten</h3>
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium">Film bearbeiten</h3>
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => setSelectedMovie(null)}
+                      className="text-sm"
+                    >
+                      Zurück zur Liste
+                    </Button>
+                  </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Label htmlFor="title">Titel</Label>
-                      <Input id="title" placeholder="Fight Club" className="mt-1" />
+                      <Input 
+                        id="title" 
+                        placeholder="Fight Club" 
+                        className="mt-1" 
+                        value={selectedMovie.title || ''}
+                        readOnly
+                      />
                     </div>
                     
                     <div>
                       <Label htmlFor="year">Jahr</Label>
-                      <Input id="year" placeholder="1999" className="mt-1" />
+                      <Input 
+                        id="year" 
+                        placeholder="1999" 
+                        className="mt-1" 
+                        value={selectedMovie.release_date?.substring(0, 4) || ''}
+                        readOnly
+                      />
                     </div>
                     
                     <div className="md:col-span-2">
@@ -140,6 +251,8 @@ const AdminPanel = () => {
                         rows={4}
                         className="w-full mt-1 p-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
                         placeholder="Film Beschreibung..."
+                        value={selectedMovie.overview || ''}
+                        readOnly
                       />
                     </div>
                     
@@ -154,7 +267,10 @@ const AdminPanel = () => {
                       </div>
                       
                       <div className="flex items-center space-x-2">
-                        <Checkbox id="hasTrailer" />
+                        <Checkbox 
+                          id="hasTrailer" 
+                          checked={selectedMovie.hasTrailer || false}
+                        />
                         <Label htmlFor="hasTrailer">Als Trailer anzeigen</Label>
                       </div>
                     </div>
@@ -177,7 +293,7 @@ const AdminPanel = () => {
                   </div>
                   
                   <div className="flex justify-end mt-6">
-                    <button className="button-primary">Speichern</button>
+                    <Button>Speichern</Button>
                   </div>
                 </div>
               )}
