@@ -90,21 +90,29 @@ const Discover = () => {
       
       const filters: FilterOptions = {
         genres: allGenres.length > 0 ? allGenres : undefined,
-        decade: decade
+        decades: selectedDecades.length > 0 ? selectedDecades : undefined,
+        moods: selectedMoods.length > 0 ? selectedMoods : undefined
       };
       
       // Get a recommendation based on filters
-      const result = await getRecommendationByFilters(filters);
+      const results = await getRecommendationByFilters(filters);
       
-      // Get full details for the recommendation
-      const detailedResult = 
-        result.media_type === 'movie' 
-          ? await getMovieById(result.id) 
-          : await getTvShowById(result.id);
-      
-      setRecommendation(detailedResult);
+      if (results.length > 0) {
+        const result = results[0]; // Get the first result
+        
+        // Get full details for the recommendation
+        const detailedResult = 
+          result.media_type === 'movie' 
+            ? await getMovieById(result.id) 
+            : await getTvShowById(result.id);
+        
+        setRecommendation(detailedResult);
+      } else {
+        setRecommendation(null);
+      }
     } catch (error) {
       console.error('Error getting recommendation:', error);
+      setRecommendation(null);
     } finally {
       setIsLoading(false);
     }

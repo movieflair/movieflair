@@ -42,12 +42,12 @@ export interface MovieDetail extends MovieOrShow {
 }
 
 export interface FilterOptions {
-  moods: string[];
-  genres: number[];
-  decades: string[];
+  genres?: number[];
+  decades?: string[];
+  moods?: string[];
 }
 
-export const moodToGenres: Record<string, number[]> = {
+const moodToGenres: Record<string, number[]> = {
   happy: [35, 10751, 12], // Comedy, Family, Adventure
   sad: [18, 10749], // Drama, Romance
   thrilling: [28, 53, 27], // Action, Thriller, Horror
@@ -88,7 +88,6 @@ interface CastMember {
   profile_path?: string;
 }
 
-// Some example movies with trailers and streaming
 const sampleMovies: MovieDetail[] = [
   {
     id: 550,
@@ -177,7 +176,6 @@ const sampleMovies: MovieDetail[] = [
   }
 ];
 
-// Mock API functions
 export const getGenres = async (): Promise<Genre[]> => {
   return genres;
 };
