@@ -1,14 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
-import { getMovieById } from '@/lib/api';
-import type { MovieDetail as MovieDetailType } from '@/lib/api';
+import { getMovieById, getSimilarMovies } from '@/lib/api';
+import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import ShareButton from '@/components/movies/ShareButton';
-import { getSimilarMovies } from '@/lib/api';
 import SimilarMovies from '@/components/movies/SimilarMovies';
 
 const MovieDetails = () => {
