@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
-import { ArrowLeft, Play, FileText, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ArrowLeft, Play, FileText, ThumbsUp, ThumbsDown, Sparkles } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { getPopularMovies } from '@/lib/api';
