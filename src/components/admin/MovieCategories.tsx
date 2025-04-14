@@ -18,7 +18,7 @@ const MovieCategories = ({
 }: MovieCategoriesProps) => {
   return (
     <div className="space-y-4">
-      <div className="text-lg font-medium mb-2">Kategorien</div>
+      <div className="text-lg font-medium mb-2">Status</div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex items-center space-x-2">
           <Checkbox 
@@ -28,7 +28,7 @@ const MovieCategories = ({
           />
           <Label htmlFor="isNewTrailer" className="flex items-center gap-1">
             <Video className="w-4 h-4" /> 
-            Trailer
+            Neuer Trailer
           </Label>
         </div>
         
@@ -40,7 +40,7 @@ const MovieCategories = ({
           />
           <Label htmlFor="isFreeMovie" className="flex items-center gap-1">
             <PlayCircle className="w-4 h-4" /> 
-            Stream
+            Kostenlos
           </Label>
         </div>
       </div>
