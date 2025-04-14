@@ -5,7 +5,6 @@ import Index from './pages/Index';
 import MovieDetails from './pages/MovieDetails';
 import Trailers from './pages/Trailers';
 import FreeMovies from './pages/FreeMovies';
-import AdminPage from './pages/AdminPage';
 import Search from './pages/Search';
 import Genres from './pages/Genres';
 import QuickTipp from './pages/QuickTipp';
@@ -23,7 +22,6 @@ const App = () => {
         } />
         <Route path="/trailers" element={<Trailers />} />
         <Route path="/free-movies" element={<FreeMovies />} />
-        <Route path="/admin" element={<AdminPage />} />
         <Route path="/search" element={<Search />} />
         <Route path="/genres" element={<Genres />} />
         <Route path="/quick-tipp" element={<QuickTipp />} />

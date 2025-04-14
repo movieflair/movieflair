@@ -55,7 +55,7 @@ const Genres = () => {
               onClick={() => handleGenreClick(genre.id)}
               className={`px-4 py-2 rounded-full ${
                 selectedGenre === genre.id
-                  ? 'bg-primary text-white'
+                  ? 'bg-theme-accent-red text-white'
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-800'
               }`}
             >
@@ -65,28 +65,28 @@ const Genres = () => {
         </div>
         
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-pulse text-gray-600">Lade Filme...</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="aspect-[2/3]">
+                <div className="animate-pulse h-full">
+                  <div className="bg-muted rounded-lg h-full"></div>
+                  <div className="h-4 bg-muted rounded w-3/4 mt-2"></div>
+                  <div className="h-3 bg-muted rounded w-1/2 mt-2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : movies.length === 0 ? (
+          <div className="text-center py-12 bg-muted/30 rounded-lg">
+            <p className="text-muted-foreground">Keine Filme für dieses Genre gefunden.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {movies.map((movie) => (
               <div key={movie.id} className="aspect-[2/3]">
                 <MovieCard movie={movie} />
               </div>
             ))}
-          </div>
-        )}
-        
-        {!isLoading && selectedGenre && movies.length === 0 && (
-          <div className="text-center py-12 bg-muted/30 rounded-lg">
-            <p className="text-gray-600">Keine Filme für dieses Genre gefunden.</p>
-          </div>
-        )}
-        
-        {!selectedGenre && (
-          <div className="text-center py-12 bg-muted/30 rounded-lg">
-            <p className="text-gray-600">Wählen Sie ein Genre aus, um Filme anzuzeigen.</p>
           </div>
         )}
       </div>
