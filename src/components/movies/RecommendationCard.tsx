@@ -14,21 +14,21 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
   
   return (
     <div className="glass-card overflow-hidden rounded-xl">
-      <div className="md:flex h-full">
-        <div className="md:w-1/4 lg:w-1/5 flex-shrink-0 h-full">
-          {movie.poster_path ? (
-            <div className="h-full">
+      <div className="md:flex">
+        <div className="md:w-[300px] flex-shrink-0">
+          <div className="rounded-lg overflow-hidden">
+            {movie.poster_path ? (
               <img
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                 alt={title}
                 className="w-full h-full object-cover"
               />
-            </div>
-          ) : (
-            <div className="h-full flex items-center justify-center bg-muted">
-              <span className="text-muted-foreground">No Image</span>
-            </div>
-          )}
+            ) : (
+              <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-400">Kein Poster</span>
+              </div>
+            )}
+          </div>
         </div>
         
         <div className="p-6 md:w-3/4 lg:w-4/5 flex flex-col">
