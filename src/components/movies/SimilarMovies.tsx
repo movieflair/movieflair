@@ -51,7 +51,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               <Button variant="outline" size="icon" className="h-8 w-8 rounded-full p-0" onClick={handleNextClick}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
-              <div className="absolute left-0 bottom-[-30px]">
+              <div className="absolute left-0 bottom-[-90px]">
                 <Button 
                   variant="outline" 
                   className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
