@@ -53,13 +53,16 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
-            <Button 
-              variant="outline" 
-              className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              Quick Tipp
-            </Button>
+            
+            <div className="mt-8">
+              <Button 
+                variant="outline" 
+                className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Quick Tipp
+              </Button>
+            </div>
           </div>
 
           <Carousel
@@ -92,4 +95,3 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
 };
 
 export default SimilarMovies;
-
