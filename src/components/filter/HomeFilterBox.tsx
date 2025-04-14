@@ -43,7 +43,9 @@ const HomeFilterBox = () => {
               setSelectedMoods(prev => 
                 prev.includes(mood.toString())
                   ? prev.filter(m => m !== mood.toString())
-                  : [...prev, mood.toString()]
+                  : prev.length < 3
+                  ? [...prev, mood.toString()]
+                  : prev
               );
             }}
             selectedValues={selectedMoods}
@@ -60,7 +62,9 @@ const HomeFilterBox = () => {
               setSelectedGenres(prev => 
                 prev.includes(Number(genreId))
                   ? prev.filter(id => id !== Number(genreId))
-                  : [...prev, Number(genreId)]
+                  : prev.length < 3
+                  ? [...prev, Number(genreId)]
+                  : prev
               );
             }}
             selectedValues={selectedGenres}
