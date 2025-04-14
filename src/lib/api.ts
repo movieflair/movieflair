@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface Genre {
@@ -110,15 +109,15 @@ export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
   const savedSettings = await getAdminMovieSettings();
   
   return data.results.map((movie: any) => {
-    const savedMovie = savedSettings[movie.id];
+    const savedMovie = savedSettings[movie.id] || {};
     return {
       ...movie,
       media_type: 'movie',
-      hasStream: savedMovie?.hasStream || false,
-      streamUrl: savedMovie?.streamUrl || '',
-      hasTrailer: savedMovie?.hasTrailer || false,
-      isFreeMovie: savedMovie?.isFreeMovie || false,
-      isNewTrailer: savedMovie?.isNewTrailer || false,
+      hasStream: savedMovie.hasStream || false,
+      streamUrl: savedMovie.streamUrl || '',
+      hasTrailer: savedMovie.hasTrailer || false,
+      isFreeMovie: savedMovie.isFreeMovie || false,
+      isNewTrailer: savedMovie.isNewTrailer || false,
     };
   });
 };
@@ -132,15 +131,15 @@ export const searchMovies = async (query: string): Promise<MovieOrShow[]> => {
   const savedSettings = await getAdminMovieSettings();
   
   return data.results.map((movie: any) => {
-    const savedMovie = savedSettings[movie.id];
+    const savedMovie = savedSettings[movie.id] || {};
     return {
       ...movie,
       media_type: 'movie',
-      hasStream: savedMovie?.hasStream || false,
-      streamUrl: savedMovie?.streamUrl || '',
-      hasTrailer: savedMovie?.hasTrailer || false,
-      isFreeMovie: savedMovie?.isFreeMovie || false,
-      isNewTrailer: savedMovie?.isNewTrailer || false,
+      hasStream: savedMovie.hasStream || false,
+      streamUrl: savedMovie.streamUrl || '',
+      hasTrailer: savedMovie.hasTrailer || false,
+      isFreeMovie: savedMovie.isFreeMovie || false,
+      isNewTrailer: savedMovie.isNewTrailer || false,
     };
   });
 };
@@ -218,7 +217,7 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
 
   // Überprüfen, ob der Film in den admin Einstellungen gespeichert ist
   const savedMoviesJson = localStorage.getItem('adminMovies');
-  let adminSettings = {};
+  let adminSettings: Record<string, any> = {}; // Initialize with an empty object with defined type
   
   if (savedMoviesJson) {
     try {
