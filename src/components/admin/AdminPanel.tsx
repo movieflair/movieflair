@@ -1,17 +1,18 @@
 
 import { useState, useEffect } from 'react';
-import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart, ExternalLink, Link as LinkIcon, BarChart } from 'lucide-react';
+import { Search, FileEdit, Film, Tv, Tag, Video, PlayCircle, ShoppingCart, ExternalLink, Link as LinkIcon, BarChart, EyeIcon, PieChartIcon, CalendarIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { useQuery } from '@tanstack/react-query';
-import { getPopularMovies, MovieOrShow } from '@/lib/api';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getPopularMovies, MovieOrShow, searchMovies } from '@/lib/api';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import AdminStats from './AdminStats';
+import AdminVisitorStats from './AdminVisitorStats';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('movies');
@@ -27,16 +28,28 @@ const AdminPanel = () => {
   const [filteredMovies, setFilteredMovies] = useState<MovieOrShow[]>([]);
   const [streamType, setStreamType] = useState<'embed' | 'link'>('embed');
   const [hasTrailer, setHasTrailer] = useState(false);
+  const [isFreeMovie, setIsFreeMovie] = useState(false);
+  const [isNewTrailer, setIsNewTrailer] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  
+  const queryClient = useQueryClient();
 
   // Fetch movies for admin panel
-  const { data: movies = [], refetch } = useQuery({
+  const { data: movies = [], refetch, isLoading: isLoadingMovies } = useQuery({
     queryKey: ['admin-movies'],
     queryFn: getPopularMovies
   });
+  
+  // Suche nach Filmen
+  const { data: searchResults = [], isLoading: isSearchLoading, refetch: refetchSearch } = useQuery({
+    queryKey: ['search-movies', searchQuery],
+    queryFn: () => searchMovies(searchQuery),
+    enabled: false, // Nicht automatisch ausführen
+  });
 
-  // Filter movies whenever search query changes
+  // Filter movies whenever search query changes or when switching tabs
   useEffect(() => {
-    if (activeTab === 'movies' && movies.length > 0) {
+    if (activeTab === 'movies' && !isSearching) {
       if (!searchQuery.trim()) {
         setFilteredMovies(movies);
       } else {
@@ -46,17 +59,26 @@ const AdminPanel = () => {
         );
         setFilteredMovies(filtered);
       }
+    } else if (activeTab === 'movies' && isSearching) {
+      setFilteredMovies(searchResults);
     }
-  }, [searchQuery, movies, activeTab]);
+  }, [searchQuery, movies, activeTab, isSearching, searchResults]);
 
   const handleLogout = () => {
     localStorage.removeItem('isAdminLoggedIn');
     window.location.reload();
   };
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Search is already handled by the useEffect
+    
+    if (searchQuery.trim()) {
+      setIsSearching(true);
+      await refetchSearch();
+    } else {
+      setIsSearching(false);
+      setFilteredMovies(movies);
+    }
   };
 
   const handleEditMovie = (movie: MovieOrShow) => {
@@ -65,30 +87,51 @@ const AdminPanel = () => {
     setStreamUrl(movie.streamUrl || '');
     setStreamType(movie.streamUrl?.includes('embed') ? 'embed' : 'link');
     setHasTrailer(!!movie.hasTrailer);
+    setIsFreeMovie(!!movie.isFreeMovie);
+    setIsNewTrailer(!!movie.isNewTrailer);
   };
 
   const handleSaveMovie = () => {
     if (!selectedMovie) return;
 
-    // Create a copy of the movies array
-    const updatedMovies = movies.map(movie => {
-      if (movie.id === selectedMovie.id) {
-        // Update the movie with the edited values
-        return {
-          ...movie,
-          hasStream: hasStream,
-          streamUrl: hasStream ? streamUrl : undefined,
-          hasTrailer: hasTrailer
-        };
-      }
-      return movie;
-    });
-
-    // Save to localStorage to persist changes
-    localStorage.setItem('adminMovies', JSON.stringify(updatedMovies));
+    // Get the existing saved movies from localStorage
+    const savedMoviesJson = localStorage.getItem('adminMovies');
+    let savedMovies: MovieOrShow[] = [];
     
-    // Refresh the movie list
-    refetch();
+    if (savedMoviesJson) {
+      try {
+        savedMovies = JSON.parse(savedMoviesJson);
+      } catch (e) {
+        console.error('Error parsing saved movies:', e);
+      }
+    }
+    
+    // Check if the movie is already in the saved list
+    const existingIndex = savedMovies.findIndex(m => m.id === selectedMovie.id);
+    
+    // Create the updated movie object
+    const updatedMovie = {
+      ...selectedMovie,
+      hasStream,
+      streamUrl: hasStream ? streamUrl : '',
+      hasTrailer,
+      isFreeMovie,
+      isNewTrailer
+    };
+    
+    // Update or add the movie in the saved list
+    if (existingIndex >= 0) {
+      savedMovies[existingIndex] = updatedMovie;
+    } else {
+      savedMovies.push(updatedMovie);
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('adminMovies', JSON.stringify(savedMovies));
+    
+    // Invalidate queries to refetch fresh data
+    queryClient.invalidateQueries({ queryKey: ['admin-movies'] });
+    queryClient.invalidateQueries({ queryKey: ['search-movies'] });
     
     // Show success message
     toast.success("Änderungen gespeichert");
@@ -112,7 +155,8 @@ const AdminPanel = () => {
       <Tabs defaultValue="content" className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="content">Inhalte</TabsTrigger>
-          <TabsTrigger value="stats">Statistiken</TabsTrigger>
+          <TabsTrigger value="stats">Feedback-Statistik</TabsTrigger>
+          <TabsTrigger value="visitors">Besucherstatistik</TabsTrigger>
           <TabsTrigger value="settings">Einstellungen</TabsTrigger>
         </TabsList>
         
@@ -188,16 +232,31 @@ const AdminPanel = () => {
                     className="w-full pl-9 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
-                <button type="submit" className="button-primary ml-2">
-                  Suchen
+                <button 
+                  type="submit" 
+                  className="button-primary ml-2"
+                  disabled={isSearchLoading}
+                >
+                  {isSearchLoading ? 'Suche...' : 'Suchen'}
                 </button>
               </form>
 
               {/* Movies Tab: Search Results */}
               {activeTab === 'movies' && !selectedMovie && (
                 <div className="mt-6">
-                  <h3 className="text-lg font-medium mb-4">Suchergebnisse</h3>
-                  {filteredMovies.length > 0 ? (
+                  <h3 className="text-lg font-medium mb-4">
+                    {isSearching 
+                      ? `Suchergebnisse für "${searchQuery}"`
+                      : 'Beliebte Filme'
+                    }
+                  </h3>
+                  
+                  {isSearchLoading || isLoadingMovies ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin h-8 w-8 border-t-2 border-primary rounded-full mx-auto"></div>
+                      <p className="mt-2 text-muted-foreground">Lade Filme...</p>
+                    </div>
+                  ) : filteredMovies.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {filteredMovies.map(movie => (
                         <div 
@@ -232,7 +291,17 @@ const AdminPanel = () => {
                                 )}
                                 {movie.hasTrailer && (
                                   <span className="inline-block text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                    Als Trailer markiert
+                                    Trailer
+                                  </span>
+                                )}
+                                {movie.isFreeMovie && (
+                                  <span className="inline-block text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
+                                    Kostenlos
+                                  </span>
+                                )}
+                                {movie.isNewTrailer && (
+                                  <span className="inline-block text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+                                    Neu
                                   </span>
                                 )}
                               </div>
@@ -246,7 +315,7 @@ const AdminPanel = () => {
                     </div>
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
-                      {searchQuery ? 'Keine Filme gefunden.' : 'Lade Filme...'}
+                      {searchQuery ? 'Keine Filme gefunden.' : 'Keine Filme verfügbar.'}
                     </div>
                   )}
                 </div>
@@ -293,7 +362,7 @@ const AdminPanel = () => {
                       <Label htmlFor="description">Beschreibung</Label>
                       <textarea 
                         id="description"
-                        rows={4}
+                        rows={3}
                         className="w-full mt-1 p-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
                         placeholder="Film Beschreibung..."
                         value={selectedMovie.overview || ''}
@@ -301,23 +370,56 @@ const AdminPanel = () => {
                       />
                     </div>
                     
-                    <div className="flex space-x-6 items-start">
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="hasStream" 
-                          checked={hasStream}
-                          onCheckedChange={(checked) => setHasStream(checked as boolean)}
-                        />
-                        <Label htmlFor="hasStream">Stream verfügbar</Label>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <Checkbox 
-                          id="hasTrailer" 
-                          checked={hasTrailer}
-                          onCheckedChange={(checked) => setHasTrailer(checked as boolean)}
-                        />
-                        <Label htmlFor="hasTrailer">Als Trailer anzeigen</Label>
+                    <div className="flex flex-col md:col-span-2">
+                      <div className="text-lg font-medium mb-2">Einstellungen</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="hasStream" 
+                            checked={hasStream}
+                            onCheckedChange={(checked) => setHasStream(checked as boolean)}
+                          />
+                          <Label htmlFor="hasStream" className="flex items-center gap-1">
+                            <PlayCircle className="w-4 h-4" /> 
+                            Stream verfügbar
+                          </Label>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="hasTrailer" 
+                            checked={hasTrailer}
+                            onCheckedChange={(checked) => setHasTrailer(checked as boolean)}
+                          />
+                          <Label htmlFor="hasTrailer" className="flex items-center gap-1">
+                            <Video className="w-4 h-4" /> 
+                            Als Trailer anzeigen
+                          </Label>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="isFreeMovie" 
+                            checked={isFreeMovie}
+                            onCheckedChange={(checked) => setIsFreeMovie(checked as boolean)}
+                          />
+                          <Label htmlFor="isFreeMovie" className="flex items-center gap-1">
+                            <ShoppingCart className="w-4 h-4" /> 
+                            Als kostenlos markieren
+                          </Label>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="isNewTrailer" 
+                            checked={isNewTrailer}
+                            onCheckedChange={(checked) => setIsNewTrailer(checked as boolean)}
+                          />
+                          <Label htmlFor="isNewTrailer" className="flex items-center gap-1">
+                            <Tag className="w-4 h-4" /> 
+                            Als neuen Trailer markieren
+                          </Label>
+                        </div>
                       </div>
                     </div>
                     
@@ -397,6 +499,12 @@ const AdminPanel = () => {
         <TabsContent value="stats">
           <div className="bg-card rounded-lg shadow-sm p-6">
             <AdminStats />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="visitors">
+          <div className="bg-card rounded-lg shadow-sm p-6">
+            <AdminVisitorStats />
           </div>
         </TabsContent>
         

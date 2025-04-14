@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
-import { getMovieById, getSimilarMovies } from '@/lib/api';
+import { getMovieById, getSimilarMovies, trackPageVisit } from '@/lib/api';
 import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
@@ -19,6 +19,8 @@ const MovieDetails = () => {
   const { amazonAffiliateId } = useAdminSettings();
 
   useEffect(() => {
+    trackPageVisit('movie-details');
+    
     const fetchMovie = async () => {
       if (!id) return;
       try {
@@ -27,17 +29,6 @@ const MovieDetails = () => {
           getMovieById(parseInt(id)),
           getSimilarMovies(parseInt(id))
         ]);
-        
-        const savedMovies = localStorage.getItem('adminMovies');
-        if (savedMovies) {
-          const parsedMovies = JSON.parse(savedMovies);
-          const savedMovie = parsedMovies.find((m: any) => m.id === movieData.id);
-          if (savedMovie) {
-            movieData.hasStream = savedMovie.hasStream;
-            movieData.streamUrl = savedMovie.streamUrl;
-            movieData.hasTrailer = savedMovie.hasTrailer;
-          }
-        }
         
         setMovie(movieData);
         setSimilarMovies(similars);

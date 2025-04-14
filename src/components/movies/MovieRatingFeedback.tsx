@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/hooks/use-toast';
 
 interface MovieRatingFeedbackProps {
   movieId: number;
@@ -12,6 +11,7 @@ interface MovieRatingFeedbackProps {
 const MovieRatingFeedback = ({ movieId }: MovieRatingFeedbackProps) => {
   const [hasVoted, setHasVoted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
 
   const handleVote = async (isHelpful: boolean) => {
     try {
@@ -20,11 +20,8 @@ const MovieRatingFeedback = ({ movieId }: MovieRatingFeedbackProps) => {
       // Prüfen Sie, ob der Benutzer ein Admin ist - vermeiden Sie das Tracking von Admin-Aufrufen
       const isAdmin = localStorage.getItem('isAdminLoggedIn') === 'true';
       if (isAdmin) {
-        // Wenn Admin, zeigen Sie eine spezielle Nachricht
-        toast({
-          title: "Admin-Feedback",
-          description: "Admin-Feedback wird nicht in der Statistik erfasst.",
-        });
+        // Wenn Admin, zeigen wir eine direkte Nachricht an (kein Toast)
+        setFeedbackMessage("Admin-Feedback wird nicht in der Statistik erfasst.");
         setHasVoted(true);
         return;
       }
@@ -38,19 +35,14 @@ const MovieRatingFeedback = ({ movieId }: MovieRatingFeedbackProps) => {
       if (error) throw error;
 
       setHasVoted(true);
-      toast({
-        title: "Danke für dein Feedback!",
-        description: isHelpful 
+      setFeedbackMessage(
+        isHelpful 
           ? "Schön, dass dir der Vorschlag gefallen hat." 
-          : "Wir werden versuchen, bessere Vorschläge zu machen.",
-      });
+          : "Wir werden versuchen, bessere Vorschläge zu machen."
+      );
     } catch (error) {
       console.error('Error saving rating:', error);
-      toast({
-        title: "Fehler",
-        description: "Dein Feedback konnte nicht gespeichert werden.",
-        variant: "destructive"
-      });
+      setFeedbackMessage("Dein Feedback konnte nicht gespeichert werden.");
     } finally {
       setIsSubmitting(false);
     }
@@ -59,7 +51,7 @@ const MovieRatingFeedback = ({ movieId }: MovieRatingFeedbackProps) => {
   if (hasVoted) {
     return (
       <p className="text-gray-600 mt-6">
-        Danke für dein Feedback!
+        Danke für dein Feedback! {feedbackMessage && <span>{feedbackMessage}</span>}
       </p>
     );
   }

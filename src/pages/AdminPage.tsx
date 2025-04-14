@@ -3,11 +3,15 @@ import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import AdminLogin from '@/components/admin/AdminLogin';
 import AdminPanel from '@/components/admin/AdminPanel';
+import { trackPageVisit } from '@/lib/api';
 
 const AdminPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   
   useEffect(() => {
+    // Seiten-Aufruf tracken
+    trackPageVisit('admin');
+    
     // Check if admin is already logged in
     const adminLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
     setIsLoggedIn(adminLoggedIn);

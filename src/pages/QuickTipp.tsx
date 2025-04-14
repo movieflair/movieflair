@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
 import { ArrowLeft, Play, FileText, Sparkles } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
-import { getPopularMovies } from '@/lib/api';
+import { getPopularMovies, trackPageVisit } from '@/lib/api';
 import type { MovieOrShow } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
 import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
@@ -17,6 +16,8 @@ const QuickTipp = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    trackPageVisit('quick-tipp');
+    
     const fetchMovies = async () => {
       try {
         setLoading(true);
@@ -24,11 +25,6 @@ const QuickTipp = () => {
         setMovies(popularMovies);
       } catch (error) {
         console.error('Error fetching movies:', error);
-        toast({
-          title: "Fehler",
-          description: "Beim Laden der Filme ist ein Fehler aufgetreten.",
-          variant: "destructive"
-        });
       } finally {
         setLoading(false);
       }
@@ -48,11 +44,6 @@ const QuickTipp = () => {
       
       setRandomMovie(selectedMovie);
       setShowAnimation(false);
-      
-      toast({
-        title: "Quick Tipp",
-        description: `Wir haben "${selectedMovie.title}" für dich ausgewählt!`,
-      });
     }, 1500);
   };
 
