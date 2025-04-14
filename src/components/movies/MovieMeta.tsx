@@ -9,7 +9,7 @@ interface MovieMetaProps {
 
 const MovieMeta = ({ year, rating, duration }: MovieMetaProps) => {
   return (
-    <div className="flex items-center gap-6 text-gray-300">
+    <div className="flex items-center gap-6 text-gray-600">
       {year && <span>{year}</span>}
       
       {rating && (
@@ -21,7 +21,7 @@ const MovieMeta = ({ year, rating, duration }: MovieMetaProps) => {
                 className={`w-4 h-4 ${
                   star <= Math.round(rating / 2)
                     ? 'text-yellow-400 fill-yellow-400'
-                    : 'text-gray-600'
+                    : 'text-gray-300'
                 }`}
               />
             ))}

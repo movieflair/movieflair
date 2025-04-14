@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -7,6 +6,7 @@ import { getMovieById } from '@/lib/api';
 import type { MovieDetail as MovieDetailType } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
+import { Play } from 'lucide-react';
 
 const MovieDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -35,8 +35,8 @@ const MovieDetails = () => {
   if (isLoading || !movie) {
     return (
       <MainLayout>
-        <div className="min-h-screen bg-[#1A1F2C] flex items-center justify-center">
-          <div className="animate-pulse text-white">Loading...</div>
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="animate-pulse text-gray-600">Loading...</div>
         </div>
       </MainLayout>
     );
@@ -52,12 +52,28 @@ const MovieDetails = () => {
 
   return (
     <MainLayout>
-      <div className="min-h-screen bg-[#1A1F2C]">
-        <div className="container-custom py-12">
-          <div className="grid md:grid-cols-[350px,1fr] gap-8">
+      <div className="min-h-screen bg-white">
+        {/* Hero Section with Backdrop */}
+        <div className="relative h-[400px] overflow-hidden">
+          {movie.backdrop_path ? (
+            <>
+              <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
+              <img
+                src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
+                alt={movie.title}
+                className="w-full h-full object-cover"
+              />
+            </>
+          ) : (
+            <div className="w-full h-full bg-gray-100" />
+          )}
+        </div>
+
+        <div className="container-custom -mt-40 relative z-20">
+          <div className="grid md:grid-cols-[300px,1fr] gap-8">
             {/* Poster */}
             <div>
-              <div className="rounded-lg overflow-hidden">
+              <div className="rounded-lg overflow-hidden shadow-xl">
                 {movie.poster_path ? (
                   <img
                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -65,7 +81,7 @@ const MovieDetails = () => {
                     className="w-full"
                   />
                 ) : (
-                  <div className="aspect-[2/3] bg-gray-800 flex items-center justify-center">
+                  <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
                     <span className="text-gray-400">Kein Poster</span>
                   </div>
                 )}
@@ -73,10 +89,10 @@ const MovieDetails = () => {
             </div>
 
             {/* Content */}
-            <div className="text-white">
+            <div className="text-gray-800">
               <h1 className="text-4xl font-semibold mb-2">{movie.title}</h1>
               {movie.tagline && (
-                <p className="text-xl text-gray-400 mb-4 italic">
+                <p className="text-xl text-gray-500 mb-4 italic">
                   {movie.tagline}
                 </p>
               )}
@@ -91,31 +107,32 @@ const MovieDetails = () => {
                 {movie.genres?.map((genre) => (
                   <span
                     key={genre.id}
-                    className="px-4 py-1 bg-blue-900/50 text-blue-100 rounded"
+                    className="px-4 py-1 bg-gray-100 text-gray-700 rounded-md"
                   >
                     {genre.name}
                   </span>
                 ))}
               </div>
 
-              <p className="text-gray-300 mb-8 leading-relaxed">
+              <p className="text-gray-600 mb-8 leading-relaxed">
                 {movie.overview}
               </p>
 
               <div className="flex gap-4 mb-8">
-                {movie.hasStream && (
+                {movie.videos?.results.length > 0 && (
                   <button
-                    className="bg-[#0FA0CE] text-white px-6 py-2 rounded hover:bg-[#0FA0CE]/90 transition-colors"
                     onClick={() => setShowTrailer(true)}
+                    className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
                   >
-                    Stream ansehen
+                    <Play className="w-4 h-4" />
+                    Trailer
                   </button>
                 )}
                 <a
                   href={getAmazonUrl(movie.title || '')}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-[#00A8E1] text-white px-6 py-2 rounded hover:bg-[#00A8E1]/90 transition-colors flex items-center gap-2"
+                  className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
                 >
                   <img 
                     src="/prime-video-icon.png" 
@@ -124,88 +141,58 @@ const MovieDetails = () => {
                   />
                   Bei Prime Video ansehen
                 </a>
+                {movie.hasStream && (
+                  <button
+                    className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors"
+                    onClick={() => setShowTrailer(true)}
+                  >
+                    Stream ansehen
+                  </button>
+                )}
               </div>
 
               <Tabs defaultValue="details" className="w-full">
-                <TabsList className="border-b border-gray-700 w-full justify-start h-auto p-0 bg-transparent">
+                <TabsList className="border-b border-gray-200 w-full justify-start h-auto p-0 bg-transparent">
                   <TabsTrigger 
                     value="details"
-                    className="px-6 py-2 text-gray-400 data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none bg-transparent"
+                    className="px-6 py-2 text-gray-600 data-[state=active]:text-gray-900 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none bg-transparent"
                   >
-                    Details
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="cast"
-                    className="px-6 py-2 text-gray-400 data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none bg-transparent"
-                  >
-                    Besetzung
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="trailer"
-                    className="px-6 py-2 text-gray-400 data-[state=active]:text-white data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none bg-transparent"
-                  >
-                    Trailer
+                    Regie & Cast
                   </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="details" className="mt-6">
-                  <div className="grid md:grid-cols-2 gap-x-12 gap-y-4 text-gray-300">
+                  <div className="grid gap-y-8">
                     <div>
-                      <h3 className="text-blue-400 mb-1">Regie</h3>
-                      <p>Lee Unkrich</p>
+                      <h3 className="text-xl font-semibold mb-4 text-gray-800">Regie</h3>
+                      <p className="text-gray-600">Lee Unkrich</p>
                     </div>
+                    
                     <div>
-                      <h3 className="text-blue-400 mb-1">Drehbuch</h3>
-                      <p>Adrian Molina, Matthew Aldrich</p>
-                    </div>
-                    <div>
-                      <h3 className="text-blue-400 mb-1">Produktionsland</h3>
-                      <p>USA</p>
-                    </div>
-                    <div>
-                      <h3 className="text-blue-400 mb-1">Sprache</h3>
-                      <p>Englisch</p>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="cast" className="mt-6">
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                    {movie.cast?.map((person) => (
-                      <div key={person.id} className="text-center">
-                        <div className="w-full aspect-[2/3] rounded-lg overflow-hidden mb-2">
-                          {person.profile_path ? (
-                            <img
-                              src={`https://image.tmdb.org/t/p/w185${person.profile_path}`}
-                              alt={person.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                              <span className="text-gray-600">No Image</span>
+                      <h3 className="text-xl font-semibold mb-4 text-gray-800">Cast</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        {movie.cast?.map((person) => (
+                          <div key={person.id} className="text-center">
+                            <div className="w-full aspect-[2/3] rounded-lg overflow-hidden mb-2 bg-gray-100">
+                              {person.profile_path ? (
+                                <img
+                                  src={`https://image.tmdb.org/t/p/w185${person.profile_path}`}
+                                  alt={person.name}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                  <span className="text-gray-400">No Image</span>
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                        <h4 className="text-sm font-medium text-white">{person.name}</h4>
-                        <p className="text-xs text-gray-400">{person.character}</p>
+                            <h4 className="text-sm font-medium text-gray-800">{person.name}</h4>
+                            <p className="text-xs text-gray-500">{person.character}</p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="trailer" className="mt-6">
-                  {movie.videos?.results.length ? (
-                    <div className="aspect-video w-full">
-                      <iframe
-                        src={`https://www.youtube.com/embed/${movie.videos.results[0].key}`}
-                        title="Movie Trailer"
-                        className="w-full h-full"
-                        allowFullScreen
-                      />
                     </div>
-                  ) : (
-                    <p className="text-gray-400">Kein Trailer verfügbar.</p>
-                  )}
+                  </div>
                 </TabsContent>
               </Tabs>
             </div>
@@ -213,8 +200,8 @@ const MovieDetails = () => {
         </div>
       </div>
 
-      {/* Stream Modal */}
-      {showTrailer && movie.streamUrl && (
+      {/* Trailer Modal */}
+      {showTrailer && (movie.videos?.results[0]?.key || movie.streamUrl) && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
           <div className="relative w-full max-w-4xl">
             <button
@@ -225,7 +212,7 @@ const MovieDetails = () => {
             </button>
             <div className="aspect-video">
               <iframe
-                src={movie.streamUrl}
+                src={movie.streamUrl || `https://www.youtube.com/embed/${movie.videos.results[0].key}`}
                 title={`${movie.title} Stream`}
                 className="w-full h-full"
                 allowFullScreen
