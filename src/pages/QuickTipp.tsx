@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
@@ -5,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { getRandomMovie, MovieDetail } from '@/lib/api';
 import { Sparkles, Film, Clock, Calendar, Star, ArrowRight, Wand2, Target, Rocket } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
 
 const QuickTipp = () => {
   const [movie, setMovie] = useState<MovieDetail | null>(null);
@@ -50,22 +50,22 @@ const QuickTipp = () => {
           </Button>
         </div>
 
-        {/* Movie Recommendation Section - DIRECTLY AFTER BUTTON */}
+        {/* Movie Recommendation Section - BETWEEN BUTTON AND FEATURES */}
         {movie && (
-          <div className="max-w-4xl mx-auto mb-16">
+          <div className="max-w-4xl mx-auto mb-12">
             <Card className="overflow-hidden bg-white/80 backdrop-blur-sm border border-gray-100 shadow-xl">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-8">
-                  {/* Movie Poster - Smaller Size */}
+                  {/* Movie Poster - Original Size */}
                   <div className="md:w-1/4">
                     {movie.poster_path ? (
                       <img
                         src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                         alt={movie.title || movie.name}
-                        className="w-full h-[200px] object-cover rounded-lg shadow-md"
+                        className="w-full h-[300px] object-cover rounded-lg shadow-md"
                       />
                     ) : (
-                      <div className="w-full h-[200px] bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="w-full h-[300px] bg-gray-100 rounded-lg flex items-center justify-center">
                         <Film className="w-16 h-16 text-gray-400" />
                       </div>
                     )}
@@ -185,3 +185,4 @@ const QuickTipp = () => {
 };
 
 export default QuickTipp;
+
