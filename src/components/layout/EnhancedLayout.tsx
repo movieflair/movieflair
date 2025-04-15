@@ -1,20 +1,20 @@
-
-import { ReactNode } from 'react';
-import MainLayout from './MainLayout';
+import React, { ReactNode } from 'react';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 interface EnhancedLayoutProps {
   children: ReactNode;
 }
 
-/**
- * This component enhances the original MainLayout
- * without modifying the original component.
- */
-const EnhancedLayout = ({ children }: EnhancedLayoutProps) => {
+const EnhancedLayout: React.FC<EnhancedLayoutProps> = ({ children }) => {
   return (
-    <MainLayout>
-      {children}
-    </MainLayout>
+    <div className="flex flex-col min-h-screen bg-background">
+      <Navbar />
+      <main className="flex-grow">
+        {children}
+      </main>
+      <Footer />
+    </div>
   );
 };
 

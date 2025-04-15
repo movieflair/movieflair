@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { List, Play, Gift, User, Bookmark, LogOut, Sparkles, Compass } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -16,16 +16,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 
 const Navbar = () => {
-  let navigate = undefined;
-  try {
-    navigate = useNavigate();
-  } catch (error) {
-    console.error("Navigation context not available:", error);
-    navigate = (path: string) => {
-      window.location.href = path;
-    };
-  }
-
+  const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
 
@@ -42,47 +33,39 @@ const Navbar = () => {
     return user.email.charAt(0).toUpperCase();
   };
 
-  const NavLink = ({ to, className, children }: { to: string, className?: string, children: React.ReactNode }) => {
-    try {
-      return <Link to={to} className={className}>{children}</Link>;
-    } catch (error) {
-      return <a href={to} className={className}>{children}</a>;
-    }
-  };
-
   return (
     <nav className="bg-theme-black sticky top-0 z-50">
       <div className="container-custom flex items-center justify-between py-4 pl-4 pr-4 md:pl-8 md:pr-8">
-        <NavLink to="/" className="flex items-center text-xl font-semibold text-white">
+        <Link to="/" className="flex items-center text-xl font-semibold text-white">
           <img 
             src="/lovable-uploads/26151e5a-66d8-4a56-ad10-e034335711e1.png" 
             alt="MovieFlair Logo" 
             className="h-12 w-auto mr-2" 
           />
-        </NavLink>
+        </Link>
 
         <div className="flex items-center space-x-6">
-          <NavLink to="/entdecken" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+          <Link to="/entdecken" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <Compass className="w-5 h-5" />
             <span>Entdecken</span>
-          </NavLink>
+          </Link>
 
-          <NavLink to="/neue-trailer" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+          <Link to="/neue-trailer" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <Play className="w-5 h-5" />
             <span>Neue Trailer</span>
-          </NavLink>
+          </Link>
 
-          <NavLink to="/kostenlose-filme" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+          <Link to="/kostenlose-filme" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <Gift className="w-5 h-5" />
             <span>Kostenlos</span>
-          </NavLink>
+          </Link>
 
-          <NavLink to="/quick-tipp">
+          <Link to="/quick-tipp">
             <Button variant="destructive" className="hidden md:flex items-center">
               <Sparkles className="w-5 h-5 mr-1" />
               <span>Quick Tipp</span>
             </Button>
-          </NavLink>
+          </Link>
 
           {user ? (
             <DropdownMenu>
