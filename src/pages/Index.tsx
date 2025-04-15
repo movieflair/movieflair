@@ -4,15 +4,15 @@ import HomeFilterBox from '@/components/filter/HomeFilterBox';
 import SEOHead from '@/components/seo/SEOHead';
 import { getRandomCustomLists, CustomList } from '@/lib/api';
 import CustomListCarousel from '@/components/movies/CustomListCarousel';
+import PrimeVideoAd from '@/components/ads/PrimeVideoAd';
+
 const Index = () => {
   const [customLists, setCustomLists] = useState<CustomList[]>([]);
   useEffect(() => {
-    // Benutzerdefinierte Listen abrufen (auf 2 beschränkt für die Startseite)
     const lists = getRandomCustomLists(2);
     setCustomLists(lists);
   }, []);
 
-  // Prepare structured data for the homepage
   const websiteStructuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -24,8 +24,16 @@ const Index = () => {
       "query-input": "required name=search_term_string"
     }
   };
-  return <MainLayout>
-      <SEOHead title="ScreenPick - Dein Filmguide" description="Entdecke den perfekten Film für jeden Moment. Lass dich von deiner Stimmung leiten und finde passende Film- und Serienempfehlungen." keywords="filme, serien, streaming, filmempfehlungen, filmtipps, filmguide, filmdatenbank" ogType="website" structuredData={websiteStructuredData} />
+
+  return (
+    <MainLayout>
+      <SEOHead 
+        title="ScreenPick - Dein Filmguide" 
+        description="Entdecke den perfekten Film für jeden Moment. Lass dich von deiner Stimmung leiten und finde passende Film- und Serienempfehlungen." 
+        keywords="filme, serien, streaming, filmempfehlungen, filmtipps, filmguide, filmdatenbank" 
+        ogType="website" 
+        structuredData={websiteStructuredData} 
+      />
 
       {/* Hero Section mit Logo */}
       <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50/50 to-white relative">
@@ -39,6 +47,7 @@ Wir finden ihn für dich!</h1>
             <p className="text-lg md:text-xl text-gray-600 mb-6 font-thin">Entdecke Filmempfehlungen, die zu deinem Tag, deiner Laune, deinem Leben passen.</p>
           </div>
           <HomeFilterBox />
+          <PrimeVideoAd />
         </div>
       </section>
 
@@ -49,6 +58,8 @@ Wir finden ihn für dich!</h1>
             {customLists.map(list => <CustomListCarousel key={list.id} list={list} />)}
           </div>
         </section>}
-    </MainLayout>;
+    </MainLayout>
+  );
 };
+
 export default Index;
