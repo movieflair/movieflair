@@ -1,3 +1,4 @@
+
 import { Genre, MovieOrShow, FilterOptions } from './types';
 import { callTMDB } from './apiUtils';
 
@@ -81,28 +82,42 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
     params.with_genres = genresToInclude.join(',');
   }
   
+  // Improve decade filtering - ensure it's properly applied for both movies and TV shows
   if (decades && decades.length > 0) {
     const decade = parseInt(decades[0]);
+    
+    // Use the right date parameters based on media type
     if (mediaType === 'movie') {
       params.primary_release_date_gte = `${decade}-01-01`;
       params.primary_release_date_lte = `${decade + 9}-12-31`;
     } else {
+      // For TV shows, use first_air_date parameters
       params.first_air_date_gte = `${decade}-01-01`;
       params.first_air_date_lte = `${decade + 9}-12-31`;
     }
+    
+    // Add console log for debugging
+    console.log(`Filtering by decade: ${decade}s, Media type: ${mediaType}`);
   }
   
   if (rating > 0) {
     params.vote_average_gte = rating.toString();
   }
   
+  // Log the API call parameters for debugging
+  console.log(`API call to ${endpoint} with params:`, params);
+  
   const data = await callTMDB(endpoint, params);
+  console.log(`Received ${data.results.length} results from API`);
   
   // Nur Medien mit Beschreibung und Cover zurückgeben
-  return data.results
+  const filteredResults = data.results
     .filter((item: any) => item.poster_path && item.overview && item.overview.trim() !== '')
     .map((item: any) => ({
       ...item,
       media_type: mediaType === 'movie' ? 'movie' : 'tv',
     }));
+    
+  console.log(`Returning ${filteredResults.length} filtered results`);
+  return filteredResults;
 };

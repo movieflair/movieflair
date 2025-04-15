@@ -22,7 +22,8 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
   
   // Funktion, um den richtigen URL-Pfad basierend auf dem mediaType zu erzeugen
   const getDetailPath = () => {
-    const baseUrl = recommendation.media_type === 'movie' ? '/film' : '/tv';
+    // Use the right base URL depending on media type
+    const baseUrl = recommendation.media_type === 'movie' ? '/film' : '/serie';
     return `${baseUrl}/${recommendation.id}`;
   };
 

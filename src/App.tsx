@@ -76,7 +76,7 @@ const App = () => {
             <Route path="/kostenlose-filme" element={<FreeMovies />} />
             <Route path="/suche" element={<Search />} />
             <Route path="/entdecken" element={<Discover />} />
-            <Route path="/genres" element={<Discover />} />
+            <Route path="/genres" element={<Genres />} />
             <Route path="/quick-tipp" element={<QuickTipp />} />
             <Route path="/merkliste" element={<Watchlist />} />
             <Route path="/auth" element={<Auth />} />
