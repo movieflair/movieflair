@@ -135,12 +135,13 @@ const HomeFilterBox = () => {
             {moods.map((mood) => (
               <Button
                 key={mood}
-                variant={selectedMoods.includes(mood) ? "default" : "outline"}
-                className={`${
-                  selectedMoods.includes(mood)
-                    ? "bg-theme-black hover:bg-theme-black/90 text-white"
-                    : "hover:bg-gray-100 text-theme-black border border-gray-200 bg-white"
-                } transition-all font-medium text-sm`}
+                variant="default"
+                className={`
+                  ${selectedMoods.includes(mood) 
+                    ? 'bg-[#ff3131] hover:bg-[#ff3131]/90 text-white' 
+                    : 'hover:bg-gray-100 text-theme-black border border-gray-200 bg-white'}
+                  transition-all font-medium text-sm
+                `}
                 onClick={() => {
                   setSelectedMoods(prev =>
                     prev.includes(mood)
@@ -197,7 +198,7 @@ const HomeFilterBox = () => {
 
         <Button 
           onClick={handleSearch}
-          className="w-full bg-theme-black hover:bg-theme-black/90 text-white transition-colors"
+          className="w-full bg-[#ff3131] hover:bg-[#ff3131]/90 text-white transition-colors"
           size="lg"
           disabled={isLoading}
         >
@@ -218,3 +219,4 @@ const HomeFilterBox = () => {
 };
 
 export default HomeFilterBox;
+
