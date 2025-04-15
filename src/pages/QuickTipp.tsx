@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { getRandomMovie, MovieOrShow } from '@/lib/api';
 import { Sparkles, Film, Clock, Calendar, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
 
 const QuickTipp = () => {
   const [movie, setMovie] = useState<MovieOrShow | null>(null);
