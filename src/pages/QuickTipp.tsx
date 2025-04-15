@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
@@ -60,9 +61,36 @@ const QuickTipp = () => {
           <div className="max-w-4xl mx-auto mb-12">
             <Card className="overflow-hidden bg-white/80 backdrop-blur-sm border border-gray-100 shadow-xl">
               <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex flex-col md:flex-row gap-4 relative">
+                  {movie.backdrop_path && (
+                    <div 
+                      className="absolute inset-0 -z-0" 
+                      style={{
+                        backgroundImage: `url(https://image.tmdb.org/t/p/w1280${movie.backdrop_path})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        opacity: 0.8,
+                      }}
+                    >
+                      <div 
+                        className="absolute inset-0" 
+                        style={{
+                          background: `
+                            linear-gradient(to left,
+                              rgba(255, 255, 255, 0.6) 0%,
+                              rgba(255, 255, 255, 0.7) 20%,
+                              rgba(255, 255, 255, 0.8) 40%,
+                              rgba(255, 255, 255, 0.9) 60%,
+                              rgba(255, 255, 255, 1) 100%
+                            )
+                          `
+                        }}
+                      />
+                    </div>
+                  )}
+                  
                   {movie.poster_path ? (
-                    <div className="w-full md:w-[200px] h-[300px] bg-muted overflow-hidden rounded-xl">
+                    <div className="w-full md:w-[200px] h-[300px] bg-muted overflow-hidden rounded-xl relative z-10">
                       <img
                         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                         alt={movie.title || movie.name}
@@ -74,25 +102,12 @@ const QuickTipp = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full md:w-[200px] h-[300px] bg-muted rounded-xl flex items-center justify-center">
+                    <div className="w-full md:w-[200px] h-[300px] bg-muted rounded-xl flex items-center justify-center relative z-10">
                       <Film className="w-16 h-16 text-muted-foreground" />
                     </div>
                   )}
 
-                  <div 
-                    className="md:w-2/3 flex flex-col justify-between relative z-10"
-                    style={{
-                      background: movie.backdrop_path ? `
-                        linear-gradient(to left,
-                          rgba(255, 255, 255, 1) 0%,
-                          rgba(255, 255, 255, 0.9) 20%,
-                          rgba(255, 255, 255, 0.8) 40%,
-                          rgba(255, 255, 255, 0.4) 60%,
-                          rgba(255, 255, 255, 0) 100%
-                        )
-                      ` : 'transparent'
-                    }}
-                  >
+                  <div className="md:w-2/3 flex flex-col justify-between relative z-10">
                     <div>
                       <h2 className="text-xl font-bold mb-2">
                         {movie.title || movie.name}
@@ -159,7 +174,7 @@ const QuickTipp = () => {
             <h2 className="text-2xl font-semibold mb-4">Warum Quick Tipp?</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Mit Quick Tipp findest du in Sekunden deinen nächsten Lieblingsfilm. 
-              Keine endlose Suche mehr - lass dich von unseren Vorschlägen ��berraschen!
+              Keine endlose Suche mehr - lass dich von unseren Vorschlägen überraschen!
             </p>
           </div>
 
