@@ -52,22 +52,22 @@ const QuickTipp = () => {
           <div className="max-w-4xl mx-auto mb-12">
             <Card className="overflow-hidden bg-white/80 backdrop-blur-sm border border-gray-100 shadow-xl">
               <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-4 min-h-[250px]">
+                <div className="flex flex-col md:flex-row gap-4">
                   {movie.poster_path ? (
-                    <div className="md:w-1/4">
+                    <div className="md:w-1/3">
                       <img
                         src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                         alt={movie.title || movie.name}
-                        className="w-full h-[250px] object-cover rounded-lg shadow-md"
+                        className="w-full h-[350px] object-cover rounded-lg shadow-md"
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-[250px] bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div className="w-full h-[350px] bg-gray-100 rounded-lg flex items-center justify-center">
                       <Film className="w-16 h-16 text-gray-400" />
                     </div>
                   )}
 
-                  <div className="md:w-3/4 flex flex-col justify-between">
+                  <div className="md:w-2/3 flex flex-col justify-between">
                     <div>
                       <h2 className="text-xl font-bold mb-2">
                         {movie.title || movie.name}
@@ -110,7 +110,7 @@ const QuickTipp = () => {
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6">
                       <Link 
                         to={`/movie/${movie.id}`}
                         className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
@@ -118,7 +118,7 @@ const QuickTipp = () => {
                         Details ansehen
                         <ArrowRight className="w-4 h-4" />
                       </Link>
-                      <div className="text-xs text-gray-600">
+                      <div className="text-sm text-gray-600 flex items-center">
                         <MovieRatingFeedback movieId={movie.id} />
                       </div>
                     </div>

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -57,12 +56,12 @@ const MovieRatingFeedback = ({ movieId }: MovieRatingFeedbackProps) => {
   }
 
   return (
-    <div className="flex items-center gap-4 mt-6">
+    <div className="flex items-center gap-4">
       <p className="text-gray-600">War dieser Vorschlag hilfreich?</p>
       <Button 
         variant="ghost" 
         size="sm" 
-        className="flex items-center gap-1"
+        className="flex items-center gap-1 text-sm"
         onClick={() => handleVote(true)}
         disabled={isSubmitting}
       >
@@ -72,7 +71,7 @@ const MovieRatingFeedback = ({ movieId }: MovieRatingFeedbackProps) => {
       <Button 
         variant="ghost" 
         size="sm" 
-        className="flex items-center gap-1"
+        className="flex items-center gap-1 text-sm"
         onClick={() => handleVote(false)}
         disabled={isSubmitting}
       >
