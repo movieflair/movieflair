@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { List, Play, Gift, User, Bookmark, LogOut, Sparkles, Compass } from 'lucide-react';
@@ -55,11 +54,10 @@ const Navbar = () => {
       <div className="container-custom flex items-center justify-between py-4">
         <NavLink to="/" className="flex items-center text-xl font-semibold text-white">
           <img 
-            src="/movieflair-logo.png" 
+            src="/lovable-uploads/26151e5a-66d8-4a56-ad10-e034335711e1.png" 
             alt="MovieFlair Logo" 
             className="h-8 mr-2"
           />
-          <span>Movie<span className="text-theme-accent-red">Flair</span></span>
         </NavLink>
 
         <div className="flex items-center space-x-6">
