@@ -25,7 +25,7 @@ const PrimeVideoAd = () => {
             </div>
           </div>
           <Button 
-            className="bg-[#33C3F0] hover:bg-[#33C3F0]/90 text-white min-w-[200px]"
+            className="bg-[#0678ff] hover:bg-[#0678ff]/90 text-white min-w-[200px]"
           >
             <Play className="w-4 h-4 mr-2" />
             Gratis streamen
