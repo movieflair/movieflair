@@ -2,6 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Genre } from '@/lib/api';
+import { getRecommendationByFilters } from '@/lib/filterApi';
 
 interface GenreGridProps {
   genres: Genre[];
@@ -10,8 +11,25 @@ interface GenreGridProps {
 const GenreGrid = ({ genres }: GenreGridProps) => {
   const navigate = useNavigate();
 
-  const handleGenreClick = (genreId: number) => {
-    navigate(`/search?genre=${genreId}`);
+  const handleGenreClick = async (genreId: number, genreName: string) => {
+    try {
+      // Get movies for this genre directly and pass to the Genres page state
+      const results = await getRecommendationByFilters({
+        genres: [genreId],
+        mediaType: 'movie'
+      });
+      
+      // Navigate to Genres page with pre-selected genre
+      navigate('/discover', { 
+        state: { 
+          selectedGenre: genreId,
+          genreName: genreName,
+          preloadedMovies: results
+        } 
+      });
+    } catch (error) {
+      console.error('Error fetching genre content:', error);
+    }
   };
 
   return (
@@ -22,7 +40,7 @@ const GenreGrid = ({ genres }: GenreGridProps) => {
           <Card 
             key={genre.id}
             className="cursor-pointer hover:bg-red-500 hover:text-white transition-colors"
-            onClick={() => handleGenreClick(genre.id)}
+            onClick={() => handleGenreClick(genre.id, genre.name)}
           >
             <CardContent className="p-4 text-center">
               <h3 className="font-medium">{genre.name}</h3>

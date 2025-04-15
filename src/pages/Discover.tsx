@@ -6,7 +6,6 @@ import {
   getGenres, 
   getPopularMovies,
   MovieOrShow,
-  getRecommendationByFilters, 
   getRandomCustomLists,
   CustomList
 } from '@/lib/api';
@@ -20,10 +19,6 @@ import { toast } from 'sonner';
 const Discover = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [popularMovies, setPopularMovies] = useState<MovieOrShow[]>([]);
-  const [sciFiMovies, setSciFiMovies] = useState<MovieOrShow[]>([]);
-  const [romanceMovies, setRomanceMovies] = useState<MovieOrShow[]>([]);
-  const [actionMovies, setActionMovies] = useState<MovieOrShow[]>([]);
-  const [documentaryMovies, setDocumentaryMovies] = useState<MovieOrShow[]>([]);
   const [customLists, setCustomLists] = useState<CustomList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -37,16 +32,6 @@ const Discover = () => {
         ]);
         setGenres(genresList);
         setPopularMovies(movies.slice(0, 4));
-
-        const sciFi = await getRecommendationByFilters({ genres: [878], mediaType: 'movie' });
-        const romance = await getRecommendationByFilters({ genres: [10749], mediaType: 'movie' });
-        const action = await getRecommendationByFilters({ genres: [28], mediaType: 'movie' });
-        const documentary = await getRecommendationByFilters({ genres: [99], mediaType: 'movie' });
-
-        setSciFiMovies(sciFi.slice(0, 4));
-        setRomanceMovies(romance.slice(0, 4));
-        setActionMovies(action.slice(0, 4));
-        setDocumentaryMovies(documentary.slice(0, 4));
         
         // Benutzerdefinierte Listen abrufen
         const customListsData = getRandomCustomLists();
@@ -76,13 +61,7 @@ const Discover = () => {
               <p className="mt-2 text-muted-foreground">Lade Inhalte...</p>
             </div>
           ) : (
-            <RandomLists 
-              sciFiMovies={sciFiMovies}
-              romanceMovies={romanceMovies}
-              actionMovies={actionMovies}
-              documentaryMovies={documentaryMovies}
-              customLists={customLists}
-            />
+            <RandomLists customLists={customLists} />
           )}
         </div>
       </div>

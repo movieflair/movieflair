@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const moodCategories = [
   { id: 'action', label: 'Action & Abenteuer', icon: <Flame className="w-4 h-4 mr-2" /> },
@@ -29,10 +29,13 @@ const moodCategories = [
 
 const Genres = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const initialState = location.state || {};
+  
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [selectedGenre, setSelectedGenre] = useState<number | null>(null);
+  const [selectedGenre, setSelectedGenre] = useState<number | null>(initialState.selectedGenre || null);
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
-  const [movies, setMovies] = useState<MovieOrShow[]>([]);
+  const [movies, setMovies] = useState<MovieOrShow[]>(initialState.preloadedMovies || []);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'movies' | 'tv'>('movies');
 
@@ -43,13 +46,18 @@ const Genres = () => {
       try {
         const genresList = await getGenres();
         setGenres(genresList);
+        
+        // Wenn ein Genre aus dem Routing-State ausgewählt wurde und keine vorgeladenen Filme
+        if (initialState.selectedGenre && !initialState.preloadedMovies) {
+          handleGenreClick(initialState.selectedGenre);
+        }
       } catch (error) {
         console.error('Error fetching genres:', error);
       }
     };
 
     fetchGenres();
-  }, []);
+  }, [initialState]);
 
   const handleGenreClick = async (genreId: number) => {
     setIsLoading(true);

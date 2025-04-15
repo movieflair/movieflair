@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Film, Check, Save, X, Tv, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -39,16 +40,16 @@ const CustomListManager = () => {
   }, []);
 
   useEffect(() => {
-    if (movieResults) {
+    if (searchType === 'movie' && movieResults.length > 0) {
       setSearchResults(movieResults);
     }
-  }, [movieResults]);
+  }, [movieResults, searchType]);
 
   useEffect(() => {
-    if (tvResults) {
+    if (searchType === 'tv' && tvResults.length > 0) {
       setSearchResults(tvResults);
     }
-  }, [tvResults]);
+  }, [tvResults, searchType]);
 
   const loadLists = () => {
     const customLists = getCustomLists();
@@ -120,15 +121,19 @@ const CustomListManager = () => {
     
     if (searchQuery.trim()) {
       setIsSearching(true);
-      if (searchType === 'movie') {
-        await refetchMovies();
-        setSearchResults(movieResults);
-      } else {
-        await refetchTvShows();
-        setSearchResults(tvResults);
+      try {
+        if (searchType === 'movie') {
+          await refetchMovies();
+        } else {
+          await refetchTvShows();
+        }
+      } catch (error) {
+        console.error('Fehler bei der Suche:', error);
+        toast.error('Fehler bei der Suche');
+      } finally {
+        setIsSearching(false);
       }
     } else {
-      setIsSearching(false);
       setSearchResults([]);
     }
   };
@@ -151,7 +156,7 @@ const CustomListManager = () => {
     if (!selectedList) return;
     
     removeMovieFromList(selectedList.id, movieId);
-    toast.success('Film aus der Liste entfernt');
+    toast.success('Inhalt aus der Liste entfernt');
     
     loadLists();
     
@@ -192,7 +197,7 @@ const CustomListManager = () => {
               >
                 <div>
                   <h4 className="font-medium">{list.title}</h4>
-                  <p className="text-xs text-muted-foreground">{list.movies.length} Filme</p>
+                  <p className="text-xs text-muted-foreground">{list.movies.length} Inhalte</p>
                 </div>
                 <Button 
                   variant="ghost" 
@@ -364,7 +369,7 @@ const CustomListManager = () => {
               </div>
 
               <div>
-                <h3 className="text-lg font-medium mb-4">Filme in dieser Liste ({selectedList.movies.length})</h3>
+                <h3 className="text-lg font-medium mb-4">Inhalte in dieser Liste ({selectedList.movies.length})</h3>
                 {selectedList.movies.length > 0 ? (
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {selectedList.movies.map(movie => (
@@ -397,13 +402,16 @@ const CustomListManager = () => {
                           </Button>
                         </div>
                         <p className="text-sm mt-1 truncate">{movie.title || movie.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {movie.media_type === 'movie' ? 'Film' : 'Serie'}
+                        </p>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
-                    <p>Keine Filme in dieser Liste</p>
-                    <p className="text-sm">Suche nach Filmen, um sie hinzuzufügen</p>
+                    <p>Keine Inhalte in dieser Liste</p>
+                    <p className="text-sm">Suche nach Filmen oder Serien, um sie hinzuzufügen</p>
                   </div>
                 )}
               </div>
