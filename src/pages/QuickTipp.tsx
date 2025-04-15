@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Star } from 'lucide-react';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { Button } from '@/components/ui/button';
 import { getRandomMovie, MovieDetail } from '@/lib/api';
-import { Sparkles, Film, Clock, Calendar, Star, ArrowRight, Wand2, Target, Rocket } from 'lucide-react';
+import { Sparkles, Film, Clock, Calendar, ArrowRight, Wand2, Target, Rocket } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
 
@@ -54,11 +55,11 @@ const QuickTipp = () => {
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
                   {movie.poster_path ? (
-                    <div className="relative w-full md:w-1/3 h-[360px] bg-muted overflow-hidden rounded-xl">
+                    <div className="w-full md:w-[200px] h-[300px] bg-muted overflow-hidden rounded-xl">
                       <img
                         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                         alt={movie.title || movie.name}
-                        className="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105"
+                        className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
                       />
                       <div className="absolute top-2 right-2 flex items-center bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full">
                         <Star className="w-3 h-3 text-yellow-500 mr-1" />
@@ -66,7 +67,7 @@ const QuickTipp = () => {
                       </div>
                     </div>
                   ) : (
-                    <div className="w-full md:w-1/3 h-[360px] bg-muted rounded-xl flex items-center justify-center">
+                    <div className="w-full md:w-[200px] h-[300px] bg-muted rounded-xl flex items-center justify-center">
                       <Film className="w-16 h-16 text-muted-foreground" />
                     </div>
                   )}
