@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Star, Film, ArrowRight, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,10 +25,28 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
     return `${baseUrl}/${recommendation.id}`;
   };
 
+  const backdropStyle = recommendation.backdrop_path ? {
+    backgroundImage: `
+      linear-gradient(to left, 
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0.9) 20%,
+        rgba(255, 255, 255, 0.8) 40%,
+        rgba(255, 255, 255, 0.4) 60%,
+        rgba(255, 255, 255, 0) 100%
+      ),
+      url(https://image.tmdb.org/t/p/w1280${recommendation.backdrop_path})
+    `,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center'
+  } : {};
+
   return (
     <div className="mt-8 animate-fade-in">
-      <div className="bg-white/90 rounded-xl p-6 shadow-lg border border-gray-100">
-        <div className="flex justify-between items-center mb-4">
+      <div 
+        className="rounded-xl p-6 shadow-lg border border-gray-100 relative overflow-hidden"
+        style={backdropStyle}
+      >
+        <div className="flex justify-between items-center mb-4 relative z-10">
           <h3 className="text-lg font-medium text-gray-800">
             Deine {recommendation.media_type === 'movie' ? 'Film' : 'Serien'}empfehlung
           </h3>
@@ -36,14 +55,14 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
             size="sm" 
             onClick={onRefresh}
             disabled={isLoading}
-            className="border-gray-200 text-gray-600 hover:text-gray-800"
+            className="border-gray-200 text-gray-600 hover:text-gray-800 bg-white/80 backdrop-blur-sm"
           >
             <RefreshCcw className="w-4 h-4 mr-2" />
             <span>Neuer Vorschlag</span>
           </Button>
         </div>
         
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="flex flex-col md:flex-row gap-6 relative z-10">
           {recommendation.poster_path ? (
             <Link 
               to={getDetailPath()}
@@ -66,12 +85,15 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
               <Film className="w-16 h-16 text-muted-foreground" />
             </div>
           )}
-          <div className="flex-1 text-gray-200">
-            <h4 className="text-xl font-medium mb-2 text-theme-black">{recommendation.title || recommendation.name}</h4>
-            <p className="text-sm text-theme-black mb-4">
+
+          <div className="flex-1 text-gray-900">
+            <h4 className="text-xl font-medium mb-2">
+              {recommendation.title || recommendation.name}
+            </h4>
+            <p className="text-sm mb-4">
               {recommendation.release_date?.substring(0, 4) || recommendation.first_air_date?.substring(0, 4)}
             </p>
-            <p className="text-sm mb-6 text-theme-black">
+            <p className="text-sm mb-6">
               {truncateOverview(recommendation.overview || 'Keine Beschreibung verfügbar.')}
             </p>
             <div className="flex items-center gap-4">
