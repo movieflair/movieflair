@@ -1,4 +1,6 @@
+
 import MainLayout from '@/components/layout/MainLayout';
+import { Link } from 'react-router-dom';
 import { Film, FileText, Users, Heart } from 'lucide-react';
 
 const About = () => {
