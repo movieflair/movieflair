@@ -24,7 +24,7 @@ const MovieCategories = ({
           <Checkbox 
             id="isNewTrailer" 
             checked={isNewTrailer}
-            onCheckedChange={(checked) => onTrailerChange(checked as boolean)}
+            onCheckedChange={onTrailerChange}
           />
           <Label htmlFor="isNewTrailer" className="flex items-center gap-1">
             <Video className="w-4 h-4" /> 
@@ -36,7 +36,7 @@ const MovieCategories = ({
           <Checkbox 
             id="isFreeMovie" 
             checked={isFreeMovie}
-            onCheckedChange={(checked) => onFreeMovieChange(checked as boolean)}
+            onCheckedChange={onFreeMovieChange}
           />
           <Label htmlFor="isFreeMovie" className="flex items-center gap-1">
             <PlayCircle className="w-4 h-4" /> 

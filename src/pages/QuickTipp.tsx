@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { getRandomMovie, MovieOrShow } from '@/lib/api';
 import { Sparkles } from 'lucide-react';
 import RecommendationCard from '@/components/movies/RecommendationCard';
+import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
 
 const QuickTipp = () => {
   const [movie, setMovie] = useState<MovieOrShow | null>(null);
@@ -43,10 +44,12 @@ const QuickTipp = () => {
         </div>
 
         {movie && (
-          <div className="flex justify-center">
-            <div className="max-w-[300px]">
+          <div className="flex flex-col items-center">
+            <div className="max-w-[300px] mb-6">
               <RecommendationCard movie={movie} />
             </div>
+            
+            {movie.id && <MovieRatingFeedback movieId={movie.id} />}
           </div>
         )}
       </div>

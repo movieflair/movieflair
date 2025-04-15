@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import MovieRatingFeedback from '../movies/MovieRatingFeedback';
 
 const moods = [
   'fröhlich',
@@ -172,7 +173,7 @@ const HomeFilterBox = () => {
             max={10}
             step={1}
             onValueChange={(values) => setRating(values[0])}
-            className="py-4 [&_[role=slider]]:bg-white [&_[role=slider]]:border-[#ea384c] [&_[role=slider]]:border-2 [&_[data-orientation=horizontal]>.slider-track]:bg-[#ea384c]"
+            className="py-4 [&_[role=slider]]:bg-white [&_[role=slider]]:border-[#ea384c] [&_[role=slider]]:border-2 [&_[data-orientation=horizontal]>.slider-track]:bg-white [&_[data-orientation=horizontal]>.slider-range]:bg-[#ea384c]"
           />
         </div>
 
@@ -191,7 +192,7 @@ const HomeFilterBox = () => {
         <div className="mt-8 animate-fade-in">
           <h3 className="text-lg font-medium text-white mb-4">Deine Filmempfehlung</h3>
           <div className="flex flex-col md:flex-row gap-6">
-            <div className="w-full md:w-[200px]">
+            <div className="w-full md:w-[300px]">
               <RecommendationCard movie={recommendation} />
             </div>
             <div className="flex-1 text-gray-200">
@@ -207,25 +208,8 @@ const HomeFilterBox = () => {
                 >
                   Details ansehen
                 </Button>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">War dieser Vorschlag zufriedenstellend?</span>
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    onClick={() => console.log('Liked')}
-                    className="hover:bg-green-500/10 hover:text-green-500"
-                  >
-                    <ThumbsUp className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    onClick={() => console.log('Disliked')}
-                    className="hover:bg-red-500/10 hover:text-red-500"
-                  >
-                    <ThumbsDown className="h-4 w-4" />
-                  </Button>
-                </div>
+                
+                {recommendation.id && <MovieRatingFeedback movieId={recommendation.id} />}
               </div>
             </div>
           </div>
