@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -52,29 +53,29 @@ const App = () => {
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/movie/:id" element={
+            <Route path="/film/:id/:slug?" element={
               <AdminSettingsProvider>
                 <MovieDetails />
               </AdminSettingsProvider>
             } />
-            <Route path="/tv/:id" element={
+            <Route path="/serie/:id/:slug?" element={
               <AdminSettingsProvider>
                 <TvShowDetails />
               </AdminSettingsProvider>
             } />
-            <Route path="/trailers" element={<Trailers />} />
-            <Route path="/free-movies" element={<FreeMovies />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/discover" element={<Discover />} />
-            <Route path="/genres" element={<Discover />} /> {/* Redirect old route to new one */}
+            <Route path="/neue-trailer" element={<Trailers />} />
+            <Route path="/kostenlose-filme" element={<FreeMovies />} />
+            <Route path="/suche" element={<Search />} />
+            <Route path="/entdecken" element={<Discover />} />
+            <Route path="/genres" element={<Discover />} />
             <Route path="/quick-tipp" element={<QuickTipp />} />
-            <Route path="/watchlist" element={<Watchlist />} />
+            <Route path="/merkliste" element={<Watchlist />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profil" element={<Profile />} />
             <Route path="/admin" element={<AdminPage />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/about" element={<About />} />
+            <Route path="/datenschutz" element={<PrivacyPolicy />} />
+            <Route path="/nutzungsbedingungen" element={<TermsOfService />} />
+            <Route path="/ueber-uns" element={<About />} />
           </Routes>
           <Toaster />
         </AuthProvider>

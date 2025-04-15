@@ -1,16 +1,18 @@
-
 import { Link } from 'react-router-dom';
 import { ArrowRight, Star, Calendar, Clock } from 'lucide-react';
 import { MovieDetail } from '@/lib/api';
+import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
 
 interface RecommendationCardProps {
   movie: MovieDetail;
 }
 
 const RecommendationCard = ({ movie }: RecommendationCardProps) => {
-  const title = movie.title || movie.name || 'Unknown Title';
+  const title = movie.title || movie.name || 'Unbekannter Titel';
   const releaseDate = movie.release_date || movie.first_air_date;
   const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
+  const mediaType = getMediaTypeInGerman(movie.media_type);
+  const slug = createUrlSlug(title);
   
   return (
     <div className="glass-card overflow-hidden rounded-xl">
@@ -67,7 +69,7 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
           
           <div className="mt-auto">
             <Link
-              to={`/${movie.media_type}/${movie.id}`}
+              to={`/${mediaType}/${movie.id}/${slug}`}
               className="button-primary inline-flex items-center"
             >
               Details ansehen

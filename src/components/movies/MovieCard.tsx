@@ -1,7 +1,7 @@
-
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
+import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
 
 interface MovieCardProps {
   movie: MovieOrShow;
@@ -10,9 +10,11 @@ interface MovieCardProps {
 }
 
 const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardProps) => {
-  const title = movie.title || movie.name || 'Unknown Title';
+  const title = movie.title || movie.name || 'Unbekannter Titel';
   const releaseDate = movie.release_date || movie.first_air_date;
   const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
+  const mediaType = getMediaTypeInGerman(movie.media_type);
+  const slug = createUrlSlug(title);
   
   const imageSizes = {
     small: 'h-[300px] w-[200px]',
@@ -28,7 +30,7 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
 
   return (
     <Link 
-      to={`/${movie.media_type}/${movie.id}`} 
+      to={`/${mediaType}/${movie.id}/${slug}`} 
       className="group block overflow-hidden rounded-xl"
     >
       <div className={`relative ${imageSizes[size]} bg-muted overflow-hidden rounded-xl`}>
@@ -61,4 +63,3 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
 };
 
 export default MovieCard;
-
