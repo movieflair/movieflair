@@ -48,6 +48,10 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
   let params: Record<string, string> = {
     'sort_by': 'popularity.desc',
     'vote_count.gte': '50', // Mindestanzahl an Bewertungen
+    'include_adult': 'false',
+    'include_video': 'false',
+    'with_original_language': 'de,en', // Deutsch und Englisch
+    'page': '1',
     'language': 'de-DE'
   };
   
@@ -101,8 +105,14 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
   console.log('API call params:', params);
   
   try {
+    // Direkte API-Anfrage an TMDB über unsere Supabase-Funktion
     const data = await callTMDB(endpoint, params);
-    console.log(`Received ${data.results.length} results from API`);
+    console.log(`Received ${data.results?.length || 0} results from API`, data);
+    
+    if (!data.results || data.results.length === 0) {
+      console.log('No results from TMDB API');
+      return [];
+    }
     
     // Überprüfe die Jahrzehnt-Filterung für alle Ergebnisse und filtere die falschen heraus
     let filteredResults = data.results
@@ -121,9 +131,13 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
           const selectedDecade = parseInt(decades[0]);
           
           // Überprüfe, ob das Veröffentlichungsjahr im ausgewählten Jahrzehnt liegt
-          return hasValidMetadata && 
-                 releaseYear >= selectedDecade && 
-                 releaseYear <= (selectedDecade + 9);
+          const isInDecade = releaseYear >= selectedDecade && releaseYear <= (selectedDecade + 9);
+          
+          if (!isInDecade) {
+            console.log(`Filtering out movie from year ${releaseYear} (not in decade ${selectedDecade}-${selectedDecade+9})`, item.title);
+          }
+          
+          return hasValidMetadata && isInDecade;
         }
         
         return false;
@@ -145,7 +159,7 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
       .sort(() => Math.random() - 0.5)
       .slice(0, 20);
   } catch (error) {
-    console.error('Error fetching movies:', error);
+    console.error('Error fetching movies from TMDB API:', error);
     return [];
   }
 };

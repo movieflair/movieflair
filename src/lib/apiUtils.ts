@@ -7,12 +7,29 @@ export async function callTMDB(path: string, searchParams = {}) {
     language: 'de-DE'
   };
   
-  const { data, error } = await supabase.functions.invoke('tmdb', {
-    body: { path, searchParams: params },
-  });
+  console.log(`Calling TMDB API: ${path} with params:`, params);
+  
+  try {
+    const { data, error } = await supabase.functions.invoke('tmdb', {
+      body: { path, searchParams: params },
+    });
 
-  if (error) throw error;
-  return data;
+    if (error) {
+      console.error('Error from Supabase TMDB function:', error);
+      throw error;
+    }
+    
+    if (!data) {
+      console.error('No data returned from TMDB API');
+      return { results: [] };
+    }
+    
+    return data;
+  } catch (err) {
+    console.error('Error calling TMDB API:', err);
+    // Fallback zu leeren Ergebnissen im Fehlerfall
+    return { results: [] };
+  }
 }
 
 export const getAdminMovieSettings = async () => {

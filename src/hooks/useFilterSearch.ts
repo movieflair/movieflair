@@ -30,6 +30,7 @@ export const useFilterSearch = () => {
     setLastUsedFilter(currentFilter);
     
     try {
+      console.log('Searching with filters:', currentFilter);
       const results = await getRecommendationByFilters(currentFilter);
       setAllResults(results);
       
@@ -48,7 +49,7 @@ export const useFilterSearch = () => {
           console.log(`Film Release: ${releaseYear}, Selected Decade: ${decade}-${decade+9}`);
           
           if (releaseYear < decade || releaseYear > decade + 9) {
-            console.error('WARNING: Film year does not match selected decade!');
+            console.error('WARNING: Film year does not match selected decade!', results[randomIndex]);
           }
         }
       }
@@ -91,6 +92,7 @@ export const useFilterSearch = () => {
       }
     } else {
       // Wenn keine oder zu wenige Ergebnisse vorhanden sind, führe eine neue Suche durch
+      console.log('Searching for new results with filters:', lastUsedFilter);
       setIsLoading(true);
       try {
         const results = await getRecommendationByFilters({...lastUsedFilter});
