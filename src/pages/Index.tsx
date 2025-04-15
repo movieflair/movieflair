@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
@@ -48,12 +47,13 @@ Wir finden ihn für dich!</h1>
             <p className="text-lg md:text-xl text-gray-600 mb-6 font-thin">Entdecke Filmempfehlungen, die zu deinem Tag, deiner Laune, deinem Leben passen.</p>
           </div>
           <HomeFilterBox />
-          <PrimeVideoAd className="mt-8" /> {/* Reduced top margin */}
         </div>
       </section>
 
+      <PrimeVideoAd className="mb-8" /> {/* Reduced bottom margin */}
+
       {/* Custom Lists Section */}
-      {customLists.length > 0 && <section className="py-20">
+      {customLists.length > 0 && <section className="py-12">
           <div className="container-custom">
             <h2 className="text-2xl font-semibold mb-8 text-theme-black px-[20px]">Weitere Filmempfehlungen</h2>
             {customLists.map(list => <CustomListCarousel key={list.id} list={list} />)}
