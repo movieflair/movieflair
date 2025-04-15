@@ -79,7 +79,20 @@ const QuickTipp = () => {
                     </div>
                   )}
 
-                  <div className="md:w-2/3 flex flex-col justify-between">
+                  <div 
+                    className="md:w-2/3 flex flex-col justify-between relative z-10"
+                    style={{
+                      background: movie.backdrop_path ? `
+                        linear-gradient(to left,
+                          rgba(255, 255, 255, 1) 0%,
+                          rgba(255, 255, 255, 0.9) 20%,
+                          rgba(255, 255, 255, 0.8) 40%,
+                          rgba(255, 255, 255, 0.4) 60%,
+                          rgba(255, 255, 255, 0) 100%
+                        )
+                      ` : 'transparent'
+                    }}
+                  >
                     <div>
                       <h2 className="text-xl font-bold mb-2">
                         {movie.title || movie.name}
@@ -146,7 +159,7 @@ const QuickTipp = () => {
             <h2 className="text-2xl font-semibold mb-4">Warum Quick Tipp?</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Mit Quick Tipp findest du in Sekunden deinen nächsten Lieblingsfilm. 
-              Keine endlose Suche mehr - lass dich von unseren Vorschlägen überraschen!
+              Keine endlose Suche mehr - lass dich von unseren Vorschlägen ��berraschen!
             </p>
           </div>
 
