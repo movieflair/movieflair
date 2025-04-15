@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Star, Film, ArrowRight, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -67,11 +68,11 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
             </div>
           )}
           <div className="flex-1 text-gray-200">
-            <h4 className="text-xl font-medium mb-2">{recommendation.title || recommendation.name}</h4>
-            <p className="text-sm text-gray-400 mb-4">
+            <h4 className="text-xl font-medium mb-2 text-theme-black">{recommendation.title || recommendation.name}</h4>
+            <p className="text-sm text-theme-black mb-4">
               {recommendation.release_date?.substring(0, 4) || recommendation.first_air_date?.substring(0, 4)}
             </p>
-            <p className="text-sm mb-6">
+            <p className="text-sm mb-6 text-theme-black">
               {truncateOverview(recommendation.overview || 'Keine Beschreibung verfügbar.')}
             </p>
             <div className="flex items-center gap-4">
@@ -97,3 +98,4 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
 };
 
 export default FilterRecommendation;
+
