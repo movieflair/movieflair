@@ -25,27 +25,9 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
     return `${baseUrl}/${recommendation.id}`;
   };
 
-  const backdropStyle = recommendation.backdrop_path ? {
-    backgroundImage: `
-      linear-gradient(to left, 
-        rgba(255, 255, 255, 1) 0%,
-        rgba(255, 255, 255, 0.9) 20%,
-        rgba(255, 255, 255, 0.8) 40%,
-        rgba(255, 255, 255, 0.4) 60%,
-        rgba(255, 255, 255, 0) 100%
-      ),
-      url(https://image.tmdb.org/t/p/w1280${recommendation.backdrop_path})
-    `,
-    backgroundSize: 'cover',
-    backgroundPosition: 'center'
-  } : {};
-
   return (
     <div className="mt-8 animate-fade-in">
-      <div 
-        className="rounded-xl p-6 shadow-lg border border-gray-100 relative overflow-hidden"
-        style={backdropStyle}
-      >
+      <div className="rounded-xl p-6 shadow-lg border border-gray-100 relative overflow-hidden">
         <div className="flex justify-between items-center mb-4 relative z-10">
           <h3 className="text-lg font-medium text-gray-800">
             Deine {recommendation.media_type === 'movie' ? 'Film' : 'Serien'}empfehlung
@@ -55,7 +37,7 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
             size="sm" 
             onClick={onRefresh}
             disabled={isLoading}
-            className="border-gray-200 text-gray-600 hover:text-gray-800 bg-white/80 backdrop-blur-sm"
+            className="border-gray-200 text-gray-600 bg-white"
           >
             <RefreshCcw className="w-4 h-4 mr-2" />
             <span>Neuer Vorschlag</span>
