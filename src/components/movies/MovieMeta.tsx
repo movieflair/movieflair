@@ -1,5 +1,5 @@
-
 import { Star, Clock, Tv, Film } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface MovieMetaProps {
   year?: string;
@@ -8,11 +8,20 @@ interface MovieMetaProps {
   seasons?: number;
   episodes?: number;
   mediaType?: 'movie' | 'tv';
+  className?: string;
 }
 
-const MovieMeta = ({ year, rating, duration, seasons, episodes, mediaType }: MovieMetaProps) => {
+const MovieMeta = ({ 
+  year, 
+  rating, 
+  duration, 
+  seasons, 
+  episodes, 
+  mediaType,
+  className 
+}: MovieMetaProps) => {
   return (
-    <div className="flex items-center gap-6 text-gray-600">
+    <div className={cn("flex items-center gap-6 text-gray-600", className)}>
       {mediaType && (
         <div className="flex items-center gap-1">
           {mediaType === 'movie' ? (

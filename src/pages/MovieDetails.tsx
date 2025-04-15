@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
@@ -109,6 +108,12 @@ const MovieDetails = () => {
     }
   };
 
+  const truncateOverview = (text: string, maxLength: number = 500) => {
+    return text.length > maxLength 
+      ? `${text.slice(0, maxLength)}...` 
+      : text;
+  };
+
   return (
     <MainLayout>
       <SEOHead 
@@ -146,10 +151,11 @@ const MovieDetails = () => {
                   rating={movie.vote_average}
                   duration={movie.runtime}
                   mediaType="movie"
+                  className="mb-4"
                 />
 
                 <p className="text-gray-600 mb-6 md:mb-8 leading-relaxed text-sm md:text-base">
-                  {movie.overview}
+                  {truncateOverview(movie.overview)}
                 </p>
 
                 <MovieStreamButtons
