@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -89,34 +90,34 @@ const AdminPanel = () => {
   useEffect(() => {
     if (activeTab === 'movies' && !isSearching) {
       if (currentView === 'free') {
-        setFilteredMovies(freeMovies);
+        setFilteredMovies(freeMovies as MovieOrShow[]);
       } else if (currentView === 'trailers') {
-        setFilteredMovies(trailerMovies);
+        setFilteredMovies(trailerMovies as MovieOrShow[]);
       } else {
         if (!searchQuery.trim()) {
-          setFilteredMovies(movies);
+          setFilteredMovies(movies as MovieOrShow[]);
         } else {
           const query = searchQuery.toLowerCase().trim();
-          const filtered = movies.filter(movie => 
+          const filtered = (movies as MovieOrShow[]).filter(movie => 
             (movie.title?.toLowerCase() || '').includes(query)
           );
           setFilteredMovies(filtered);
         }
       }
     } else if (activeTab === 'movies' && isSearching) {
-      setFilteredMovies(searchResults);
+      setFilteredMovies(searchResults as MovieOrShow[]);
     } else if (activeTab === 'shows' && !isSearching) {
       if (!searchQuery.trim()) {
-        setFilteredTvShows(tvShows);
+        setFilteredTvShows(tvShows as MovieOrShow[]);
       } else {
         const query = searchQuery.toLowerCase().trim();
-        const filtered = tvShows.filter(show => 
+        const filtered = (tvShows as MovieOrShow[]).filter(show => 
           (show.name?.toLowerCase() || '').includes(query)
         );
         setFilteredTvShows(filtered);
       }
     } else if (activeTab === 'shows' && isSearching) {
-      setFilteredTvShows(searchTvResults);
+      setFilteredTvShows(searchTvResults as MovieOrShow[]);
     }
   }, [
     searchQuery, 
@@ -149,10 +150,10 @@ const AdminPanel = () => {
     } else {
       setIsSearching(false);
       if (activeTab === 'movies') {
-        setFilteredMovies(currentView === 'free' ? freeMovies : 
-                         currentView === 'trailers' ? trailerMovies : movies);
+        setFilteredMovies(currentView === 'free' ? freeMovies as MovieOrShow[] : 
+                         currentView === 'trailers' ? trailerMovies as MovieOrShow[] : movies as MovieOrShow[]);
       } else if (activeTab === 'shows') {
-        setFilteredTvShows(tvShows);
+        setFilteredTvShows(tvShows as MovieOrShow[]);
       }
     }
   };
