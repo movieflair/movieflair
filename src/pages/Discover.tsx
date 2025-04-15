@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Command, CommandInput } from '@/components/ui/command';
@@ -11,9 +10,8 @@ import {
   getPopularTvShows,
   MovieOrShow 
 } from '@/lib/api';
-import { useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
-import { Bookmark, Film, TrendingUp } from 'lucide-react';
+import { Shuffle, Film, TrendingUp } from 'lucide-react';
 
 const Discover = () => {
   const navigate = useNavigate();
@@ -87,29 +85,48 @@ const Discover = () => {
             </div>
           </div>
 
-          {/* Popular Movies */}
-          <section className="mb-12">
-            <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="w-6 h-6 text-red-500" />
-              <h2 className="text-2xl font-semibold">Trending Filme</h2>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {popularMovies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
-              ))}
-            </div>
-          </section>
-
           {/* Top TV Shows */}
           <section className="mb-12">
             <div className="flex items-center gap-2 mb-6">
-              <Film className="w-6 h-6 text-purple-500" />
+              <Film className="w-6 h-6 text-red-500" />
               <h2 className="text-2xl font-semibold">Top Serien</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {popularShows.map((show) => (
                 <MovieCard key={show.id} movie={show} />
               ))}
+            </div>
+          </section>
+
+          {/* Listen Section */}
+          <section className="mb-12">
+            <div className="flex items-center gap-2 mb-6">
+              <Shuffle className="w-6 h-6 text-purple-500" />
+              <h2 className="text-2xl font-semibold">Zufällige Listen</h2>
+            </div>
+            {/* Hier können Sie die Listen-Komponenten hinzufügen */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {/* Platzhalter für Listen */}
+              <Card className="cursor-pointer hover:bg-accent transition-colors">
+                <CardContent className="p-4">
+                  <h3 className="font-medium">Sci-Fi Klassiker</h3>
+                </CardContent>
+              </Card>
+              <Card className="cursor-pointer hover:bg-accent transition-colors">
+                <CardContent className="p-4">
+                  <h3 className="font-medium">Liebesfilme</h3>
+                </CardContent>
+              </Card>
+              <Card className="cursor-pointer hover:bg-accent transition-colors">
+                <CardContent className="p-4">
+                  <h3 className="font-medium">Action Blockbuster</h3>
+                </CardContent>
+              </Card>
+              <Card className="cursor-pointer hover:bg-accent transition-colors">
+                <CardContent className="p-4">
+                  <h3 className="font-medium">Dokumentarfilme</h3>
+                </CardContent>
+              </Card>
             </div>
           </section>
         </div>
