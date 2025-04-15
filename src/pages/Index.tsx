@@ -1,8 +1,6 @@
-
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
 import FeaturedMovies from '@/components/movies/FeaturedMovies';
-import SearchBox from '@/components/search/SearchBox';
 import SEOHead from '@/components/seo/SEOHead';
 
 const Index = () => {
@@ -39,9 +37,6 @@ const Index = () => {
             <p className="text-lg md:text-xl text-gray-600 mb-6">
               Entdecke den perfekten Film für jeden Moment. Lass dich von deiner Stimmung leiten.
             </p>
-            <div className="max-w-xl mx-auto mb-8 opacity-80 hover:opacity-100 transition-opacity">
-              <SearchBox variant="page" />
-            </div>
           </div>
           <HomeFilterBox />
         </div>

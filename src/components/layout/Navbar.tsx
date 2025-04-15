@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { List, Play, PlayCircle, Gift, User, Bookmark, LogOut, Sparkles } from 'lucide-react';
+import { List, Play, PlayCircle, Gift, User, Bookmark, LogOut, Sparkles, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -71,6 +71,11 @@ const Navbar = () => {
           <NavLink to="/free-movies" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <Gift className="w-5 h-5" />
             <span>Kostenlos</span>
+          </NavLink>
+
+          <NavLink to="/genres" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+            <Search className="w-5 h-5" />
+            <span>Suchen</span>
           </NavLink>
 
           <NavLink to="/quick-tipp">
