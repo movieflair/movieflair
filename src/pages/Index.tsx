@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
@@ -48,15 +47,13 @@ Wir finden ihn für dich!</h1>
           </div>
           <HomeFilterBox />
           <PrimeVideoAd className="mt-8" />
+          {customLists.length > 0 && (
+            <div className="mt-8">
+              {customLists.map(list => <CustomListCarousel key={list.id} list={list} />)}
+            </div>
+          )}
         </div>
       </section>
-
-      {customLists.length > 0 && <section className="py-8">
-          <div className="container-custom">
-            <h2 className="text-2xl font-semibold mb-8 text-theme-black px-[20px]">Weitere Filmempfehlungen</h2>
-            {customLists.map(list => <CustomListCarousel key={list.id} list={list} />)}
-          </div>
-        </section>}
     </MainLayout>
   );
 };
