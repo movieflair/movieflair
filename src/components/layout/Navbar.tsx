@@ -51,7 +51,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-gray-900 sticky top-0 z-50">
+    <nav className="bg-theme-black sticky top-0 z-50">
       <div className="container-custom flex items-center justify-between py-4 pl-4 pr-4 md:pl-8 md:pr-8">
         <NavLink to="/" className="flex items-center text-xl font-semibold text-white">
           <img 

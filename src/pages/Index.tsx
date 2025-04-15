@@ -49,7 +49,7 @@ const Index = () => {
                 className="w-24 h-24"
               />
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-gray-900">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-theme-black">
               Entdecke deine Filme
             </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-6">
@@ -64,7 +64,7 @@ const Index = () => {
       {customLists.length > 0 && (
         <section className="py-20">
           <div className="container-custom">
-            <h2 className="text-2xl font-semibold mb-8">Unsere Empfehlungen</h2>
+            <h2 className="text-2xl font-semibold mb-8 text-theme-black">Unsere Empfehlungen</h2>
             {customLists.map(list => (
               <CustomListCarousel key={list.id} list={list} />
             ))}

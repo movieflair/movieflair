@@ -117,9 +117,9 @@ const HomeFilterBox = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-gray-900/90 to-gray-800/90 backdrop-blur-lg p-8 rounded-xl shadow-xl max-w-[800px] mx-auto border border-gray-700/50">
+    <div className="bg-gradient-to-r from-theme-black/90 to-gray-800/90 backdrop-blur-lg p-8 rounded-xl shadow-xl max-w-[800px] mx-auto border border-gray-700/50">
       <div className="flex items-center gap-3 mb-6">
-        <Sparkles className="w-6 h-6 text-[#ea384c]" />
+        <Sparkles className="w-6 h-6 text-theme-red" />
         <h2 className="text-2xl font-medium text-white">Finde deinen perfekten Film</h2>
       </div>
       
@@ -197,7 +197,7 @@ const HomeFilterBox = () => {
 
         <Button 
           onClick={handleSearch}
-          className="w-full bg-[#ea384c] hover:bg-[#ea384c]/90 text-white"
+          className="w-full bg-theme-red hover:bg-theme-red/90 text-white"
           size="lg"
           disabled={isLoading}
         >
