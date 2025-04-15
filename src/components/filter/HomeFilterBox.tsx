@@ -171,7 +171,7 @@ const HomeFilterBox = () => {
             max={10}
             step={1}
             onValueChange={(values) => setRating(values[0])}
-            className="py-4 [&_.text-primary]:text-[#ea384c] [&_[role=slider]]:bg-[#ea384c] [&_[data-orientation=horizontal]]:bg-[#ea384c]"
+            className="py-4 [&_[role=slider]]:bg-white [&_[role=slider]]:border-[#ea384c] [&_[role=slider]]:border-2 [&_[data-orientation=horizontal]>.slider-track]:bg-[#ea384c]"
           />
         </div>
 
