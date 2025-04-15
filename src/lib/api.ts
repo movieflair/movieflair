@@ -13,6 +13,7 @@ export interface MovieOrShow {
   backdrop_path?: string;
   overview: string;
   vote_average: number;
+  vote_count?: number;
   release_date?: string;
   first_air_date?: string;
   genre_ids: number[];
@@ -48,6 +49,7 @@ export interface MovieDetail extends MovieOrShow {
   trailerUrl?: string;
   isFreeMovie?: boolean;
   isNewTrailer?: boolean;
+  vote_count?: number;
 }
 
 export interface FilterOptions {
