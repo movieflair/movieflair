@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Star, Film, ArrowRight, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,12 +19,18 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength).trim() + '...';
   };
+  
+  // Funktion, um den richtigen URL-Pfad basierend auf dem mediaType zu erzeugen
+  const getDetailPath = () => {
+    const baseUrl = recommendation.media_type === 'movie' ? '/film' : '/tv';
+    return `${baseUrl}/${recommendation.id}`;
+  };
 
   return (
     <div className="mt-8 animate-fade-in">
       <div className="bg-gradient-to-b from-white/10 to-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-white">Deine Filmempfehlung</h3>
+          <h3 className="text-lg font-medium text-white">Deine {recommendation.media_type === 'movie' ? 'Film' : 'Serien'}empfehlung</h3>
           <Button 
             variant="ghost" 
             size="sm" 
@@ -39,7 +46,7 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
         <div className="flex flex-col md:flex-row gap-6">
           {recommendation.poster_path ? (
             <Link 
-              to={`/${recommendation.media_type}/${recommendation.id}`}
+              to={getDetailPath()}
               className="group block overflow-hidden rounded-xl w-full md:w-[200px]"
             >
               <div className="relative h-[300px] bg-muted overflow-hidden rounded-xl">
@@ -69,7 +76,7 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
             </p>
             <div className="flex items-center gap-4">
               <Button 
-                onClick={() => window.location.href = `/${recommendation.media_type}/${recommendation.id}`}
+                onClick={() => window.location.href = getDetailPath()}
                 className="w-full md:w-auto bg-[#ea384c] hover:bg-[#ea384c]/90 text-white flex items-center"
               >
                 Details ansehen

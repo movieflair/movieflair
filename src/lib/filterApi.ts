@@ -1,4 +1,3 @@
-
 import { Genre, MovieOrShow, FilterOptions } from './types';
 import { callTMDB } from './apiUtils';
 
@@ -24,11 +23,39 @@ export const getGenres = async (): Promise<Genre[]> => {
 export const getRecommendationByFilters = async (filters: FilterOptions): Promise<MovieOrShow[]> => {
   const { genres, decades, moods, mediaType = 'movie', rating = 0 } = filters;
   
+  // Handle 'all' mediaType by performing both movie and TV searches
+  if (mediaType === 'all') {
+    const movieResults = await fetchMediaByType({ ...filters, mediaType: 'movie' });
+    const tvResults = await fetchMediaByType({ ...filters, mediaType: 'tv' });
+    
+    // Combine and shuffle results to provide a mix of movies and shows
+    const combinedResults = [...movieResults, ...tvResults];
+    return shuffleArray(combinedResults);
+  }
+  
+  // Otherwise fetch just the requested media type
+  return fetchMediaByType(filters);
+};
+
+// Helper function to shuffle array (for mixing movies and TV shows)
+const shuffleArray = (array: MovieOrShow[]): MovieOrShow[] => {
+  const newArray = [...array];
+  for (let i = newArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+  }
+  return newArray;
+};
+
+// Helper function to fetch either movies or TV shows based on filters
+const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> => {
+  const { genres, decades, moods, mediaType = 'movie', rating = 0 } = filters;
+  
   const endpoint = mediaType === 'tv' ? '/discover/tv' : '/discover/movie';
   
   let params: Record<string, string> = {
     sort_by: 'popularity.desc',
-    'vote_count.gte': '20', // Nur Filme mit einer Mindestanzahl an Bewertungen
+    'vote_count.gte': '20', // Nur Medien mit einer Mindestanzahl an Bewertungen
   };
   
   // Genres zusammenstellen (direkt ausgewählte und aus Moods abgeleitete)
@@ -71,7 +98,7 @@ export const getRecommendationByFilters = async (filters: FilterOptions): Promis
   
   const data = await callTMDB(endpoint, params);
   
-  // Nur Filme mit Beschreibung und Cover zurückgeben
+  // Nur Medien mit Beschreibung und Cover zurückgeben
   return data.results
     .filter((item: any) => item.poster_path && item.overview && item.overview.trim() !== '')
     .map((item: any) => ({
@@ -79,4 +106,3 @@ export const getRecommendationByFilters = async (filters: FilterOptions): Promis
       media_type: mediaType === 'movie' ? 'movie' : 'tv',
     }));
 };
-
