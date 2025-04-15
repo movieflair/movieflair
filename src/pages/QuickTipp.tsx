@@ -54,16 +54,20 @@ const QuickTipp = () => {
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-4">
                   {movie.poster_path ? (
-                    <div className="md:w-1/3">
+                    <div className="relative w-full md:w-1/3 h-[360px] bg-muted overflow-hidden rounded-xl">
                       <img
                         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                         alt={movie.title || movie.name}
-                        className="w-full h-[300px] object-cover rounded-lg shadow-md"
+                        className="w-full h-full object-cover rounded-xl transition-transform duration-300 hover:scale-105"
                       />
+                      <div className="absolute top-2 right-2 flex items-center bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full">
+                        <Star className="w-3 h-3 text-yellow-500 mr-1" />
+                        <span className="text-xs font-medium">{movie.vote_average.toFixed(1)}</span>
+                      </div>
                     </div>
                   ) : (
-                    <div className="w-full h-[300px] bg-gray-100 rounded-lg flex items-center justify-center">
-                      <Film className="w-16 h-16 text-gray-400" />
+                    <div className="w-full md:w-1/3 h-[360px] bg-muted rounded-xl flex items-center justify-center">
+                      <Film className="w-16 h-16 text-muted-foreground" />
                     </div>
                   )}
 
