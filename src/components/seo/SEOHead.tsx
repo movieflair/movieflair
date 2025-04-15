@@ -13,8 +13,8 @@ interface SEOHeadProps {
 }
 
 const SEOHead = ({
-  title = 'ScreenPick - Dein Filmguide',
-  description = 'Entdecke den perfekten Film für jeden Moment. Lass dich von deiner Stimmung leiten.',
+  title = 'MovieFlair – Finde den perfekten Film für deine Stimmung',
+  description = 'Jeder Moment hat seinen Film. MovieFlair zeigt dir Filme, die zu deiner Stimmung passen – persönlich, emotional und genau im richtigen Moment.',
   keywords = 'filme, serien, streaming, filmempfehlungen, filmtipps',
   ogImage = '/movieflair-logo.png',
   ogType = 'website',
