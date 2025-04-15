@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from 'react-router-dom';
 
 interface WatchlistButtonProps {
   mediaId: number;
@@ -15,6 +16,7 @@ const WatchlistButton = ({ mediaId, mediaType, className = '' }: WatchlistButton
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     checkWatchlistStatus();
@@ -34,7 +36,7 @@ const WatchlistButton = ({ mediaId, mediaType, className = '' }: WatchlistButton
         .eq('media_id', mediaId)
         .eq('media_type', mediaType)
         .eq('user_id', session.session.user.id)
-        .single();
+        .maybeSingle();
 
       setIsInWatchlist(!!data);
     } catch (error) {
@@ -52,6 +54,7 @@ const WatchlistButton = ({ mediaId, mediaType, className = '' }: WatchlistButton
         description: "Bitte melde dich an, um die Merkliste zu nutzen.",
         variant: "destructive"
       });
+      navigate('/auth');
       return;
     }
 

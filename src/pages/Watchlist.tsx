@@ -6,32 +6,33 @@ import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import MovieCard from '@/components/movies/MovieCard';
 import { Bookmark } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 const Watchlist = () => {
   const [items, setItems] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    checkAuth();
-    fetchWatchlist();
-  }, []);
-
-  const checkAuth = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    if (!authLoading && !user) {
       navigate('/auth');
+    } else if (user) {
+      fetchWatchlist();
     }
-  };
+  }, [user, authLoading]);
 
   const fetchWatchlist = async () => {
     try {
-      const { data: watchlistItems } = await supabase
+      setIsLoading(true);
+      const { data: watchlistItems, error } = await supabase
         .from('watchlist')
         .select('*')
         .order('added_at', { ascending: false });
 
-      if (watchlistItems) {
+      if (error) throw error;
+
+      if (watchlistItems && watchlistItems.length > 0) {
         // Fetch details for each item from your API
         const detailedItems = await Promise.all(
           watchlistItems.map(async (item) => {
@@ -56,6 +57,8 @@ const Watchlist = () => {
           })
         );
         setItems(detailedItems);
+      } else {
+        setItems([]);
       }
     } catch (error) {
       console.error('Error fetching watchlist:', error);
@@ -63,6 +66,16 @@ const Watchlist = () => {
       setIsLoading(false);
     }
   };
+
+  if (authLoading) {
+    return (
+      <EnhancedLayout>
+        <div className="container-custom py-12">
+          <div className="text-center">Lädt...</div>
+        </div>
+      </EnhancedLayout>
+    );
+  }
 
   return (
     <EnhancedLayout>

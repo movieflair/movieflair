@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
@@ -121,6 +122,21 @@ const MovieDetails = () => {
           <div className="glass-card overflow-hidden rounded-xl">
             <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
               <div className="space-y-4">
+                <div className="relative">
+                  <div className="rounded-lg overflow-hidden shadow-xl">
+                    {movie.poster_path ? (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                        alt={movie.title}
+                        className="w-full"
+                      />
+                    ) : (
+                      <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
+                        <span className="text-gray-400">Kein Poster</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
                 <WatchlistButton mediaId={movie.id} mediaType="movie" />
                 <ShareButton movieTitle={movie.title} />
               </div>
