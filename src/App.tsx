@@ -66,6 +66,7 @@ const App = () => {
             <Route path="/free-movies" element={<FreeMovies />} />
             <Route path="/search" element={<Search />} />
             <Route path="/genres" element={<Genres />} />
+            <Route path="/discover" element={<Genres />} /> {/* Alias für Genres Seite */}
             <Route path="/quick-tipp" element={<QuickTipp />} />
             <Route path="/watchlist" element={<Watchlist />} />
             <Route path="/auth" element={<Auth />} />

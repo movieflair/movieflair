@@ -32,14 +32,14 @@ const Index = () => {
       {/* Hero Section */}
       <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50/50 to-white">
         <div className="container-custom">
-          <div className="max-w-3xl mx-auto text-center mb-12">
+          <div className="max-w-3xl mx-auto text-center mb-8">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-gray-900">
               Entdecke deine Filme
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-12">
+            <p className="text-lg md:text-xl text-gray-600 mb-6">
               Entdecke den perfekten Film für jeden Moment. Lass dich von deiner Stimmung leiten.
             </p>
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-xl mx-auto mb-8 opacity-80 hover:opacity-100 transition-opacity">
               <SearchBox variant="page" />
             </div>
           </div>
