@@ -121,10 +121,9 @@ const fetchMoviesByFilters = async (filters: FilterOptions): Promise<MovieOrShow
               'vote_count.gte': '3'
             };
             
-            // Sprache nicht einschränken für ältere Filme
-            if (decade < 2000) {
-              delete fallbackParams.with_original_language;
-            }
+            // Für ältere Filme sind weniger Einschränkungen nötig, aber wir müssen
+            // mit den Parametern arbeiten, die im Objekt tatsächlich existieren
+            // Daher kein Versuch, nicht existierende Eigenschaften zu löschen
             
             const fallbackData = await callTMDB('/discover/movie', fallbackParams);
             
