@@ -54,7 +54,12 @@ const Navbar = () => {
     <nav className="bg-gray-900 sticky top-0 z-50">
       <div className="container-custom flex items-center justify-between py-4">
         <NavLink to="/" className="flex items-center text-xl font-semibold text-white">
-          Movie<span className="text-theme-accent-red">Flair</span>
+          <img 
+            src="/movieflair-logo.png" 
+            alt="MovieFlair Logo" 
+            className="h-8 mr-2"
+          />
+          <span>Movie<span className="text-theme-accent-red">Flair</span></span>
         </NavLink>
 
         <div className="flex items-center space-x-6">

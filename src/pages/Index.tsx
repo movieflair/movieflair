@@ -38,10 +38,15 @@ const Index = () => {
         structuredData={websiteStructuredData}
       />
 
-      {/* Hero Section */}
+      {/* Hero Section mit Logo */}
       <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50/50 to-white">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-8">
+            <img
+              src="/movieflair-logo.png"
+              alt="MovieFlair M Logo"
+              className="w-24 h-24 mx-auto mb-8"
+            />
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-gray-900">
               Entdecke deine Filme
             </h1>
