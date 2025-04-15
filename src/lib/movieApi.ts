@@ -85,18 +85,20 @@ export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/movie/popular');
   const savedSettings = await getAdminMovieSettings();
   
-  return data.results.map((movie: any) => {
-    const savedMovie = savedSettings[movie.id] || {};
-    return {
-      ...movie,
-      media_type: 'movie',
-      isFreeMovie: savedMovie.isFreeMovie || false,
-      streamUrl: savedMovie.streamUrl || '',
-      isNewTrailer: savedMovie.isNewTrailer || false,
-      hasTrailer: savedMovie.hasTrailer || false,
-      trailerUrl: savedMovie.trailerUrl || '',
-    };
-  });
+  return data.results
+    .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '')
+    .map((movie: any) => {
+      const savedMovie = savedSettings[movie.id] || {};
+      return {
+        ...movie,
+        media_type: 'movie',
+        isFreeMovie: savedMovie.isFreeMovie || false,
+        streamUrl: savedMovie.streamUrl || '',
+        isNewTrailer: savedMovie.isNewTrailer || false,
+        hasTrailer: savedMovie.hasTrailer || false,
+        trailerUrl: savedMovie.trailerUrl || '',
+      };
+    });
 };
 
 export const searchMovies = async (query: string): Promise<MovieOrShow[]> => {
@@ -105,18 +107,20 @@ export const searchMovies = async (query: string): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/search/movie', { query });
   const savedSettings = await getAdminMovieSettings();
   
-  return data.results.map((movie: any) => {
-    const savedMovie = savedSettings[movie.id] || {};
-    return {
-      ...movie,
-      media_type: 'movie',
-      isFreeMovie: savedMovie.isFreeMovie || false,
-      streamUrl: savedMovie.streamUrl || '',
-      isNewTrailer: savedMovie.isNewTrailer || false,
-      hasTrailer: savedMovie.hasTrailer || false,
-      trailerUrl: savedMovie.trailerUrl || '',
-    };
-  });
+  return data.results
+    .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '')
+    .map((movie: any) => {
+      const savedMovie = savedSettings[movie.id] || {};
+      return {
+        ...movie,
+        media_type: 'movie',
+        isFreeMovie: savedMovie.isFreeMovie || false,
+        streamUrl: savedMovie.streamUrl || '',
+        isNewTrailer: savedMovie.isNewTrailer || false,
+        hasTrailer: savedMovie.hasTrailer || false,
+        trailerUrl: savedMovie.trailerUrl || '',
+      };
+    });
 };
 
 export const getMovieById = async (id: number): Promise<MovieDetail> => {
@@ -146,15 +150,19 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
 
 export const getSimilarMovies = async (id: number): Promise<MovieOrShow[]> => {
   const data = await callTMDB(`/movie/${id}/similar`);
-  return data.results.map((movie: any) => ({
-    ...movie,
-    media_type: 'movie'
-  }));
+  return data.results
+    .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '')
+    .map((movie: any) => ({
+      ...movie,
+      media_type: 'movie'
+    }));
 };
 
 export const getRandomMovie = async (): Promise<MovieDetail> => {
   // Get a list of popular movies
   const popularMovies = await getPopularMovies();
+  
+  // Filme sind bereits gefiltert in getPopularMovies
   
   // Randomly select one
   const randomIndex = Math.floor(Math.random() * popularMovies.length);
@@ -163,3 +171,4 @@ export const getRandomMovie = async (): Promise<MovieDetail> => {
   // Fetch its full details
   return getMovieById(randomMovie.id);
 };
+

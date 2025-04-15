@@ -7,6 +7,7 @@ import { getRandomMovie, MovieDetail } from '@/lib/api';
 import { Sparkles, Film, Clock, Calendar, ArrowRight, Wand2, Target, Rocket } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
+import { toast } from 'sonner';
 
 const QuickTipp = () => {
   const [movie, setMovie] = useState<MovieDetail | null>(null);
@@ -16,9 +17,15 @@ const QuickTipp = () => {
     setLoading(true);
     try {
       const randomMovie = await getRandomMovie();
+      if (!randomMovie.poster_path || !randomMovie.overview || randomMovie.overview.trim() === '') {
+        toast.error('Film ohne Beschreibung oder Cover gefunden. Bitte erneut versuchen.');
+        setLoading(false);
+        return;
+      }
       setMovie(randomMovie);
     } catch (error) {
       console.error('Error getting random movie:', error);
+      toast.error('Fehler beim Laden eines Films');
     } finally {
       setLoading(false);
     }

@@ -4,12 +4,13 @@ import FilterSelector from './FilterSelector';
 import { Button } from '../ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { getGenres, getRecommendationByFilters, MovieOrShow } from '@/lib/api';
-import { Search, Film, Tv, Star, Sparkles, MonitorPlay, ArrowRight } from 'lucide-react';
+import { Search, Film, Tv, Star, Sparkles, MonitorPlay, ArrowRight, RefreshCcw } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Link } from 'react-router-dom';
 import MovieRatingFeedback from '../movies/MovieRatingFeedback';
+import { toast } from 'sonner';
 
 const moods = [
   'fröhlich',
@@ -35,6 +36,13 @@ const HomeFilterBox = () => {
   const [rating, setRating] = useState<number>(5);
   const [recommendation, setRecommendation] = useState<MovieOrShow | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [lastUsedFilter, setLastUsedFilter] = useState<{
+    moods: string[];
+    genres: number[];
+    decades: string[];
+    mediaType: 'movie' | 'tv' | 'all';
+    rating: number;
+  } | null>(null);
 
   const { data: genres } = useQuery({
     queryKey: ['genres'],
@@ -43,17 +51,62 @@ const HomeFilterBox = () => {
 
   const handleSearch = async () => {
     setIsLoading(true);
+    const currentFilter = {
+      moods: selectedMoods,
+      genres: selectedGenres,
+      decades: selectedDecades,
+      mediaType,
+      rating
+    };
+    
+    setLastUsedFilter(currentFilter);
+    
     try {
-      const results = await getRecommendationByFilters({
-        moods: selectedMoods,
-        genres: selectedGenres,
-        decades: selectedDecades,
-        mediaType,
-        rating
-      });
-      setRecommendation(results[0]);
+      const results = await getRecommendationByFilters(currentFilter);
+      
+      if (results.length === 0) {
+        toast.error('Keine passenden Filme gefunden. Bitte versuche andere Filter.');
+        setRecommendation(null);
+      } else {
+        // Zufälligen Film aus den Ergebnissen auswählen
+        const randomIndex = Math.floor(Math.random() * results.length);
+        setRecommendation(results[randomIndex]);
+      }
     } catch (error) {
       console.error('Error getting recommendation:', error);
+      toast.error('Fehler bei der Suche. Bitte versuche es erneut.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleRefreshRecommendation = async () => {
+    if (!lastUsedFilter) return;
+    
+    setIsLoading(true);
+    try {
+      const results = await getRecommendationByFilters(lastUsedFilter);
+      
+      if (results.length === 0) {
+        toast.error('Keine weiteren passenden Filme gefunden.');
+      } else {
+        // Zufälligen neuen Film aus den Ergebnissen auswählen
+        const randomIndex = Math.floor(Math.random() * results.length);
+        const newRecommendation = results[randomIndex];
+        
+        // Sicherstellen, dass der neue Vorschlag nicht der gleiche ist
+        if (recommendation && newRecommendation.id === recommendation.id && results.length > 1) {
+          const newIndex = (randomIndex + 1) % results.length;
+          setRecommendation(results[newIndex]);
+        } else {
+          setRecommendation(newRecommendation);
+        }
+        
+        toast.success('Neuer Filmvorschlag generiert!');
+      }
+    } catch (error) {
+      console.error('Error refreshing recommendation:', error);
+      toast.error('Fehler beim Aktualisieren des Vorschlags.');
     } finally {
       setIsLoading(false);
     }
@@ -190,50 +243,65 @@ const HomeFilterBox = () => {
 
       {recommendation && (
         <div className="mt-8 animate-fade-in">
-          <h3 className="text-lg font-medium text-white mb-4">Deine Filmempfehlung</h3>
-          <div className="flex flex-col md:flex-row gap-6">
-            {recommendation.poster_path ? (
-              <Link 
-                to={`/${recommendation.media_type}/${recommendation.id}`}
-                className="group block overflow-hidden rounded-xl w-full md:w-[200px]"
+          <div className="bg-gradient-to-b from-white/10 to-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-white">Deine Filmempfehlung</h3>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleRefreshRecommendation}
+                disabled={isLoading}
+                className="hover:bg-white/10"
               >
-                <div className="relative h-[300px] bg-muted overflow-hidden rounded-xl">
-                  <img
-                    src={`https://image.tmdb.org/t/p/w500${recommendation.poster_path}`}
-                    alt={recommendation.title || recommendation.name}
-                    className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
-                  />
-                  <div className="absolute top-2 right-2 flex items-center bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full">
-                    <Star className="w-3 h-3 text-yellow-500 mr-1" />
-                    <span className="text-xs font-medium">{recommendation.vote_average.toFixed(1)}</span>
-                  </div>
-                </div>
-              </Link>
-            ) : (
-              <div className="w-full md:w-[200px] h-[300px] bg-muted rounded-xl flex items-center justify-center">
-                <Film className="w-16 h-16 text-muted-foreground" />
-              </div>
-            )}
-            <div className="flex-1 text-gray-200">
-              <h4 className="text-xl font-medium mb-2">{recommendation.title || recommendation.name}</h4>
-              <p className="text-sm text-gray-400 mb-4">
-                {recommendation.release_date?.substring(0, 4) || recommendation.first_air_date?.substring(0, 4)}
-              </p>
-              <p className="text-sm mb-6">{recommendation.overview}</p>
-              <div className="flex items-center gap-4">
-                <Button 
-                  onClick={() => window.location.href = `/${recommendation.media_type}/${recommendation.id}`}
-                  className="w-full md:w-auto bg-[#ea384c] hover:bg-[#ea384c]/90 text-white flex items-center"
+                <RefreshCcw className="w-4 h-4 mr-2 text-white" />
+                <span className="text-white">Neuer Vorschlag</span>
+              </Button>
+            </div>
+            
+            <div className="flex flex-col md:flex-row gap-6">
+              {recommendation.poster_path ? (
+                <Link 
+                  to={`/${recommendation.media_type}/${recommendation.id}`}
+                  className="group block overflow-hidden rounded-xl w-full md:w-[200px]"
                 >
-                  Details ansehen
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-                
-                {recommendation.id && (
-                  <div className="text-xs text-gray-600">
-                    <MovieRatingFeedback movieId={recommendation.id} />
+                  <div className="relative h-[300px] bg-muted overflow-hidden rounded-xl">
+                    <img
+                      src={`https://image.tmdb.org/t/p/w500${recommendation.poster_path}`}
+                      alt={recommendation.title || recommendation.name}
+                      className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
+                    />
+                    <div className="absolute top-2 right-2 flex items-center bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full">
+                      <Star className="w-3 h-3 text-yellow-500 mr-1" />
+                      <span className="text-xs font-medium">{recommendation.vote_average.toFixed(1)}</span>
+                    </div>
                   </div>
-                )}
+                </Link>
+              ) : (
+                <div className="w-full md:w-[200px] h-[300px] bg-muted rounded-xl flex items-center justify-center">
+                  <Film className="w-16 h-16 text-muted-foreground" />
+                </div>
+              )}
+              <div className="flex-1 text-gray-200">
+                <h4 className="text-xl font-medium mb-2">{recommendation.title || recommendation.name}</h4>
+                <p className="text-sm text-gray-400 mb-4">
+                  {recommendation.release_date?.substring(0, 4) || recommendation.first_air_date?.substring(0, 4)}
+                </p>
+                <p className="text-sm mb-6">{recommendation.overview}</p>
+                <div className="flex items-center gap-4">
+                  <Button 
+                    onClick={() => window.location.href = `/${recommendation.media_type}/${recommendation.id}`}
+                    className="w-full md:w-auto bg-[#ea384c] hover:bg-[#ea384c]/90 text-white flex items-center"
+                  >
+                    Details ansehen
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                  
+                  {recommendation.id && (
+                    <div className="text-xs text-gray-600">
+                      <MovieRatingFeedback movieId={recommendation.id} />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

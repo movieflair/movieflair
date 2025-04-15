@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
 import { ChevronLeft, ChevronRight, Zap, FileText } from 'lucide-react';
@@ -18,7 +18,19 @@ interface SimilarMoviesProps {
 }
 
 const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
-  if (!movies.length) return null;
+  const [filteredMovies, setFilteredMovies] = useState<MovieOrShow[]>([]);
+  
+  useEffect(() => {
+    // Filter movies to only include those with descriptions and covers
+    const filtered = movies.filter(movie => 
+      movie.poster_path && 
+      movie.overview && 
+      movie.overview.trim() !== ''
+    );
+    setFilteredMovies(filtered);
+  }, [movies]);
+
+  if (!filteredMovies.length) return null;
 
   const handlePrevClick = () => {
     const prevButton = document.querySelector('.embla__prev') as HTMLElement;
@@ -78,7 +90,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               className="w-[450px]"
             >
               <CarouselContent className="-ml-4">
-                {movies.map((movie) => (
+                {filteredMovies.map((movie) => (
                   <CarouselItem key={movie.id} className="pl-4 basis-1/2">
                     <MovieCard movie={movie} size="small" />
                   </CarouselItem>
@@ -98,4 +110,3 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
 };
 
 export default SimilarMovies;
-
