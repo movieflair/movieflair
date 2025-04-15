@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
@@ -51,6 +50,87 @@ const QuickTipp = () => {
           </Button>
         </div>
 
+        {/* Movie Recommendation Section - DIRECTLY AFTER BUTTON */}
+        {movie && (
+          <div className="max-w-4xl mx-auto mb-16">
+            <Card className="overflow-hidden bg-white/80 backdrop-blur-sm border border-gray-100 shadow-xl">
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row gap-8">
+                  {/* Movie Poster - Smaller Size */}
+                  <div className="md:w-1/4">
+                    {movie.poster_path ? (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+                        alt={movie.title || movie.name}
+                        className="w-full h-[200px] object-cover rounded-lg shadow-md"
+                      />
+                    ) : (
+                      <div className="w-full h-[200px] bg-gray-100 rounded-lg flex items-center justify-center">
+                        <Film className="w-16 h-16 text-gray-400" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Movie Details */}
+                  <div className="md:w-3/4 flex flex-col justify-between">
+                    <div>
+                      <h2 className="text-2xl font-bold mb-4">
+                        {movie.title || movie.name}
+                      </h2>
+
+                      <div className="flex items-center gap-6 mb-6">
+                        {movie.release_date && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Calendar className="w-5 h-5" />
+                            <span>{new Date(movie.release_date).getFullYear()}</span>
+                          </div>
+                        )}
+                        {movie.runtime && (
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <Clock className="w-5 h-5" />
+                            <span>{movie.runtime} min</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 text-gray-600">
+                          <Star className="w-5 h-5 text-yellow-500" />
+                          <span>{movie.vote_average.toFixed(1)}/10</span>
+                        </div>
+                      </div>
+
+                      {movie.genres && (
+                        <div className="flex flex-wrap gap-2 mb-6">
+                          {movie.genres.map((genre) => (
+                            <span 
+                              key={genre.id}
+                              className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600"
+                            >
+                              {genre.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <p className="text-gray-600 mb-6 line-clamp-3">
+                        {movie.overview || 'Keine Beschreibung verfügbar.'}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <Link 
+                        to={`/movie/${movie.id}`}
+                        className="inline-flex items-center gap-2 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                      >
+                        Details ansehen
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Features Section */}
         <div className="max-w-5xl mx-auto mb-16">
           <div className="text-center mb-8">
@@ -99,92 +179,6 @@ const QuickTipp = () => {
             </Card>
           </div>
         </div>
-
-        {/* Movie Recommendation Card */}
-        {movie && (
-          <div className="max-w-4xl mx-auto">
-            <Card className="overflow-hidden bg-white/80 backdrop-blur-sm border border-gray-100 shadow-xl">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-8">
-                  {/* Movie Poster - Smaller Size */}
-                  <div className="md:w-1/4">
-                    {movie.poster_path ? (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                        alt={movie.title || movie.name}
-                        className="w-full h-[300px] object-cover rounded-lg shadow-md"
-                      />
-                    ) : (
-                      <div className="w-full h-[300px] bg-gray-100 rounded-lg flex items-center justify-center">
-                        <Film className="w-16 h-16 text-gray-400" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Movie Details */}
-                  <div className="md:w-3/4">
-                    <h2 className="text-2xl font-bold mb-4">
-                      {movie.title || movie.name}
-                    </h2>
-
-                    <div className="flex items-center gap-6 mb-6">
-                      {movie.release_date && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Calendar className="w-5 h-5" />
-                          <span>{new Date(movie.release_date).getFullYear()}</span>
-                        </div>
-                      )}
-                      {movie.runtime && (
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Clock className="w-5 h-5" />
-                          <span>{movie.runtime} min</span>
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <Star className="w-5 h-5 text-yellow-500" />
-                        <span>{movie.vote_average.toFixed(1)}/10</span>
-                      </div>
-                    </div>
-
-                    {movie.genres && (
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        {movie.genres.map((genre) => (
-                          <span 
-                            key={genre.id}
-                            className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600"
-                          >
-                            {genre.name}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <p className="text-gray-600 mb-8 line-clamp-3">
-                      {movie.overview || 'Keine Beschreibung verfügbar.'}
-                    </p>
-
-                    <div className="flex items-center gap-4 mb-8">
-                      <Link 
-                        to={`/movie/${movie.id}`}
-                        className="inline-flex items-center gap-2 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-                      >
-                        Details ansehen
-                        <ArrowRight className="w-4 h-4" />
-                      </Link>
-                    </div>
-
-                    {/* Rating Feedback */}
-                    {movie.id && (
-                      <div className="pt-4 border-t">
-                        <MovieRatingFeedback movieId={movie.id} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
       </div>
     </EnhancedLayout>
   );
