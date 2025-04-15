@@ -85,7 +85,7 @@ const QuickTipp = () => {
         </div>
 
         <div className="container-custom -mt-40 relative z-20">
-          <div className="flex items-center mb-8">
+          <div className="flex items-center mb-4">
             <Button 
               variant="ghost" 
               size="icon" 

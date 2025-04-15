@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { List, Play, PlayCircle, Gift, User, Bookmark, LogOut } from 'lucide-react';
+import { List, Play, PlayCircle, Gift, User, Bookmark, LogOut, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -16,14 +15,11 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 
 const Navbar = () => {
-  // Wrap all Router-related hooks in a try/catch to prevent app from crashing
-  // if Navbar is rendered outside of a Router context
   let navigate = undefined;
   try {
     navigate = useNavigate();
   } catch (error) {
     console.error("Navigation context not available:", error);
-    // Provide a fallback for navigate
     navigate = (path: string) => {
       window.location.href = path;
     };
@@ -45,20 +41,16 @@ const Navbar = () => {
     return user.email.charAt(0).toUpperCase();
   };
 
-  // Conditional rendering for navigation links to ensure they work
-  // even if router context is missing
   const NavLink = ({ to, className, children }: { to: string, className?: string, children: React.ReactNode }) => {
     try {
-      // Try to use Link component first
       return <Link to={to} className={className}>{children}</Link>;
     } catch (error) {
-      // Fall back to regular anchor tag if Link fails
       return <a href={to} className={className}>{children}</a>;
     }
   };
 
   return (
-    <nav className="bg-black">
+    <nav className="bg-black sticky top-0 z-50">
       <div className="container-custom flex items-center justify-between py-4">
         <NavLink to="/" className="flex items-center text-xl font-semibold text-white">
           Movie<span className="text-theme-accent-red">Flair</span>
@@ -82,7 +74,7 @@ const Navbar = () => {
 
           <NavLink to="/quick-tipp">
             <Button variant="destructive" className="hidden md:flex items-center space-x-2">
-              <PlayCircle className="w-5 h-5" />
+              <Sparkles className="w-5 h-5" />
               <span>Quick Tipps</span>
             </Button>
           </NavLink>
