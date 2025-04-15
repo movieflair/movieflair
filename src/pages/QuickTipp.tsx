@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
@@ -6,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { getRandomMovie, MovieDetail } from '@/lib/api';
 import { Sparkles, Film, Clock, Calendar, Star, ArrowRight, Wand2, Target, Rocket } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
 
 const QuickTipp = () => {
   const [movie, setMovie] = useState<MovieDetail | null>(null);
@@ -26,7 +26,6 @@ const QuickTipp = () => {
   return (
     <EnhancedLayout>
       <div className="container-custom min-h-screen py-12">
-        {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-rose-700">
             Quick Tipp
@@ -37,7 +36,6 @@ const QuickTipp = () => {
           </p>
         </div>
 
-        {/* Action Button */}
         <div className="flex justify-center mb-12">
           <Button 
             onClick={handleGetRandomMovie} 
@@ -50,28 +48,25 @@ const QuickTipp = () => {
           </Button>
         </div>
 
-        {/* Movie Recommendation Section - BETWEEN BUTTON AND FEATURES */}
         {movie && (
           <div className="max-w-4xl mx-auto mb-12">
             <Card className="overflow-hidden bg-white/80 backdrop-blur-sm border border-gray-100 shadow-xl">
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row gap-8">
-                  {/* Movie Poster - Original Size */}
-                  <div className="md:w-1/4">
-                    {movie.poster_path ? (
+                  {movie.poster_path ? (
+                    <div className="md:w-1/4">
                       <img
                         src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                         alt={movie.title || movie.name}
                         className="w-full h-[300px] object-cover rounded-lg shadow-md"
                       />
-                    ) : (
-                      <div className="w-full h-[300px] bg-gray-100 rounded-lg flex items-center justify-center">
-                        <Film className="w-16 h-16 text-gray-400" />
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-[300px] bg-gray-100 rounded-lg flex items-center justify-center">
+                      <Film className="w-16 h-16 text-gray-400" />
+                    </div>
+                  )}
 
-                  {/* Movie Details */}
                   <div className="md:w-3/4 flex flex-col justify-between">
                     <div>
                       <h2 className="text-2xl font-bold mb-4">
@@ -123,6 +118,7 @@ const QuickTipp = () => {
                         Details ansehen
                         <ArrowRight className="w-4 h-4" />
                       </Link>
+                      <MovieRatingFeedback movieId={movie.id} />
                     </div>
                   </div>
                 </div>
@@ -131,7 +127,6 @@ const QuickTipp = () => {
           </div>
         )}
 
-        {/* Features Section */}
         <div className="max-w-5xl mx-auto mb-16">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-semibold mb-4">Warum Quick Tipp?</h2>
@@ -185,4 +180,3 @@ const QuickTipp = () => {
 };
 
 export default QuickTipp;
-
