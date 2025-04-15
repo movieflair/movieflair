@@ -1,136 +1,45 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
-import { Command, CommandInput, CommandList, CommandEmpty } from '@/components/ui/command';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Compass, Film, Sparkles, Shuffle } from 'lucide-react';
-import FilterSelector from '@/components/filter/FilterSelector';
-import RecommendationCard from '@/components/movies/RecommendationCard';
+import { Command, CommandInput } from '@/components/ui/command';
+import MovieCard from '@/components/movies/MovieCard';
 import { 
   Genre, 
   getGenres, 
-  moodToGenres, 
-  FilterOptions, 
-  getRecommendationByFilters,
-  getMovieById,
-  getTvShowById,
-  MovieDetail,
-  MovieOrShow
+  getPopularMovies,
+  getPopularTvShows,
+  MovieOrShow 
 } from '@/lib/api';
-
-const moods = [
-  'happy', 'sad', 'thrilling', 'thoughtful', 'relaxing',
-  'inspiring', 'romantic', 'exciting', 'nostalgic', 'suspenseful', 'lighthearted'
-];
-
-const decades = [
-  '1970', '1980', '1990', '2000', '2010', '2020'
-];
+import { useEffect } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Bookmark, Film, TrendingUp } from 'lucide-react';
 
 const Discover = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('explore');
-  const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
-  const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
-  const [selectedDecades, setSelectedDecades] = useState<string[]>([]);
-  const [recommendation, setRecommendation] = useState<MovieDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasSearched, setHasSearched] = useState(false);
   const [genres, setGenres] = useState<Genre[]>([]);
+  const [popularMovies, setPopularMovies] = useState<MovieOrShow[]>([]);
+  const [popularShows, setPopularShows] = useState<MovieOrShow[]>([]);
 
   useEffect(() => {
-    // Fetch genres when component mounts
-    const fetchGenres = async () => {
+    const fetchInitialData = async () => {
       try {
-        const genresList = await getGenres();
+        const [genresList, movies, shows] = await Promise.all([
+          getGenres(),
+          getPopularMovies(),
+          getPopularTvShows()
+        ]);
         setGenres(genresList);
+        setPopularMovies(movies.slice(0, 4));
+        setPopularShows(shows.slice(0, 4));
       } catch (error) {
-        console.error('Error fetching genres:', error);
+        console.error('Error fetching initial data:', error);
       }
     };
 
-    fetchGenres();
+    fetchInitialData();
   }, []);
-
-  const handleMoodSelection = (mood: string) => {
-    setSelectedMoods(prev => 
-      prev.includes(mood) 
-        ? prev.filter(m => m !== mood) 
-        : [...prev, mood]
-    );
-  };
-
-  const handleGenreSelection = (genreId: number) => {
-    setSelectedGenres(prev => 
-      prev.includes(genreId) 
-        ? prev.filter(g => g !== genreId) 
-        : [...prev, genreId]
-    );
-  };
-
-  const handleDecadeSelection = (decade: string) => {
-    setSelectedDecades(prev => 
-      prev.includes(decade) 
-        ? prev.filter(d => d !== decade) 
-        : [...prev, decade]
-    );
-  };
-
-  const handleGetRecommendation = async () => {
-    setIsLoading(true);
-    setHasSearched(true);
-    
-    try {
-      // Combine all genres from selected moods
-      const genresFromMoods = selectedMoods.flatMap(mood => moodToGenres[mood] || []);
-      
-      // Combine with directly selected genres and remove duplicates
-      const allGenres = [...new Set([...genresFromMoods, ...selectedGenres])];
-      
-      // Use the first selected decade if any
-      const decade = selectedDecades.length > 0 ? selectedDecades[0] : undefined;
-      
-      const filters: FilterOptions = {
-        genres: allGenres.length > 0 ? allGenres : undefined,
-        decades: selectedDecades.length > 0 ? selectedDecades : undefined,
-        moods: selectedMoods.length > 0 ? selectedMoods : undefined
-      };
-      
-      // Get a recommendation based on filters
-      const results = await getRecommendationByFilters(filters);
-      
-      if (results.length > 0) {
-        const result = results[0]; // Get the first result
-        
-        // Get full details for the recommendation
-        const detailedResult = 
-          result.media_type === 'movie' 
-            ? await getMovieById(result.id) 
-            : await getTvShowById(result.id);
-        
-        setRecommendation(detailedResult);
-      } else {
-        setRecommendation(null);
-      }
-    } catch (error) {
-      console.error('Error getting recommendation:', error);
-      setRecommendation(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleTryAgain = () => {
-    handleGetRecommendation();
-  };
-
-  const handleViewDetails = () => {
-    if (recommendation) {
-      navigate(`/${recommendation.media_type}/${recommendation.id}`);
-    }
-  };
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
@@ -139,150 +48,70 @@ const Discover = () => {
     }
   };
 
+  const handleGenreClick = (genreId: number) => {
+    navigate(`/search?genre=${genreId}`);
+  };
+
   return (
     <MainLayout>
       <div className="container-custom py-12">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto mb-12">
+          {/* Search Section */}
           <div className="text-center mb-12">
-            <div className="inline-flex items-center mb-4">
-              <Compass className="w-8 h-8 text-purple-500 mr-2" />
-              <h1 className="text-3xl font-semibold">Entdecke Neues</h1>
-            </div>
-            <p className="text-lg text-gray-600">
-              Finde den perfekten Film oder die Serie für jeden Moment
-            </p>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
-            <Command className="border-none">
+            <h1 className="text-3xl font-semibold mb-6">Entdecke neue Filme und Serien</h1>
+            <Command className="border-none shadow-lg">
               <CommandInput 
                 placeholder="Suche nach Filmen, Serien oder Kategorien..." 
                 value={searchQuery}
                 onValueChange={handleSearch}
+                className="h-12"
               />
             </Command>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-            <TabsList className="w-full justify-start bg-transparent border-b space-x-8">
-              <TabsTrigger 
-                value="explore" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-purple-500 rounded-none border-b-2 border-transparent"
-              >
-                <Compass className="w-4 h-4 mr-2" />
-                Entdecken
-              </TabsTrigger>
-              <TabsTrigger 
-                value="movies" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-purple-500 rounded-none border-b-2 border-transparent"
-              >
-                <Film className="w-4 h-4 mr-2" />
-                Filme
-              </TabsTrigger>
-              <TabsTrigger 
-                value="mood" 
-                className="data-[state=active]:border-b-2 data-[state=active]:border-purple-500 rounded-none border-b-2 border-transparent"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Nach Stimmung
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="explore" className="space-y-8">
-              <div>
-                <label className="block text-sm font-medium mb-2">How are you feeling?</label>
-                <FilterSelector 
-                  title="Select mood" 
-                  options={moods}
-                  onSelect={(mood) => handleMoodSelection(mood as string)}
-                  selectedValues={selectedMoods}
-                  type="mood"
-                  maxSelections={3}
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2">Choose genres (optional)</label>
-                <FilterSelector 
-                  title="Select genres" 
-                  options={genres}
-                  onSelect={(genreId) => handleGenreSelection(genreId as number)}
-                  selectedValues={selectedGenres}
-                  type="genre"
-                  maxSelections={2}
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-2">Select decade (optional)</label>
-                <FilterSelector 
-                  title="Select decade" 
-                  options={decades}
-                  onSelect={(decade) => handleDecadeSelection(decade as string)}
-                  selectedValues={selectedDecades}
-                  type="decade"
-                  maxSelections={1}
-                />
-              </div>
-              
-              <div className="mt-8">
-                <button 
-                  onClick={handleGetRecommendation}
-                  disabled={isLoading || (selectedMoods.length === 0 && selectedGenres.length === 0)}
-                  className="button-primary w-full py-3"
+          {/* Genres Grid */}
+          <div className="mb-12">
+            <h2 className="text-2xl font-semibold mb-4">Genres</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {genres.map((genre) => (
+                <Card 
+                  key={genre.id}
+                  className="cursor-pointer hover:bg-accent transition-colors"
+                  onClick={() => handleGenreClick(genre.id)}
                 >
-                  {isLoading ? 'Finding the perfect match...' : 'Get Recommendation'}
-                </button>
-              </div>
+                  <CardContent className="p-4 text-center">
+                    <h3 className="font-medium">{genre.name}</h3>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
 
-              {hasSearched && (
-                <div className="animate-fade">
-                  {recommendation ? (
-                    <div>
-                      <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-semibold">Your Recommendation</h2>
-                        <button 
-                          onClick={handleTryAgain}
-                          className="button-secondary flex items-center"
-                        >
-                          <Shuffle className="w-4 h-4 mr-2" />
-                          Try Another
-                        </button>
-                      </div>
-                      
-                      <RecommendationCard movie={recommendation} />
-                    </div>
-                  ) : (
-                    <div className="text-center py-12 bg-muted/30 rounded-lg">
-                      <h2 className="text-xl font-medium mb-2">No Recommendations Found</h2>
-                      <p className="text-muted-foreground mb-6">
-                        Try different filters or moods to get a recommendation.
-                      </p>
-                      <button 
-                        onClick={() => {
-                          setSelectedMoods([]);
-                          setSelectedGenres([]);
-                          setSelectedDecades([]);
-                          setHasSearched(false);
-                        }}
-                        className="button-secondary"
-                      >
-                        Reset Filters
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </TabsContent>
+          {/* Popular Movies */}
+          <section className="mb-12">
+            <div className="flex items-center gap-2 mb-6">
+              <TrendingUp className="w-6 h-6 text-red-500" />
+              <h2 className="text-2xl font-semibold">Trending Filme</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {popularMovies.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} />
+              ))}
+            </div>
+          </section>
 
-            <TabsContent value="movies" className="space-y-8">
-              {/* Movies content will be implemented based on your needs */}
-            </TabsContent>
-
-            <TabsContent value="mood" className="space-y-8">
-              {/* Mood-based content will be implemented based on your needs */}
-            </TabsContent>
-          </Tabs>
+          {/* Top TV Shows */}
+          <section className="mb-12">
+            <div className="flex items-center gap-2 mb-6">
+              <Film className="w-6 h-6 text-purple-500" />
+              <h2 className="text-2xl font-semibold">Top Serien</h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {popularShows.map((show) => (
+                <MovieCard key={show.id} movie={show} />
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </MainLayout>
