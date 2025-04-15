@@ -159,16 +159,85 @@ export const getSimilarMovies = async (id: number): Promise<MovieOrShow[]> => {
 };
 
 export const getRandomMovie = async (): Promise<MovieDetail> => {
-  // Get a list of popular movies
-  const popularMovies = await getPopularMovies();
+  console.log('Getting random movie with improved decade selection...');
   
-  // Filme sind bereits gefiltert in getPopularMovies
+  // Definiere alle möglichen Jahrzehnte
+  const allDecades = ['1970', '1980', '1990', '2000', '2010', '2020'];
   
-  // Randomly select one
-  const randomIndex = Math.floor(Math.random() * popularMovies.length);
-  const randomMovie = popularMovies[randomIndex];
+  // Wähle zufällig ein Jahrzehnt
+  const randomDecade = allDecades[Math.floor(Math.random() * allDecades.length)];
+  console.log(`Selected random decade: ${randomDecade}`);
   
-  // Fetch its full details
-  return getMovieById(randomMovie.id);
+  try {
+    // Grundlegende Parameter für die API-Anfrage
+    let params: Record<string, any> = {
+      'sort_by': 'popularity.desc',
+      'vote_count.gte': '5',
+      'include_adult': 'false',
+      'include_video': 'false',
+      'page': '1',
+    };
+    
+    // Setze den Jahrzehnt-Filter
+    const decade = parseInt(randomDecade);
+    if (!isNaN(decade)) {
+      const startYear = decade;
+      const endYear = decade + 9;
+      
+      params = {
+        ...params,
+        'primary_release_date.gte': `${startYear}-01-01`,
+        'primary_release_date.lte': `${endYear}-12-31`
+      };
+      
+      console.log(`Searching for movies between ${startYear}-${endYear}`);
+    }
+    
+    // API-Aufruf für das ausgewählte Jahrzehnt
+    const data = await callTMDB('/discover/movie', params);
+    
+    if (!data.results || data.results.length === 0) {
+      console.log('No results found, trying with fewer restrictions');
+      
+      // Fallback mit weniger Einschränkungen für ältere Filme
+      params.vote_count_gte = '3';
+      const fallbackData = await callTMDB('/discover/movie', params);
+      
+      if (!fallbackData.results || fallbackData.results.length === 0) {
+        throw new Error('No movies found for the selected decade');
+      }
+      
+      // Filter valid results
+      const validResults = fallbackData.results
+        .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '');
+      
+      if (validResults.length === 0) {
+        throw new Error('No valid movies found for the selected decade');
+      }
+      
+      // Randomly select one movie from valid results
+      const randomMovie = validResults[Math.floor(Math.random() * validResults.length)];
+      return getMovieById(randomMovie.id);
+    }
+    
+    // Filter valid results from initial search
+    const validResults = data.results
+      .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '');
+    
+    if (validResults.length === 0) {
+      throw new Error('No valid movies found for the selected decade');
+    }
+    
+    // Randomly select one movie from valid results
+    const randomMovie = validResults[Math.floor(Math.random() * validResults.length)];
+    return getMovieById(randomMovie.id);
+    
+  } catch (error) {
+    console.error('Error getting random movie:', error);
+    // Fallback to original popular movies if everything else fails
+    const popularMovies = await getPopularMovies();
+    const randomIndex = Math.floor(Math.random() * popularMovies.length);
+    return getMovieById(popularMovies[randomIndex].id);
+  }
 };
 
