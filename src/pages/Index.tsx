@@ -35,7 +35,6 @@ const Index = () => {
         structuredData={websiteStructuredData} 
       />
 
-      {/* Hero Section mit Logo */}
       <section className="py-24 md:py-32 bg-gradient-to-b from-blue-50/50 to-white relative">
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-8 relative">
@@ -47,12 +46,10 @@ Wir finden ihn für dich!</h1>
             <p className="text-lg md:text-xl text-gray-600 mb-6 font-thin">Entdecke Filmempfehlungen, die zu deinem Tag, deiner Laune, deinem Leben passen.</p>
           </div>
           <HomeFilterBox />
+          <PrimeVideoAd className="mt-8" />
         </div>
       </section>
 
-      <PrimeVideoAd className="mb-8" /> {/* Reduced bottom margin */}
-
-      {/* Custom Lists Section */}
       {customLists.length > 0 && <section className="py-12">
           <div className="container-custom">
             <h2 className="text-2xl font-semibold mb-8 text-theme-black px-[20px]">Weitere Filmempfehlungen</h2>
