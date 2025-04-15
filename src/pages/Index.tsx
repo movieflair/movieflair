@@ -18,10 +18,10 @@ const Index = () => {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "MovieFlair – Finde den perfekten Film für deine Stimmung",
-    "url": "https://screenspick.com/",
+    "url": "https://movieflair.co",
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://screenspick.com/search?q={search_term_string}",
+      "target": "https://movieflair.co/search?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };
