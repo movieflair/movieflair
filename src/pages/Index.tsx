@@ -43,7 +43,7 @@ const Index = () => {
         <div className="container-custom">
           <div className="max-w-3xl mx-auto text-center mb-8">
             <img
-              src="/movieflair-logo.png"
+              src="/lovable-uploads/3cbbc2d9-09d4-4965-abef-c43336adc68a.png"
               alt="MovieFlair M Logo"
               className="w-24 h-24 mx-auto mb-8"
             />
