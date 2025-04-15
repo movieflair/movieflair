@@ -8,6 +8,7 @@ import RecommendationCard from '../movies/RecommendationCard';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { ThumbsUp, ThumbsDown } from 'lucide-react';
 
 const moods = [
   'fröhlich',
@@ -190,7 +191,7 @@ const HomeFilterBox = () => {
         <div className="mt-8 animate-fade-in">
           <h3 className="text-lg font-medium text-white mb-4">Deine Filmempfehlung</h3>
           <div className="flex flex-col md:flex-row gap-6">
-            <div className="w-full md:w-1/3">
+            <div className="w-full md:w-[200px]">
               <RecommendationCard movie={recommendation} />
             </div>
             <div className="flex-1 text-gray-200">
@@ -214,7 +215,7 @@ const HomeFilterBox = () => {
                     onClick={() => console.log('Liked')}
                     className="hover:bg-green-500/10 hover:text-green-500"
                   >
-                    👍
+                    <ThumbsUp className="h-4 w-4" />
                   </Button>
                   <Button 
                     variant="outline" 
@@ -222,7 +223,7 @@ const HomeFilterBox = () => {
                     onClick={() => console.log('Disliked')}
                     className="hover:bg-red-500/10 hover:text-red-500"
                   >
-                    👎
+                    <ThumbsDown className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
