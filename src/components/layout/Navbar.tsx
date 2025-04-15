@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { List, Play, Gift, User, Bookmark, LogOut, Sparkles, Compass } from 'lucide-react';
@@ -57,17 +58,17 @@ const Navbar = () => {
         </NavLink>
 
         <div className="flex items-center space-x-6">
-          <NavLink to="/discover" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+          <NavLink to="/entdecken" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <Compass className="w-5 h-5" />
             <span>Entdecken</span>
           </NavLink>
 
-          <NavLink to="/trailers" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+          <NavLink to="/neue-trailer" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <Play className="w-5 h-5" />
             <span>Neue Trailer</span>
           </NavLink>
 
-          <NavLink to="/free-movies" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+          <NavLink to="/kostenlose-filme" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <Gift className="w-5 h-5" />
             <span>Kostenlos</span>
           </NavLink>
@@ -91,11 +92,11 @@ const Navbar = () => {
               <DropdownMenuContent className="w-56" align="end">
                 <DropdownMenuLabel>Mein Konto</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/profile')}>
+                <DropdownMenuItem onClick={() => navigate('/profil')}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Profil</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/watchlist')}>
+                <DropdownMenuItem onClick={() => navigate('/merkliste')}>
                   <Bookmark className="mr-2 h-4 w-4" />
                   <span>Merkliste</span>
                 </DropdownMenuItem>

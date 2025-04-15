@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { ArrowRight, Star, Calendar, Clock } from 'lucide-react';
 import { MovieDetail } from '@/lib/api';

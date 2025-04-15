@@ -25,11 +25,11 @@ import Discover from './pages/Discover';
 const PrivacyPolicy = () => (
   <EnhancedLayout>
     <div className="container-custom py-12">
-      <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
+      <h1 className="text-3xl font-bold mb-6">Datenschutzerklärung</h1>
       <p className="mb-4">
-        This privacy policy outlines how we collect, use, and protect your personal information when using our service.
+        Diese Datenschutzerklärung erläutert, wie wir Ihre persönlichen Informationen sammeln, verwenden und schützen, wenn Sie unseren Service nutzen.
       </p>
-      <p>Content to be added...</p>
+      <p>Inhalt wird noch hinzugefügt...</p>
     </div>
   </EnhancedLayout>
 );
@@ -37,11 +37,11 @@ const PrivacyPolicy = () => (
 const TermsOfService = () => (
   <EnhancedLayout>
     <div className="container-custom py-12">
-      <h1 className="text-3xl font-bold mb-6">Terms of Service</h1>
+      <h1 className="text-3xl font-bold mb-6">Nutzungsbedingungen</h1>
       <p className="mb-4">
-        By using our service, you agree to these terms of service that outline your rights and responsibilities.
+        Durch die Nutzung unseres Dienstes stimmen Sie diesen Nutzungsbedingungen zu, die Ihre Rechte und Pflichten umreißen.
       </p>
-      <p>Content to be added...</p>
+      <p>Inhalt wird noch hinzugefügt...</p>
     </div>
   </EnhancedLayout>
 );
