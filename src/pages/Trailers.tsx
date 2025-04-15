@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import EnhancedLayout from '@/components/layout/EnhancedLayout';
+import MainLayout from '@/components/layout/MainLayout';
 import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { PlayCircle } from 'lucide-react';
@@ -34,7 +34,7 @@ const Trailers = () => {
   }, []);
 
   return (
-    <EnhancedLayout>
+    <MainLayout>
       <div className="container-custom py-12">
         <div className="flex items-center mb-8">
           <PlayCircle className="w-6 h-6 text-theme-accent-blue mr-2" />
@@ -63,7 +63,7 @@ const Trailers = () => {
           </div>
         )}
       </div>
-    </EnhancedLayout>
+    </MainLayout>
   );
 };
 
