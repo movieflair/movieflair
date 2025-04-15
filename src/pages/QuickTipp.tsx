@@ -56,7 +56,7 @@ const QuickTipp = () => {
                   {movie.poster_path ? (
                     <div className="md:w-1/3">
                       <img
-                        src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
+                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                         alt={movie.title || movie.name}
                         className="w-full h-[300px] object-cover rounded-lg shadow-md"
                       />
