@@ -1,9 +1,10 @@
+
 import { useState } from 'react';
 import FilterSelector from './FilterSelector';
 import { Button } from '../ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { getGenres, getRecommendationByFilters, MovieOrShow } from '@/lib/api';
-import { Search, Film, Tv, Star, Sparkles, Film2 } from 'lucide-react';
+import { Search, Film, Tv, Star, Sparkles, MonitorPlay } from 'lucide-react';
 import RecommendationCard from '../movies/RecommendationCard';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -89,7 +90,7 @@ const HomeFilterBox = () => {
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="all" id="all" className="border-[#ea384c] text-[#ea384c]" />
               <Label htmlFor="all" className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
-                <Film2 className="h-4 w-4" />
+                <MonitorPlay className="h-4 w-4" />
                 Beides
               </Label>
             </div>
@@ -106,7 +107,7 @@ const HomeFilterBox = () => {
                 className={`${
                   selectedMoods.includes(mood)
                     ? "bg-[#ea384c] hover:bg-[#ea384c]/90 text-white"
-                    : "hover:bg-gray-700/50 text-gray-200 border border-gray-600"
+                    : "hover:bg-gray-700/50 text-gray-800 border border-gray-600 bg-gray-200"
                 } transition-all font-medium`}
                 onClick={() => {
                   setSelectedMoods(prev =>
