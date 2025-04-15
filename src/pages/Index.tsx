@@ -36,9 +36,7 @@ const Index = () => {
             </div>
             <h1 className="text-4xl lg:text-6xl tracking-tight mb-6 text-theme-black font-bold md:text-5xl">Jeder Moment hat seinen Film.
 Wir finden ihn für dich!</h1>
-            <p className="text-lg md:text-xl text-gray-600 mb-6">
-              Entdecke den perfekten Film für jeden Moment. Lass dich von deiner Stimmung leiten.
-            </p>
+            <p className="text-lg md:text-xl text-gray-600 mb-6 font-thin">Entdecke Filmempfehlungen, die zu deinem Tag, deiner Laune, deinem Leben passen.</p>
           </div>
           <HomeFilterBox />
         </div>
