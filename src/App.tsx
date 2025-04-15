@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import Index from './pages/Index';
 import MovieDetails from './pages/MovieDetails';
@@ -58,6 +58,11 @@ const App = () => {
                 <MovieDetails />
               </AdminSettingsProvider>
             } />
+            {/* Add redirect for /movie/:id to /film/:id */}
+            <Route path="/movie/:id" element={<Navigate to={(location) => {
+              const id = location.pathname.split('/').pop();
+              return `/film/${id}`;
+            }} />} />
             <Route path="/serie/:id/:slug?" element={
               <AdminSettingsProvider>
                 <TvShowDetails />
