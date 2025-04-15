@@ -1,14 +1,14 @@
-
 import { useState, useEffect } from 'react';
-import { Search, Plus, Edit, Trash2, Film, Check, Save, X } from 'lucide-react';
+import { Search, Plus, Edit, Film, Check, Save, X, Tv } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useQuery } from '@tanstack/react-query';
-import { searchMovies, CustomList, MovieOrShow } from '@/lib/api';
+import { searchMovies, searchTvShows, CustomList, MovieOrShow } from '@/lib/api';
 import { getCustomLists, createCustomList, updateCustomList, addMovieToList, removeMovieFromList, deleteCustomList } from '@/lib/customListApi';
 import { toast } from "sonner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const CustomListManager = () => {
   const [lists, setLists] = useState<CustomList[]>([]);
@@ -19,26 +19,36 @@ const CustomListManager = () => {
   const [listDescription, setListDescription] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<MovieOrShow[]>([]);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchType, setSearchType] = useState<'movie' | 'tv'>('movie');
 
-  // Liste der benutzerdefinierten Listen abrufen
-  const { data: searchMoviesData, isLoading: isSearching, refetch } = useQuery({
+  const { data: movieResults = [], isLoading: isSearchingMovies, refetch: refetchMovies } = useQuery({
     queryKey: ['search-movies-for-list', searchQuery],
     queryFn: () => searchMovies(searchQuery),
     enabled: false,
   });
 
-  // Listen laden
+  const { data: tvResults = [], isLoading: isSearchingTvShows, refetch: refetchTvShows } = useQuery({
+    queryKey: ['search-tv-shows-for-list', searchQuery],
+    queryFn: () => searchTvShows(searchQuery),
+    enabled: false,
+  });
+
   useEffect(() => {
     loadLists();
   }, []);
 
-  // Beobachten Sie Änderungen an den Suchergebnissen
   useEffect(() => {
-    if (searchMoviesData) {
-      setSearchResults(searchMoviesData);
+    if (movieResults) {
+      setSearchResults(movieResults);
     }
-  }, [searchMoviesData]);
+  }, [movieResults]);
+
+  useEffect(() => {
+    if (tvResults) {
+      setSearchResults(tvResults);
+    }
+  }, [tvResults]);
 
   const loadLists = () => {
     const customLists = getCustomLists();
@@ -109,21 +119,28 @@ const CustomListManager = () => {
     e.preventDefault();
     
     if (searchQuery.trim()) {
-      await refetch();
+      setIsSearching(true);
+      if (searchType === 'movie') {
+        await refetchMovies();
+        setSearchResults(movieResults);
+      } else {
+        await refetchTvShows();
+        setSearchResults(tvResults);
+      }
     } else {
+      setIsSearching(false);
       setSearchResults([]);
     }
   };
 
-  const handleAddMovie = (movie: MovieOrShow) => {
+  const handleAddMedia = (media: MovieOrShow) => {
     if (!selectedList) return;
     
-    addMovieToList(selectedList.id, movie);
-    toast.success(`${movie.title || movie.name} zur Liste hinzugefügt`);
+    addMovieToList(selectedList.id, media);
+    toast.success(`${media.title || media.name} zur Liste hinzugefügt`);
     
     loadLists();
     
-    // Ausgewählte Liste aktualisieren
     const updatedList = getCustomLists().find(l => l.id === selectedList.id);
     if (updatedList) {
       setSelectedList(updatedList);
@@ -200,8 +217,93 @@ const CustomListManager = () => {
           )}
         </div>
 
+      <div className="p-4">
+        <form onSubmit={handleSearch} className="flex flex-col gap-4 max-w-md mb-6">
+          <div className="flex gap-2">
+            <TabsList className="w-full">
+              <TabsTrigger
+                value="movie"
+                onClick={() => setSearchType('movie')}
+                className={searchType === 'movie' ? 'bg-primary text-primary-foreground' : ''}
+              >
+                <Film className="w-4 h-4 mr-2" />
+                Filme
+              </TabsTrigger>
+              <TabsTrigger
+                value="tv"
+                onClick={() => setSearchType('tv')}
+                className={searchType === 'tv' ? 'bg-primary text-primary-foreground' : ''}
+              >
+                <Tv className="w-4 h-4 mr-2" />
+                Serien
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          
+          <div className="flex gap-2">
+            <div className="relative flex-grow">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder={`Nach ${searchType === 'movie' ? 'Filmen' : 'Serien'} suchen...`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <Button 
+              type="submit" 
+              disabled={isSearchingMovies || isSearchingTvShows}
+            >
+              {(isSearchingMovies || isSearchingTvShows) ? 'Suche...' : 'Suchen'}
+            </Button>
+          </div>
+        </form>
+
+        {searchResults.length > 0 && (
+          <div className="grid grid-cols-2 gap-4 max-h-[300px] overflow-y-auto">
+            {searchResults.map(media => (
+              <div 
+                key={media.id} 
+                className="flex items-center gap-3 p-2 border rounded-md hover:bg-muted/30"
+              >
+                <div className="h-12 w-8 bg-muted rounded overflow-hidden flex-shrink-0">
+                  {media.poster_path ? (
+                    <img 
+                      src={`https://image.tmdb.org/t/p/w92${media.poster_path}`}
+                      alt={media.title || media.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <Film className="h-full w-full p-1 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="flex-grow">
+                  <p className="font-medium truncate">{media.title || media.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {(media.release_date || media.first_air_date)?.substring(0, 4) || 'Unbekanntes Jahr'}
+                  </p>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-green-500"
+                  onClick={() => handleAddMedia(media)}
+                  disabled={selectedList?.movies.some(m => m.id === media.id)}
+                >
+                  {selectedList?.movies.some(m => m.id === media.id) ? (
+                    <Check size={16} className="text-green-500" />
+                  ) : (
+                    <Plus size={16} />
+                  )}
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Listendetails und Suchfunktion */}
-        <div className="p-4">
+        
           {selectedList ? (
             <div className="space-y-6">
               <div className="flex justify-between items-start">
@@ -262,70 +364,7 @@ const CustomListManager = () => {
                 )}
               </div>
 
-              <div className="border-t border-b py-4">
-                <h3 className="text-lg font-medium mb-4">Filme hinzufügen</h3>
-                <form onSubmit={handleSearch} className="flex max-w-md mb-6">
-                  <div className="relative flex-grow">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      type="text"
-                      placeholder="Nach Filmen suchen..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9"
-                    />
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="ml-2"
-                    disabled={isSearching}
-                  >
-                    {isSearching ? 'Suche...' : 'Suchen'}
-                  </Button>
-                </form>
-
-                {searchResults.length > 0 && (
-                  <div className="grid grid-cols-2 gap-4 max-h-[300px] overflow-y-auto">
-                    {searchResults.map(movie => (
-                      <div 
-                        key={movie.id} 
-                        className="flex items-center gap-3 p-2 border rounded-md hover:bg-muted/30"
-                      >
-                        <div className="h-12 w-8 bg-muted rounded overflow-hidden flex-shrink-0">
-                          {movie.poster_path ? (
-                            <img 
-                              src={`https://image.tmdb.org/t/p/w92${movie.poster_path}`}
-                              alt={movie.title || movie.name}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <Film className="h-full w-full p-1 text-muted-foreground" />
-                          )}
-                        </div>
-                        <div className="flex-grow">
-                          <p className="font-medium truncate">{movie.title || movie.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {(movie.release_date || movie.first_air_date)?.substring(0, 4) || 'Unbekanntes Jahr'}
-                          </p>
-                        </div>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8 text-green-500"
-                          onClick={() => handleAddMovie(movie)}
-                          disabled={selectedList.movies.some(m => m.id === movie.id)}
-                        >
-                          {selectedList.movies.some(m => m.id === movie.id) ? (
-                            <Check size={16} className="text-green-500" />
-                          ) : (
-                            <Plus size={16} />
-                          )}
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              
 
               <div>
                 <h3 className="text-lg font-medium mb-4">Filme in dieser Liste ({selectedList.movies.length})</h3>
@@ -379,7 +418,7 @@ const CustomListManager = () => {
               <p className="text-sm">Wähle eine Liste aus oder erstelle eine neue</p>
             </div>
           )}
-        </div>
+        
       </div>
 
       {/* Dialog zum Erstellen einer neuen Liste */}
