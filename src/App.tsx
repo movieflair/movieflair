@@ -20,7 +20,6 @@ import { Toaster } from '@/components/ui/toaster';
 import EnhancedLayout from './components/layout/EnhancedLayout';
 import Discover from './pages/Discover';
 
-// Adding placeholder components for Privacy and Terms pages
 const PrivacyPolicy = () => (
   <EnhancedLayout>
     <div className="container-custom py-12">
@@ -47,7 +46,6 @@ const TermsOfService = () => (
   </EnhancedLayout>
 );
 
-// Create a wrapper component for the movie redirect
 const MovieRedirect = () => {
   const location = useLocation();
   const id = location.pathname.split('/').pop();
@@ -66,7 +64,6 @@ const App = () => {
                 <MovieDetails />
               </AdminSettingsProvider>
             } />
-            {/* Add redirect for /movie/:id to /film/:id using the wrapper component */}
             <Route path="/movie/:id" element={<MovieRedirect />} />
             <Route path="/serie/:id/:slug?" element={
               <AdminSettingsProvider>
@@ -87,6 +84,7 @@ const App = () => {
             <Route path="/datenschutz" element={<PrivacyPolicy />} />
             <Route path="/nutzungsbedingungen" element={<TermsOfService />} />
             <Route path="/ueber-uns" element={<About />} />
+            <Route path="/about" element={<About />} />
           </Routes>
           <Toaster />
         </AuthProvider>
