@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { Play } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getMovieById, getSimilarMovies, trackPageVisit } from '@/lib/api';
 import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/api';
@@ -12,6 +11,10 @@ import ShareButton from '@/components/movies/ShareButton';
 import SimilarMovies from '@/components/movies/SimilarMovies';
 import WatchlistButton from '@/components/movies/WatchlistButton';
 import SEOHead from '@/components/seo/SEOHead';
+import MovieHeader from '@/components/movies/MovieHeader';
+import MovieStreamButtons from '@/components/movies/MovieStreamButtons';
+import MovieTrailerDialog from '@/components/movies/MovieTrailerDialog';
+import MovieBackdrop from '@/components/movies/MovieBackdrop';
 
 const MovieDetails = () => {
   const { id, slug } = useParams<{ id: string, slug?: string }>();
@@ -78,20 +81,27 @@ const MovieDetails = () => {
   const seoTitle = `${movie.title} (${releaseYear}) Online Stream anschauen | MovieFlair`;
   const seoDescription = `${movie.title} (${releaseYear}) kostenlos online streamen. ${movie.overview?.slice(0, 150)}...`;
 
-  const getAmazonUrl = (title: string) => {
-    const formattedTitle = encodeURIComponent(title);
-    const tag = amazonAffiliateId || 'movieflair-21';
-    return `https://www.amazon.de/gp/video/search?phrase=${formattedTitle}&tag=${tag}`;
+  const getTrailerUrl = () => {
+    if (movie?.trailerUrl) {
+      return movie.trailerUrl;
+    }
+    
+    if (movie?.videos?.results?.length > 0) {
+      const firstTrailer = movie.videos.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+      if (firstTrailer) {
+        return `https://www.youtube.com/embed/${firstTrailer.key}`;
+      }
+    }
+    
+    if (isEmbedUrl && movie?.streamUrl) {
+      return movie.streamUrl;
+    }
+    
+    return null;
   };
 
-  const isEmbedUrl = movie.streamUrl && (
-    movie.streamUrl.includes('embed') || 
-    movie.streamUrl.includes('iframe') ||
-    movie.streamUrl.includes('player')
-  );
-
   const handleStreamClick = () => {
-    if (!movie.streamUrl) return;
+    if (!movie?.streamUrl) return;
     
     if (isEmbedUrl) {
       setShowTrailer(true);
@@ -99,27 +109,6 @@ const MovieDetails = () => {
       window.open(movie.streamUrl, '_blank');
     }
   };
-  
-  const getTrailerUrl = () => {
-    if (movie.trailerUrl) {
-      return movie.trailerUrl;
-    }
-    
-    if (movie.videos?.results?.length > 0) {
-      const firstTrailer = movie.videos.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
-      if (firstTrailer) {
-        return `https://www.youtube.com/embed/${firstTrailer.key}`;
-      }
-    }
-    
-    if (isEmbedUrl) {
-      return movie.streamUrl;
-    }
-    
-    return null;
-  };
-  
-  const trailerUrl = getTrailerUrl();
 
   const movieStructuredData = {
     "@context": "https://schema.org",
@@ -158,20 +147,7 @@ const MovieDetails = () => {
       />
 
       <div className="min-h-screen bg-white">
-        <div className="relative h-[400px] overflow-hidden">
-          {movie.backdrop_path ? (
-            <>
-              <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
-              <img
-                src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
-                alt={movie.title}
-                className="w-full h-full object-cover"
-              />
-            </>
-          ) : (
-            <div className="w-full h-full bg-gray-100" />
-          )}
-        </div>
+        <MovieBackdrop backdropPath={movie.backdrop_path} title={movie.title} />
 
         <div className="container-custom -mt-40 relative z-20">
           <div className="glass-card overflow-hidden rounded-xl">
@@ -197,12 +173,12 @@ const MovieDetails = () => {
               </div>
 
               <div className="text-gray-800">
-                <h1 className="text-4xl font-semibold mb-2">{movie.title}</h1>
-                {movie.tagline && (
-                  <p className="text-xl text-gray-500 mb-4 italic">
-                    {movie.tagline}
-                  </p>
-                )}
+                <MovieHeader 
+                  title={movie.title}
+                  tagline={movie.tagline}
+                  releaseYear={releaseYear}
+                  genres={movie.genres}
+                />
 
                 <MovieMeta
                   year={releaseYear}
@@ -211,50 +187,19 @@ const MovieDetails = () => {
                   mediaType="movie"
                 />
 
-                <div className="flex flex-wrap gap-2 my-6">
-                  {movie.genres?.map((genre) => (
-                    <span
-                      key={genre.id}
-                      className="px-4 py-1 bg-gray-100 text-gray-700 rounded-md"
-                    >
-                      {genre.name}
-                    </span>
-                  ))}
-                </div>
-
                 <p className="text-gray-600 mb-8 leading-relaxed">
                   {movie.overview}
                 </p>
 
-                <div className="flex flex-wrap gap-3 mb-8">
-                  {movie.hasTrailer && trailerUrl && (
-                    <button
-                      onClick={() => setShowTrailer(true)}
-                      className="bg-gray-100 text-gray-800 px-6 py-2 rounded-md hover:bg-gray-200 transition-colors flex items-center gap-2"
-                    >
-                      <Play className="w-4 h-4" />
-                      Trailer
-                    </button>
-                  )}
-                  <a
-                    href={getAmazonUrl(movie.title || '')}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-[rgba(26,152,255,255)] text-white px-6 py-2 rounded-md hover:bg-[rgba(26,152,255,255)]/90 transition-colors flex items-center gap-2"
-                  >
-                    <Play className="w-4 h-4" />
-                    Prime Video
-                  </a>
-                  {movie.streamUrl && (
-                    <button
-                      className="bg-[#ea384c] text-white px-6 py-2 rounded-md hover:bg-[#ea384c]/90 transition-colors flex items-center gap-2"
-                      onClick={handleStreamClick}
-                    >
-                      <Play className="w-4 h-4" />
-                      Kostenlos
-                    </button>
-                  )}
-                </div>
+                <MovieStreamButtons
+                  hasTrailer={movie.hasTrailer}
+                  trailerUrl={trailerUrl}
+                  streamUrl={movie.streamUrl}
+                  title={movie.title}
+                  amazonAffiliateId={amazonAffiliateId}
+                  onTrailerClick={() => setShowTrailer(true)}
+                  onStreamClick={handleStreamClick}
+                />
 
                 <div className="mt-8">
                   <CastAndCrewSection 
@@ -270,26 +215,12 @@ const MovieDetails = () => {
 
       <SimilarMovies movies={similarMovies} />
 
-      {showTrailer && trailerUrl && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-4xl">
-            <button
-              onClick={() => setShowTrailer(false)}
-              className="absolute -top-12 right-0 text-white hover:text-white/80"
-            >
-              Schließen
-            </button>
-            <div className="aspect-video">
-              <iframe
-                src={trailerUrl}
-                title={`${movie.title} Stream`}
-                className="w-full h-full"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      <MovieTrailerDialog
+        isOpen={showTrailer}
+        onClose={() => setShowTrailer(false)}
+        trailerUrl={trailerUrl || ''}
+        movieTitle={movie.title}
+      />
     </MainLayout>
   );
 };
