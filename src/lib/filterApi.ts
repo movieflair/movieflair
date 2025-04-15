@@ -48,12 +48,16 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
   // Build basic parameters
   let params: Record<string, any> = {
     'sort_by': 'popularity.desc',
-    'vote_count.gte': '20', // Reduce minimum vote count to get more results
+    'vote_count.gte': '10', // Reduzierte Mindestanzahl an Stimmen für mehr Ergebnisse
     'include_adult': 'false',
     'include_video': 'false',
-    'with_original_language': 'de,en', // Deutsch und Englisch
     'page': '1'
   };
+  
+  // Nur bei modernen Filmen nach deutscher Sprache filtern
+  if (!decades || (decades.length > 0 && parseInt(decades[0]) >= 2000)) {
+    params.with_original_language = 'de,en';
+  }
   
   // Genres zusammenstellen (direkt ausgewählte und zufällige aus Moods)
   let genresToInclude: number[] = [];
@@ -90,7 +94,6 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
       const startYear = decade;
       const endYear = decade + 9;
       
-      // Dezember hinzufügen, um das gesamte Jahr einzuschließen
       params.primary_release_date_gte = `${startYear}-01-01`;
       params.primary_release_date_lte = `${endYear}-12-31`;
       
@@ -105,39 +108,69 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
   console.log('API call params:', params);
   
   try {
-    // Try to get movies with current parameters
+    // First API call to get movies
     const data = await callTMDB(endpoint, params);
     
     if (!data.results || data.results.length === 0) {
       console.log('No results from initial TMDB API call, trying with fewer restrictions');
       
-      // If no results, try again with reduced restrictions
-      delete params.with_original_language; // Try all languages
-      params.vote_count_gte = '10'; // Lower the vote count threshold
+      // Trying with fewer restrictions
+      const fallbackParams = { ...params };
       
-      const fallbackData = await callTMDB(endpoint, params);
+      // Remove language restriction for older decades
+      delete fallbackParams.with_original_language;
+      
+      // Lower the vote count threshold even more
+      fallbackParams.vote_count_gte = '5';
+      
+      const fallbackData = await callTMDB(endpoint, fallbackParams);
       console.log(`Received ${fallbackData.results?.length || 0} results from fallback API call`);
       
-      if (!fallbackData.results || fallbackData.results.length === 0) {
-        console.log('Still no results after fallback query');
+      if (!fallbackData.results || fallbackData.results.length === 0 && decades && decades.length > 0) {
+        // Last resort: try to get any popular movies from that decade
+        const lastResortParams = {
+          'sort_by': 'popularity.desc',
+          'primary_release_date_gte': params.primary_release_date_gte,
+          'primary_release_date_lte': params.primary_release_date_lte,
+          'vote_count_gte': '3'
+        };
+        
+        console.log('Last resort API call with params:', lastResortParams);
+        const lastResortData = await callTMDB(endpoint, lastResortParams);
+        
+        if (!lastResortData.results || lastResortData.results.length === 0) {
+          console.log('No results after all attempts');
+          return [];
+        }
+        
+        data.results = lastResortData.results;
+      } else if (fallbackData.results && fallbackData.results.length > 0) {
+        data.results = fallbackData.results;
+      } else {
+        console.log('No results after fallback query');
         return [];
       }
-      
-      data.results = fallbackData.results;
-    } else {
-      console.log(`Received ${data.results.length} results from API`);
     }
+    
+    console.log(`Received ${data.results.length} results from API`);
     
     // Filter the results to ensure they match our criteria
     let filteredResults = data.results
       .filter((item: any) => {
-        // Überprüfe, ob das Item eine gültige Beschreibung und ein Poster hat
         const hasValidMetadata = item.poster_path && item.overview && item.overview.trim() !== '';
+        
+        if (!hasValidMetadata) {
+          return false;
+        }
         
         // Additional decade check
         if (decades && decades.length > 0 && item.release_date) {
           const releaseYear = parseInt(item.release_date.split('-')[0]);
           const selectedDecade = parseInt(decades[0]);
+          
+          if (isNaN(releaseYear) || isNaN(selectedDecade)) {
+            return false;
+          }
           
           // Check if release year is in the selected decade
           const isInDecade = releaseYear >= selectedDecade && releaseYear <= (selectedDecade + 9);
@@ -148,7 +181,7 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
           }
         }
         
-        return hasValidMetadata;
+        return true;
       })
       .map((item: any) => ({
         ...item,

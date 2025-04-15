@@ -37,6 +37,14 @@ export const useFilterSearch = () => {
       if (results.length === 0) {
         toast.error('Keine passenden Filme gefunden. Bitte versuche andere Filter.');
         setRecommendation(null);
+        
+        // Nur bei Jahrzehnt-Filtern einen spezifischen Hinweis anzeigen
+        if (currentFilter.decades && currentFilter.decades.length > 0) {
+          const decade = currentFilter.decades[0];
+          toast('Hinweis: Bei älteren Filmen funktioniert die Suche am besten mit weniger Filtern.', {
+            duration: 5000
+          });
+        }
       } else {
         const randomIndex = Math.floor(Math.random() * results.length);
         setRecommendation(results[randomIndex]);
@@ -48,6 +56,8 @@ export const useFilterSearch = () => {
           year: movie.release_date?.split('-')[0],
           id: movie.id
         })));
+        
+        toast.success(`${results.length} passende Filme gefunden!`);
       }
     } catch (error) {
       console.error('Error getting recommendation:', error);
