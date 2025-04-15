@@ -24,7 +24,7 @@ const QuickTipp = () => {
 
   return (
     <EnhancedLayout>
-      <div className="container-custom pt-4 pb-6">
+      <div className="container-custom pt-2 pb-6">
         <h1 className="text-3xl font-semibold mb-4">Quick Tipp</h1>
         <p className="text-gray-600 mb-6">
           Hier findest du zufällige Filmempfehlungen, wenn du dich nicht entscheiden kannst.
