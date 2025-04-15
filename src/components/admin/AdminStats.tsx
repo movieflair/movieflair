@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
@@ -28,12 +29,18 @@ const AdminStats = () => {
       try {
         setLoading(true);
         
-        // Fetch user count
-        const { count: usersCount } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact' });
+        // Fetch user count by counting unique user_ids in the watchlist table
+        const { count: usersCount, error: countError } = await supabase
+          .from('watchlist')
+          .select('user_id', { count: 'exact', head: true })
+          .limit(1);
         
-        setUserCount(usersCount || 0);
+        if (countError) {
+          console.error('Error fetching user count:', countError);
+          setUserCount(0);
+        } else {
+          setUserCount(usersCount || 0);
+        }
         
         // Fetch ratings data
         const { data, error } = await supabase

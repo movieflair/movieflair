@@ -33,6 +33,7 @@ const WatchlistButton = ({ mediaId, mediaType, className = '' }: WatchlistButton
         .select('id')
         .eq('media_id', mediaId)
         .eq('media_type', mediaType)
+        .eq('user_id', session.session.user.id)
         .single();
 
       setIsInWatchlist(!!data);
@@ -60,7 +61,8 @@ const WatchlistButton = ({ mediaId, mediaType, className = '' }: WatchlistButton
           .from('watchlist')
           .delete()
           .eq('media_id', mediaId)
-          .eq('media_type', mediaType);
+          .eq('media_type', mediaType)
+          .eq('user_id', session.session.user.id);
         
         setIsInWatchlist(false);
         toast({
@@ -71,7 +73,8 @@ const WatchlistButton = ({ mediaId, mediaType, className = '' }: WatchlistButton
           .from('watchlist')
           .insert({
             media_id: mediaId,
-            media_type: mediaType
+            media_type: mediaType,
+            user_id: session.session.user.id
           });
         
         setIsInWatchlist(true);

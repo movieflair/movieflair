@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
@@ -16,7 +17,8 @@ const FreeMovies = () => {
       try {
         setIsLoading(true);
         const data = await getFreeMovies();
-        setMovies(data);
+        // Limit to max 4 movies per row
+        setMovies(data.slice(0, 4));
       } catch (error) {
         console.error('Error fetching free movies:', error);
       } finally {
