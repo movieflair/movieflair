@@ -1,7 +1,36 @@
 
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const Footer = () => {
+  const { user } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        return;
+      }
+
+      const { data, error } = await supabase.rpc(
+        'has_role',
+        { 
+          _user_id: user.id,
+          _role: 'admin'
+        }
+      );
+
+      if (!error && data) {
+        setIsAdmin(true);
+      }
+    };
+
+    checkAdminStatus();
+  }, [user]);
+
   return (
     <footer className="bg-secondary mt-auto py-12">
       <div className="container-custom">
@@ -31,11 +60,13 @@ const Footer = () => {
                   About
                 </Link>
               </li>
-              <li>
-                <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Admin
-                </Link>
-              </li>
+              {isAdmin && (
+                <li>
+                  <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Admin
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
           
