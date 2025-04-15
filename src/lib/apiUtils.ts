@@ -1,0 +1,53 @@
+
+import { supabase } from '@/integrations/supabase/client';
+
+export async function callTMDB(path: string, searchParams = {}) {
+  const params = {
+    ...searchParams,
+    language: 'de-DE'
+  };
+  
+  const { data, error } = await supabase.functions.invoke('tmdb', {
+    body: { path, searchParams: params },
+  });
+
+  if (error) throw error;
+  return data;
+}
+
+export const getAdminMovieSettings = async () => {
+  const savedMoviesJson = localStorage.getItem('adminMovies');
+  if (!savedMoviesJson) return {};
+  
+  try {
+    const savedMovies = JSON.parse(savedMoviesJson);
+    return savedMovies.reduce((acc: Record<number, any>, movie: any) => {
+      if (movie.id) {
+        acc[movie.id] = movie;
+      }
+      return acc;
+    }, {});
+  } catch (e) {
+    console.error('Error parsing saved movies:', e);
+    return {};
+  }
+};
+
+export const getAdminTvShowSettings = async () => {
+  const savedShowsJson = localStorage.getItem('adminShows');
+  if (!savedShowsJson) return {};
+  
+  try {
+    const savedShows = JSON.parse(savedShowsJson);
+    return savedShows.reduce((acc: Record<number, any>, show: any) => {
+      if (show.id) {
+        acc[show.id] = show;
+      }
+      return acc;
+    }, {});
+  } catch (e) {
+    console.error('Error parsing saved shows:', e);
+    return {};
+  }
+};
+
