@@ -8,11 +8,11 @@ interface FilterTagProps {
 
 const FilterTag = ({ label, onRemove }: FilterTagProps) => {
   return (
-    <div className="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
+    <div className="inline-flex items-center px-3 py-1 rounded-full bg-[#ea384c]/10 text-[#ea384c] text-sm">
       <span>{label}</span>
       <button 
         onClick={onRemove}
-        className="ml-2 text-primary/70 hover:text-primary transition-colors"
+        className="ml-2 text-[#ea384c]/70 hover:text-[#ea384c] transition-colors"
       >
         <X className="w-3 h-3" />
       </button>

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { List, Play, PlayCircle, Gift, User, Bookmark, LogOut, Sparkles } from 'lucide-react';
@@ -50,7 +51,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-black sticky top-0 z-50">
+    <nav className="bg-gray-900 sticky top-0 z-50">
       <div className="container-custom flex items-center justify-between py-4">
         <NavLink to="/" className="flex items-center text-xl font-semibold text-white">
           Movie<span className="text-theme-accent-red">Flair</span>
@@ -73,9 +74,9 @@ const Navbar = () => {
           </NavLink>
 
           <NavLink to="/quick-tipp">
-            <Button variant="destructive" className="hidden md:flex items-center space-x-2">
-              <Sparkles className="w-5 h-5" />
-              <span>Quick Tipps</span>
+            <Button variant="destructive" className="hidden md:flex items-center">
+              <Sparkles className="w-5 h-5 mr-1" />
+              <span>Quick Tipp</span>
             </Button>
           </NavLink>
 

@@ -24,7 +24,8 @@ const moods = [
   'herzerwärmend'
 ];
 
-const decades = ['1970', '1980', '1990', '2000', '2010', '2020'];
+// Reversed decades order to show newest first
+const decades = ['2020', '2010', '2000', '1990', '1980', '1970'];
 
 const HomeFilterBox = () => {
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
@@ -87,6 +88,14 @@ const HomeFilterBox = () => {
                 Serien
               </Label>
             </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="all" id="all" className="border-red-500 text-red-500" />
+              <Label htmlFor="all" className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
+                <Film className="h-4 w-4 mr-0" />
+                <Tv className="h-4 w-4 -ml-2" />
+                Beides
+              </Label>
+            </div>
           </RadioGroup>
         </div>
 
@@ -100,8 +109,8 @@ const HomeFilterBox = () => {
                 className={`${
                   selectedMoods.includes(mood)
                     ? "bg-[#ea384c] hover:bg-[#ea384c]/90 text-white"
-                    : "hover:bg-gray-700/50 text-gray-300"
-                } transition-all`}
+                    : "hover:bg-gray-700/50 text-gray-200 border border-gray-600"
+                } transition-all font-medium`}
                 onClick={() => {
                   setSelectedMoods(prev =>
                     prev.includes(mood)
@@ -183,7 +192,9 @@ const HomeFilterBox = () => {
       {recommendation && (
         <div className="mt-8 animate-fade-in">
           <h3 className="text-lg font-medium text-white mb-4">Deine Filmempfehlung</h3>
-          <RecommendationCard movie={recommendation} />
+          <div className="max-w-[300px] mx-auto">
+            <RecommendationCard movie={recommendation} />
+          </div>
         </div>
       )}
     </div>
