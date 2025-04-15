@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
@@ -52,52 +53,52 @@ const QuickTipp = () => {
           <div className="max-w-4xl mx-auto mb-12">
             <Card className="overflow-hidden bg-white/80 backdrop-blur-sm border border-gray-100 shadow-xl">
               <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-8">
+                <div className="flex flex-col md:flex-row gap-4 min-h-[250px]">
                   {movie.poster_path ? (
                     <div className="md:w-1/4">
                       <img
                         src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
                         alt={movie.title || movie.name}
-                        className="w-full h-[300px] object-cover rounded-lg shadow-md"
+                        className="w-full h-[250px] object-cover rounded-lg shadow-md"
                       />
                     </div>
                   ) : (
-                    <div className="w-full h-[300px] bg-gray-100 rounded-lg flex items-center justify-center">
+                    <div className="w-full h-[250px] bg-gray-100 rounded-lg flex items-center justify-center">
                       <Film className="w-16 h-16 text-gray-400" />
                     </div>
                   )}
 
                   <div className="md:w-3/4 flex flex-col justify-between">
                     <div>
-                      <h2 className="text-2xl font-bold mb-4">
+                      <h2 className="text-xl font-bold mb-2">
                         {movie.title || movie.name}
                       </h2>
 
-                      <div className="flex items-center gap-6 mb-6">
+                      <div className="flex items-center gap-4 mb-4">
                         {movie.release_date && (
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <Calendar className="w-5 h-5" />
+                          <div className="flex items-center gap-2 text-gray-600 text-sm">
+                            <Calendar className="w-4 h-4" />
                             <span>{new Date(movie.release_date).getFullYear()}</span>
                           </div>
                         )}
                         {movie.runtime && (
-                          <div className="flex items-center gap-2 text-gray-600">
-                            <Clock className="w-5 h-5" />
+                          <div className="flex items-center gap-2 text-gray-600 text-sm">
+                            <Clock className="w-4 h-4" />
                             <span>{movie.runtime} min</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <Star className="w-5 h-5 text-yellow-500" />
+                        <div className="flex items-center gap-2 text-gray-600 text-sm">
+                          <Star className="w-4 h-4 text-yellow-500" />
                           <span>{movie.vote_average.toFixed(1)}/10</span>
                         </div>
                       </div>
 
                       {movie.genres && (
-                        <div className="flex flex-wrap gap-2 mb-6">
+                        <div className="flex flex-wrap gap-2 mb-4">
                           {movie.genres.map((genre) => (
                             <span 
                               key={genre.id}
-                              className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600"
+                              className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600"
                             >
                               {genre.name}
                             </span>
@@ -105,7 +106,7 @@ const QuickTipp = () => {
                         </div>
                       )}
 
-                      <p className="text-gray-600 mb-6 line-clamp-3">
+                      <p className="text-gray-600 mb-4 text-sm line-clamp-2">
                         {movie.overview || 'Keine Beschreibung verfügbar.'}
                       </p>
                     </div>
@@ -113,7 +114,7 @@ const QuickTipp = () => {
                     <div className="flex items-center gap-4">
                       <Link 
                         to={`/movie/${movie.id}`}
-                        className="inline-flex items-center gap-2 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
                       >
                         Details ansehen
                         <ArrowRight className="w-4 h-4" />
@@ -180,3 +181,4 @@ const QuickTipp = () => {
 };
 
 export default QuickTipp;
+
