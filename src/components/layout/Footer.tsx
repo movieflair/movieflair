@@ -120,16 +120,6 @@ const Footer = () => {
                   Nutzungsbedingungen
                 </Link>
               </li>
-              <li>
-                <a 
-                  href="https://www.themoviedb.org/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  TMDB Attribution
-                </a>
-              </li>
             </ul>
           </div>
         </div>
