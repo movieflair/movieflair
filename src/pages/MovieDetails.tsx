@@ -122,14 +122,16 @@ const MovieDetails = () => {
       <div className="min-h-screen bg-white">
         <MovieBackdrop backdropPath={movie.backdrop_path} title={movie.title} />
 
-        <div className="container-custom -mt-40 relative z-20">
+        <div className="container-custom -mt-20 md:-mt-40 relative z-20 px-3 md:px-8">
           <div className="glass-card overflow-hidden rounded-xl">
-            <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
-              <MoviePoster 
-                id={movie.id} 
-                title={movie.title} 
-                posterPath={movie.poster_path}
-              />
+            <div className="grid md:grid-cols-[300px,1fr] gap-4 md:gap-8 p-4 md:p-8">
+              <div className="flex justify-center md:block">
+                <MoviePoster 
+                  id={movie.id} 
+                  title={movie.title} 
+                  posterPath={movie.poster_path}
+                />
+              </div>
 
               <div className="text-gray-800">
                 <MovieHeader 
@@ -146,7 +148,7 @@ const MovieDetails = () => {
                   mediaType="movie"
                 />
 
-                <p className="text-gray-600 mb-8 leading-relaxed">
+                <p className="text-gray-600 mb-6 md:mb-8 leading-relaxed text-sm md:text-base">
                   {movie.overview}
                 </p>
 
@@ -160,7 +162,7 @@ const MovieDetails = () => {
                   onStreamClick={handleStreamClick}
                 />
 
-                <div className="mt-8">
+                <div className="mt-6 md:mt-8">
                   <CastAndCrewSection 
                     director={director}
                     cast={movie.cast?.filter(person => person.character)}
