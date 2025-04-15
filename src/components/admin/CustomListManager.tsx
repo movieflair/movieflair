@@ -19,7 +19,7 @@ const CustomListManager = () => {
   const [listDescription, setListDescription] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<MovieOrShow[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Liste der benutzerdefinierten Listen abrufen
   const { data: searchMoviesData, isLoading: isSearching, refetch } = useQuery({
