@@ -8,78 +8,73 @@ const About = () => {
     <MainLayout>
       <div className="container-custom py-12">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-semibold mb-6">About ScreenPick</h1>
+          <h1 className="text-3xl font-semibold mb-6">Über MovieFlair</h1>
           
           <div className="prose max-w-none">
             <p className="text-lg text-muted-foreground mb-6">
-              ScreenPick was created to solve the "what should we watch tonight?" dilemma.
-              Instead of endlessly scrolling through streaming apps, we help you find the perfect movie or show
-              based on your mood and preferences.
+              MovieFlair wurde mit einem klaren Ziel entwickelt: Die ewige Frage "Was schauen wir heute?" 
+              zu beantworten. Statt endlosen Scrollens durch Streaming-Dienste helfen wir dir dabei, 
+              den perfekten Film oder die perfekte Serie zu finden, die genau zu deiner aktuellen 
+              Stimmung und deinen Vorlieben passt.
             </p>
             
-            <h2 className="text-2xl font-medium mt-10 mb-6">How It Works</h2>
+            <h2 className="text-2xl font-medium mt-10 mb-6">So funktioniert's</h2>
             
             <div className="grid md:grid-cols-2 gap-6 mb-10">
               <div className="bg-card rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                    <Film className="w-5 h-5 text-primary" />
+                    <Film className="w-5 h-5 text-[#ff3131]" />
                   </div>
-                  <h3 className="text-xl font-medium">Smart Recommendations</h3>
+                  <h3 className="text-xl font-medium">Smarte Empfehlungen</h3>
                 </div>
                 <p className="text-muted-foreground">
-                  Our algorithm takes your mood and preferences into account to suggest films and shows
-                  you're likely to enjoy, cutting through the endless options.
+                  Unser Algorithmus berücksichtigt deine Stimmung und Vorlieben, um dir Filme und Serien 
+                  vorzuschlagen, die dir wirklich gefallen werden.
                 </p>
               </div>
               
               <div className="bg-card rounded-lg p-6">
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                    <FileText className="w-5 h-5 text-primary" />
+                    <FileText className="w-5 h-5 text-[#ff3131]" />
                   </div>
-                  <h3 className="text-xl font-medium">Detailed Information</h3>
+                  <h3 className="text-xl font-medium">Detaillierte Informationen</h3>
                 </div>
                 <p className="text-muted-foreground">
-                  Each recommendation includes comprehensive details, trailers, ratings, and more to
-                  help you decide if it's right for you.
+                  Zu jeder Empfehlung findest du umfassende Details, Trailer, Bewertungen und mehr, 
+                  damit du die perfekte Entscheidung treffen kannst.
                 </p>
               </div>
             </div>
             
-            <h2 className="text-2xl font-medium mt-10 mb-6">Our Vision</h2>
+            <h2 className="text-2xl font-medium mt-10 mb-6">Unsere Vision</h2>
             
             <p className="text-muted-foreground mb-6">
-              We believe that great stories bring people together. Our goal is to help you spend less time
-              searching and more time enjoying amazing content that matches your preferences.
+              Wir glauben daran, dass großartige Geschichten Menschen zusammenbringen. Unser Ziel ist es, 
+              dir zu helfen, weniger Zeit mit der Suche und mehr Zeit damit zu verbringen, 
+              fantastische Unterhaltung zu genießen, die perfekt zu dir passt.
             </p>
             
             <div className="bg-theme-light-gray rounded-lg p-8 my-10">
               <div className="flex items-center mb-6">
-                <Users className="w-6 h-6 text-theme-accent-blue mr-3" />
-                <h3 className="text-xl font-medium">Join Our Community</h3>
+                <Users className="w-6 h-6 text-[#ff3131] mr-3" />
+                <h3 className="text-xl font-medium">Werde Teil unserer Community</h3>
               </div>
               <p className="text-muted-foreground mb-4">
-                Love movies and TV shows? Join our growing community of entertainment enthusiasts.
-                Share recommendations, discuss your favorites, and discover new content together.
+                Du liebst Filme und Serien? Dann werde Teil unserer wachsenden Community von 
+                Entertainmentbegeisterten. Teile Empfehlungen, diskutiere über deine Favoriten 
+                und entdecke gemeinsam neue Inhalte.
               </p>
-              <Link to="/discover" className="button-primary inline-flex">
-                Start Discovering
+              <Link to="/entdecken" className="inline-flex items-center px-6 py-3 bg-[#ff3131] text-white rounded-lg hover:bg-[#ff3131]/90 transition-colors">
+                Jetzt entdecken
               </Link>
             </div>
             
-            <h2 className="text-2xl font-medium mt-10 mb-6">The TMDB API</h2>
-            
-            <p className="text-muted-foreground mb-6">
-              ScreenPick is powered by the TMDB (The Movie Database) API, which provides access to a vast 
-              collection of movies and TV shows. This allows us to offer comprehensive information and 
-              high-quality images for all our recommendations.
-            </p>
-            
             <div className="flex items-center justify-center my-10">
               <div className="flex items-center text-muted-foreground">
-                <Heart className="w-5 h-5 text-theme-accent-red mr-2" />
-                <span>Made with love for movie fans everywhere</span>
+                <Heart className="w-5 h-5 text-[#ff3131] mr-2" />
+                <span>Mit Liebe entwickelt für Filmfans</span>
               </div>
             </div>
           </div>
