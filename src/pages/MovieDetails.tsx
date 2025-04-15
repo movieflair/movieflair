@@ -121,8 +121,8 @@ const MovieDetails = () => {
         <div className="container-custom -mt-40 relative z-20">
           <div className="glass-card overflow-hidden rounded-xl">
             <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
-              <div className="space-y-4">
-                <div className="relative">
+              <div className="space-y-2">
+                <div className="relative mb-2">
                   <div className="rounded-lg overflow-hidden shadow-xl">
                     {movie.poster_path ? (
                       <img

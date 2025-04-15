@@ -99,8 +99,7 @@ const WatchlistButton = ({ mediaId, mediaType, className = '' }: WatchlistButton
 
   return (
     <Button
-      variant="secondary"
-      className={`w-full flex items-center justify-center gap-2 ${className}`}
+      className={`w-full flex items-center justify-center gap-2 ${className} ${isInWatchlist ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-yellow-500 hover:bg-yellow-600'}`}
       onClick={toggleWatchlist}
     >
       {isInWatchlist ? (

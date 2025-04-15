@@ -3,6 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Index from './pages/Index';
 import MovieDetails from './pages/MovieDetails';
+import TvShowDetails from './pages/TvShowDetails';
 import Trailers from './pages/Trailers';
 import FreeMovies from './pages/FreeMovies';
 import Search from './pages/Search';
@@ -29,7 +30,7 @@ const App = () => {
           } />
           <Route path="/tv/:id" element={
             <AdminSettingsProvider>
-              <MovieDetails />
+              <TvShowDetails />
             </AdminSettingsProvider>
           } />
           <Route path="/trailers" element={<Trailers />} />

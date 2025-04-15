@@ -8,6 +8,7 @@ import { getTvShowById, MovieDetail, trackPageVisit } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import ShareButton from '@/components/movies/ShareButton';
+import WatchlistButton from '@/components/movies/WatchlistButton';
 
 type TvShowDetailType = MovieDetail;
 
@@ -160,8 +161,8 @@ const TvShowDetails = () => {
         <div className="container-custom -mt-40 relative z-20">
           <div className="glass-card overflow-hidden rounded-xl">
             <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
-              <div className="space-y-4">
-                <div className="relative">
+              <div className="space-y-2">
+                <div className="relative mb-2">
                   <div className="rounded-lg overflow-hidden shadow-xl">
                     {tvShow.poster_path ? (
                       <img
@@ -176,6 +177,7 @@ const TvShowDetails = () => {
                     )}
                   </div>
                 </div>
+                <WatchlistButton mediaId={tvShow.id} mediaType="tv" />
                 <ShareButton movieTitle={tvShow.name} />
               </div>
 
