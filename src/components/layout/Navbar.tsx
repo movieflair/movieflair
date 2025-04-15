@@ -16,8 +16,20 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 
 const Navbar = () => {
+  // Wrap all Router-related hooks in a try/catch to prevent app from crashing
+  // if Navbar is rendered outside of a Router context
+  let navigate = undefined;
+  try {
+    navigate = useNavigate();
+  } catch (error) {
+    console.error("Navigation context not available:", error);
+    // Provide a fallback for navigate
+    navigate = (path: string) => {
+      window.location.href = path;
+    };
+  }
+
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSignOut = async () => {
@@ -33,35 +45,47 @@ const Navbar = () => {
     return user.email.charAt(0).toUpperCase();
   };
 
+  // Conditional rendering for navigation links to ensure they work
+  // even if router context is missing
+  const NavLink = ({ to, className, children }: { to: string, className?: string, children: React.ReactNode }) => {
+    try {
+      // Try to use Link component first
+      return <Link to={to} className={className}>{children}</Link>;
+    } catch (error) {
+      // Fall back to regular anchor tag if Link fails
+      return <a href={to} className={className}>{children}</a>;
+    }
+  };
+
   return (
     <nav className="bg-black">
       <div className="container-custom flex items-center justify-between py-4">
-        <Link to="/" className="flex items-center text-xl font-semibold text-white">
+        <NavLink to="/" className="flex items-center text-xl font-semibold text-white">
           Movie<span className="text-theme-accent-red">Flair</span>
-        </Link>
+        </NavLink>
 
         <div className="flex items-center space-x-6">
-          <Link to="/genres" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+          <NavLink to="/genres" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <List className="w-5 h-5" />
             <span>Genres</span>
-          </Link>
+          </NavLink>
 
-          <Link to="/trailers" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+          <NavLink to="/trailers" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <Play className="w-5 h-5" />
             <span>Neue Trailer</span>
-          </Link>
+          </NavLink>
 
-          <Link to="/free-movies" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
+          <NavLink to="/free-movies" className="hidden md:flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <Gift className="w-5 h-5" />
             <span>Kostenlos</span>
-          </Link>
+          </NavLink>
 
-          <Link to="/quick-tipp">
+          <NavLink to="/quick-tipp">
             <Button variant="destructive" className="hidden md:flex items-center space-x-2">
               <PlayCircle className="w-5 h-5" />
               <span>Quick Tipps</span>
             </Button>
-          </Link>
+          </NavLink>
 
           {user ? (
             <DropdownMenu>

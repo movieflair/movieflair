@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
@@ -101,7 +100,6 @@ const MovieDetails = () => {
   
   const trailerUrl = getTrailerUrl();
 
-  // Prepare structured data for SEO
   const movieStructuredData = {
     "@context": "https://schema.org",
     "@type": "Movie",
@@ -112,7 +110,7 @@ const MovieDetails = () => {
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": movie.vote_average,
-      "ratingCount": movie.vote_count,
+      "ratingCount": movie.vote_count || 0,
       "bestRating": "10",
       "worstRating": "0"
     },
