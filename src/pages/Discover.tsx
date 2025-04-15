@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Command, CommandInput, CommandList, CommandEmpty } from '@/components/ui/command';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Search, Film, Compass, Sparkles } from 'lucide-react';
+import { Compass, Film, Sparkles, Shuffle } from 'lucide-react';
 import FilterSelector from '@/components/filter/FilterSelector';
 import RecommendationCard from '@/components/movies/RecommendationCard';
 import { 
@@ -37,6 +38,7 @@ const Discover = () => {
   const [recommendation, setRecommendation] = useState<MovieDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  const [genres, setGenres] = useState<Genre[]>([]);
 
   useEffect(() => {
     // Fetch genres when component mounts
