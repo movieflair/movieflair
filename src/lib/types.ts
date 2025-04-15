@@ -1,4 +1,3 @@
-
 export interface Genre {
   id: number;
   name: string;
@@ -56,7 +55,6 @@ export interface FilterOptions {
   genres?: number[];
   decades?: string[];
   moods?: string[];
-  mediaType?: 'movie' | 'tv' | 'all';
   rating?: number;
 }
 

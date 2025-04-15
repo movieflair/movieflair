@@ -43,7 +43,7 @@ const HomeFilterBox = () => {
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [selectedDecades, setSelectedDecades] = useState<string[]>([]);
-  const [mediaType, setMediaType] = useState<'movie' | 'tv' | 'all'>('movie');
+  const mediaType = 'movie';
   const [rating, setRating] = useState<number>(5);
   const [recommendation, setRecommendation] = useState<MovieOrShow | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +51,6 @@ const HomeFilterBox = () => {
     moods: string[];
     genres: number[];
     decades: string[];
-    mediaType: 'movie' | 'tv' | 'all';
     rating: number;
   } | null>(null);
 
@@ -90,7 +89,7 @@ const HomeFilterBox = () => {
     setIsLoading(true);
     
     try {
-      const results = await getRecommendationByFilters(lastUsedFilter);
+      const results = await getRecommendationByFilters({...lastUsedFilter, mediaType});
       
       if (results.length === 0) {
         toast.error('Keine weiteren passenden Filme gefunden.');
@@ -123,11 +122,6 @@ const HomeFilterBox = () => {
       </div>
       
       <div className="space-y-6">
-        <MediaTypeSelector 
-          value={mediaType} 
-          onChange={(value) => setMediaType(value)} 
-        />
-
         <div className="space-y-3">
           <label className="block text-sm font-medium text-theme-black">Welche Stimmung suchst du?</label>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">

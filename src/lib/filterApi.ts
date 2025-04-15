@@ -1,4 +1,3 @@
-
 import { Genre, MovieOrShow, FilterOptions } from './types';
 import { callTMDB } from './apiUtils';
 
@@ -22,19 +21,8 @@ export const getGenres = async (): Promise<Genre[]> => {
 };
 
 export const getRecommendationByFilters = async (filters: FilterOptions): Promise<MovieOrShow[]> => {
-  const { genres, decades, moods, mediaType = 'movie', rating = 0 } = filters;
+  const { genres, decades, moods, rating = 0 } = filters;
   
-  // Handle 'all' mediaType by performing both movie and TV searches
-  if (mediaType === 'all') {
-    const movieResults = await fetchMediaByType({ ...filters, mediaType: 'movie' });
-    const tvResults = await fetchMediaByType({ ...filters, mediaType: 'tv' });
-    
-    // Combine and shuffle results to provide a mix of movies and shows
-    const combinedResults = [...movieResults, ...tvResults];
-    return shuffleArray(combinedResults);
-  }
-  
-  // Otherwise fetch just the requested media type
   return fetchMediaByType(filters);
 };
 
@@ -50,9 +38,9 @@ const shuffleArray = (array: MovieOrShow[]): MovieOrShow[] => {
 
 // Helper function to fetch either movies or TV shows based on filters
 const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> => {
-  const { genres, decades, moods, mediaType = 'movie', rating = 0 } = filters;
+  const { genres, decades, moods, rating = 0 } = filters;
   
-  const endpoint = mediaType === 'tv' ? '/discover/tv' : '/discover/movie';
+  const endpoint = '/discover/movie';
   
   let params: Record<string, string> = {
     sort_by: 'popularity.desc',
@@ -87,17 +75,11 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
     const decade = parseInt(decades[0]);
     
     // Use the right date parameters based on media type
-    if (mediaType === 'movie') {
-      params.primary_release_date_gte = `${decade}-01-01`;
-      params.primary_release_date_lte = `${decade + 9}-12-31`;
-    } else {
-      // For TV shows, use first_air_date parameters
-      params.first_air_date_gte = `${decade}-01-01`;
-      params.first_air_date_lte = `${decade + 9}-12-31`;
-    }
+    params.primary_release_date_gte = `${decade}-01-01`;
+    params.primary_release_date_lte = `${decade + 9}-12-31`;
     
     // Add console log for debugging
-    console.log(`Filtering by decade: ${decade}s, Media type: ${mediaType}`);
+    console.log(`Filtering by decade: ${decade}s, Media type: movie`);
   }
   
   if (rating > 0) {
@@ -115,7 +97,7 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
     .filter((item: any) => item.poster_path && item.overview && item.overview.trim() !== '')
     .map((item: any) => ({
       ...item,
-      media_type: mediaType === 'movie' ? 'movie' : 'tv',
+      media_type: 'movie',
     }));
     
   console.log(`Returning ${filteredResults.length} filtered results`);
