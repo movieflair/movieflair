@@ -71,16 +71,18 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
     params.with_genres = uniqueGenres.join(',');
   }
   
-  // Improve decade filtering - ensure it's properly applied for both movies and TV shows
+  // Improved decade filtering with exact year ranges
   if (decades && decades.length > 0) {
     const decade = parseInt(decades[0]);
+    const startYear = decade;
+    const endYear = decade + 9;
     
-    // Use the right date parameters based on media type
-    params.primary_release_date_gte = `${decade}-01-01`;
-    params.primary_release_date_lte = `${decade + 9}-12-31`;
+    // Use the exact decade range parameters
+    params.primary_release_date_gte = `${startYear}-01-01`;
+    params.primary_release_date_lte = `${endYear}-12-31`;
     
     // Add console log for debugging
-    console.log(`Filtering by decade: ${decade}s, Media type: movie`);
+    console.log(`Filtering by decade: ${startYear}-${endYear}, Media type: movie`);
   }
   
   if (rating > 0) {

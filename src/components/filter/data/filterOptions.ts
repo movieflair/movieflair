@@ -29,4 +29,22 @@ export const moods = [
   'herzerwärmend'
 ];
 
-export const decades = ['2020', '2010', '2000', '1990', '1980', '1970'];
+export const decades = [
+  '2020', // 2020-2029
+  '2010', // 2010-2019
+  '2000', // 2000-2009
+  '1990', // 1990-1999
+  '1980', // 1980-1989
+  '1970'  // 1970-1979
+];
+
+// Diese Übersetzungstabelle für die Jahrzehnte ist optional und kann verwendet werden, 
+// wenn eine benutzerfreundlichere Anzeige gewünscht wird
+export const decadeRanges = {
+  '1970': '1970er (1970-1979)',
+  '1980': '1980er (1980-1989)',
+  '1990': '1990er (1990-1999)',
+  '2000': '2000er (2000-2009)',
+  '2010': '2010er (2010-2019)',
+  '2020': '2020er (2020-2029)'
+};
