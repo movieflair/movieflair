@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { parseUrlSlug } from '@/lib/urlUtils';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play, Video } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
@@ -13,7 +13,7 @@ import WatchlistButton from '@/components/movies/WatchlistButton';
 type TvShowDetailType = MovieDetail;
 
 const TvShowDetails = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id: string, slug?: string }>();
   const [tvShow, setTvShow] = useState<TvShowDetailType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
@@ -26,9 +26,17 @@ const TvShowDetails = () => {
     const fetchTvShow = async () => {
       if (!id) return;
       
+      // Parse the ID from the slug if necessary
+      const parsedId = slug ? parseUrlSlug(id).id : parseInt(id);
+      
+      if (!parsedId) {
+        console.error('Invalid TV show ID');
+        return;
+      }
+
       try {
         setIsLoading(true);
-        const data = await getTvShowById(parseInt(id));
+        const data = await getTvShowById(parsedId);
         
         const savedShows = localStorage.getItem('adminShows');
         if (savedShows) {
@@ -51,7 +59,7 @@ const TvShowDetails = () => {
     };
 
     fetchTvShow();
-  }, [id]);
+  }, [id, slug]);
 
   // Bestimme die richtige Trailer-URL
   const getTrailerUrl = () => {

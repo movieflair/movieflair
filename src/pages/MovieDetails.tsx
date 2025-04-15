@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { parseUrlSlug } from '@/lib/urlUtils';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
@@ -13,7 +14,7 @@ import WatchlistButton from '@/components/movies/WatchlistButton';
 import SEOHead from '@/components/seo/SEOHead';
 
 const MovieDetails = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id: string, slug?: string }>();
   const [movie, setMovie] = useState<MovieDetailType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
@@ -25,11 +26,19 @@ const MovieDetails = () => {
     
     const fetchMovie = async () => {
       if (!id) return;
+      
+      const parsedId = slug ? parseUrlSlug(id).id : parseInt(id);
+      
+      if (!parsedId) {
+        console.error('Invalid movie ID');
+        return;
+      }
+
       try {
         setIsLoading(true);
         const [movieData, similars] = await Promise.all([
-          getMovieById(parseInt(id)),
-          getSimilarMovies(parseInt(id))
+          getMovieById(parsedId),
+          getSimilarMovies(parsedId)
         ]);
         
         setMovie(movieData);
@@ -42,7 +51,7 @@ const MovieDetails = () => {
     };
 
     fetchMovie();
-  }, [id]);
+  }, [id, slug]);
 
   if (isLoading || !movie) {
     return (
