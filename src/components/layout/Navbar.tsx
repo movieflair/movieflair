@@ -52,12 +52,12 @@ const Navbar = () => {
 
   return (
     <nav className="bg-gray-900 sticky top-0 z-50">
-      <div className="container-custom flex items-center justify-between py-4">
+      <div className="container-custom flex items-center justify-between py-4 pl-4 pr-4 md:pl-8 md:pr-8">
         <NavLink to="/" className="flex items-center text-xl font-semibold text-white">
           <img 
             src="/lovable-uploads/26151e5a-66d8-4a56-ad10-e034335711e1.png" 
             alt="MovieFlair Logo" 
-            className="h-12 w-auto mr-2" // Increased height from h-8 to h-12
+            className="h-12 w-auto mr-2" 
           />
         </NavLink>
 
