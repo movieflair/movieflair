@@ -1,9 +1,20 @@
+
+import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
-import FeaturedMovies from '@/components/movies/FeaturedMovies';
 import SEOHead from '@/components/seo/SEOHead';
+import { getRandomCustomLists, CustomList } from '@/lib/api';
+import CustomListCarousel from '@/components/movies/CustomListCarousel';
 
 const Index = () => {
+  const [customLists, setCustomLists] = useState<CustomList[]>([]);
+
+  useEffect(() => {
+    // Benutzerdefinierte Listen abrufen
+    const lists = getRandomCustomLists(2);
+    setCustomLists(lists);
+  }, []);
+
   // Prepare structured data for the homepage
   const websiteStructuredData = {
     "@context": "https://schema.org",
@@ -42,13 +53,17 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Movies Section */}
-      <section className="py-20">
-        <div className="container-custom">
-          <h2 className="text-2xl font-semibold mb-8">Unsere Empfehlungen</h2>
-          <FeaturedMovies />
-        </div>
-      </section>
+      {/* Custom Lists Section */}
+      {customLists.length > 0 && (
+        <section className="py-20">
+          <div className="container-custom">
+            <h2 className="text-2xl font-semibold mb-8">Unsere Empfehlungen</h2>
+            {customLists.map(list => (
+              <CustomListCarousel key={list.id} list={list} />
+            ))}
+          </div>
+        </section>
+      )}
     </MainLayout>
   );
 };

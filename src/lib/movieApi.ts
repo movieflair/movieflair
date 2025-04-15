@@ -1,4 +1,3 @@
-
 import { MovieOrShow, MovieDetail } from './types';
 import { callTMDB, getAdminMovieSettings } from './apiUtils';
 
@@ -128,3 +127,8 @@ export const getSimilarMovies = async (movieId: number): Promise<MovieOrShow[]> 
   });
 };
 
+export const getRandomMovie = async (): Promise<MovieOrShow> => {
+  const movies = await getPopularMovies();
+  const randomIndex = Math.floor(Math.random() * movies.length);
+  return movies[randomIndex];
+};

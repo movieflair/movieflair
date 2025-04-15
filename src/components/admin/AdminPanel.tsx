@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Search, FileEdit, Film, Pencil, Tv } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,6 +21,7 @@ import AdminVisitorStats from './AdminVisitorStats';
 import AdminContentTabs from './AdminContentTabs';
 import MovieEditForm from './MovieEditForm';
 import TvShowEditForm from './TvShowEditForm';
+import CustomListManager from './CustomListManager';
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('movies');

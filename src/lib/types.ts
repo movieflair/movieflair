@@ -66,3 +66,11 @@ export interface VisitorStat {
   page: string;
 }
 
+export interface CustomList {
+  id: string;
+  title: string;
+  description: string;
+  movies: MovieOrShow[];
+  createdAt: string;
+  updatedAt: string;
+}

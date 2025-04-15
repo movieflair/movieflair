@@ -6,7 +6,9 @@ import {
   getGenres, 
   getPopularMovies,
   MovieOrShow,
-  getRecommendationByFilters 
+  getRecommendationByFilters, 
+  getRandomCustomLists,
+  CustomList
 } from '@/lib/api';
 
 import SearchSection from '@/components/discover/SearchSection';
@@ -21,6 +23,7 @@ const Discover = () => {
   const [romanceMovies, setRomanceMovies] = useState<MovieOrShow[]>([]);
   const [actionMovies, setActionMovies] = useState<MovieOrShow[]>([]);
   const [documentaryMovies, setDocumentaryMovies] = useState<MovieOrShow[]>([]);
+  const [customLists, setCustomLists] = useState<CustomList[]>([]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -41,6 +44,10 @@ const Discover = () => {
         setRomanceMovies(romance.slice(0, 4));
         setActionMovies(action.slice(0, 4));
         setDocumentaryMovies(documentary.slice(0, 4));
+        
+        // Benutzerdefinierte Listen abrufen
+        const customListsData = getRandomCustomLists();
+        setCustomLists(customListsData);
       } catch (error) {
         console.error('Error fetching initial data:', error);
       }
@@ -61,6 +68,7 @@ const Discover = () => {
             romanceMovies={romanceMovies}
             actionMovies={actionMovies}
             documentaryMovies={documentaryMovies}
+            customLists={customLists}
           />
         </div>
       </div>

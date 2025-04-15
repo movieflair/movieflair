@@ -4,4 +4,4 @@ export * from './movieApi';
 export * from './tvShowApi';
 export * from './filterApi';
 export * from './analyticsApi';
-
+export * from './customListApi';
