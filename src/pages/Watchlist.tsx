@@ -54,7 +54,7 @@ const Watchlist = () => {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+                  'Authorization': `Bearer ${supabase.auth.getSession().then(res => res.data.session?.access_token)}`,
                 },
                 body: JSON.stringify({
                   path: `/${item.media_type}/${item.media_id}`,
@@ -106,7 +106,7 @@ const Watchlist = () => {
     <EnhancedLayout>
       <div className="container-custom py-12">
         <div className="flex items-center mb-8">
-          <Bookmark className="w-6 h-6 text-yellow-500 mr-2" />
+          <Bookmark className="w-6 h-6 text-[#ff3131] mr-2" />
           <h1 className="text-3xl font-semibold">Merkliste</h1>
         </div>
         
@@ -125,7 +125,7 @@ const Watchlist = () => {
             <p className="text-muted-foreground">Deine Merkliste ist noch leer.</p>
             <button 
               onClick={() => navigate('/')}
-              className="mt-4 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
+              className="mt-4 px-4 py-2 bg-[#ff3131] text-white rounded-md hover:bg-[#ff3131]/90 transition-colors"
             >
               Filme entdecken
             </button>
