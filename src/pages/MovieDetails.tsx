@@ -7,14 +7,14 @@ import { getMovieById, getSimilarMovies, trackPageVisit } from '@/lib/api';
 import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/api';
 import MovieMeta from '@/components/movies/MovieMeta';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
-import ShareButton from '@/components/movies/ShareButton';
 import SimilarMovies from '@/components/movies/SimilarMovies';
-import WatchlistButton from '@/components/movies/WatchlistButton';
 import SEOHead from '@/components/seo/SEOHead';
 import MovieHeader from '@/components/movies/MovieHeader';
 import MovieStreamButtons from '@/components/movies/MovieStreamButtons';
 import MovieTrailerDialog from '@/components/movies/MovieTrailerDialog';
 import MovieBackdrop from '@/components/movies/MovieBackdrop';
+import MoviePoster from '@/components/movies/MoviePoster';
+import MovieStructuredData from '@/components/movies/MovieStructuredData';
 
 const MovieDetails = () => {
   const { id, slug } = useParams<{ id: string, slug?: string }>();
@@ -93,7 +93,7 @@ const MovieDetails = () => {
       }
     }
     
-    if (isEmbedUrl && movie?.streamUrl) {
+    if (movie?.streamUrl) {
       return movie.streamUrl;
     }
     
@@ -103,38 +103,14 @@ const MovieDetails = () => {
   const handleStreamClick = () => {
     if (!movie?.streamUrl) return;
     
-    if (isEmbedUrl) {
+    if (movie?.streamUrl.includes('embed')) {
       setShowTrailer(true);
     } else {
       window.open(movie.streamUrl, '_blank');
     }
   };
 
-  const movieStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "Movie",
-    "name": movie.title,
-    "description": movie.overview,
-    "image": movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : undefined,
-    "datePublished": movie.release_date,
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": movie.vote_average,
-      "ratingCount": movie.vote_count || 0,
-      "bestRating": "10",
-      "worstRating": "0"
-    },
-    "director": director ? {
-      "@type": "Person",
-      "name": director.name
-    } : undefined,
-    "actor": movie.cast?.slice(0, 5).map(actor => ({
-      "@type": "Person",
-      "name": actor.name
-    })),
-    "genre": movie.genres?.map(genre => genre.name),
-    "duration": movie.runtime ? `PT${String(movie.runtime)}M` : undefined
-  };
+  const trailerUrl = getTrailerUrl();
 
   return (
     <MainLayout>
@@ -143,8 +119,8 @@ const MovieDetails = () => {
         description={seoDescription}
         ogType="movie"
         ogImage={movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : undefined}
-        structuredData={movieStructuredData}
       />
+      <MovieStructuredData movie={movie} director={director} />
 
       <div className="min-h-screen bg-white">
         <MovieBackdrop backdropPath={movie.backdrop_path} title={movie.title} />
@@ -152,25 +128,11 @@ const MovieDetails = () => {
         <div className="container-custom -mt-40 relative z-20">
           <div className="glass-card overflow-hidden rounded-xl">
             <div className="grid md:grid-cols-[300px,1fr] gap-8 p-8">
-              <div className="space-y-2">
-                <div className="relative mb-2">
-                  <div className="rounded-lg overflow-hidden shadow-xl">
-                    {movie.poster_path ? (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                        alt={movie.title}
-                        className="w-full"
-                      />
-                    ) : (
-                      <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">
-                        <span className="text-gray-400">Kein Poster</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <WatchlistButton mediaId={movie.id} mediaType="movie" />
-                <ShareButton movieTitle={movie.title} />
-              </div>
+              <MoviePoster 
+                id={movie.id} 
+                title={movie.title} 
+                posterPath={movie.poster_path}
+              />
 
               <div className="text-gray-800">
                 <MovieHeader 
