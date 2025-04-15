@@ -1,3 +1,4 @@
+
 import { Genre, MovieOrShow, FilterOptions } from './types';
 import { callTMDB } from './apiUtils';
 
@@ -38,8 +39,9 @@ const shuffleArray = (array: MovieOrShow[]): MovieOrShow[] => {
 
 // Helper function to fetch either movies or TV shows based on filters
 const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> => {
-  const { genres, decades, moods, rating = 0 } = filters;
+  const { genres, decades, moods, rating = 0, mediaType = 'movie' } = filters;
   
+  // Always use movie endpoint since we only support movies now
   const endpoint = '/discover/movie';
   
   let params: Record<string, string> = {
