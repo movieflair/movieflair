@@ -3,9 +3,13 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
 
-const PrimeVideoAd = () => {
+interface PrimeVideoAdProps {
+  className?: string;
+}
+
+const PrimeVideoAd = ({ className = '' }: PrimeVideoAdProps) => {
   return (
-    <div className="mt-8 w-full">
+    <div className={`w-full ${className}`}>
       <a 
         href="https://www.amazon.de/gp/video/primesignup?tag=moovala0d-21" 
         target="_blank" 

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
@@ -47,7 +48,7 @@ Wir finden ihn für dich!</h1>
             <p className="text-lg md:text-xl text-gray-600 mb-6 font-thin">Entdecke Filmempfehlungen, die zu deinem Tag, deiner Laune, deinem Leben passen.</p>
           </div>
           <HomeFilterBox />
-          <PrimeVideoAd />
+          <PrimeVideoAd className="mt-8" /> {/* Reduced top margin */}
         </div>
       </section>
 
