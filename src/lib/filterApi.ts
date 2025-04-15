@@ -22,8 +22,7 @@ export const getGenres = async (): Promise<Genre[]> => {
 };
 
 export const getRecommendationByFilters = async (filters: FilterOptions): Promise<MovieOrShow[]> => {
-  const { genres, decades, moods, rating = 0 } = filters;
-  
+  console.log('Filter options received:', filters);
   return fetchMediaByType(filters);
 };
 
@@ -50,26 +49,26 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
   };
   
   // Genres zusammenstellen (direkt ausgewählte und aus Moods abgeleitete)
-  let genresToInclude: number[] = [];
+  const genresToInclude: number[] = [];
   
   // Direkt ausgewählte Genres
   if (genres && genres.length > 0) {
-    genresToInclude = [...genresToInclude, ...genres];
+    genresToInclude.push(...genres);
   }
   
   // Genres basierend auf ausgewählten Stimmungen hinzufügen
   if (moods && moods.length > 0) {
     moods.forEach(mood => {
       const moodGenres = moodToGenres[mood] || [];
-      genresToInclude = [...genresToInclude, ...moodGenres];
+      genresToInclude.push(...moodGenres);
     });
   }
   
   // Doppelte Genres entfernen
-  genresToInclude = [...new Set(genresToInclude)];
+  const uniqueGenres = [...new Set(genresToInclude)];
   
-  if (genresToInclude.length > 0) {
-    params.with_genres = genresToInclude.join(',');
+  if (uniqueGenres.length > 0) {
+    params.with_genres = uniqueGenres.join(',');
   }
   
   // Improve decade filtering - ensure it's properly applied for both movies and TV shows
@@ -85,7 +84,7 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
   }
   
   if (rating > 0) {
-    params.vote_average_gte = rating.toString();
+    params['vote_average.gte'] = rating.toString();
   }
   
   // Log the API call parameters for debugging

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Search, Sparkles } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -5,7 +6,8 @@ import FilterSelector from './FilterSelector';
 import MediaTypeSelector from './filters/MediaTypeSelector';
 import RatingSelector from './filters/RatingSelector';
 import FilterRecommendation from './recommendation/FilterRecommendation';
-import { MovieOrShow, getRecommendationByFilters } from '@/lib/api';
+import { getRecommendationByFilters } from '@/lib/filterApi';
+import { MovieOrShow } from '@/lib/types';
 import { toast } from 'sonner';
 import { Genre } from '@/lib/types';
 
@@ -56,6 +58,11 @@ const HomeFilterBox = () => {
   } | null>(null);
 
   const handleSearch = async () => {
+    if (selectedMoods.length === 0 && selectedGenres.length === 0 && selectedDecades.length === 0) {
+      toast.warning('Bitte wähle mindestens einen Filter aus (Stimmung, Genre oder Jahrzehnt)');
+      return;
+    }
+    
     setIsLoading(true);
     const currentFilter = {
       moods: selectedMoods,
@@ -76,6 +83,7 @@ const HomeFilterBox = () => {
       } else {
         const randomIndex = Math.floor(Math.random() * results.length);
         setRecommendation(results[randomIndex]);
+        console.log('Selected recommendation:', results[randomIndex]);
       }
     } catch (error) {
       console.error('Error getting recommendation:', error);
