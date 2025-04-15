@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Search, Sparkles } from 'lucide-react';
+import { Search, Sparkles, RefreshCcw } from 'lucide-react';
 import { Button } from '../ui/button';
 import FilterSelector from './FilterSelector';
 import MediaTypeSelector from './filters/MediaTypeSelector';
