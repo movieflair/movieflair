@@ -17,8 +17,7 @@ const FreeMovies = () => {
       try {
         setIsLoading(true);
         const data = await getFreeMovies();
-        // Limit to max 4 movies per row
-        setMovies(data.slice(0, 4));
+        setMovies(data);
       } catch (error) {
         console.error('Error fetching free movies:', error);
       } finally {
@@ -56,9 +55,7 @@ const FreeMovies = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {movies.map((movie) => (
-              <div key={movie.id} className="aspect-[2/3]">
-                <MovieCard movie={movie} />
-              </div>
+              <MovieCard key={movie.id} movie={movie} />
             ))}
           </div>
         )}

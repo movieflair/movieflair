@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Search, FileEdit, Film, Pencil, Tv } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -190,9 +191,9 @@ const AdminPanel = () => {
     
     const updatedMovie = {
       ...selectedMovie,
-      hasStream: isFreeMovie, // Set hasStream based on isFreeMovie
+      hasStream: isFreeMovie, // Associate hasStream with isFreeMovie
       streamUrl: isFreeMovie ? streamUrl : '',
-      hasTrailer: isNewTrailer, // Set hasTrailer based on isNewTrailer
+      hasTrailer: isNewTrailer, // Associate hasTrailer with isNewTrailer
       trailerUrl: isNewTrailer ? trailerUrl : '',
       isFreeMovie,
       isNewTrailer

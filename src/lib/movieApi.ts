@@ -1,3 +1,4 @@
+
 import { MovieOrShow, MovieDetail } from './types';
 import { callTMDB, getAdminMovieSettings } from './apiUtils';
 
@@ -59,6 +60,7 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     };
   });
   
+  // Filter movies where isNewTrailer is true
   return movies.filter(movie => movie.isNewTrailer === true);
 };
 
@@ -80,6 +82,7 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
     };
   });
   
+  // Filter movies where isFreeMovie is true
   return movies.filter(movie => movie.isFreeMovie === true);
 };
 

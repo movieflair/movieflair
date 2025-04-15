@@ -1,9 +1,8 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { MovieOrShow } from "@/lib/api";
+import { MovieOrShow } from "@/lib/types";
 import { LinkIcon, PlayCircle } from "lucide-react";
 import MovieCategories from "./MovieCategories";
 
