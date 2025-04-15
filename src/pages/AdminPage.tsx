@@ -8,10 +8,12 @@ import { AdminSettingsProvider } from '@/hooks/useAdminSettings';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 const queryClient = new QueryClient();
 
 const AdminPage = () => {
+  const { user, loading: authLoading } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -19,12 +21,12 @@ const AdminPage = () => {
   useEffect(() => {
     trackPageVisit('admin');
     checkAdminAccess();
-  }, []);
+  }, [user]);
 
   const checkAdminAccess = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
+    if (authLoading) return;
+
+    if (!user) {
       setIsLoading(false);
       setIsLoggedIn(false);
       toast.error("Bitte melde dich an, um fortzufahren");
@@ -35,7 +37,7 @@ const AdminPage = () => {
     const { data, error } = await supabase.rpc(
       'has_role',
       { 
-        _user_id: session.user.id,
+        _user_id: user.id,
         _role: 'admin'
       }
     );
@@ -61,7 +63,7 @@ const AdminPage = () => {
     setIsLoading(false);
   };
 
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <MainLayout>
         <div className="container-custom py-12">
