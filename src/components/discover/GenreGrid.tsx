@@ -2,7 +2,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Genre } from '@/lib/api';
-import { getRecommendationByFilters } from '@/lib/filterApi';
 
 interface GenreGridProps {
   genres: Genre[];
@@ -11,25 +10,14 @@ interface GenreGridProps {
 const GenreGrid = ({ genres }: GenreGridProps) => {
   const navigate = useNavigate();
 
-  const handleGenreClick = async (genreId: number, genreName: string) => {
-    try {
-      // Get movies for this genre directly and pass to the Genres page state
-      const results = await getRecommendationByFilters({
-        genres: [genreId],
-        mediaType: 'movie'
-      });
-      
-      // Navigate to Genres page with pre-selected genre
-      navigate('/discover', { 
-        state: { 
-          selectedGenre: genreId,
-          genreName: genreName,
-          preloadedMovies: results
-        } 
-      });
-    } catch (error) {
-      console.error('Error fetching genre content:', error);
-    }
+  const handleGenreClick = (genreId: number, genreName: string) => {
+    // Navigate directly to the genres page with the selected genre
+    navigate('/genres', { 
+      state: { 
+        selectedGenre: genreId,
+        genreName: genreName
+      } 
+    });
   };
 
   return (

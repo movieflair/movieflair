@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Film, Check, Save, X, Tv, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -42,14 +41,10 @@ const CustomListManager = () => {
   useEffect(() => {
     if (searchType === 'movie' && movieResults.length > 0) {
       setSearchResults(movieResults);
-    }
-  }, [movieResults, searchType]);
-
-  useEffect(() => {
-    if (searchType === 'tv' && tvResults.length > 0) {
+    } else if (searchType === 'tv' && tvResults.length > 0) {
       setSearchResults(tvResults);
     }
-  }, [tvResults, searchType]);
+  }, [movieResults, tvResults, searchType]);
 
   const loadLists = () => {
     const customLists = getCustomLists();
@@ -186,7 +181,6 @@ const CustomListManager = () => {
       </div>
 
       <div className="grid grid-cols-[250px,1fr] divide-x">
-        {/* Listenübersicht */}
         <div className="p-4 space-y-2 max-h-[600px] overflow-y-auto">
           {lists.length > 0 ? (
             lists.map(list => (
@@ -306,8 +300,6 @@ const CustomListManager = () => {
             </div>
           )}
 
-          {/* Listendetails und Suchfunktion */}
-          
           {selectedList ? (
             <div className="space-y-6">
               <div className="flex justify-between items-start">
@@ -426,7 +418,6 @@ const CustomListManager = () => {
         </div>
       </div>
 
-      {/* Dialog zum Erstellen einer neuen Liste */}
       <Dialog open={isCreatingList} onOpenChange={setIsCreatingList}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

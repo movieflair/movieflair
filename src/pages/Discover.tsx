@@ -6,7 +6,7 @@ import {
   getGenres, 
   getPopularMovies,
   MovieOrShow,
-  getRandomCustomLists,
+  getCustomLists,
   CustomList
 } from '@/lib/api';
 
@@ -33,10 +33,10 @@ const Discover = () => {
         setGenres(genresList);
         setPopularMovies(movies.slice(0, 4));
         
-        // Benutzerdefinierte Listen abrufen
-        const customListsData = getRandomCustomLists();
-        console.log('Geladene benutzerdefinierte Listen:', customListsData);
-        setCustomLists(customListsData);
+        // Get custom lists from user
+        const userCustomLists = getCustomLists();
+        console.log('Geladene benutzerdefinierte Listen:', userCustomLists);
+        setCustomLists(userCustomLists);
       } catch (error) {
         console.error('Error fetching initial data:', error);
         toast.error('Fehler beim Laden der Daten');
