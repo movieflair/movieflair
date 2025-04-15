@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
-import AdminLogin from '@/components/admin/AdminLogin';
+// Removed AdminLogin import
 import AdminPanel from '@/components/admin/AdminPanel';
 import { trackPageVisit } from '@/lib/api';
 import { AdminSettingsProvider } from '@/hooks/useAdminSettings';
