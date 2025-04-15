@@ -12,6 +12,7 @@ import QuickTipp from './pages/QuickTipp';
 import Watchlist from './pages/Watchlist';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
+import About from './pages/About';
 import { AdminSettingsProvider } from './hooks/useAdminSettings';
 import AdminPage from './pages/AdminPage';
 import { AuthProvider } from './context/AuthContext';
@@ -70,6 +71,7 @@ const App = () => {
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/about" element={<About />} />
         </Routes>
         <Toaster />
       </AuthProvider>

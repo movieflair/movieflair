@@ -74,6 +74,11 @@ const Footer = () => {
                   Quick Tipp
                 </Link>
               </li>
+              <li>
+                <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+                  About
+                </Link>
+              </li>
               {isAdmin && (
                 <li>
                   <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
