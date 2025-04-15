@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import Index from './pages/Index';
 import MovieDetails from './pages/MovieDetails';
@@ -46,6 +46,13 @@ const TermsOfService = () => (
   </EnhancedLayout>
 );
 
+// Create a wrapper component for the movie redirect
+const MovieRedirect = () => {
+  const location = useLocation();
+  const id = location.pathname.split('/').pop();
+  return <Navigate to={`/film/${id}`} replace />;
+};
+
 const App = () => {
   return (
     <HelmetProvider>
@@ -58,11 +65,8 @@ const App = () => {
                 <MovieDetails />
               </AdminSettingsProvider>
             } />
-            {/* Add redirect for /movie/:id to /film/:id */}
-            <Route path="/movie/:id" element={<Navigate to={(location) => {
-              const id = location.pathname.split('/').pop();
-              return `/film/${id}`;
-            }} />} />
+            {/* Add redirect for /movie/:id to /film/:id using the wrapper component */}
+            <Route path="/movie/:id" element={<MovieRedirect />} />
             <Route path="/serie/:id/:slug?" element={
               <AdminSettingsProvider>
                 <TvShowDetails />
