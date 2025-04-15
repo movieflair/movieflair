@@ -21,7 +21,7 @@ const RatingSelector = ({ value, onChange }: RatingSelectorProps) => {
         max={10}
         step={1}
         onValueChange={(values) => onChange(values[0])}
-        className="py-4 [&_[role=slider]]:bg-white [&_[role=slider]]:border-[#ea384c] [&_[role=slider]]:border-2 [&_[data-orientation=horizontal]>.slider-track]:bg-white [&_[data-orientation=horizontal]>.slider-range]:bg-[#ea384c]"
+        className="py-4 [&_[role=slider]]:bg-white [&_[role=slider]]:border-[#EE3B3B] [&_[role=slider]]:border-2 [&_[data-orientation=horizontal]>.slider-track]:bg-white [&_[data-orientation=horizontal]>.slider-range]:bg-[#EE3B3B]"
       />
     </div>
   );

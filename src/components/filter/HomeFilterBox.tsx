@@ -138,7 +138,7 @@ const HomeFilterBox = () => {
                 variant={selectedMoods.includes(mood) ? "default" : "outline"}
                 className={`${
                   selectedMoods.includes(mood)
-                    ? "bg-[#ea384c] hover:bg-[#ea384c]/90 text-white"
+                    ? "bg-[#EE3B3B] hover:bg-[#EE3B3B]/90 text-white"
                     : "hover:bg-gray-700/50 text-gray-800 border border-gray-600 bg-gray-200"
                 } transition-all font-medium`}
                 onClick={() => {

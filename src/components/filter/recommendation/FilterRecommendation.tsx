@@ -78,7 +78,7 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
             <div className="flex items-center gap-4">
               <Button 
                 onClick={() => window.location.href = getDetailPath()}
-                className="w-full md:w-auto bg-[#ea384c] hover:bg-[#ea384c]/90 text-white flex items-center"
+                className="w-full md:w-auto bg-[#EE3B3B] hover:bg-[#EE3B3B]/90 text-white flex items-center"
               >
                 Details ansehen
                 <ArrowRight className="ml-2 w-4 h-4" />

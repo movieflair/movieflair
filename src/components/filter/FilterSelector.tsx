@@ -74,7 +74,7 @@ const FilterSelector = ({
                   key={value.toString()}
                   onClick={() => handleSelect(value)}
                   className={`w-full text-left px-3 py-2 rounded-md hover:bg-gray-700 transition-colors ${
-                    isSelected ? 'bg-[#ea384c]/10 text-[#ea384c]' : 'text-gray-200'
+                    isSelected ? 'bg-[#EE3B3B]/10 text-[#EE3B3B]' : 'text-gray-200'
                   }`}
                   disabled={selectedValues.length >= maxSelections && !isSelected}
                 >

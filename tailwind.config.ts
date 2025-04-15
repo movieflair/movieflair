@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -69,8 +70,8 @@ export default {
           'accent-blue': '#EE3B3B',
           'accent-dark': '#1D1D1F',
           'accent-red': '#EE3B3B',
-          'black': '#252527',
-          'red': '#ff3131'
+          'black': '#1D1D1F',
+          'red': '#EE3B3B'
         }
       },
       borderRadius: {
