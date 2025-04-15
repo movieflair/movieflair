@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import FilterTag from './FilterTag';
-import { moodToGenres } from '@/lib/api';
-import { Genre } from '@/lib/api';
+import { decadeRanges } from './data/filterOptions';
+import { Genre } from '@/lib/types';
 
 interface FilterSelectorProps {
   title: string;
@@ -35,6 +35,8 @@ const FilterSelector = ({
     if (type === 'genre') {
       const genre = (options as Genre[]).find(g => g.id === value);
       return genre ? genre.name : '';
+    } else if (type === 'decade' && typeof value === 'string') {
+      return decadeRanges[value] || value.toString();
     }
     return value.toString();
   };
@@ -66,7 +68,13 @@ const FilterSelector = ({
           <div className="max-h-60 overflow-y-auto p-2">
             {options.map((option) => {
               const value = type === 'genre' ? (option as Genre).id : option;
-              const label = type === 'genre' ? (option as Genre).name : option.toString();
+              let label = type === 'genre' ? (option as Genre).name : option.toString();
+              
+              // Bei Jahrzehnten verwenden wir die benutzerfreundliche Anzeige
+              if (type === 'decade' && typeof value === 'string') {
+                label = decadeRanges[value] || value;
+              }
+              
               const isSelected = selectedValues.includes(value);
               
               return (
