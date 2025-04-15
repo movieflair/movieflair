@@ -10,7 +10,7 @@ const Index = () => {
   const [customLists, setCustomLists] = useState<CustomList[]>([]);
 
   useEffect(() => {
-    // Benutzerdefinierte Listen abrufen
+    // Benutzerdefinierte Listen abrufen (auf 2 beschränkt für die Startseite)
     const lists = getRandomCustomLists(2);
     setCustomLists(lists);
   }, []);

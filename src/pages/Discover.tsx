@@ -45,7 +45,7 @@ const Discover = () => {
         setActionMovies(action.slice(0, 4));
         setDocumentaryMovies(documentary.slice(0, 4));
         
-        // Benutzerdefinierte Listen abrufen
+        // Benutzerdefinierte Listen abrufen - hier rufen wir alle Listen ab (nicht auf 2 beschränkt)
         const customListsData = getRandomCustomLists();
         setCustomLists(customListsData);
       } catch (error) {
