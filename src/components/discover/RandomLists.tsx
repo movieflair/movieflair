@@ -19,6 +19,9 @@ const RandomLists = ({
   documentaryMovies,
   customLists 
 }: RandomListsProps) => {
+  // Nur Listen mit Filmen berücksichtigen
+  const listsWithMovies = customLists.filter(list => list.movies.length > 0);
+  
   return (
     <section className="mb-12">
       <div className="flex items-center gap-2 mb-6">
@@ -26,9 +29,9 @@ const RandomLists = ({
         <h2 className="text-2xl font-semibold">Zufällige Listen</h2>
       </div>
       
-      {customLists.length > 0 ? (
+      {listsWithMovies.length > 0 ? (
         <div>
-          {customLists.map((list) => (
+          {listsWithMovies.map((list) => (
             <CustomListCarousel key={list.id} list={list} />
           ))}
         </div>

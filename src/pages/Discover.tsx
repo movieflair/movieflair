@@ -15,6 +15,7 @@ import SearchSection from '@/components/discover/SearchSection';
 import GenreGrid from '@/components/discover/GenreGrid';
 import TrendingMovies from '@/components/discover/TrendingMovies';
 import RandomLists from '@/components/discover/RandomLists';
+import { toast } from 'sonner';
 
 const Discover = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
@@ -24,9 +25,11 @@ const Discover = () => {
   const [actionMovies, setActionMovies] = useState<MovieOrShow[]>([]);
   const [documentaryMovies, setDocumentaryMovies] = useState<MovieOrShow[]>([]);
   const [customLists, setCustomLists] = useState<CustomList[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchInitialData = async () => {
+      setIsLoading(true);
       try {
         const [genresList, movies] = await Promise.all([
           getGenres(),
@@ -45,11 +48,15 @@ const Discover = () => {
         setActionMovies(action.slice(0, 4));
         setDocumentaryMovies(documentary.slice(0, 4));
         
-        // Benutzerdefinierte Listen abrufen - hier rufen wir alle Listen ab (nicht auf 2 beschränkt)
+        // Benutzerdefinierte Listen abrufen
         const customListsData = getRandomCustomLists();
+        console.log('Geladene benutzerdefinierte Listen:', customListsData);
         setCustomLists(customListsData);
       } catch (error) {
         console.error('Error fetching initial data:', error);
+        toast.error('Fehler beim Laden der Daten');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -63,13 +70,20 @@ const Discover = () => {
           <SearchSection />
           <GenreGrid genres={genres} />
           <TrendingMovies movies={popularMovies} />
-          <RandomLists 
-            sciFiMovies={sciFiMovies}
-            romanceMovies={romanceMovies}
-            actionMovies={actionMovies}
-            documentaryMovies={documentaryMovies}
-            customLists={customLists}
-          />
+          {isLoading ? (
+            <div className="text-center py-10">
+              <div className="animate-spin h-8 w-8 border-t-2 border-primary rounded-full mx-auto"></div>
+              <p className="mt-2 text-muted-foreground">Lade Inhalte...</p>
+            </div>
+          ) : (
+            <RandomLists 
+              sciFiMovies={sciFiMovies}
+              romanceMovies={romanceMovies}
+              actionMovies={actionMovies}
+              documentaryMovies={documentaryMovies}
+              customLists={customLists}
+            />
+          )}
         </div>
       </div>
     </MainLayout>

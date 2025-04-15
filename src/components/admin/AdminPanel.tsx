@@ -285,6 +285,7 @@ const AdminPanel = () => {
       <Tabs defaultValue="content" className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="content">Inhalte</TabsTrigger>
+          <TabsTrigger value="custom-lists">Benutzerdefinierte Listen</TabsTrigger>
           <TabsTrigger value="stats">Feedback-Statistik</TabsTrigger>
           <TabsTrigger value="visitors">Besucherstatistik</TabsTrigger>
           <TabsTrigger value="settings">Einstellungen</TabsTrigger>
@@ -518,6 +519,10 @@ const AdminPanel = () => {
               )}
             </div>
           </div>
+        </TabsContent>
+        
+        <TabsContent value="custom-lists">
+          <CustomListManager />
         </TabsContent>
         
         <TabsContent value="stats">
