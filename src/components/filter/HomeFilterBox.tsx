@@ -1,16 +1,14 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import FilterSelector from './FilterSelector';
 import { Button } from '../ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { getGenres, getRecommendationByFilters, MovieOrShow } from '@/lib/api';
-import { Search, Film, Tv, Star, Sparkles, MonitorPlay } from 'lucide-react';
-import RecommendationCard from '../movies/RecommendationCard';
+import { Search, Film, Tv, Star, Sparkles, MonitorPlay, ArrowRight } from 'lucide-react';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
-import MovieRatingFeedback from '../movies/MovieRatingFeedback';
 import { Link } from 'react-router-dom';
+import MovieRatingFeedback from '../movies/MovieRatingFeedback';
 
 const moods = [
   'fröhlich',
@@ -221,12 +219,13 @@ const HomeFilterBox = () => {
                 {recommendation.release_date?.substring(0, 4) || recommendation.first_air_date?.substring(0, 4)}
               </p>
               <p className="text-sm mb-6">{recommendation.overview}</p>
-              <div className="space-y-4">
+              <div className="flex items-center gap-4">
                 <Button 
                   onClick={() => window.location.href = `/${recommendation.media_type}/${recommendation.id}`}
-                  className="w-full md:w-auto bg-[#ea384c] hover:bg-[#ea384c]/90 text-white"
+                  className="w-full md:w-auto bg-[#ea384c] hover:bg-[#ea384c]/90 text-white flex items-center"
                 >
                   Details ansehen
+                  <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
                 
                 {recommendation.id && <MovieRatingFeedback movieId={recommendation.id} />}
