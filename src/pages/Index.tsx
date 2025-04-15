@@ -45,7 +45,7 @@ Wir finden ihn für dich!</h1>
       {/* Custom Lists Section */}
       {customLists.length > 0 && <section className="py-20">
           <div className="container-custom">
-            <h2 className="text-2xl font-semibold mb-8 text-theme-black px-[20px]">Empfehlungen</h2>
+            <h2 className="text-2xl font-semibold mb-8 text-theme-black px-[20px]">Weitere Filmempfehlungen</h2>
             {customLists.map(list => <CustomListCarousel key={list.id} list={list} />)}
           </div>
         </section>}
