@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import FilterSelector from './FilterSelector';
 import { Button } from '../ui/button';
@@ -189,7 +190,7 @@ const HomeFilterBox = () => {
 
       {recommendation && (
         <div className="mt-8 animate-fade-in">
-          <h3 className="text-lg font-medium text-white mb-4">Deine Filmempfehlung</h3>
+          <h3 className="text-base font-medium text-white mb-4">Deine Filmempfehlung</h3>
           <div className="flex flex-col md:flex-row gap-6">
             {recommendation.poster_path ? (
               <Link 
@@ -214,15 +215,15 @@ const HomeFilterBox = () => {
               </div>
             )}
             <div className="flex-1 text-gray-200">
-              <h4 className="text-xl font-medium mb-2">{recommendation.title || recommendation.name}</h4>
-              <p className="text-sm text-gray-400 mb-4">
+              <h4 className="text-lg font-medium mb-2">{recommendation.title || recommendation.name}</h4>
+              <p className="text-xs text-gray-400 mb-4">
                 {recommendation.release_date?.substring(0, 4) || recommendation.first_air_date?.substring(0, 4)}
               </p>
-              <p className="text-sm mb-6">{recommendation.overview}</p>
+              <p className="text-xs mb-6">{recommendation.overview}</p>
               <div className="flex items-center gap-4">
                 <Button 
                   onClick={() => window.location.href = `/${recommendation.media_type}/${recommendation.id}`}
-                  className="w-full md:w-auto bg-[#ea384c] hover:bg-[#ea384c]/90 text-white flex items-center"
+                  className="w-full md:w-auto bg-[#ea384c] hover:bg-[#ea384c]/90 text-white flex items-center text-sm"
                 >
                   Details ansehen
                   <ArrowRight className="ml-2 w-4 h-4" />
