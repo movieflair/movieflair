@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -17,11 +18,11 @@ import { AdminSettingsProvider } from './hooks/useAdminSettings';
 import AdminPage from './pages/AdminPage';
 import { AuthProvider } from './context/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
-import EnhancedLayout from './components/layout/EnhancedLayout';
+import MainLayout from './components/layout/MainLayout';
 import Discover from './pages/Discover';
 
 const PrivacyPolicy = () => (
-  <EnhancedLayout>
+  <MainLayout>
     <div className="container-custom py-12">
       <h1 className="text-3xl font-bold mb-6">Datenschutzerklärung</h1>
       <p className="prose max-w-none">
@@ -30,11 +31,11 @@ const PrivacyPolicy = () => (
       </p>
       {/* Placeholder for more detailed privacy policy content */}
     </div>
-  </EnhancedLayout>
+  </MainLayout>
 );
 
 const TermsOfService = () => (
-  <EnhancedLayout>
+  <MainLayout>
     <div className="container-custom py-12">
       <h1 className="text-3xl font-bold mb-6">Nutzungsbedingungen</h1>
       <p className="prose max-w-none">
@@ -43,7 +44,7 @@ const TermsOfService = () => (
       </p>
       {/* Placeholder for more detailed terms of service content */}
     </div>
-  </EnhancedLayout>
+  </MainLayout>
 );
 
 const MovieRedirect = () => {
