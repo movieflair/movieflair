@@ -35,7 +35,7 @@ const QuickTipp = () => {
     <EnhancedLayout>
       <div className="container-custom min-h-screen py-12">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-rose-700">
+          <h1 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#ff3131] to-[#ff3131]">
             Quick Tipp
           </h1>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
