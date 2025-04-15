@@ -1,12 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import MainLayout from '@/components/layout/MainLayout';
 import { getMovieById, getSimilarMovies, trackPageVisit } from '@/lib/api';
-import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/api';
+import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/types';
 import SEOHead from '@/components/seo/SEOHead';
 import MovieHeader from '@/components/movies/MovieHeader';
+import MovieMeta from '@/components/movies/MovieMeta';
 import MovieStreamButtons from '@/components/movies/MovieStreamButtons';
 import MovieTrailerDialog from '@/components/movies/MovieTrailerDialog';
 import MovieBackdrop from '@/components/movies/MovieBackdrop';
@@ -74,7 +76,7 @@ const MovieDetails = () => {
   }
 
   const director = movie.crew?.find(person => person.job === 'Director');
-  const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : '';
+  const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
   const seoTitle = `${movie.title} (${releaseYear}) Online Stream anschauen | MovieFlair`;
   const seoDescription = `${movie.title} (${releaseYear}) kostenlos online streamen. ${movie.overview?.slice(0, 150)}...`;
 
