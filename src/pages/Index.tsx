@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
@@ -48,8 +49,12 @@ Wir finden ihn für dich!</h1>
           <HomeFilterBox />
           <PrimeVideoAd className="mt-8" />
           {customLists.length > 0 && (
-            <div className="mt-8">
-              {customLists.map(list => <CustomListCarousel key={list.id} list={list} />)}
+            <div className="mt-8 max-w-[800px] mx-auto">
+              {customLists.map(list => (
+                <div key={list.id} className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100 mb-4">
+                  <CustomListCarousel list={list} />
+                </div>
+              ))}
             </div>
           )}
         </div>
