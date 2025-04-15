@@ -12,30 +12,51 @@ interface MediaTypeSelectorProps {
 const MediaTypeSelector = ({ value, onChange }: MediaTypeSelectorProps) => {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-200 mb-3">Was möchtest du sehen?</label>
+      <label className="block text-sm font-medium text-theme-black mb-3">Was möchtest du sehen?</label>
       <RadioGroup 
         value={value} 
         onValueChange={(value) => onChange(value as 'movie' | 'tv' | 'all')}
         className="flex flex-wrap gap-4"
       >
         <div className="flex items-center space-x-2">
-          <RadioGroupItem value="movie" id="movie" className="border-[#ea384c] text-[#ea384c]" />
-          <Label htmlFor="movie" className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
-            <Film className="h-4 w-4" />
+          <RadioGroupItem 
+            value="movie" 
+            id="movie" 
+            className="border-theme-red text-theme-red" 
+          />
+          <Label 
+            htmlFor="movie" 
+            className="flex items-center gap-2 cursor-pointer text-theme-black hover:text-theme-black/80"
+          >
+            <Film className="h-4 w-4 text-theme-black" />
             Filme
           </Label>
         </div>
         <div className="flex items-center space-x-2">
-          <RadioGroupItem value="tv" id="tv" className="border-[#ea384c] text-[#ea384c]" />
-          <Label htmlFor="tv" className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
-            <Tv className="h-4 w-4" />
+          <RadioGroupItem 
+            value="tv" 
+            id="tv" 
+            className="border-theme-red text-theme-red" 
+          />
+          <Label 
+            htmlFor="tv" 
+            className="flex items-center gap-2 cursor-pointer text-theme-black hover:text-theme-black/80"
+          >
+            <Tv className="h-4 w-4 text-theme-black" />
             Serien
           </Label>
         </div>
         <div className="flex items-center space-x-2">
-          <RadioGroupItem value="all" id="all" className="border-[#ea384c] text-[#ea384c]" />
-          <Label htmlFor="all" className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
-            <MonitorPlay className="h-4 w-4" />
+          <RadioGroupItem 
+            value="all" 
+            id="all" 
+            className="border-theme-red text-theme-red" 
+          />
+          <Label 
+            htmlFor="all" 
+            className="flex items-center gap-2 cursor-pointer text-theme-black hover:text-theme-black/80"
+          >
+            <MonitorPlay className="h-4 w-4 text-theme-black" />
             Beides
           </Label>
         </div>

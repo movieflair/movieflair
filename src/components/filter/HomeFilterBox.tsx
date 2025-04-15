@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Search, Sparkles } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -118,8 +119,8 @@ const HomeFilterBox = () => {
   return (
     <div className="bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-2xl shadow-lg border border-gray-100 max-w-[800px] mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <Sparkles className="w-6 h-6 text-gray-400" />
-        <h2 className="text-2xl font-medium text-gray-800">Finde deinen perfekten Film</h2>
+        <Sparkles className="w-6 h-6 text-theme-black" />
+        <h2 className="text-2xl font-medium text-theme-black">Finde deinen perfekten Film</h2>
       </div>
       
       <div className="space-y-6">
@@ -129,7 +130,7 @@ const HomeFilterBox = () => {
         />
 
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-600">Welche Stimmung suchst du?</label>
+          <label className="block text-sm font-medium text-theme-black">Welche Stimmung suchst du?</label>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             {moods.map((mood) => (
               <Button
@@ -137,8 +138,8 @@ const HomeFilterBox = () => {
                 variant={selectedMoods.includes(mood) ? "default" : "outline"}
                 className={`${
                   selectedMoods.includes(mood)
-                    ? "bg-gray-800 hover:bg-gray-700 text-white"
-                    : "hover:bg-gray-100 text-gray-700 border border-gray-200 bg-white"
+                    ? "bg-theme-black hover:bg-theme-black/90 text-white"
+                    : "hover:bg-gray-100 text-theme-black border border-gray-200 bg-white"
                 } transition-all font-medium text-sm`}
                 onClick={() => {
                   setSelectedMoods(prev =>
@@ -196,7 +197,7 @@ const HomeFilterBox = () => {
 
         <Button 
           onClick={handleSearch}
-          className="w-full bg-gray-800 hover:bg-gray-700 text-white transition-colors"
+          className="w-full bg-theme-black hover:bg-theme-black/90 text-white transition-colors"
           size="lg"
           disabled={isLoading}
         >
