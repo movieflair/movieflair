@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -60,7 +59,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             <div className="absolute bottom-32 left-8">
               <Button 
                 variant="outline" 
-                className="w-fit bg-[#ea384c] text-white hover:bg-[#ea384c]/90 border-0 shadow-lg"
+                className="w-fit bg-[#ff3131] text-white hover:bg-[#ff3131]/90 border-0 shadow-lg"
                 asChild
               >
                 <Link to="/quick-tipp">
