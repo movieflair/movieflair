@@ -1,12 +1,12 @@
 
 import React from 'react';
-import MainLayout from '@/components/layout/MainLayout';
+import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { Link } from 'react-router-dom';
 import { Film, FileText, Users, Heart } from 'lucide-react';
 
 const About = () => {
   return (
-    <MainLayout>
+    <EnhancedLayout>
       <div className="container-custom py-12">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-semibold mb-6">Über MovieFlair</h1>
@@ -84,7 +84,7 @@ const About = () => {
           </div>
         </div>
       </div>
-    </MainLayout>
+    </EnhancedLayout>
   );
 };
 
