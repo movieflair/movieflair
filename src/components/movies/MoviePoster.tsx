@@ -1,6 +1,5 @@
-
-import { WatchlistButton } from '@/components/movies/WatchlistButton';
-import { ShareButton } from '@/components/movies/ShareButton';
+import WatchlistButton from '@/components/movies/WatchlistButton';
+import ShareButton from '@/components/movies/ShareButton';
 
 interface MoviePosterProps {
   id: number;

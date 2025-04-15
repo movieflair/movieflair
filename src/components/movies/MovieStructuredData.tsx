@@ -30,7 +30,7 @@ const MovieStructuredData = ({ movie, director }: MovieStructuredDataProps) => {
       "name": actor.name
     })),
     "genre": movie.genres?.map(genre => genre.name),
-    "duration": movie.runtime ? `PT${movie.runtime}M` : undefined
+    "duration": movie.runtime ? `PT${String(movie.runtime)}M` : undefined
   };
 
   return (

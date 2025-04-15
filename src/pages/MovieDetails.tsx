@@ -5,9 +5,6 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
 import MainLayout from '@/components/layout/MainLayout';
 import { getMovieById, getSimilarMovies, trackPageVisit } from '@/lib/api';
 import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/api';
-import MovieMeta from '@/components/movies/MovieMeta';
-import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
-import SimilarMovies from '@/components/movies/SimilarMovies';
 import SEOHead from '@/components/seo/SEOHead';
 import MovieHeader from '@/components/movies/MovieHeader';
 import MovieStreamButtons from '@/components/movies/MovieStreamButtons';
@@ -15,6 +12,10 @@ import MovieTrailerDialog from '@/components/movies/MovieTrailerDialog';
 import MovieBackdrop from '@/components/movies/MovieBackdrop';
 import MoviePoster from '@/components/movies/MoviePoster';
 import MovieStructuredData from '@/components/movies/MovieStructuredData';
+import MovieLoadingState from '@/components/movies/MovieLoadingState';
+import MovieErrorState from '@/components/movies/MovieErrorState';
+import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
+import SimilarMovies from '@/components/movies/SimilarMovies';
 
 const MovieDetails = () => {
   const { id, slug } = useParams<{ id: string, slug?: string }>();
@@ -59,9 +60,7 @@ const MovieDetails = () => {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="min-h-screen bg-white flex items-center justify-center">
-          <div className="animate-pulse text-gray-600">Loading...</div>
-        </div>
+        <MovieLoadingState />
       </MainLayout>
     );
   }
@@ -69,9 +68,7 @@ const MovieDetails = () => {
   if (!movie) {
     return (
       <MainLayout>
-        <div className="min-h-screen bg-white flex items-center justify-center">
-          <div className="animate-pulse text-gray-600">Movie not found</div>
-        </div>
+        <MovieErrorState />
       </MainLayout>
     );
   }
@@ -109,8 +106,6 @@ const MovieDetails = () => {
       window.open(movie.streamUrl, '_blank');
     }
   };
-
-  const trailerUrl = getTrailerUrl();
 
   return (
     <MainLayout>
@@ -155,7 +150,7 @@ const MovieDetails = () => {
 
                 <MovieStreamButtons
                   hasTrailer={movie.hasTrailer}
-                  trailerUrl={trailerUrl}
+                  trailerUrl={getTrailerUrl()}
                   streamUrl={movie.streamUrl}
                   title={movie.title}
                   amazonAffiliateId={amazonAffiliateId}
@@ -180,7 +175,7 @@ const MovieDetails = () => {
       <MovieTrailerDialog
         isOpen={showTrailer}
         onClose={() => setShowTrailer(false)}
-        trailerUrl={trailerUrl || ''}
+        trailerUrl={getTrailerUrl() || ''}
         movieTitle={movie.title}
       />
     </MainLayout>
