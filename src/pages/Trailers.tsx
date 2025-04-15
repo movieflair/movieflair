@@ -6,21 +6,23 @@ import MovieCard from '@/components/movies/MovieCard';
 import { PlayCircle } from 'lucide-react';
 
 const Trailers = () => {
-  const [movies, setMovies] = useState<MovieOrShow[]>([]);
+  const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Track page visit
     trackPageVisit('trailers');
     
-    const fetchMovies = async () => {
+    const fetchTrailerItems = async () => {
       try {
         setIsLoading(true);
-        console.log('Trailers page: Fetching trailer movies...');
+        console.log('Trailers page: Fetching trailer items...');
         const data = await getTrailerMovies();
-        console.log('Trailers page: Fetched trailer movies:', data.length);
-        console.log('Trailers page: Sample trailer movie:', data[0]);
-        setMovies(data);
+        console.log('Trailers page: Fetched trailer items:', data.length);
+        if (data.length > 0) {
+          console.log('Trailers page: Sample trailer item:', data[0]);
+        }
+        setTrailerItems(data);
       } catch (error) {
         console.error('Error fetching trailers:', error);
       } finally {
@@ -28,7 +30,7 @@ const Trailers = () => {
       }
     };
 
-    fetchMovies();
+    fetchTrailerItems();
   }, []);
 
   return (
@@ -49,14 +51,14 @@ const Trailers = () => {
               </div>
             ))}
           </div>
-        ) : movies.length === 0 ? (
+        ) : trailerItems.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Keine neuen Trailer gefunden. Bitte markiere Filme im Admin-Bereich als neue Trailer.</p>
+            <p className="text-muted-foreground">Keine neuen Trailer gefunden. Bitte markiere Filme oder Serien im Admin-Bereich als Trailer.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {movies.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} />
+            {trailerItems.map((item) => (
+              <MovieCard key={item.id} movie={item} />
             ))}
           </div>
         )}

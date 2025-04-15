@@ -1,6 +1,6 @@
 
 import { MovieOrShow, MovieDetail } from './types';
-import { callTMDB, getAdminMovieSettings } from './apiUtils';
+import { callTMDB, getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 
 export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/movie/popular');
@@ -48,30 +48,45 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching trailer movies...');
   
   const savedMoviesJson = localStorage.getItem('adminMovies');
-  let trailerMovies: MovieOrShow[] = [];
-  
-  if (!savedMoviesJson) {
-    console.log('No saved movies found in localStorage');
-    return trailerMovies;
-  }
+  const savedShowsJson = localStorage.getItem('adminShows');
+  let trailerItems: MovieOrShow[] = [];
   
   try {
-    const savedMovies = JSON.parse(savedMoviesJson);
-    console.log(`Found ${savedMovies.length} total saved movies`);
+    // Process movies with trailers
+    if (savedMoviesJson) {
+      const savedMovies = JSON.parse(savedMoviesJson);
+      const trailerMovies = savedMovies
+        .filter((movie: MovieOrShow) => movie.isNewTrailer === true);
+      
+      trailerItems = [...trailerItems, ...trailerMovies];
+      console.log(`Found ${trailerMovies.length} trailer movies`);
+    } else {
+      console.log('No saved movies found in localStorage');
+    }
     
-    // Filter for movies marked as trailers and sort by newest first
-    trailerMovies = savedMovies
-      .filter((movie: MovieOrShow) => movie.isNewTrailer === true)
-      .sort((a: MovieOrShow, b: MovieOrShow) => {
-        const dateA = new Date(a.release_date || a.first_air_date || '');
-        const dateB = new Date(b.release_date || b.first_air_date || '');
-        return dateB.getTime() - dateA.getTime();
-      });
+    // Process TV shows with trailers
+    if (savedShowsJson) {
+      const savedShows = JSON.parse(savedShowsJson);
+      const trailerShows = savedShows
+        .filter((show: MovieOrShow) => show.hasTrailer === true);
+      
+      trailerItems = [...trailerItems, ...trailerShows];
+      console.log(`Found ${trailerShows.length} TV shows with trailers`);
+    } else {
+      console.log('No saved TV shows found in localStorage');
+    }
     
-    console.log(`Filtered ${trailerMovies.length} trailer movies`);
-    return trailerMovies;
+    // Sort all trailer items by release date, newest first
+    trailerItems.sort((a: MovieOrShow, b: MovieOrShow) => {
+      const dateA = new Date(a.release_date || a.first_air_date || '');
+      const dateB = new Date(b.release_date || b.first_air_date || '');
+      return dateB.getTime() - dateA.getTime();
+    });
+    
+    console.log(`Total trailer items: ${trailerItems.length}`);
+    return trailerItems;
   } catch (e) {
-    console.error('Error parsing saved movies:', e);
+    console.error('Error processing trailers:', e);
     return [];
   }
 };
