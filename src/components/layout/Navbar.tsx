@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { List, Play, Gift, User, Bookmark, LogOut, Sparkles, Compass } from 'lucide-react';
@@ -56,7 +57,7 @@ const Navbar = () => {
           <img 
             src="/lovable-uploads/26151e5a-66d8-4a56-ad10-e034335711e1.png" 
             alt="MovieFlair Logo" 
-            className="h-8 mr-2"
+            className="h-12 w-auto mr-2" // Increased height from h-8 to h-12
           />
         </NavLink>
 
