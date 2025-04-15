@@ -455,23 +455,13 @@ export const getVisitorStats = (): VisitorStat[] => {
   }
 };
 
-export const getRandomMovie = async (): Promise<MovieOrShow> => {
+export const getRandomMovie = async (): Promise<MovieDetail> => {
   const data = await callTMDB('/movie/popular', { page: Math.floor(Math.random() * 5) + 1 });
   
   const randomIndex = Math.floor(Math.random() * data.results.length);
-  const randomMovie = data.results[randomIndex];
+  const randomMovieBasic = data.results[randomIndex];
   
-  const savedSettings = await getAdminMovieSettings();
-  const savedMovie = savedSettings[randomMovie.id] || {};
+  const movieDetail = await getMovieById(randomMovieBasic.id);
   
-  return {
-    ...randomMovie,
-    media_type: 'movie',
-    hasStream: savedMovie.hasStream || false,
-    streamUrl: savedMovie.streamUrl || '',
-    hasTrailer: savedMovie.hasTrailer || false,
-    trailerUrl: savedMovie.trailerUrl || '',
-    isFreeMovie: savedMovie.isFreeMovie || false,
-    isNewTrailer: savedMovie.isNewTrailer || false,
-  };
+  return movieDetail;
 };

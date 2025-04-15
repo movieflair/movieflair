@@ -2,13 +2,13 @@
 import React, { useState } from 'react';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { Button } from '@/components/ui/button';
-import { getRandomMovie, MovieOrShow } from '@/lib/api';
+import { getRandomMovie, MovieDetail } from '@/lib/api';
 import { Sparkles, Film, Clock, Calendar, Star } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
 
 const QuickTipp = () => {
-  const [movie, setMovie] = useState<MovieOrShow | null>(null);
+  const [movie, setMovie] = useState<MovieDetail | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleGetRandomMovie = async () => {
