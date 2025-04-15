@@ -17,16 +17,24 @@ export async function callTMDB(path: string, searchParams = {}) {
 
 export const getAdminMovieSettings = async () => {
   const savedMoviesJson = localStorage.getItem('adminMovies');
-  if (!savedMoviesJson) return {};
+  if (!savedMoviesJson) {
+    console.log('No saved movie settings found');
+    return {};
+  }
   
   try {
     const savedMovies = JSON.parse(savedMoviesJson);
-    return savedMovies.reduce((acc: Record<number, any>, movie: any) => {
+    console.log(`Found ${savedMovies.length} saved movie settings`);
+    
+    // Convert array to object indexed by movie ID
+    const movieSettings = savedMovies.reduce((acc: Record<number, any>, movie: any) => {
       if (movie.id) {
         acc[movie.id] = movie;
       }
       return acc;
     }, {});
+    
+    return movieSettings;
   } catch (e) {
     console.error('Error parsing saved movies:', e);
     return {};
@@ -50,4 +58,3 @@ export const getAdminTvShowSettings = async () => {
     return {};
   }
 };
-

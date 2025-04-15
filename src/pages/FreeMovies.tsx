@@ -10,13 +10,14 @@ const FreeMovies = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Seiten-Aufruf tracken
+    // Track page visit
     trackPageVisit('free-movies');
     
     const fetchMovies = async () => {
       try {
         setIsLoading(true);
         const data = await getFreeMovies();
+        console.log('Fetched free movies:', data);
         setMovies(data);
       } catch (error) {
         console.error('Error fetching free movies:', error);

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Search, FileEdit, Film, Pencil, Tv } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -154,13 +153,13 @@ const AdminPanel = () => {
   const handleEditMovie = (movie: MovieOrShow) => {
     setSelectedMovie(movie);
     setSelectedTvShow(null);
-    setHasStream(movie.hasStream || false);
-    setStreamUrl(movie.streamUrl || '');
-    setStreamType(movie.streamUrl?.includes('embed') ? 'embed' : 'link');
-    setHasTrailer(movie.hasTrailer || false);
-    setTrailerUrl(movie.trailerUrl || '');
     setIsFreeMovie(movie.isFreeMovie || false);
     setIsNewTrailer(movie.isNewTrailer || false);
+    setStreamUrl(movie.streamUrl || '');
+    setStreamType(movie.streamUrl?.includes('embed') ? 'embed' : 'link');
+    setTrailerUrl(movie.trailerUrl || '');
+    setHasStream(movie.isFreeMovie || false);
+    setHasTrailer(movie.isNewTrailer || false);
   };
   
   const handleEditTvShow = (show: MovieOrShow) => {
@@ -191,12 +190,12 @@ const AdminPanel = () => {
     
     const updatedMovie = {
       ...selectedMovie,
-      hasStream: isFreeMovie, // Associate hasStream with isFreeMovie
-      streamUrl: isFreeMovie ? streamUrl : '',
-      hasTrailer: isNewTrailer, // Associate hasTrailer with isNewTrailer
-      trailerUrl: isNewTrailer ? trailerUrl : '',
       isFreeMovie,
-      isNewTrailer
+      isNewTrailer,
+      hasStream: isFreeMovie, 
+      streamUrl: isFreeMovie ? streamUrl : '',
+      hasTrailer: isNewTrailer,
+      trailerUrl: isNewTrailer ? trailerUrl : ''
     };
     
     if (existingIndex >= 0) {
@@ -207,7 +206,6 @@ const AdminPanel = () => {
     
     localStorage.setItem('adminMovies', JSON.stringify(savedMovies));
     
-    // Invalidate all relevant queries to refresh data
     queryClient.invalidateQueries({ queryKey: ['admin-movies'] });
     queryClient.invalidateQueries({ queryKey: ['admin-free-movies'] });
     queryClient.invalidateQueries({ queryKey: ['admin-trailer-movies'] });

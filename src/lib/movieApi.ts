@@ -1,4 +1,3 @@
-
 import { MovieOrShow, MovieDetail } from './types';
 import { callTMDB, getAdminMovieSettings } from './apiUtils';
 
@@ -43,7 +42,7 @@ export const searchMovies = async (query: string): Promise<MovieOrShow[]> => {
 };
 
 export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
-  const data = await callTMDB('/movie/now_playing');
+  const data = await callTMDB('/movie/popular');
   const savedSettings = await getAdminMovieSettings();
   
   const movies = data.results.map((movie: any) => {
@@ -60,8 +59,14 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     };
   });
   
-  // Filter movies where isNewTrailer is true
-  return movies.filter(movie => movie.isNewTrailer === true);
+  console.log('All movies before filtering for trailers:', movies.length);
+  
+  const trailerMovies = movies.filter(movie => movie.isNewTrailer === true);
+  
+  console.log('Filtered trailer movies:', trailerMovies.length);
+  console.log('Sample trailer movie:', trailerMovies[0]);
+  
+  return trailerMovies;
 };
 
 export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
@@ -82,8 +87,14 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
     };
   });
   
-  // Filter movies where isFreeMovie is true
-  return movies.filter(movie => movie.isFreeMovie === true);
+  console.log('All movies before filtering for free movies:', movies.length);
+  
+  const freeMovies = movies.filter(movie => movie.isFreeMovie === true);
+  
+  console.log('Filtered free movies:', freeMovies.length);
+  console.log('Sample free movie:', freeMovies[0]);
+  
+  return freeMovies;
 };
 
 export const getMovieById = async (id: number): Promise<MovieDetail> => {
