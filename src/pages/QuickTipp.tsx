@@ -1,9 +1,10 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { Button } from '@/components/ui/button';
 import { getRandomMovie, MovieDetail } from '@/lib/api';
-import { Sparkles, Film, Clock, Calendar, Star } from 'lucide-react';
+import { Sparkles, Film, Clock, Calendar, Star, ArrowRight, Wand2, Target, Rocket } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
 
@@ -50,30 +51,79 @@ const QuickTipp = () => {
           </Button>
         </div>
 
+        {/* Features Section */}
+        <div className="max-w-5xl mx-auto mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-semibold mb-4">Warum Quick Tipp?</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Mit Quick Tipp findest du in Sekunden deinen nächsten Lieblingsfilm. 
+              Keine endlose Suche mehr - lass dich von unseren Vorschlägen überraschen!
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 mt-8">
+            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+                  <Wand2 className="h-6 w-6 text-red-500" />
+                </div>
+                <h3 className="font-semibold mb-2">Magische Empfehlungen</h3>
+                <p className="text-gray-600 text-sm">
+                  Unser Algorithmus zaubert dir perfekt passende Film- und Serienvorschläge.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+                  <Target className="h-6 w-6 text-red-500" />
+                </div>
+                <h3 className="font-semibold mb-2">Treffsicher & Schnell</h3>
+                <p className="text-gray-600 text-sm">
+                  Keine lange Suche mehr - finde sofort neue Unterhaltung mit einem Klick.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/80 backdrop-blur-sm border border-gray-100">
+              <CardContent className="p-6 text-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+                  <Rocket className="h-6 w-6 text-red-500" />
+                </div>
+                <h3 className="font-semibold mb-2">Entdecke Neues</h3>
+                <p className="text-gray-600 text-sm">
+                  Lass dich von überraschenden Vorschlägen inspirieren und entdecke verborgene Perlen.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
         {/* Movie Recommendation Card */}
         {movie && (
           <div className="max-w-4xl mx-auto">
             <Card className="overflow-hidden bg-white/80 backdrop-blur-sm border border-gray-100 shadow-xl">
-              <CardContent className="p-0">
-                <div className="flex flex-col md:flex-row">
-                  {/* Movie Poster */}
-                  <div className="md:w-1/3 relative">
+              <CardContent className="p-6">
+                <div className="flex flex-col md:flex-row gap-8">
+                  {/* Movie Poster - Smaller Size */}
+                  <div className="md:w-1/4">
                     {movie.poster_path ? (
                       <img
                         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                         alt={movie.title || movie.name}
-                        className="w-full h-[500px] object-cover"
+                        className="w-full h-[300px] object-cover rounded-lg shadow-md"
                       />
                     ) : (
-                      <div className="w-full h-[500px] bg-gray-100 flex items-center justify-center">
+                      <div className="w-full h-[300px] bg-gray-100 rounded-lg flex items-center justify-center">
                         <Film className="w-16 h-16 text-gray-400" />
                       </div>
                     )}
                   </div>
 
                   {/* Movie Details */}
-                  <div className="md:w-2/3 p-8">
-                    <h2 className="text-3xl font-bold mb-4">
+                  <div className="md:w-3/4">
+                    <h2 className="text-2xl font-bold mb-4">
                       {movie.title || movie.name}
                     </h2>
 
@@ -109,13 +159,23 @@ const QuickTipp = () => {
                       </div>
                     )}
 
-                    <p className="text-gray-600 mb-8 line-clamp-4">
+                    <p className="text-gray-600 mb-8 line-clamp-3">
                       {movie.overview || 'Keine Beschreibung verfügbar.'}
                     </p>
 
+                    <div className="flex items-center gap-4 mb-8">
+                      <Link 
+                        to={`/movie/${movie.id}`}
+                        className="inline-flex items-center gap-2 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                      >
+                        Details ansehen
+                        <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    </div>
+
                     {/* Rating Feedback */}
                     {movie.id && (
-                      <div className="mt-auto pt-4 border-t">
+                      <div className="pt-4 border-t">
                         <MovieRatingFeedback movieId={movie.id} />
                       </div>
                     )}
