@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Film, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { CustomList, MovieOrShow } from '@/lib/api';
+import { CustomList, MovieOrShow } from '@/lib/types';
 import { getCustomLists, updateCustomList, addMovieToList, removeMovieFromList, deleteCustomList } from '@/lib/customListApi';
 import { toast } from "sonner";
 import ListCreationDialog from './lists/ListCreationDialog';
@@ -70,28 +70,26 @@ const CustomListManager = () => {
   const handleAddMedia = (media: MovieOrShow) => {
     if (!selectedList) return;
     
-    addMovieToList(selectedList.id, media);
-    toast.success(`${media.title || media.name} zur Liste hinzugefügt`);
-    
-    loadLists();
-    
-    const updatedList = getCustomLists().find(l => l.id === selectedList.id);
+    const updatedList = addMovieToList(selectedList.id, media);
     if (updatedList) {
+      toast.success(`${media.title || media.name} zur Liste hinzugefügt`);
+      loadLists();
       setSelectedList(updatedList);
+    } else {
+      toast.error('Fehler beim Hinzufügen des Inhalts');
     }
   };
 
   const handleRemoveMovie = (movieId: number) => {
     if (!selectedList) return;
     
-    removeMovieFromList(selectedList.id, movieId);
-    toast.success('Inhalt aus der Liste entfernt');
-    
-    loadLists();
-    
-    const updatedList = getCustomLists().find(l => l.id === selectedList.id);
+    const updatedList = removeMovieFromList(selectedList.id, movieId);
     if (updatedList) {
+      toast.success('Inhalt aus der Liste entfernt');
+      loadLists();
       setSelectedList(updatedList);
+    } else {
+      toast.error('Fehler beim Entfernen des Inhalts');
     }
   };
 

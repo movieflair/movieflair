@@ -47,18 +47,18 @@ export const updateCustomList = (updatedList: CustomList): CustomList => {
   return updatedList;
 };
 
-// Film zu einer benutzerdefinierten Liste hinzufügen
-export const addMovieToList = (listId: string, movie: MovieOrShow): CustomList | null => {
+// Film oder Serie zu einer benutzerdefinierten Liste hinzufügen
+export const addMovieToList = (listId: string, media: MovieOrShow): CustomList | null => {
   const lists = getCustomLists();
   
   const listIndex = lists.findIndex(list => list.id === listId);
   
   if (listIndex >= 0) {
-    // Überprüfen, ob der Film bereits in der Liste ist
-    const movieExists = lists[listIndex].movies.some(m => m.id === movie.id);
+    // Überprüfen, ob der Film oder die Serie bereits in der Liste ist
+    const mediaExists = lists[listIndex].movies.some(m => m.id === media.id);
     
-    if (!movieExists) {
-      lists[listIndex].movies.push(movie);
+    if (!mediaExists) {
+      lists[listIndex].movies.push(media);
       lists[listIndex].updatedAt = new Date().toISOString();
       localStorage.setItem('customLists', JSON.stringify(lists));
     }
@@ -69,14 +69,14 @@ export const addMovieToList = (listId: string, movie: MovieOrShow): CustomList |
   return null;
 };
 
-// Film aus einer benutzerdefinierten Liste entfernen
-export const removeMovieFromList = (listId: string, movieId: number): CustomList | null => {
+// Film oder Serie aus einer benutzerdefinierten Liste entfernen
+export const removeMovieFromList = (listId: string, mediaId: number): CustomList | null => {
   const lists = getCustomLists();
   
   const listIndex = lists.findIndex(list => list.id === listId);
   
   if (listIndex >= 0) {
-    lists[listIndex].movies = lists[listIndex].movies.filter(movie => movie.id !== movieId);
+    lists[listIndex].movies = lists[listIndex].movies.filter(media => media.id !== mediaId);
     lists[listIndex].updatedAt = new Date().toISOString();
     localStorage.setItem('customLists', JSON.stringify(lists));
     

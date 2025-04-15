@@ -4,7 +4,7 @@ import { Search, Film, Tv, Check, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MovieOrShow } from '@/lib/api';
+import { MovieOrShow } from '@/lib/types';
 import { useQuery } from '@tanstack/react-query';
 import { searchMovies, searchTvShows } from '@/lib/api';
 import { toast } from "sonner";
