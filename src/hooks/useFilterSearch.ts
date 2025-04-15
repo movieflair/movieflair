@@ -42,16 +42,12 @@ export const useFilterSearch = () => {
         setRecommendation(results[randomIndex]);
         console.log('Selected recommendation:', results[randomIndex]);
         
-        // Überprüfe für Debug-Zwecke, ob das Jahrzehnt korrekt ist
-        if (currentFilter.decades.length > 0 && results[randomIndex].release_date) {
-          const decade = parseInt(currentFilter.decades[0]);
-          const releaseYear = parseInt(results[randomIndex].release_date.split('-')[0]);
-          console.log(`Film Release: ${releaseYear}, Selected Decade: ${decade}-${decade+9}`);
-          
-          if (releaseYear < decade || releaseYear > decade + 9) {
-            console.error('WARNING: Film year does not match selected decade!', results[randomIndex]);
-          }
-        }
+        // Logge alle gefundenen Filme für Debug-Zwecke
+        console.log('All matching movies:', results.map(movie => ({
+          title: movie.title,
+          year: movie.release_date?.split('-')[0],
+          id: movie.id
+        })));
       }
     } catch (error) {
       console.error('Error getting recommendation:', error);
@@ -93,24 +89,7 @@ export const useFilterSearch = () => {
     } else {
       // Wenn keine oder zu wenige Ergebnisse vorhanden sind, führe eine neue Suche durch
       console.log('Searching for new results with filters:', lastUsedFilter);
-      setIsLoading(true);
-      try {
-        const results = await getRecommendationByFilters({...lastUsedFilter});
-        setAllResults(results);
-        
-        if (results.length === 0) {
-          toast.error('Keine weiteren passenden Filme gefunden.');
-        } else {
-          const randomIndex = Math.floor(Math.random() * results.length);
-          setRecommendation(results[randomIndex]);
-          toast.success('Neuer Filmvorschlag generiert!');
-        }
-      } catch (error) {
-        console.error('Error refreshing recommendation:', error);
-        toast.error('Fehler beim Aktualisieren des Vorschlags.');
-      } finally {
-        setIsLoading(false);
-      }
+      handleSearch(lastUsedFilter);
     }
   };
 

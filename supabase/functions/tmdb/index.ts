@@ -25,12 +25,20 @@ Deno.serve(async (req) => {
     
     // Add additional search parameters
     Object.entries(searchParams).forEach(([key, value]) => {
-      url.searchParams.append(key, String(value))
+      if (value !== undefined && value !== null && value !== '') {
+        url.searchParams.append(key, String(value))
+      }
     })
 
     console.log(`Fetching TMDB API: ${url.toString().replace(apiKey, 'API_KEY_HIDDEN')}`);
 
-    const response = await fetch(url.toString())
+    const response = await fetch(url.toString(), {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    })
+    
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`TMDB API responded with status ${response.status}: ${errorText}`);

@@ -45,14 +45,14 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
     return [];
   }
   
-  let params: Record<string, string> = {
+  // Build basic parameters
+  let params: Record<string, any> = {
     'sort_by': 'popularity.desc',
-    'vote_count.gte': '50', // Mindestanzahl an Bewertungen
+    'vote_count.gte': '20', // Reduce minimum vote count to get more results
     'include_adult': 'false',
     'include_video': 'false',
     'with_original_language': 'de,en', // Deutsch und Englisch
-    'page': '1',
-    'language': 'de-DE'
+    'page': '1'
   };
   
   // Genres zusammenstellen (direkt ausgewählte und zufällige aus Moods)
@@ -81,7 +81,7 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
     params.with_genres = uniqueGenres.join(',');
   }
   
-  // STRIKTE Jahrzehnt-Filter anwenden
+  // Jahrzehnt-Filter anwenden
   if (decades && decades.length > 0) {
     const decadeStr = decades[0]; // Wir verwenden nur das erste ausgewählte Jahrzehnt
     const decade = parseInt(decadeStr);
@@ -90,71 +90,79 @@ const fetchMediaByType = async (filters: FilterOptions): Promise<MovieOrShow[]> 
       const startYear = decade;
       const endYear = decade + 9;
       
-      // Verwende exakte Jahrzehnt-Filterung mit Anfangs- und Enddatum
+      // Dezember hinzufügen, um das gesamte Jahr einzuschließen
       params.primary_release_date_gte = `${startYear}-01-01`;
       params.primary_release_date_lte = `${endYear}-12-31`;
       
-      console.log(`Strict decade filtering: ${startYear}-01-01 to ${endYear}-12-31`);
+      console.log(`Decade filtering: ${startYear}-01-01 to ${endYear}-12-31`);
     }
   }
   
   if (rating > 0) {
-    params['vote_average.gte'] = rating.toString();
+    params.vote_average_gte = rating.toString();
   }
   
   console.log('API call params:', params);
   
   try {
-    // Direkte API-Anfrage an TMDB über unsere Supabase-Funktion
+    // Try to get movies with current parameters
     const data = await callTMDB(endpoint, params);
-    console.log(`Received ${data.results?.length || 0} results from API`, data);
     
     if (!data.results || data.results.length === 0) {
-      console.log('No results from TMDB API');
-      return [];
+      console.log('No results from initial TMDB API call, trying with fewer restrictions');
+      
+      // If no results, try again with reduced restrictions
+      delete params.with_original_language; // Try all languages
+      params.vote_count_gte = '10'; // Lower the vote count threshold
+      
+      const fallbackData = await callTMDB(endpoint, params);
+      console.log(`Received ${fallbackData.results?.length || 0} results from fallback API call`);
+      
+      if (!fallbackData.results || fallbackData.results.length === 0) {
+        console.log('Still no results after fallback query');
+        return [];
+      }
+      
+      data.results = fallbackData.results;
+    } else {
+      console.log(`Received ${data.results.length} results from API`);
     }
     
-    // Überprüfe die Jahrzehnt-Filterung für alle Ergebnisse und filtere die falschen heraus
+    // Filter the results to ensure they match our criteria
     let filteredResults = data.results
       .filter((item: any) => {
         // Überprüfe, ob das Item eine gültige Beschreibung und ein Poster hat
         const hasValidMetadata = item.poster_path && item.overview && item.overview.trim() !== '';
         
-        // Wenn keine Jahrzehnt-Filterung aktiv ist, prüfe nur Metadaten
-        if (!decades || decades.length === 0) {
-          return hasValidMetadata;
-        }
-        
-        // Wenn Jahrzehnt-Filterung aktiv ist, überprüfe auch das Veröffentlichungsdatum
-        if (item.release_date) {
+        // Additional decade check
+        if (decades && decades.length > 0 && item.release_date) {
           const releaseYear = parseInt(item.release_date.split('-')[0]);
           const selectedDecade = parseInt(decades[0]);
           
-          // Überprüfe, ob das Veröffentlichungsjahr im ausgewählten Jahrzehnt liegt
+          // Check if release year is in the selected decade
           const isInDecade = releaseYear >= selectedDecade && releaseYear <= (selectedDecade + 9);
           
           if (!isInDecade) {
-            console.log(`Filtering out movie from year ${releaseYear} (not in decade ${selectedDecade}-${selectedDecade+9})`, item.title);
+            console.log(`Filtering out movie from year ${releaseYear} (not in decade ${selectedDecade}-${selectedDecade+9}): ${item.title}`);
+            return false;
           }
-          
-          return hasValidMetadata && isInDecade;
         }
         
-        return false;
+        return hasValidMetadata;
       })
       .map((item: any) => ({
         ...item,
         media_type: 'movie'
       }));
     
-    console.log(`Filtered to ${filteredResults.length} valid results after decade check`);
+    console.log(`Filtered to ${filteredResults.length} valid results after checks`);
     
     if (filteredResults.length === 0) {
-      console.log('No results found after filtering');
+      console.log('No results after filtering');
       return [];
     }
     
-    // Ergebnisse zufällig mischen und maximal 20 zurückgeben
+    // Randomize results and return up to 20
     return filteredResults
       .sort(() => Math.random() - 0.5)
       .slice(0, 20);
