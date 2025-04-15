@@ -47,7 +47,6 @@ export const searchMovies = async (query: string): Promise<MovieOrShow[]> => {
 export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching trailer movies...');
   
-  // Get all saved movies from localStorage
   const savedMoviesJson = localStorage.getItem('adminMovies');
   let trailerMovies: MovieOrShow[] = [];
   
@@ -60,14 +59,16 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     const savedMovies = JSON.parse(savedMoviesJson);
     console.log(`Found ${savedMovies.length} total saved movies`);
     
-    // Filter for movies marked as trailers
-    trailerMovies = savedMovies.filter((movie: MovieOrShow) => movie.isNewTrailer === true);
+    // Filter for movies marked as trailers and sort by newest first
+    trailerMovies = savedMovies
+      .filter((movie: MovieOrShow) => movie.isNewTrailer === true)
+      .sort((a: MovieOrShow, b: MovieOrShow) => {
+        const dateA = new Date(a.release_date || a.first_air_date || '');
+        const dateB = new Date(b.release_date || b.first_air_date || '');
+        return dateB.getTime() - dateA.getTime();
+      });
     
     console.log(`Filtered ${trailerMovies.length} trailer movies`);
-    trailerMovies.forEach((movie, index) => {
-      if (index < 3) console.log(`Trailer movie ${index + 1}:`, movie.title, movie.id, movie.isNewTrailer);
-    });
-    
     return trailerMovies;
   } catch (e) {
     console.error('Error parsing saved movies:', e);
@@ -78,7 +79,6 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
 export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching free movies...');
   
-  // Get all saved movies from localStorage
   const savedMoviesJson = localStorage.getItem('adminMovies');
   let freeMovies: MovieOrShow[] = [];
   
@@ -91,14 +91,16 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
     const savedMovies = JSON.parse(savedMoviesJson);
     console.log(`Found ${savedMovies.length} total saved movies`);
     
-    // Filter for movies marked as free
-    freeMovies = savedMovies.filter((movie: MovieOrShow) => movie.isFreeMovie === true);
+    // Filter for movies marked as free and sort by newest first
+    freeMovies = savedMovies
+      .filter((movie: MovieOrShow) => movie.isFreeMovie === true)
+      .sort((a: MovieOrShow, b: MovieOrShow) => {
+        const dateA = new Date(a.release_date || a.first_air_date || '');
+        const dateB = new Date(b.release_date || b.first_air_date || '');
+        return dateB.getTime() - dateA.getTime();
+      });
     
     console.log(`Filtered ${freeMovies.length} free movies`);
-    freeMovies.forEach((movie, index) => {
-      if (index < 3) console.log(`Free movie ${index + 1}:`, movie.title, movie.id, movie.isFreeMovie);
-    });
-    
     return freeMovies;
   } catch (e) {
     console.error('Error parsing saved movies:', e);
