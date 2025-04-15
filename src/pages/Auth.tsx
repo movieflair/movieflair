@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,12 +8,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import ResetPassword from '@/components/auth/ResetPassword';
 
 const Auth = () => {
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get('tab') || 'login';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -76,7 +80,7 @@ const Auth = () => {
     <EnhancedLayout>
       <div className="container-custom flex justify-center py-12">
         <Card className="w-full max-w-md">
-          <Tabs defaultValue="login">
+          <Tabs defaultValue={defaultTab}>
             <CardHeader>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Anmelden</TabsTrigger>
@@ -88,33 +92,55 @@ const Auth = () => {
             </CardHeader>
             <CardContent>
               <TabsContent value="login">
-                <form onSubmit={handleSignIn}>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="email-login">Email</Label>
-                      <Input 
-                        id="email-login" 
-                        type="email" 
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
+                {!showResetPassword ? (
+                  <form onSubmit={handleSignIn}>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="email-login">Email</Label>
+                        <Input 
+                          id="email-login" 
+                          type="email" 
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="password-login">Passwort</Label>
+                        <Input 
+                          id="password-login" 
+                          type="password" 
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <Button type="submit" className="w-full" disabled={loading}>
+                        {loading ? 'Wird angemeldet...' : 'Anmelden'}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="w-full"
+                        onClick={() => setShowResetPassword(true)}
+                      >
+                        Passwort vergessen?
+                      </Button>
                     </div>
-                    <div>
-                      <Label htmlFor="password-login">Passwort</Label>
-                      <Input 
-                        id="password-login" 
-                        type="password" 
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? 'Wird angemeldet...' : 'Anmelden'}
+                  </form>
+                ) : (
+                  <div>
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="mb-4"
+                      onClick={() => setShowResetPassword(false)}
+                    >
+                      ← Zurück zum Login
                     </Button>
+                    <ResetPassword />
                   </div>
-                </form>
+                )}
               </TabsContent>
               <TabsContent value="register">
                 <form onSubmit={handleSignUp}>
