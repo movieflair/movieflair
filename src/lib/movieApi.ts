@@ -62,11 +62,11 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
       freeMovies = savedMovies
         .filter((movie: MovieOrShow) => movie.isFreeMovie === true);
       
-      // Sort by release date, newest first
+      // Sort by release date, OLDEST first (same as trailers page)
       freeMovies.sort((a: MovieOrShow, b: MovieOrShow) => {
         const dateA = new Date(a.release_date || a.first_air_date || '');
         const dateB = new Date(b.release_date || b.first_air_date || '');
-        return dateB.getTime() - dateA.getTime();
+        return dateA.getTime() - dateB.getTime();
       });
       
       console.log(`Found ${freeMovies.length} free movies`);
