@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
@@ -119,7 +118,9 @@ const QuickTipp = () => {
                         Details ansehen
                         <ArrowRight className="w-4 h-4" />
                       </Link>
-                      <MovieRatingFeedback movieId={movie.id} />
+                      <div className="text-xs text-gray-600">
+                        <MovieRatingFeedback movieId={movie.id} />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -181,4 +182,3 @@ const QuickTipp = () => {
 };
 
 export default QuickTipp;
-
