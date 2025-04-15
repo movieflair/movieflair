@@ -1,32 +1,78 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import AdminLogin from '@/components/admin/AdminLogin';
 import AdminPanel from '@/components/admin/AdminPanel';
 import { trackPageVisit } from '@/lib/api';
 import { AdminSettingsProvider } from '@/hooks/useAdminSettings';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
-// Create a new query client instance
 const queryClient = new QueryClient();
 
 const AdminPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
   
   useEffect(() => {
-    // Seiten-Aufruf tracken
     trackPageVisit('admin');
-    
-    // Check if admin is already logged in
-    const adminLoggedIn = localStorage.getItem('isAdminLoggedIn') === 'true';
-    setIsLoggedIn(adminLoggedIn);
+    checkAdminAccess();
   }, []);
-  
-  const handleLogin = () => {
-    // Set admin login status in localStorage
-    localStorage.setItem('isAdminLoggedIn', 'true');
+
+  const checkAdminAccess = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      setIsLoading(false);
+      setIsLoggedIn(false);
+      toast.error("Bitte melde dich an, um fortzufahren");
+      navigate('/auth');
+      return;
+    }
+
+    const { data, error } = await supabase.rpc(
+      'has_role',
+      { 
+        _user_id: session.user.id,
+        _role: 'admin'
+      }
+    );
+
+    if (error) {
+      console.error('Error checking admin role:', error);
+      setIsLoading(false);
+      setIsLoggedIn(false);
+      toast.error("Fehler beim Überprüfen der Berechtigungen");
+      navigate('/');
+      return;
+    }
+
+    if (!data) {
+      setIsLoading(false);
+      setIsLoggedIn(false);
+      toast.error("Keine Administrator-Rechte");
+      navigate('/');
+      return;
+    }
+
     setIsLoggedIn(true);
+    setIsLoading(false);
   };
+
+  if (isLoading) {
+    return (
+      <MainLayout>
+        <div className="container-custom py-12">
+          <div className="flex justify-center items-center">
+            <div className="animate-spin h-8 w-8 border-t-2 border-primary rounded-full"></div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
   
   return (
     <MainLayout>
@@ -37,11 +83,7 @@ const AdminPage = () => {
               <AdminPanel />
             </AdminSettingsProvider>
           </QueryClientProvider>
-        ) : (
-          <div className="container-custom max-w-md">
-            <AdminLogin onLogin={handleLogin} />
-          </div>
-        )}
+        ) : null}
       </div>
     </MainLayout>
   );
