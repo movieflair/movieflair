@@ -43,7 +43,7 @@ const HomeFilterBox = () => {
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [selectedDecades, setSelectedDecades] = useState<string[]>([]);
-  const mediaType = 'movie';
+  const mediaType = 'movie' as const;
   const [rating, setRating] = useState<number>(5);
   const [recommendation, setRecommendation] = useState<MovieOrShow | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +52,7 @@ const HomeFilterBox = () => {
     genres: number[];
     decades: string[];
     rating: number;
+    mediaType: 'movie';
   } | null>(null);
 
   const handleSearch = async () => {
@@ -89,7 +90,7 @@ const HomeFilterBox = () => {
     setIsLoading(true);
     
     try {
-      const results = await getRecommendationByFilters({...lastUsedFilter, mediaType});
+      const results = await getRecommendationByFilters({...lastUsedFilter});
       
       if (results.length === 0) {
         toast.error('Keine weiteren passenden Filme gefunden.');

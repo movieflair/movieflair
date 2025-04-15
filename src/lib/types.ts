@@ -57,7 +57,7 @@ export interface FilterOptions {
   decades?: string[];
   moods?: string[];
   rating?: number;
-  mediaType?: 'movie';
+  mediaType?: 'movie' | 'tv' | 'all';
 }
 
 export interface VisitorStat {

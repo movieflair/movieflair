@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getGenres, Genre, getRecommendationByFilters, MovieOrShow } from '@/lib/api';
@@ -67,7 +66,7 @@ const Genres = () => {
     try {
       const results = await getRecommendationByFilters({
         genres: [genreId],
-        mediaType: activeTab as 'movie' | 'tv' | 'all'
+        mediaType: 'movie'
       });
       
       setMovies(results);
@@ -96,7 +95,7 @@ const Genres = () => {
     try {
       const results = await getRecommendationByFilters({
         ...filterConfig,
-        mediaType: activeTab as 'movie' | 'tv' | 'all'
+        mediaType: 'movie'
       });
       
       setMovies(results);
