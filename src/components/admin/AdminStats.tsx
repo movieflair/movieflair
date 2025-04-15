@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { ActivitySquare, ThumbsUp, ThumbsDown, BarChart } from 'lucide-react';
+import { ActivitySquare, ThumbsUp, ThumbsDown, BarChart, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
@@ -22,11 +21,19 @@ const AdminStats = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userCount, setUserCount] = useState(0);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
         setLoading(true);
+        
+        // Fetch user count
+        const { count: usersCount } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact' });
+        
+        setUserCount(usersCount || 0);
         
         // Fetch ratings data
         const { data, error } = await supabase
@@ -93,10 +100,13 @@ const AdminStats = () => {
           {error}
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
           <Card className="p-4 flex flex-col items-center">
-            <div className="text-3xl font-bold text-primary">{ratingStats.total}</div>
-            <div className="text-muted-foreground text-sm mt-1">Gesamtbewertungen</div>
+            <div className="text-3xl font-bold text-primary">{userCount}</div>
+            <div className="flex items-center gap-1 mt-1 text-sm text-muted-foreground">
+              <Users className="h-4 w-4" />
+              <span>Registrierte Nutzer</span>
+            </div>
           </Card>
           
           <Card className="p-4 flex flex-col items-center">

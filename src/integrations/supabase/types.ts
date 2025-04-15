@@ -33,6 +33,30 @@ export type Database = {
         }
         Relationships: []
       }
+      watchlist: {
+        Row: {
+          added_at: string | null
+          id: string
+          media_id: number
+          media_type: string
+          user_id: string
+        }
+        Insert: {
+          added_at?: string | null
+          id?: string
+          media_id: number
+          media_type: string
+          user_id: string
+        }
+        Update: {
+          added_at?: string | null
+          id?: string
+          media_id?: number
+          media_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
