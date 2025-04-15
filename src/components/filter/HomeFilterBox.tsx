@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Sparkles } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -219,4 +218,3 @@ const HomeFilterBox = () => {
 };
 
 export default HomeFilterBox;
-

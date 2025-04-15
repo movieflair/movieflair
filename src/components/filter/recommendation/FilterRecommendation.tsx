@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Star, Film, ArrowRight, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -98,4 +97,3 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
 };
 
 export default FilterRecommendation;
-

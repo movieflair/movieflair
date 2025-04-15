@@ -49,7 +49,7 @@ const QuickTipp = () => {
             onClick={handleGetRandomMovie} 
             disabled={loading}
             size="lg"
-            className="bg-gradient-to-r from-red-500 to-rose-700 hover:from-red-600 hover:to-rose-800 text-white font-semibold px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            className="bg-gradient-to-r from-[#ff3131] to-[#ff3131] hover:from-[#ff3131]/90 hover:to-[#ff3131]/90 text-white font-semibold px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <Sparkles className="mr-2 h-6 w-6" />
             {loading ? 'Suche einen tollen Film...' : 'Zufälligen Film vorschlagen'}
@@ -125,7 +125,7 @@ const QuickTipp = () => {
                     <div className="flex items-center gap-6">
                       <Link 
                         to={`/movie/${movie.id}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-[#ff3131] text-white rounded-lg hover:bg-[#ff3131]/90 transition-colors"
                       >
                         Details ansehen
                         <ArrowRight className="w-4 h-4" />
