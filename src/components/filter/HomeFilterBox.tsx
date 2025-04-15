@@ -1,17 +1,27 @@
+
 import { useState } from 'react';
 import FilterSelector from './FilterSelector';
 import { Button } from '../ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { getGenres, getRecommendationByFilters, MovieOrShow } from '@/lib/api';
-import { Search, Film, Tv, Star } from 'lucide-react';
+import { Search, Film, Tv, Star, Sparkles } from 'lucide-react';
 import RecommendationCard from '../movies/RecommendationCard';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
 const moods = [
-  'happy', 'sad', 'thrilling', 'thoughtful', 'relaxing',
-  'inspiring', 'romantic', 'exciting', 'nostalgic', 'suspenseful', 'lighthearted'
+  'fröhlich',
+  'nachdenklich',
+  'entspannend',
+  'romantisch',
+  'spannend',
+  'nostalgisch',
+  'inspirierend',
+  'dramatisch',
+  'aufregend',
+  'geheimnisvoll',
+  'herzerwärmend'
 ];
 
 const decades = ['1970', '1980', '1990', '2000', '2010', '2020'];
@@ -40,7 +50,7 @@ const HomeFilterBox = () => {
         mediaType,
         rating
       });
-      setRecommendation(results[0]); // Zeige den ersten empfohlenen Film
+      setRecommendation(results[0]);
     } catch (error) {
       console.error('Error getting recommendation:', error);
     } finally {
@@ -49,61 +59,67 @@ const HomeFilterBox = () => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg max-w-[800px] mx-auto">
-      <h2 className="text-xl font-medium mb-4">Finde deinen nächsten Film oder Serie</h2>
+    <div className="bg-gradient-to-r from-gray-900/90 to-gray-800/90 backdrop-blur-lg p-8 rounded-xl shadow-xl max-w-[800px] mx-auto border border-gray-700/50">
+      <div className="flex items-center gap-3 mb-6">
+        <Sparkles className="w-6 h-6 text-[#ea384c]" />
+        <h2 className="text-2xl font-medium text-white">Finde deinen perfekten Film</h2>
+      </div>
       
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium mb-2">Medientyp</label>
+          <label className="block text-sm font-medium text-gray-200 mb-3">Was möchtest du sehen?</label>
           <RadioGroup 
             value={mediaType} 
             onValueChange={(value) => setMediaType(value as 'movie' | 'tv' | 'all')}
             className="flex flex-wrap gap-4"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="movie" id="movie" />
-              <Label htmlFor="movie" className="flex items-center gap-2 cursor-pointer">
+              <RadioGroupItem value="movie" id="movie" className="border-red-500 text-red-500" />
+              <Label htmlFor="movie" className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
                 <Film className="h-4 w-4" />
                 Filme
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="tv" id="tv" />
-              <Label htmlFor="tv" className="flex items-center gap-2 cursor-pointer">
+              <RadioGroupItem value="tv" id="tv" className="border-red-500 text-red-500" />
+              <Label htmlFor="tv" className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
                 <Tv className="h-4 w-4" />
                 Serien
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="all" id="all" />
-              <Label htmlFor="all" className="cursor-pointer">
-                Beides
               </Label>
             </div>
           </RadioGroup>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-2">Stimmung</label>
-          <FilterSelector
-            title="Wähle bis zu 3 Stimmungen"
-            options={moods}
-            onSelect={(mood) => {
-              setSelectedMoods(prev => 
-                prev.includes(mood.toString())
-                  ? prev.filter(m => m !== mood.toString())
-                  : prev.length < 3
-                  ? [...prev, mood.toString()]
-                  : prev
-              );
-            }}
-            selectedValues={selectedMoods}
-            type="mood"
-          />
+        <div className="space-y-3">
+          <label className="block text-sm font-medium text-gray-200">Welche Stimmung suchst du?</label>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            {moods.map((mood) => (
+              <Button
+                key={mood}
+                variant={selectedMoods.includes(mood) ? "default" : "outline"}
+                className={`${
+                  selectedMoods.includes(mood)
+                    ? "bg-[#ea384c] hover:bg-[#ea384c]/90 text-white"
+                    : "hover:bg-gray-700/50 text-gray-300"
+                } transition-all`}
+                onClick={() => {
+                  setSelectedMoods(prev =>
+                    prev.includes(mood)
+                      ? prev.filter(m => m !== mood)
+                      : prev.length < 3
+                      ? [...prev, mood]
+                      : prev
+                  );
+                }}
+              >
+                {mood}
+              </Button>
+            ))}
+          </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Genre</label>
+          <label className="block text-sm font-medium text-gray-200 mb-3">Genre</label>
           <FilterSelector
             title="Wähle bis zu 3 Genres"
             options={genres || []}
@@ -122,7 +138,7 @@ const HomeFilterBox = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Jahrzehnt</label>
+          <label className="block text-sm font-medium text-gray-200 mb-3">Jahrzehnt</label>
           <FilterSelector
             title="Wähle ein Jahrzehnt"
             options={decades}
@@ -139,9 +155,9 @@ const HomeFilterBox = () => {
         </div>
         
         <div>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-3">
             <Star className="h-4 w-4 text-amber-500" />
-            <label className="block text-sm font-medium">Mindestbewertung: {rating}/10</label>
+            <label className="block text-sm font-medium text-gray-200">Mindestbewertung: {rating}/10</label>
           </div>
           <Slider
             value={[rating]}
@@ -149,12 +165,13 @@ const HomeFilterBox = () => {
             max={10}
             step={1}
             onValueChange={(values) => setRating(values[0])}
+            className="py-4"
           />
         </div>
 
         <Button 
           onClick={handleSearch}
-          className="w-full bg-red-500 hover:bg-red-600 text-white"
+          className="w-full bg-[#ea384c] hover:bg-[#ea384c]/90 text-white"
           size="lg"
           disabled={isLoading}
         >
@@ -165,7 +182,7 @@ const HomeFilterBox = () => {
 
       {recommendation && (
         <div className="mt-8 animate-fade-in">
-          <h3 className="text-lg font-medium mb-4">Deine Filmempfehlung</h3>
+          <h3 className="text-lg font-medium text-white mb-4">Deine Filmempfehlung</h3>
           <RecommendationCard movie={recommendation} />
         </div>
       )}
