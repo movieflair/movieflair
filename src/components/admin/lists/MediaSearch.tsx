@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Search, Film, Tv } from 'lucide-react';
+import { Search, Film, Tv, Check, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";

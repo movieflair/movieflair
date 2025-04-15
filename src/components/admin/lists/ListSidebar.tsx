@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Trash2 } from 'lucide-react';
+import { Trash2, Film } from 'lucide-react';
 import { CustomList } from '@/lib/api';
 
 interface ListSidebarProps {

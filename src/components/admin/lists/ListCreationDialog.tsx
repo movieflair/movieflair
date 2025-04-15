@@ -1,4 +1,5 @@
 
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,8 +14,8 @@ interface ListCreationDialogProps {
 }
 
 const ListCreationDialog = ({ isOpen, onClose, onListCreated }: ListCreationDialogProps) => {
-  const [listTitle, setListTitle] = React.useState('');
-  const [listDescription, setListDescription] = React.useState('');
+  const [listTitle, setListTitle] = useState('');
+  const [listDescription, setListDescription] = useState('');
 
   const handleCreateList = () => {
     if (!listTitle.trim()) {
