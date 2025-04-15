@@ -17,7 +17,7 @@ const Index = () => {
   const websiteStructuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "ScreenPick - Dein Filmguide",
+    "name": "MovieFlair – Finde den perfekten Film für deine Stimmung",
     "url": "https://screenspick.com/",
     "potentialAction": {
       "@type": "SearchAction",
@@ -29,9 +29,9 @@ const Index = () => {
   return (
     <MainLayout>
       <SEOHead 
-        title="ScreenPick - Dein Filmguide" 
-        description="Entdecke den perfekten Film für jeden Moment. Lass dich von deiner Stimmung leiten und finde passende Film- und Serienempfehlungen." 
-        keywords="filme, serien, streaming, filmempfehlungen, filmtipps, filmguide, filmdatenbank" 
+        title="MovieFlair – Finde den perfekten Film für deine Stimmung" 
+        description="Jeder Moment hat seinen Film. MovieFlair zeigt dir Filme, die zu deiner Stimmung passen – persönlich, emotional und genau im richtigen Moment." 
+        keywords="filmtipps, filmempfehlungen, filme entdecken, filmfinder, filme nach stimmung, was soll ich heute schauen, passende filme, streaming tipps, movieflair, bester film für jetzt, persönlicher filmvorschlag, filme für jede laune, emotional passende filme" 
         ogType="website" 
         structuredData={websiteStructuredData} 
       />
