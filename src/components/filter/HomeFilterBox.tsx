@@ -116,13 +116,13 @@ const HomeFilterBox = () => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-2xl shadow-lg border border-gray-100 max-w-[800px] mx-auto">
-      <div className="flex items-center gap-3 mb-6">
-        <Sparkles className="w-6 h-6 text-theme-black" />
-        <h2 className="text-2xl font-medium text-theme-black">Finde deinen perfekten Film</h2>
+    <div className="bg-white/80 backdrop-blur-sm p-4 md:p-6 lg:p-8 rounded-2xl shadow-lg border border-gray-100 max-w-[800px] mx-auto">
+      <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+        <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-theme-black" />
+        <h2 className="text-xl md:text-2xl font-medium text-theme-black">Finde deinen perfekten Film</h2>
       </div>
       
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         <div className="space-y-3">
           <label className="block text-sm font-medium text-theme-black">Welche Stimmung suchst du?</label>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
@@ -134,7 +134,7 @@ const HomeFilterBox = () => {
                   ${selectedMoods.includes(mood) 
                     ? 'bg-[#ff3131] hover:bg-[#ff3131]/90 text-white' 
                     : 'hover:bg-gray-100 text-theme-black border border-gray-200 bg-white'}
-                  transition-all font-medium text-sm
+                  transition-all font-medium text-xs md:text-sm py-1.5 md:py-2.5 px-2 md:px-5
                 `}
                 onClick={() => {
                   setSelectedMoods(prev =>
@@ -192,7 +192,7 @@ const HomeFilterBox = () => {
 
         <Button 
           onClick={handleSearch}
-          className="w-full bg-[#ff3131] hover:bg-[#ff3131]/90 text-white transition-colors"
+          className="w-full bg-[#ff3131] hover:bg-[#ff3131]/90 text-white transition-colors text-sm md:text-base py-2 md:py-2.5"
           size="lg"
           disabled={isLoading}
         >

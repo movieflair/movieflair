@@ -30,18 +30,18 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
   };
 
   return (
-    <div className="container-custom my-12">
-      <div className="glass-card overflow-hidden rounded-xl p-8">
-        <div className="grid grid-cols-[1fr,auto] gap-8">
+    <div className="container-custom my-6 md:my-12">
+      <div className="glass-card overflow-hidden rounded-xl p-4 md:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr,auto] gap-4 md:gap-8">
           <div className="space-y-4">
             <Link 
               to="/discover" 
-              className="flex items-center gap-2 text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
+              className="flex items-center gap-2 text-xl md:text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
             >
-              <ListPlus className="w-6 h-6" />
+              <ListPlus className="w-5 h-5 md:w-6 md:h-6" />
               {list.title}
             </Link>
-            <p className="text-gray-600">
+            <p className="text-sm md:text-base text-gray-600">
               {list.description}
             </p>
             <div className="flex items-center gap-2 mt-2">
@@ -54,7 +54,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
             </div>
           </div>
 
-          <div className="relative">
+          <div className="relative w-full md:w-[450px]">
             <Carousel
               id={`list-${list.id}`}
               opts={{
@@ -63,7 +63,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
                 dragFree: true,
                 skipSnaps: true,
               }}
-              className="w-[450px]"
+              className="w-full"
             >
               <CarouselContent className="-ml-4">
                 {list.movies.map((movie) => (
