@@ -11,7 +11,6 @@ import {
 } from '@/lib/api';
 
 import SearchSection from '@/components/discover/SearchSection';
-import GenreGrid from '@/components/discover/GenreGrid';
 import TrendingMovies from '@/components/discover/TrendingMovies';
 import RandomLists from '@/components/discover/RandomLists';
 import { toast } from 'sonner';
@@ -53,7 +52,6 @@ const Discover = () => {
       <div className="container-custom py-12">
         <div className="max-w-4xl mx-auto mb-12">
           <SearchSection />
-          <GenreGrid genres={genres} />
           <TrendingMovies movies={popularMovies} />
           {isLoading ? (
             <div className="text-center py-10">
