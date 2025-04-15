@@ -1,6 +1,7 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
-export async function callTMDB(path: string, searchParams = {}) {
+export async function callTMDB(path: string, searchParams: Record<string, any> = {}) {
   // Remove language parameter from searchParams if it's included in the path
   if (path.includes('language=')) {
     delete searchParams.language;
