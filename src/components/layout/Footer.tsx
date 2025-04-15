@@ -15,16 +15,25 @@ const Footer = () => {
         return;
       }
 
-      const { data, error } = await supabase.rpc(
-        'has_role',
-        { 
-          _user_id: user.id,
-          _role: 'admin'
-        }
-      );
+      try {
+        const { data, error } = await supabase.rpc(
+          'has_role',
+          { 
+            _user_id: user.id,
+            _role: 'admin'
+          }
+        );
 
-      if (!error && data) {
-        setIsAdmin(true);
+        if (error) {
+          console.error('Error checking admin role:', error);
+          setIsAdmin(false);
+          return;
+        }
+
+        setIsAdmin(data === true);
+      } catch (err) {
+        console.error('Unexpected error checking admin status:', err);
+        setIsAdmin(false);
       }
     };
 
