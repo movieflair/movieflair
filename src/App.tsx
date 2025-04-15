@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import Index from './pages/Index';
 import MovieDetails from './pages/MovieDetails';
 import TvShowDetails from './pages/TvShowDetails';
@@ -46,36 +47,38 @@ const TermsOfService = () => (
 
 const App = () => {
   return (
-    <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/movie/:id" element={
-            <AdminSettingsProvider>
-              <MovieDetails />
-            </AdminSettingsProvider>
-          } />
-          <Route path="/tv/:id" element={
-            <AdminSettingsProvider>
-              <TvShowDetails />
-            </AdminSettingsProvider>
-          } />
-          <Route path="/trailers" element={<Trailers />} />
-          <Route path="/free-movies" element={<FreeMovies />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/genres" element={<Genres />} />
-          <Route path="/quick-tipp" element={<QuickTipp />} />
-          <Route path="/watchlist" element={<Watchlist />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsOfService />} />
-          <Route path="/about" element={<About />} />
-        </Routes>
-        <Toaster />
-      </AuthProvider>
-    </Router>
+    <HelmetProvider>
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/movie/:id" element={
+              <AdminSettingsProvider>
+                <MovieDetails />
+              </AdminSettingsProvider>
+            } />
+            <Route path="/tv/:id" element={
+              <AdminSettingsProvider>
+                <TvShowDetails />
+              </AdminSettingsProvider>
+            } />
+            <Route path="/trailers" element={<Trailers />} />
+            <Route path="/free-movies" element={<FreeMovies />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/genres" element={<Genres />} />
+            <Route path="/quick-tipp" element={<QuickTipp />} />
+            <Route path="/watchlist" element={<Watchlist />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/about" element={<About />} />
+          </Routes>
+          <Toaster />
+        </AuthProvider>
+      </Router>
+    </HelmetProvider>
   );
 };
 

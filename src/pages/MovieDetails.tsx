@@ -11,6 +11,7 @@ import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import ShareButton from '@/components/movies/ShareButton';
 import SimilarMovies from '@/components/movies/SimilarMovies';
 import WatchlistButton from '@/components/movies/WatchlistButton';
+import SEOHead from '@/components/seo/SEOHead';
 
 const MovieDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -100,8 +101,44 @@ const MovieDetails = () => {
   
   const trailerUrl = getTrailerUrl();
 
+  // Prepare structured data for SEO
+  const movieStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Movie",
+    "name": movie.title,
+    "description": movie.overview,
+    "image": movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : undefined,
+    "datePublished": movie.release_date,
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": movie.vote_average,
+      "ratingCount": movie.vote_count,
+      "bestRating": "10",
+      "worstRating": "0"
+    },
+    "director": director ? {
+      "@type": "Person",
+      "name": director.name
+    } : undefined,
+    "actor": movie.cast?.slice(0, 5).map(actor => ({
+      "@type": "Person",
+      "name": actor.name
+    })),
+    "genre": movie.genres?.map(genre => genre.name),
+    "duration": movie.runtime ? `PT${movie.runtime}M` : undefined
+  };
+
   return (
     <MainLayout>
+      <SEOHead
+        title={`${movie.title} ${year ? `(${year})` : ''} - ScreenPick`}
+        description={movie.overview?.substring(0, 160) || `Entdecke ${movie.title} und ähnliche Filme auf ScreenPick.`}
+        keywords={`${movie.title}, ${movie.genres?.map(g => g.name).join(', ')}, film, movie, streaming`}
+        ogImage={movie.backdrop_path ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` : undefined}
+        ogType="movie"
+        structuredData={movieStructuredData}
+      />
+
       <div className="min-h-screen bg-white">
         <div className="relative h-[400px] overflow-hidden">
           {movie.backdrop_path ? (
