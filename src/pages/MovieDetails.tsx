@@ -53,7 +53,7 @@ const MovieDetails = () => {
     fetchMovie();
   }, [id, slug]);
 
-  if (isLoading || !movie) {
+  if (isLoading) {
     return (
       <MainLayout>
         <div className="min-h-screen bg-white flex items-center justify-center">
@@ -63,9 +63,21 @@ const MovieDetails = () => {
     );
   }
 
+  if (!movie) {
+    return (
+      <MainLayout>
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="animate-pulse text-gray-600">Movie not found</div>
+        </div>
+      </MainLayout>
+    );
+  }
+
   const director = movie.crew?.find(person => person.job === 'Director');
-  const year = movie.release_date ? new Date(movie.release_date).getFullYear() : undefined;
-  
+  const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear() : '';
+  const seoTitle = `${movie.title} (${releaseYear}) Online Stream anschauen | MovieFlair`;
+  const seoDescription = `${movie.title} (${releaseYear}) kostenlos online streamen. ${movie.overview?.slice(0, 150)}...`;
+
   const getAmazonUrl = (title: string) => {
     const formattedTitle = encodeURIComponent(title);
     const tag = amazonAffiliateId || 'movieflair-21';
@@ -137,12 +149,11 @@ const MovieDetails = () => {
 
   return (
     <MainLayout>
-      <SEOHead
-        title={`${movie.title} ${year ? `(${year})` : ''} - ScreenPick`}
-        description={movie.overview?.substring(0, 160) || `Entdecke ${movie.title} und ähnliche Filme auf ScreenPick.`}
-        keywords={`${movie.title}, ${movie.genres?.map(g => g.name).join(', ')}, film, movie, streaming`}
-        ogImage={movie.backdrop_path ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}` : undefined}
+      <SEOHead 
+        title={seoTitle}
+        description={seoDescription}
         ogType="movie"
+        ogImage={movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : undefined}
         structuredData={movieStructuredData}
       />
 
@@ -194,7 +205,7 @@ const MovieDetails = () => {
                 )}
 
                 <MovieMeta
-                  year={year?.toString()}
+                  year={releaseYear}
                   rating={movie.vote_average}
                   duration={movie.runtime}
                   mediaType="movie"
