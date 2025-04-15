@@ -10,7 +10,7 @@ const SearchSection = () => {
   const handleSearch = (value: string) => {
     setSearchQuery(value);
     if (value.trim()) {
-      navigate(`/search?q=${encodeURIComponent(value.trim())}`);
+      navigate(`/suche?q=${encodeURIComponent(value.trim())}`);
     }
   };
 

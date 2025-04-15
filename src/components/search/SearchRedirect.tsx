@@ -14,11 +14,11 @@ const SearchRedirect = () => {
   useEffect(() => {
     // Check if the current URL contains a search parameter
     const searchParams = new URLSearchParams(location.search);
-    const searchQuery = searchParams.get('search');
+    const searchQuery = searchParams.get('search') || searchParams.get('q');
     
-    // If there's a search parameter, redirect to the dedicated search page
-    if (searchQuery && location.pathname !== '/search') {
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+    // If there's a search parameter and we're not already on the search page
+    if (searchQuery && location.pathname !== '/suche') {
+      navigate(`/suche?q=${encodeURIComponent(searchQuery)}`);
     }
   }, [location, navigate]);
   
