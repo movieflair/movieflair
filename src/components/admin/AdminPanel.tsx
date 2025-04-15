@@ -1,27 +1,34 @@
 import { useState, useEffect } from 'react';
-import { Search, FileEdit, Film, Pencil, Tv } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useAdminSettings } from '@/hooks/useAdminSettings';
+import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { FileEdit } from 'lucide-react';
+import { toast } from "sonner";
+
+import { useAdminSettings } from '@/hooks/useAdminSettings';
+import { MovieOrShow } from '@/lib/types';
 import { 
   getPopularMovies, 
   getFreeMovies, 
   getTrailerMovies,
   searchMovies, 
   searchTvShows,
-  getPopularTvShows,
-  MovieOrShow 
+  getPopularTvShows 
 } from '@/lib/api';
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import AdminStats from './AdminStats';
-import AdminVisitorStats from './AdminVisitorStats';
-import AdminContentTabs from './AdminContentTabs';
+
+import AdminHeader from './header/AdminHeader';
+import AdminSearch from './search/AdminSearch';
+import MovieGrid from './movies/MovieGrid';
+import ShowGrid from './shows/ShowGrid';
 import MovieEditForm from './MovieEditForm';
 import TvShowEditForm from './TvShowEditForm';
+import AdminContentTabs from './AdminContentTabs';
 import CustomListManager from './CustomListManager';
+import AdminStats from './AdminStats';
+import AdminVisitorStats from './AdminVisitorStats';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('movies');
@@ -271,15 +278,7 @@ const AdminPanel = () => {
 
   return (
     <div className="container-custom py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
-        <button 
-          onClick={handleLogout}
-          className="button-secondary"
-        >
-          Logout
-        </button>
-      </div>
+      <AdminHeader onLogout={handleLogout} />
 
       <Tabs defaultValue="content" className="w-full">
         <TabsList className="mb-6">
@@ -300,25 +299,13 @@ const AdminPanel = () => {
             />
 
             <div className="p-4">
-              <form onSubmit={handleSearch} className="flex max-w-md mb-6">
-                <div className="relative flex-grow">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input
-                    type="text"
-                    placeholder={`Suche ${activeTab === 'movies' ? 'Filme' : activeTab === 'shows' ? 'Serien' : 'Tags'}...`}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  />
-                </div>
-                <button 
-                  type="submit" 
-                  className="button-primary ml-2"
-                  disabled={isSearchLoading || isSearchTvLoading}
-                >
-                  {(isSearchLoading || isSearchTvLoading) ? 'Suche...' : 'Suchen'}
-                </button>
-              </form>
+              <AdminSearch
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onSearch={handleSearch}
+                isLoading={isSearchLoading || isSearchTvLoading}
+                activeTab={activeTab}
+              />
 
               {activeTab === 'movies' && selectedMovie && (
                 <MovieEditForm
@@ -375,76 +362,13 @@ const AdminPanel = () => {
                     }
                   </h3>
                   
-                  {isSearchLoading || isLoadingMovies || isLoadingFreeMovies || isLoadingTrailerMovies ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin h-8 w-8 border-t-2 border-primary rounded-full mx-auto"></div>
-                      <p className="mt-2 text-muted-foreground">Lade Filme...</p>
-                    </div>
-                  ) : filteredMovies.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredMovies.map(movie => (
-                        <div 
-                          key={movie.id} 
-                          className="border border-border rounded-md p-4 hover:bg-muted/30 cursor-pointer transition-colors"
-                          onClick={() => handleEditMovie(movie)}
-                        >
-                          <div className="flex items-start">
-                            <div className="w-16 h-24 bg-muted rounded overflow-hidden">
-                              {movie.poster_path ? (
-                                <img 
-                                  src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`} 
-                                  alt={movie.title} 
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-muted">
-                                  <Film className="w-8 h-8 text-muted-foreground" />
-                                </div>
-                              )}
-                            </div>
-                            <div className="ml-4 flex-grow">
-                              <h4 className="font-medium">{movie.title}</h4>
-                              <p className="text-sm text-muted-foreground">
-                                {movie.release_date?.substring(0, 4) || 'Unbekanntes Jahr'}
-                              </p>
-                              <div className="flex flex-wrap gap-1 mt-2">
-                                {movie.hasStream && (
-                                  <span className="inline-block text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                                    Stream verfügbar
-                                  </span>
-                                )}
-                                {movie.hasTrailer && (
-                                  <span className="inline-block text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                    Trailer
-                                  </span>
-                                )}
-                                {movie.isFreeMovie && (
-                                  <span className="inline-block text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
-                                    Kostenlos
-                                  </span>
-                                )}
-                                {movie.isNewTrailer && (
-                                  <span className="inline-block text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
-                                    Neu
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <Button variant="ghost" size="icon" className="text-muted-foreground">
-                              <Pencil className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      {searchQuery ? 'Keine Filme gefunden.' : 
-                       currentView === 'free' ? 'Keine kostenlosen Filme markiert.' :
-                       currentView === 'trailers' ? 'Keine neuen Trailer markiert.' :
-                       'Keine Filme verfügbar.'}
-                    </div>
-                  )}
+                  <MovieGrid
+                    movies={filteredMovies}
+                    onEditMovie={handleEditMovie}
+                    isLoading={isSearchLoading || isLoadingMovies || isLoadingFreeMovies || isLoadingTrailerMovies}
+                    searchQuery={searchQuery}
+                    currentView={currentView}
+                  />
                 </div>
               )}
 
@@ -457,63 +381,12 @@ const AdminPanel = () => {
                     }
                   </h3>
                   
-                  {isSearchTvLoading || isLoadingTvShows ? (
-                    <div className="text-center py-8">
-                      <div className="animate-spin h-8 w-8 border-t-2 border-primary rounded-full mx-auto"></div>
-                      <p className="mt-2 text-muted-foreground">Lade Serien...</p>
-                    </div>
-                  ) : filteredTvShows.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {filteredTvShows.map(show => (
-                        <div 
-                          key={show.id} 
-                          className="border border-border rounded-md p-4 hover:bg-muted/30 cursor-pointer transition-colors"
-                          onClick={() => handleEditTvShow(show)}
-                        >
-                          <div className="flex items-start">
-                            <div className="w-16 h-24 bg-muted rounded overflow-hidden">
-                              {show.poster_path ? (
-                                <img 
-                                  src={`https://image.tmdb.org/t/p/w200${show.poster_path}`} 
-                                  alt={show.name} 
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-muted">
-                                  <Tv className="w-8 h-8 text-muted-foreground" />
-                                </div>
-                              )}
-                            </div>
-                            <div className="ml-4 flex-grow">
-                              <h4 className="font-medium">{show.name}</h4>
-                              <p className="text-sm text-muted-foreground">
-                                {show.first_air_date?.substring(0, 4) || 'Unbekanntes Jahr'}
-                              </p>
-                              <div className="flex flex-wrap gap-1 mt-2">
-                                {show.hasStream && (
-                                  <span className="inline-block text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                                    Stream verfügbar
-                                  </span>
-                                )}
-                                {show.hasTrailer && (
-                                  <span className="inline-block text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                    Trailer
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <Button variant="ghost" size="icon" className="text-muted-foreground">
-                              <Pencil className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-muted-foreground">
-                      {searchQuery ? 'Keine Serien gefunden.' : 'Keine Serien verfügbar.'}
-                    </div>
-                  )}
+                  <ShowGrid
+                    shows={filteredTvShows}
+                    onEditShow={handleEditTvShow}
+                    isLoading={isSearchTvLoading || isLoadingTvShows}
+                    searchQuery={searchQuery}
+                  />
                 </div>
               )}
             </div>
