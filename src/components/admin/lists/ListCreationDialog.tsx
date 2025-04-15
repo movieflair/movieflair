@@ -1,9 +1,9 @@
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { createCustomList } from '@/lib/customListApi';
 import { toast } from "sonner";
 
@@ -13,55 +13,74 @@ interface ListCreationDialogProps {
   onListCreated: () => void;
 }
 
-const ListCreationDialog = ({ isOpen, onClose, onListCreated }: ListCreationDialogProps) => {
-  const [listTitle, setListTitle] = useState('');
-  const [listDescription, setListDescription] = useState('');
+const ListCreationDialog: React.FC<ListCreationDialogProps> = ({ isOpen, onClose, onListCreated }) => {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
 
   const handleCreateList = () => {
-    if (!listTitle.trim()) {
+    if (!title.trim()) {
       toast.error('Bitte gib einen Titel für die Liste ein');
       return;
     }
     
-    createCustomList(listTitle.trim(), listDescription.trim());
-    toast.success('Liste erfolgreich erstellt');
+    setIsCreating(true);
     
-    setListTitle('');
-    setListDescription('');
-    onClose();
-    onListCreated();
+    try {
+      createCustomList(title.trim(), description.trim());
+      toast.success('Liste erfolgreich erstellt');
+      
+      onListCreated();
+      onClose();
+      
+      // Reset form
+      setTitle('');
+      setDescription('');
+    } catch (error) {
+      console.error('Fehler beim Erstellen der Liste:', error);
+      toast.error('Fehler beim Erstellen der Liste');
+    } finally {
+      setIsCreating(false);
+    }
   };
-
+  
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>Neue Liste erstellen</DialogTitle>
         </DialogHeader>
+        
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <label htmlFor="list-title" className="text-sm font-medium">Titel</label>
+            <label htmlFor="title" className="text-sm font-medium">Titel</label>
             <Input
-              id="list-title"
-              value={listTitle}
-              onChange={(e) => setListTitle(e.target.value)}
-              placeholder="z.B. Meine Lieblingsfilme"
+              id="title"
+              placeholder="Titel der Liste"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
+          
           <div className="space-y-2">
-            <label htmlFor="list-description" className="text-sm font-medium">Beschreibung</label>
+            <label htmlFor="description" className="text-sm font-medium">Beschreibung (optional)</label>
             <Textarea
-              id="list-description"
-              value={listDescription}
-              onChange={(e) => setListDescription(e.target.value)}
-              placeholder="Beschreibe deine Liste"
-              className="min-h-[100px]"
+              id="description"
+              placeholder="Beschreibung der Liste"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows={3}
             />
           </div>
         </div>
+        
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Abbrechen</Button>
-          <Button onClick={handleCreateList}>Liste erstellen</Button>
+          <Button variant="outline" onClick={onClose} disabled={isCreating}>
+            Abbrechen
+          </Button>
+          <Button onClick={handleCreateList} disabled={isCreating}>
+            {isCreating ? 'Erstelle...' : 'Liste erstellen'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
