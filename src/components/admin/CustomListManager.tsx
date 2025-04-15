@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Film, Check, Save, X, Tv, Trash2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ const CustomListManager = () => {
     loadLists();
   }, []);
 
+  // Use a single useEffect to handle both movie and TV results
   useEffect(() => {
     if (searchType === 'movie' && movieResults.length > 0) {
       setSearchResults(movieResults);
