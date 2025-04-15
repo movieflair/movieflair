@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Star, Film, ArrowRight } from 'lucide-react';
+import { Star, Film, ArrowRight, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
