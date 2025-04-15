@@ -1,10 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
-import { getTvShowDetails, getCast, MovieOrShow } from '@/lib/api';
+import { MovieOrShow } from '@/lib/types';
+import { getTvShowDetails, getCast } from '@/lib/tvShowApi';
 import MovieCard from '@/components/movies/MovieCard';
 import { PlayCircle } from 'lucide-react';
 import SEOHead from '@/components/seo/SEOHead';
+import { generateTVShowSchema } from '@/utils/seoUtils';
 
 const TvShowDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,6 +73,8 @@ const TvShowDetails = () => {
   const seoTitle = `${show.name} (${firstAirYear}) Online Stream anschauen | MovieFlair`;
   const seoDescription = `${show.name} (${firstAirYear}) kostenlos online streamen. ${show.overview?.slice(0, 150)}...`;
 
+  const tvShowStructuredData = generateTVShowSchema(show);
+
   return (
     <MainLayout>
       <SEOHead 
@@ -77,6 +82,7 @@ const TvShowDetails = () => {
         description={seoDescription}
         ogType="tv_show"
         ogImage={show.backdrop_path ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` : undefined}
+        structuredData={tvShowStructuredData}
       />
       <div className="container-custom py-12">
         <h1 className="text-3xl font-semibold mb-6">{show.name}</h1>

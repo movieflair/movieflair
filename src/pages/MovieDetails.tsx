@@ -144,7 +144,7 @@ const MovieDetails = () => {
       "name": actor.name
     })),
     "genre": movie.genres?.map(genre => genre.name),
-    "duration": movie.runtime ? `PT${movie.runtime}M` : undefined
+    "duration": movie.runtime ? `PT${movie.runtime.toString()}M` : undefined
   };
 
   return (
