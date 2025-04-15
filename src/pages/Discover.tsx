@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -20,6 +21,10 @@ const Discover = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [popularMovies, setPopularMovies] = useState<MovieOrShow[]>([]);
   const [popularShows, setPopularShows] = useState<MovieOrShow[]>([]);
+  const [sciFiMovies, setSciFiMovies] = useState<MovieOrShow[]>([]);
+  const [romanceMovies, setRomanceMovies] = useState<MovieOrShow[]>([]);
+  const [actionMovies, setActionMovies] = useState<MovieOrShow[]>([]);
+  const [documentaryMovies, setDocumentaryMovies] = useState<MovieOrShow[]>([]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -32,6 +37,17 @@ const Discover = () => {
         setGenres(genresList);
         setPopularMovies(movies.slice(0, 4));
         setPopularShows(shows.slice(0, 4));
+
+        // Fetch movies for each list category
+        const sciFi = await getRecommendationByFilters({ genres: [878], mediaType: 'movie' });
+        const romance = await getRecommendationByFilters({ genres: [10749], mediaType: 'movie' });
+        const action = await getRecommendationByFilters({ genres: [28], mediaType: 'movie' });
+        const documentary = await getRecommendationByFilters({ genres: [99], mediaType: 'movie' });
+
+        setSciFiMovies(sciFi.slice(0, 4));
+        setRomanceMovies(romance.slice(0, 4));
+        setActionMovies(action.slice(0, 4));
+        setDocumentaryMovies(documentary.slice(0, 4));
       } catch (error) {
         console.error('Error fetching initial data:', error);
       }
@@ -49,20 +65,6 @@ const Discover = () => {
 
   const handleGenreClick = (genreId: number) => {
     navigate(`/search?genre=${genreId}`);
-  };
-
-  const handleListClick = (genre: string) => {
-    const genreMapping: Record<string, number[]> = {
-      'sci-fi': [878], // Science Fiction
-      'romance': [10749], // Romance
-      'action': [28], // Action
-      'documentary': [99] // Documentary
-    };
-
-    const selectedGenres = genreMapping[genre];
-    if (selectedGenres) {
-      navigate(`/search?genre=${selectedGenres.join(',')}`);
-    }
   };
 
   return (
@@ -89,7 +91,7 @@ const Discover = () => {
               {genres.map((genre) => (
                 <Card 
                   key={genre.id}
-                  className="cursor-pointer hover:bg-accent transition-colors"
+                  className="cursor-pointer hover:bg-red-500 hover:text-white transition-colors"
                   onClick={() => handleGenreClick(genre.id)}
                 >
                   <CardContent className="p-4 text-center">
@@ -113,45 +115,51 @@ const Discover = () => {
             </div>
           </section>
 
-          {/* Listen Section */}
+          {/* Lists Sections */}
           <section className="mb-12">
             <div className="flex items-center gap-2 mb-6">
               <Shuffle className="w-6 h-6 text-purple-500" />
               <h2 className="text-2xl font-semibold">Zufällige Listen</h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <Card 
-                className="cursor-pointer hover:bg-red-500 hover:text-white transition-colors"
-                onClick={() => handleListClick('sci-fi')}
-              >
-                <CardContent className="p-4">
-                  <h3 className="font-medium">Sci-Fi Klassiker</h3>
-                </CardContent>
-              </Card>
-              <Card 
-                className="cursor-pointer hover:bg-red-500 hover:text-white transition-colors"
-                onClick={() => handleListClick('romance')}
-              >
-                <CardContent className="p-4">
-                  <h3 className="font-medium">Liebesfilme</h3>
-                </CardContent>
-              </Card>
-              <Card 
-                className="cursor-pointer hover:bg-red-500 hover:text-white transition-colors"
-                onClick={() => handleListClick('action')}
-              >
-                <CardContent className="p-4">
-                  <h3 className="font-medium">Action Blockbuster</h3>
-                </CardContent>
-              </Card>
-              <Card 
-                className="cursor-pointer hover:bg-red-500 hover:text-white transition-colors"
-                onClick={() => handleListClick('documentary')}
-              >
-                <CardContent className="p-4">
-                  <h3 className="font-medium">Dokumentarfilme</h3>
-                </CardContent>
-              </Card>
+            
+            {/* Sci-Fi List */}
+            <div className="mb-8">
+              <h3 className="text-xl font-medium mb-4">Sci-Fi Klassiker</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {sciFiMovies.map((movie) => (
+                  <MovieCard key={movie.id} movie={movie} />
+                ))}
+              </div>
+            </div>
+            
+            {/* Romance List */}
+            <div className="mb-8">
+              <h3 className="text-xl font-medium mb-4">Liebesfilme</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {romanceMovies.map((movie) => (
+                  <MovieCard key={movie.id} movie={movie} />
+                ))}
+              </div>
+            </div>
+            
+            {/* Action List */}
+            <div className="mb-8">
+              <h3 className="text-xl font-medium mb-4">Action Blockbuster</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {actionMovies.map((movie) => (
+                  <MovieCard key={movie.id} movie={movie} />
+                ))}
+              </div>
+            </div>
+            
+            {/* Documentary List */}
+            <div className="mb-8">
+              <h3 className="text-xl font-medium mb-4">Dokumentarfilme</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {documentaryMovies.map((movie) => (
+                  <MovieCard key={movie.id} movie={movie} />
+                ))}
+              </div>
             </div>
           </section>
         </div>
