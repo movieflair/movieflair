@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
@@ -70,6 +69,8 @@ const QuickTipp = () => {
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         opacity: 0.8,
+                        borderTopRightRadius: '0.75rem',
+                        borderBottomRightRadius: '0.75rem'
                       }}
                     >
                       <div 
@@ -83,7 +84,9 @@ const QuickTipp = () => {
                               rgba(255, 255, 255, 0.9) 60%,
                               rgba(255, 255, 255, 1) 100%
                             )
-                          `
+                          `,
+                          borderTopRightRadius: '0.75rem',
+                          borderBottomRightRadius: '0.75rem'
                         }}
                       />
                     </div>
@@ -145,21 +148,23 @@ const QuickTipp = () => {
                         </div>
                       )}
 
-                      <p className="text-gray-600 mb-4 text-sm line-clamp-2">
-                        {movie.overview || 'Keine Beschreibung verfügbar.'}
+                      <p className="text-gray-600 mb-8 text-sm">
+                        {movie.overview?.length > 400 
+                          ? `${movie.overview.substring(0, 400)}...` 
+                          : movie.overview || 'Keine Beschreibung verfügbar.'}
                       </p>
-                    </div>
 
-                    <div className="flex items-center gap-6">
-                      <Link 
-                        to={`/movie/${movie.id}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-[#ff3131] text-white rounded-lg hover:bg-[#ff3131]/90 transition-colors"
-                      >
-                        Details ansehen
-                        <ArrowRight className="w-4 h-4" />
-                      </Link>
-                      <div className="text-sm text-gray-600 flex items-center">
-                        <MovieRatingFeedback movieId={movie.id} />
+                      <div className="flex items-center gap-6 mb-4">
+                        <Link 
+                          to={`/movie/${movie.id}`}
+                          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-[#ff3131] text-white rounded-lg hover:bg-[#ff3131]/90 transition-colors"
+                        >
+                          Details ansehen
+                          <ArrowRight className="w-4 h-4" />
+                        </Link>
+                        <div className="text-sm text-gray-600 flex items-center">
+                          <MovieRatingFeedback movieId={movie.id} />
+                        </div>
                       </div>
                     </div>
                   </div>
