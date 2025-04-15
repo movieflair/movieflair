@@ -16,6 +16,32 @@ import { AdminSettingsProvider } from './hooks/useAdminSettings';
 import AdminPage from './pages/AdminPage';
 import { AuthProvider } from './context/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
+import EnhancedLayout from './components/layout/EnhancedLayout';
+
+// Adding placeholder components for Privacy and Terms pages
+const PrivacyPolicy = () => (
+  <EnhancedLayout>
+    <div className="container-custom py-12">
+      <h1 className="text-3xl font-bold mb-6">Privacy Policy</h1>
+      <p className="mb-4">
+        This privacy policy outlines how we collect, use, and protect your personal information when using our service.
+      </p>
+      <p>Content to be added...</p>
+    </div>
+  </EnhancedLayout>
+);
+
+const TermsOfService = () => (
+  <EnhancedLayout>
+    <div className="container-custom py-12">
+      <h1 className="text-3xl font-bold mb-6">Terms of Service</h1>
+      <p className="mb-4">
+        By using our service, you agree to these terms of service that outline your rights and responsibilities.
+      </p>
+      <p>Content to be added...</p>
+    </div>
+  </EnhancedLayout>
+);
 
 const App = () => {
   return (
@@ -42,6 +68,8 @@ const App = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
         </Routes>
         <Toaster />
       </AuthProvider>

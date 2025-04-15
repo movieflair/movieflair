@@ -60,13 +60,18 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/discover" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Discover
+                <Link to="/genres" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Genres
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">
-                  About
+                <Link to="/trailers" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Trailers
+                </Link>
+              </li>
+              <li>
+                <Link to="/quick-tipp" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Quick Tipp
                 </Link>
               </li>
               {isAdmin && (
