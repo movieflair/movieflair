@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import FilterSelector from './FilterSelector';
 import { Button } from '../ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { getGenres, getRecommendationByFilters, MovieOrShow } from '@/lib/api';
-import { Search, Film, Tv, Star, Sparkles } from 'lucide-react';
+import { Search, Film, Tv, Star, Sparkles, Film2 } from 'lucide-react';
 import RecommendationCard from '../movies/RecommendationCard';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -24,7 +23,6 @@ const moods = [
   'herzerwärmend'
 ];
 
-// Reversed decades order to show newest first
 const decades = ['2020', '2010', '2000', '1990', '1980', '1970'];
 
 const HomeFilterBox = () => {
@@ -75,24 +73,23 @@ const HomeFilterBox = () => {
             className="flex flex-wrap gap-4"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="movie" id="movie" className="border-red-500 text-red-500" />
+              <RadioGroupItem value="movie" id="movie" className="border-[#ea384c] text-[#ea384c]" />
               <Label htmlFor="movie" className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
                 <Film className="h-4 w-4" />
                 Filme
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="tv" id="tv" className="border-red-500 text-red-500" />
+              <RadioGroupItem value="tv" id="tv" className="border-[#ea384c] text-[#ea384c]" />
               <Label htmlFor="tv" className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
                 <Tv className="h-4 w-4" />
                 Serien
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="all" id="all" className="border-red-500 text-red-500" />
+              <RadioGroupItem value="all" id="all" className="border-[#ea384c] text-[#ea384c]" />
               <Label htmlFor="all" className="flex items-center gap-2 cursor-pointer text-gray-300 hover:text-white">
-                <Film className="h-4 w-4 mr-0" />
-                <Tv className="h-4 w-4 -ml-2" />
+                <Film2 className="h-4 w-4" />
                 Beides
               </Label>
             </div>
@@ -174,7 +171,7 @@ const HomeFilterBox = () => {
             max={10}
             step={1}
             onValueChange={(values) => setRating(values[0])}
-            className="py-4"
+            className="py-4 [&_.text-primary]:text-[#ea384c] [&_[role=slider]]:bg-[#ea384c]"
           />
         </div>
 
