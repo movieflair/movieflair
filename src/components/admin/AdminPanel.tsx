@@ -6,7 +6,7 @@ import { FileEdit } from 'lucide-react';
 import { toast } from "sonner";
 
 import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { MovieOrShow } from '@/lib/types';
+import { MovieOrShow } from "@/lib/types";
 import { 
   getPopularMovies, 
   getFreeMovies, 
@@ -182,12 +182,22 @@ const AdminPanel = () => {
   const handleSaveMovie = () => {
     if (!selectedMovie) return;
 
+    console.log("Saving movie with these settings:", {
+      id: selectedMovie.id,
+      title: selectedMovie.title,
+      isFreeMovie,
+      isNewTrailer,
+      streamUrl: isFreeMovie ? streamUrl : '',
+      trailerUrl: isNewTrailer ? trailerUrl : ''
+    });
+
     const savedMoviesJson = localStorage.getItem('adminMovies');
-    let savedMovies: MovieOrShow[] = [];
+    let savedMovies: any[] = [];
     
     if (savedMoviesJson) {
       try {
         savedMovies = JSON.parse(savedMoviesJson);
+        console.log("Found existing saved movies:", savedMovies.length);
       } catch (e) {
         console.error('Error parsing saved movies:', e);
       }
@@ -206,12 +216,15 @@ const AdminPanel = () => {
     };
     
     if (existingIndex >= 0) {
+      console.log("Updating existing movie at index:", existingIndex);
       savedMovies[existingIndex] = updatedMovie;
     } else {
+      console.log("Adding new movie to saved movies");
       savedMovies.push(updatedMovie);
     }
     
     localStorage.setItem('adminMovies', JSON.stringify(savedMovies));
+    console.log("Saved movies to localStorage, count:", savedMovies.length);
     
     queryClient.invalidateQueries({ queryKey: ['admin-movies'] });
     queryClient.invalidateQueries({ queryKey: ['admin-free-movies'] });
@@ -226,12 +239,22 @@ const AdminPanel = () => {
   const handleSaveTvShow = () => {
     if (!selectedTvShow) return;
 
+    console.log("Saving TV show with these settings:", {
+      id: selectedTvShow.id,
+      name: selectedTvShow.name,
+      hasStream,
+      hasTrailer,
+      streamUrl: hasStream ? streamUrl : '',
+      trailerUrl: hasTrailer ? trailerUrl : ''
+    });
+
     const savedShowsJson = localStorage.getItem('adminShows');
-    let savedShows: MovieOrShow[] = [];
+    let savedShows: any[] = [];
     
     if (savedShowsJson) {
       try {
         savedShows = JSON.parse(savedShowsJson);
+        console.log("Found existing saved shows:", savedShows.length);
       } catch (e) {
         console.error('Error parsing saved shows:', e);
       }
@@ -248,12 +271,15 @@ const AdminPanel = () => {
     };
     
     if (existingIndex >= 0) {
+      console.log("Updating existing show at index:", existingIndex);
       savedShows[existingIndex] = updatedShow;
     } else {
+      console.log("Adding new show to saved shows");
       savedShows.push(updatedShow);
     }
     
     localStorage.setItem('adminShows', JSON.stringify(savedShows));
+    console.log("Saved shows to localStorage, count:", savedShows.length);
     
     queryClient.invalidateQueries({ queryKey: ['admin-tv-shows'] });
     queryClient.invalidateQueries({ queryKey: ['search-tv-shows'] });

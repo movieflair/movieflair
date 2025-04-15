@@ -16,8 +16,10 @@ const Trailers = () => {
     const fetchMovies = async () => {
       try {
         setIsLoading(true);
+        console.log('Trailers page: Fetching trailer movies...');
         const data = await getTrailerMovies();
-        console.log('Fetched trailer movies:', data);
+        console.log('Trailers page: Fetched trailer movies:', data.length);
+        console.log('Trailers page: Sample trailer movie:', data[0]);
         setMovies(data);
       } catch (error) {
         console.error('Error fetching trailers:', error);

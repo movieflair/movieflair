@@ -41,7 +41,7 @@ const MovieEditForm = ({
   return (
     <div className="border border-border rounded-md p-6 mb-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">Film bearbeiten</h3>
+        <h3 className="text-lg font-medium">Film bearbeiten: {selectedMovie.title}</h3>
         <Button variant="ghost" onClick={onCancel} className="text-sm">
           Zurück zur Liste
         </Button>

@@ -18,13 +18,13 @@ export async function callTMDB(path: string, searchParams = {}) {
 export const getAdminMovieSettings = async () => {
   const savedMoviesJson = localStorage.getItem('adminMovies');
   if (!savedMoviesJson) {
-    console.log('No saved movie settings found');
+    console.log('No saved movie settings found in localStorage');
     return {};
   }
   
   try {
     const savedMovies = JSON.parse(savedMoviesJson);
-    console.log(`Found ${savedMovies.length} saved movie settings`);
+    console.log(`Found ${savedMovies.length} saved movie settings in localStorage`);
     
     // Convert array to object indexed by movie ID
     const movieSettings = savedMovies.reduce((acc: Record<number, any>, movie: any) => {
@@ -43,10 +43,15 @@ export const getAdminMovieSettings = async () => {
 
 export const getAdminTvShowSettings = async () => {
   const savedShowsJson = localStorage.getItem('adminShows');
-  if (!savedShowsJson) return {};
+  if (!savedShowsJson) {
+    console.log('No saved TV show settings found in localStorage');
+    return {};
+  }
   
   try {
     const savedShows = JSON.parse(savedShowsJson);
+    console.log(`Found ${savedShows.length} saved TV show settings in localStorage`);
+    
     return savedShows.reduce((acc: Record<number, any>, show: any) => {
       if (show.id) {
         acc[show.id] = show;

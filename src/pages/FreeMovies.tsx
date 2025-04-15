@@ -16,8 +16,10 @@ const FreeMovies = () => {
     const fetchMovies = async () => {
       try {
         setIsLoading(true);
+        console.log('FreeMovies page: Fetching free movies...');
         const data = await getFreeMovies();
-        console.log('Fetched free movies:', data);
+        console.log('FreeMovies page: Fetched free movies:', data.length);
+        console.log('FreeMovies page: Sample free movie:', data[0]);
         setMovies(data);
       } catch (error) {
         console.error('Error fetching free movies:', error);
@@ -51,7 +53,7 @@ const FreeMovies = () => {
           </div>
         ) : movies.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Keine kostenlosen Filme gefunden.</p>
+            <p className="text-muted-foreground">Keine kostenlosen Filme gefunden. Bitte markiere Filme im Admin-Bereich als kostenlos.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
