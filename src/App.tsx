@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -26,10 +25,11 @@ const PrivacyPolicy = () => (
   <EnhancedLayout>
     <div className="container-custom py-12">
       <h1 className="text-3xl font-bold mb-6">Datenschutzerklärung</h1>
-      <p className="mb-4">
-        Diese Datenschutzerklärung erläutert, wie wir Ihre persönlichen Informationen sammeln, verwenden und schützen, wenn Sie unseren Service nutzen.
+      <p className="prose max-w-none">
+        Hier finden Sie detaillierte Informationen zum Schutz und zur Verarbeitung Ihrer persönlichen Daten bei MovieFlair. 
+        Wir legen großen Wert auf Transparenz und den verantwortungsvollen Umgang mit Ihren Daten.
       </p>
-      <p>Inhalt wird noch hinzugefügt...</p>
+      {/* Placeholder for more detailed privacy policy content */}
     </div>
   </EnhancedLayout>
 );
@@ -38,10 +38,11 @@ const TermsOfService = () => (
   <EnhancedLayout>
     <div className="container-custom py-12">
       <h1 className="text-3xl font-bold mb-6">Nutzungsbedingungen</h1>
-      <p className="mb-4">
-        Durch die Nutzung unseres Dienstes stimmen Sie diesen Nutzungsbedingungen zu, die Ihre Rechte und Pflichten umreißen.
+      <p className="prose max-w-none">
+        Die folgenden Nutzungsbedingungen regeln Ihre Nutzung des MovieFlair-Services. 
+        Durch die Nutzung unserer Plattform erkennen Sie diese Bedingungen an.
       </p>
-      <p>Inhalt wird noch hinzugefügt...</p>
+      {/* Placeholder for more detailed terms of service content */}
     </div>
   </EnhancedLayout>
 );
