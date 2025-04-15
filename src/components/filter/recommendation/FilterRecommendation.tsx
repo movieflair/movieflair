@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Star, Film, ArrowRight, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,27 +19,27 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
     return text.slice(0, maxLength).trim() + '...';
   };
   
-  // Funktion, um den richtigen URL-Pfad basierend auf dem mediaType zu erzeugen
   const getDetailPath = () => {
-    // Use the right base URL depending on media type
     const baseUrl = recommendation.media_type === 'movie' ? '/film' : '/serie';
     return `${baseUrl}/${recommendation.id}`;
   };
 
   return (
     <div className="mt-8 animate-fade-in">
-      <div className="bg-gradient-to-b from-white/10 to-white/5 rounded-xl p-6 backdrop-blur-sm border border-white/10">
+      <div className="bg-white/90 rounded-xl p-6 shadow-lg border border-gray-100">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-medium text-white">Deine {recommendation.media_type === 'movie' ? 'Film' : 'Serien'}empfehlung</h3>
+          <h3 className="text-lg font-medium text-gray-800">
+            Deine {recommendation.media_type === 'movie' ? 'Film' : 'Serien'}empfehlung
+          </h3>
           <Button 
-            variant="ghost" 
+            variant="outline" 
             size="sm" 
             onClick={onRefresh}
             disabled={isLoading}
-            className="hover:bg-white/10"
+            className="border-gray-200 text-gray-600 hover:text-gray-800"
           >
-            <RefreshCcw className="w-4 h-4 mr-2 text-white" />
-            <span className="text-white">Neuer Vorschlag</span>
+            <RefreshCcw className="w-4 h-4 mr-2" />
+            <span>Neuer Vorschlag</span>
           </Button>
         </div>
         
@@ -78,7 +77,7 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
             <div className="flex items-center gap-4">
               <Button 
                 onClick={() => window.location.href = getDetailPath()}
-                className="w-full md:w-auto bg-[#EE3B3B] hover:bg-[#EE3B3B]/90 text-white flex items-center"
+                className="w-full md:w-auto bg-gray-800 hover:bg-gray-700 text-white flex items-center"
               >
                 Details ansehen
                 <ArrowRight className="ml-2 w-4 h-4" />

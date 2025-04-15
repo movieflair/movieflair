@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Search, Sparkles, RefreshCcw } from 'lucide-react';
+import { Search, Sparkles } from 'lucide-react';
 import { Button } from '../ui/button';
 import FilterSelector from './FilterSelector';
 import MediaTypeSelector from './filters/MediaTypeSelector';
@@ -117,10 +116,10 @@ const HomeFilterBox = () => {
   };
 
   return (
-    <div className="bg-gradient-to-r from-theme-black/90 to-gray-800/90 backdrop-blur-lg p-8 rounded-xl shadow-xl max-w-[800px] mx-auto border border-gray-700/50">
+    <div className="bg-white/80 backdrop-blur-sm p-6 lg:p-8 rounded-2xl shadow-lg border border-gray-100 max-w-[800px] mx-auto">
       <div className="flex items-center gap-3 mb-6">
-        <Sparkles className="w-6 h-6 text-theme-red" />
-        <h2 className="text-2xl font-medium text-white">Finde deinen perfekten Film</h2>
+        <Sparkles className="w-6 h-6 text-gray-400" />
+        <h2 className="text-2xl font-medium text-gray-800">Finde deinen perfekten Film</h2>
       </div>
       
       <div className="space-y-6">
@@ -130,7 +129,7 @@ const HomeFilterBox = () => {
         />
 
         <div className="space-y-3">
-          <label className="block text-sm font-medium text-gray-200">Welche Stimmung suchst du?</label>
+          <label className="block text-sm font-medium text-gray-600">Welche Stimmung suchst du?</label>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
             {moods.map((mood) => (
               <Button
@@ -138,9 +137,9 @@ const HomeFilterBox = () => {
                 variant={selectedMoods.includes(mood) ? "default" : "outline"}
                 className={`${
                   selectedMoods.includes(mood)
-                    ? "bg-[#EE3B3B] hover:bg-[#EE3B3B]/90 text-white"
-                    : "hover:bg-gray-700/50 text-gray-800 border border-gray-600 bg-gray-200"
-                } transition-all font-medium`}
+                    ? "bg-gray-800 hover:bg-gray-700 text-white"
+                    : "hover:bg-gray-100 text-gray-700 border border-gray-200 bg-white"
+                } transition-all font-medium text-sm`}
                 onClick={() => {
                   setSelectedMoods(prev =>
                     prev.includes(mood)
@@ -158,7 +157,7 @@ const HomeFilterBox = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-200 mb-3">Genre</label>
+          <label className="block text-sm font-medium text-gray-600 mb-3">Genre</label>
           <FilterSelector
             title="Wähle bis zu 3 Genres"
             options={genres || []}
@@ -177,7 +176,7 @@ const HomeFilterBox = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-200 mb-3">Jahrzehnt</label>
+          <label className="block text-sm font-medium text-gray-600 mb-3">Jahrzehnt</label>
           <FilterSelector
             title="Wähle ein Jahrzehnt"
             options={decades}
@@ -197,7 +196,7 @@ const HomeFilterBox = () => {
 
         <Button 
           onClick={handleSearch}
-          className="w-full bg-theme-red hover:bg-theme-red/90 text-white"
+          className="w-full bg-gray-800 hover:bg-gray-700 text-white transition-colors"
           size="lg"
           disabled={isLoading}
         >

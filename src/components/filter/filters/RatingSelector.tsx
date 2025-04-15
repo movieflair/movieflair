@@ -13,7 +13,7 @@ const RatingSelector = ({ value, onChange }: RatingSelectorProps) => {
     <div>
       <div className="flex items-center gap-2 mb-3">
         <Star className="h-4 w-4 text-amber-500" />
-        <label className="block text-sm font-medium text-gray-200">Mindestbewertung: {value}/10</label>
+        <label className="block text-sm font-medium text-gray-600">Mindestbewertung: {value}/10</label>
       </div>
       <Slider
         value={[value]}
@@ -21,7 +21,7 @@ const RatingSelector = ({ value, onChange }: RatingSelectorProps) => {
         max={10}
         step={1}
         onValueChange={(values) => onChange(values[0])}
-        className="py-4 [&_[role=slider]]:bg-white [&_[role=slider]]:border-[#EE3B3B] [&_[role=slider]]:border-2 [&_[data-orientation=horizontal]>.slider-track]:bg-white [&_[data-orientation=horizontal]>.slider-range]:bg-[#EE3B3B]"
+        className="py-4 [&_[role=slider]]:bg-white [&_[role=slider]]:border-gray-300 [&_[role=slider]]:border-2 [&_[data-orientation=horizontal]>.slider-track]:bg-gray-200 [&_[data-orientation=horizontal]>.slider-range]:bg-gray-800"
       />
     </div>
   );

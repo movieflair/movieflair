@@ -43,7 +43,7 @@ const FilterSelector = ({
     <div className="relative">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-2 border border-gray-600 rounded-lg bg-gray-800 text-gray-200"
+        className="w-full flex items-center justify-between px-4 py-2 border border-gray-200 rounded-lg bg-white text-gray-700 hover:bg-gray-50 transition-colors"
       >
         <span>{title}</span>
         <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -62,7 +62,7 @@ const FilterSelector = ({
       )}
       
       {isOpen && (
-        <div className="absolute z-10 mt-1 w-full bg-gray-800 border border-gray-600 rounded-lg shadow-lg overflow-hidden">
+        <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
           <div className="max-h-60 overflow-y-auto p-2">
             {options.map((option) => {
               const value = type === 'genre' ? (option as Genre).id : option;
@@ -73,8 +73,8 @@ const FilterSelector = ({
                 <button
                   key={value.toString()}
                   onClick={() => handleSelect(value)}
-                  className={`w-full text-left px-3 py-2 rounded-md hover:bg-gray-700 transition-colors ${
-                    isSelected ? 'bg-[#EE3B3B]/10 text-[#EE3B3B]' : 'text-gray-200'
+                  className={`w-full text-left px-3 py-2 rounded-md transition-colors ${
+                    isSelected ? 'bg-gray-100 text-gray-800' : 'text-gray-600 hover:bg-gray-50'
                   }`}
                   disabled={selectedValues.length >= maxSelections && !isSelected}
                 >
