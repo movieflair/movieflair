@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom'; // Add Link here
+import { useParams, Link } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play, Video } from 'lucide-react';
@@ -21,13 +20,11 @@ const TvShowDetails = () => {
   const { amazonAffiliateId } = useAdminSettings();
 
   useEffect(() => {
-    // Seiten-Aufruf tracken
     trackPageVisit('tv-show-details');
     
     const fetchTvShow = async () => {
       if (!id) return;
       
-      // Parse the ID from the slug if necessary
       const parsedId = slug ? parseUrlSlug(id).id : parseInt(id);
       
       if (!parsedId) {
@@ -62,16 +59,13 @@ const TvShowDetails = () => {
     fetchTvShow();
   }, [id, slug]);
 
-  // Bestimme die richtige Trailer-URL
   const getTrailerUrl = () => {
     if (!tvShow) return null;
     
-    // Priorisiere die benutzerdefinierte Trailer-URL
     if (tvShow.trailerUrl) {
       return tvShow.trailerUrl;
     }
     
-    // Ansonsten verwende den ersten YouTube-Trailer aus den API-Daten
     if (tvShow.videos?.results?.length > 0) {
       const trailer = tvShow.videos.results.find(
         video => video.type === 'Trailer' && video.site === 'YouTube'
@@ -82,7 +76,6 @@ const TvShowDetails = () => {
       }
     }
     
-    // Wenn keine URL gefunden wurde, verwende den Stream als Fallback
     if (tvShow.streamUrl && (
       tvShow.streamUrl.includes('embed') || 
       tvShow.streamUrl.includes('iframe') ||
@@ -98,7 +91,7 @@ const TvShowDetails = () => {
   
   const getAmazonUrl = (title: string) => {
     const formattedTitle = encodeURIComponent(title);
-    const tag = amazonAffiliateId || 'movieflair-21'; // Default tag if not set
+    const tag = amazonAffiliateId || 'movieflair-21';
     return `https://www.amazon.de/s?k=${formattedTitle}&tag=${tag}`;
   };
 
@@ -248,18 +241,6 @@ const TvShowDetails = () => {
                       <Play className="w-4 h-4" />
                       Kostenlos
                     </button>
-                  )}
-                  
-                  {tvShow.homepage && (
-                    <a
-                      href={tvShow.homepage}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-gray-800 text-white px-6 py-2 rounded-md hover:bg-gray-700 transition-colors flex items-center gap-2"
-                    >
-                      <Video className="w-4 h-4" />
-                      Offizielle Webseite
-                    </a>
                   )}
                 </div>
 
