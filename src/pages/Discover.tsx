@@ -8,7 +8,8 @@ import {
   getGenres, 
   getPopularMovies,
   getPopularTvShows,
-  MovieOrShow 
+  MovieOrShow,
+  getRecommendationByFilters 
 } from '@/lib/api';
 import { Card, CardContent } from "@/components/ui/card";
 import { Shuffle, Film, TrendingUp } from 'lucide-react';
@@ -50,6 +51,20 @@ const Discover = () => {
     navigate(`/search?genre=${genreId}`);
   };
 
+  const handleListClick = (genre: string) => {
+    const genreMapping: Record<string, number[]> = {
+      'sci-fi': [878], // Science Fiction
+      'romance': [10749], // Romance
+      'action': [28], // Action
+      'documentary': [99] // Documentary
+    };
+
+    const selectedGenres = genreMapping[genre];
+    if (selectedGenres) {
+      navigate(`/search?genre=${selectedGenres.join(',')}`);
+    }
+  };
+
   return (
     <MainLayout>
       <div className="container-custom py-12">
@@ -85,15 +100,15 @@ const Discover = () => {
             </div>
           </div>
 
-          {/* Top TV Shows */}
+          {/* Trending Movies */}
           <section className="mb-12">
             <div className="flex items-center gap-2 mb-6">
               <Film className="w-6 h-6 text-red-500" />
-              <h2 className="text-2xl font-semibold">Top Serien</h2>
+              <h2 className="text-2xl font-semibold">Trending Filme</h2>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {popularShows.map((show) => (
-                <MovieCard key={show.id} movie={show} />
+              {popularMovies.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} />
               ))}
             </div>
           </section>
@@ -104,25 +119,35 @@ const Discover = () => {
               <Shuffle className="w-6 h-6 text-purple-500" />
               <h2 className="text-2xl font-semibold">Zufällige Listen</h2>
             </div>
-            {/* Hier können Sie die Listen-Komponenten hinzufügen */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              {/* Platzhalter für Listen */}
-              <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <Card 
+                className="cursor-pointer hover:bg-red-500 hover:text-white transition-colors"
+                onClick={() => handleListClick('sci-fi')}
+              >
                 <CardContent className="p-4">
                   <h3 className="font-medium">Sci-Fi Klassiker</h3>
                 </CardContent>
               </Card>
-              <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <Card 
+                className="cursor-pointer hover:bg-red-500 hover:text-white transition-colors"
+                onClick={() => handleListClick('romance')}
+              >
                 <CardContent className="p-4">
                   <h3 className="font-medium">Liebesfilme</h3>
                 </CardContent>
               </Card>
-              <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <Card 
+                className="cursor-pointer hover:bg-red-500 hover:text-white transition-colors"
+                onClick={() => handleListClick('action')}
+              >
                 <CardContent className="p-4">
                   <h3 className="font-medium">Action Blockbuster</h3>
                 </CardContent>
               </Card>
-              <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <Card 
+                className="cursor-pointer hover:bg-red-500 hover:text-white transition-colors"
+                onClick={() => handleListClick('documentary')}
+              >
                 <CardContent className="p-4">
                   <h3 className="font-medium">Dokumentarfilme</h3>
                 </CardContent>
