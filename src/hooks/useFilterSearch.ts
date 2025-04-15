@@ -38,10 +38,9 @@ export const useFilterSearch = () => {
         toast.error('Keine passenden Filme gefunden. Bitte versuche andere Filter.');
         setRecommendation(null);
         
-        // Nur bei Jahrzehnt-Filtern einen spezifischen Hinweis anzeigen
+        // Hilfestellung bei leeren Ergebnissen
         if (currentFilter.decades && currentFilter.decades.length > 0) {
-          const decade = currentFilter.decades[0];
-          toast('Hinweis: Bei älteren Filmen funktioniert die Suche am besten mit weniger Filtern.', {
+          toast('Tipp: Versuche es mit weniger Filtern für ältere Jahrzehnte.', {
             duration: 5000
           });
         }
@@ -50,7 +49,7 @@ export const useFilterSearch = () => {
         setRecommendation(results[randomIndex]);
         console.log('Selected recommendation:', results[randomIndex]);
         
-        // Logge alle gefundenen Filme für Debug-Zwecke
+        // Informationen für Debug-Zwecke
         console.log('All matching movies:', results.map(movie => ({
           title: movie.title,
           year: movie.release_date?.split('-')[0],
@@ -70,7 +69,7 @@ export const useFilterSearch = () => {
   const handleRefreshRecommendation = async () => {
     if (!lastUsedFilter) return;
     
-    // Wenn wir bereits Ergebnisse haben, verwenden wir diese, um einen neuen Film auszuwählen
+    // Wenn bereits Ergebnisse vorhanden sind, daraus auswählen
     if (allResults.length > 1) {
       setIsLoading(true);
       try {
@@ -97,8 +96,7 @@ export const useFilterSearch = () => {
         setIsLoading(false);
       }
     } else {
-      // Wenn keine oder zu wenige Ergebnisse vorhanden sind, führe eine neue Suche durch
-      console.log('Searching for new results with filters:', lastUsedFilter);
+      // Bei wenigen Ergebnissen neue Suche durchführen
       handleSearch(lastUsedFilter);
     }
   };

@@ -1,23 +1,17 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export async function callTMDB(path: string, searchParams: Record<string, any> = {}) {
-  // Remove language parameter from searchParams if it's included in the path
-  if (path.includes('language=')) {
-    delete searchParams.language;
-  } else {
-    // Otherwise use German as default language
-    searchParams = {
-      ...searchParams,
-      language: 'de-DE'
-    };
-  }
+  // Füge Standardparameter hinzu, wenn nicht angegeben
+  const finalParams = {
+    language: 'de-DE',
+    ...searchParams
+  };
   
-  console.log(`Calling TMDB API: ${path} with params:`, searchParams);
+  console.log(`Calling TMDB API: ${path} with params:`, finalParams);
   
   try {
     const { data, error } = await supabase.functions.invoke('tmdb', {
-      body: { path, searchParams },
+      body: { path, searchParams: finalParams },
     });
 
     if (error) {
