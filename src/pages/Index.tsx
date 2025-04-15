@@ -34,9 +34,9 @@ const Index = () => {
             <div className="absolute right-0 -top-12">
               <img src="/lovable-uploads/3cbbc2d9-09d4-4965-abef-c43336adc68a.png" alt="MovieFlair M Logo" className="w-24 h-24" />
             </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-theme-black">
-              Entdecke deine Filme
-            </h1>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight mb-6 text-theme-black">Jeder Moment hat seinen Film.
+Wir finden ihn für dich!
+          </h1>
             <p className="text-lg md:text-xl text-gray-600 mb-6">
               Entdecke den perfekten Film für jeden Moment. Lass dich von deiner Stimmung leiten.
             </p>
