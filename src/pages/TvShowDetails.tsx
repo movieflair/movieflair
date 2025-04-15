@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom'; // Add Link here
 import { parseUrlSlug } from '@/lib/urlUtils';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Play, Video } from 'lucide-react';
