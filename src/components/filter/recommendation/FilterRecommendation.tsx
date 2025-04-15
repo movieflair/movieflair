@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Star, Film, ArrowRight, RefreshCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,11 @@ interface FilterRecommendationProps {
 
 const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRecommendationProps) => {
   if (!recommendation) return null;
+
+  const truncateOverview = (text: string, maxLength: number = 400) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength).trim() + '...';
+  };
 
   return (
     <div className="mt-8 animate-fade-in">
@@ -60,7 +64,9 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
             <p className="text-sm text-gray-400 mb-4">
               {recommendation.release_date?.substring(0, 4) || recommendation.first_air_date?.substring(0, 4)}
             </p>
-            <p className="text-sm mb-6">{recommendation.overview}</p>
+            <p className="text-sm mb-6">
+              {truncateOverview(recommendation.overview || 'Keine Beschreibung verfügbar.')}
+            </p>
             <div className="flex items-center gap-4">
               <Button 
                 onClick={() => window.location.href = `/${recommendation.media_type}/${recommendation.id}`}
