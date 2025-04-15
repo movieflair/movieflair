@@ -1,15 +1,16 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
+import { Command, CommandInput, CommandList, CommandEmpty } from '@/components/ui/command';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Search, Film, Compass, Sparkles } from 'lucide-react';
 import FilterSelector from '@/components/filter/FilterSelector';
 import RecommendationCard from '@/components/movies/RecommendationCard';
-import { Shuffle } from 'lucide-react';
 import { 
   Genre, 
   getGenres, 
-  moodToGenres,
-  FilterOptions,
+  moodToGenres, 
+  FilterOptions, 
   getRecommendationByFilters,
   getMovieById,
   getTvShowById,
@@ -28,7 +29,8 @@ const decades = [
 
 const Discover = () => {
   const navigate = useNavigate();
-  const [genres, setGenres] = useState<Genre[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('explore');
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [selectedDecades, setSelectedDecades] = useState<string[]>([]);
@@ -128,52 +130,97 @@ const Discover = () => {
     }
   };
 
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    if (value.trim()) {
+      navigate(`/search?q=${encodeURIComponent(value.trim())}`);
+    }
+  };
+
   return (
     <MainLayout>
       <div className="container-custom py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-semibold mb-8 text-center">Discover What to Watch</h1>
-          
-          <div className="bg-card rounded-xl shadow-sm overflow-hidden mb-12">
-            <div className="p-6">
-              <h2 className="text-xl font-medium mb-6">Select your preferences</h2>
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center mb-4">
+              <Compass className="w-8 h-8 text-purple-500 mr-2" />
+              <h1 className="text-3xl font-semibold">Entdecke Neues</h1>
+            </div>
+            <p className="text-lg text-gray-600">
+              Finde den perfekten Film oder die Serie für jeden Moment
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+            <Command className="border-none">
+              <CommandInput 
+                placeholder="Suche nach Filmen, Serien oder Kategorien..." 
+                value={searchQuery}
+                onValueChange={handleSearch}
+              />
+            </Command>
+          </div>
+
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+            <TabsList className="w-full justify-start bg-transparent border-b space-x-8">
+              <TabsTrigger 
+                value="explore" 
+                className="data-[state=active]:border-b-2 data-[state=active]:border-purple-500 rounded-none border-b-2 border-transparent"
+              >
+                <Compass className="w-4 h-4 mr-2" />
+                Entdecken
+              </TabsTrigger>
+              <TabsTrigger 
+                value="movies" 
+                className="data-[state=active]:border-b-2 data-[state=active]:border-purple-500 rounded-none border-b-2 border-transparent"
+              >
+                <Film className="w-4 h-4 mr-2" />
+                Filme
+              </TabsTrigger>
+              <TabsTrigger 
+                value="mood" 
+                className="data-[state=active]:border-b-2 data-[state=active]:border-purple-500 rounded-none border-b-2 border-transparent"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                Nach Stimmung
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="explore" className="space-y-8">
+              <div>
+                <label className="block text-sm font-medium mb-2">How are you feeling?</label>
+                <FilterSelector 
+                  title="Select mood" 
+                  options={moods}
+                  onSelect={(mood) => handleMoodSelection(mood as string)}
+                  selectedValues={selectedMoods}
+                  type="mood"
+                  maxSelections={3}
+                />
+              </div>
               
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">How are you feeling?</label>
-                  <FilterSelector 
-                    title="Select mood" 
-                    options={moods}
-                    onSelect={(mood) => handleMoodSelection(mood as string)}
-                    selectedValues={selectedMoods}
-                    type="mood"
-                    maxSelections={3}
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">Choose genres (optional)</label>
-                  <FilterSelector 
-                    title="Select genres" 
-                    options={genres}
-                    onSelect={(genreId) => handleGenreSelection(genreId as number)}
-                    selectedValues={selectedGenres}
-                    type="genre"
-                    maxSelections={2}
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2">Select decade (optional)</label>
-                  <FilterSelector 
-                    title="Select decade" 
-                    options={decades}
-                    onSelect={(decade) => handleDecadeSelection(decade as string)}
-                    selectedValues={selectedDecades}
-                    type="decade"
-                    maxSelections={1}
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Choose genres (optional)</label>
+                <FilterSelector 
+                  title="Select genres" 
+                  options={genres}
+                  onSelect={(genreId) => handleGenreSelection(genreId as number)}
+                  selectedValues={selectedGenres}
+                  type="genre"
+                  maxSelections={2}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Select decade (optional)</label>
+                <FilterSelector 
+                  title="Select decade" 
+                  options={decades}
+                  onSelect={(decade) => handleDecadeSelection(decade as string)}
+                  selectedValues={selectedDecades}
+                  type="decade"
+                  maxSelections={1}
+                />
               </div>
               
               <div className="mt-8">
@@ -185,47 +232,55 @@ const Discover = () => {
                   {isLoading ? 'Finding the perfect match...' : 'Get Recommendation'}
                 </button>
               </div>
-            </div>
-          </div>
-          
-          {hasSearched && (
-            <div className="animate-fade">
-              {recommendation ? (
-                <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-semibold">Your Recommendation</h2>
-                    <button 
-                      onClick={handleTryAgain}
-                      className="button-secondary flex items-center"
-                    >
-                      <Shuffle className="w-4 h-4 mr-2" />
-                      Try Another
-                    </button>
-                  </div>
-                  
-                  <RecommendationCard movie={recommendation} />
-                </div>
-              ) : (
-                <div className="text-center py-12 bg-muted/30 rounded-lg">
-                  <h2 className="text-xl font-medium mb-2">No Recommendations Found</h2>
-                  <p className="text-muted-foreground mb-6">
-                    Try different filters or moods to get a recommendation.
-                  </p>
-                  <button 
-                    onClick={() => {
-                      setSelectedMoods([]);
-                      setSelectedGenres([]);
-                      setSelectedDecades([]);
-                      setHasSearched(false);
-                    }}
-                    className="button-secondary"
-                  >
-                    Reset Filters
-                  </button>
+
+              {hasSearched && (
+                <div className="animate-fade">
+                  {recommendation ? (
+                    <div>
+                      <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-semibold">Your Recommendation</h2>
+                        <button 
+                          onClick={handleTryAgain}
+                          className="button-secondary flex items-center"
+                        >
+                          <Shuffle className="w-4 h-4 mr-2" />
+                          Try Another
+                        </button>
+                      </div>
+                      
+                      <RecommendationCard movie={recommendation} />
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 bg-muted/30 rounded-lg">
+                      <h2 className="text-xl font-medium mb-2">No Recommendations Found</h2>
+                      <p className="text-muted-foreground mb-6">
+                        Try different filters or moods to get a recommendation.
+                      </p>
+                      <button 
+                        onClick={() => {
+                          setSelectedMoods([]);
+                          setSelectedGenres([]);
+                          setSelectedDecades([]);
+                          setHasSearched(false);
+                        }}
+                        className="button-secondary"
+                      >
+                        Reset Filters
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
+            </TabsContent>
+
+            <TabsContent value="movies" className="space-y-8">
+              {/* Movies content will be implemented based on your needs */}
+            </TabsContent>
+
+            <TabsContent value="mood" className="space-y-8">
+              {/* Mood-based content will be implemented based on your needs */}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </MainLayout>

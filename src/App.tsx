@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -19,6 +18,7 @@ import AdminPage from './pages/AdminPage';
 import { AuthProvider } from './context/AuthContext';
 import { Toaster } from '@/components/ui/toaster';
 import EnhancedLayout from './components/layout/EnhancedLayout';
+import Discover from './pages/Discover';
 
 // Adding placeholder components for Privacy and Terms pages
 const PrivacyPolicy = () => (
@@ -65,8 +65,8 @@ const App = () => {
             <Route path="/trailers" element={<Trailers />} />
             <Route path="/free-movies" element={<FreeMovies />} />
             <Route path="/search" element={<Search />} />
-            <Route path="/genres" element={<Genres />} />
-            <Route path="/discover" element={<Genres />} /> {/* Alias für Genres Seite */}
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/genres" element={<Discover />} /> {/* Redirect old route to new one */}
             <Route path="/quick-tipp" element={<QuickTipp />} />
             <Route path="/watchlist" element={<Watchlist />} />
             <Route path="/auth" element={<Auth />} />
