@@ -18,7 +18,8 @@ const mapSupabaseListToCustomList = (list: SupabaseCustomList): CustomList => ({
   id: list.id,
   title: list.title,
   description: list.description,
-  movies: Array.isArray(list.movies) ? list.movies as MovieOrShow[] : [],
+  // Properly cast the JSON data to MovieOrShow[] with a type assertion
+  movies: Array.isArray(list.movies) ? (list.movies as unknown as MovieOrShow[]) : [],
   createdAt: list.created_at || list.createdat,
   updatedAt: list.updated_at || list.updatedat
 });
@@ -90,7 +91,8 @@ export const updateCustomList = async (list: CustomList): Promise<CustomList> =>
     id: list.id,
     title: list.title,
     description: list.description,
-    movies: list.movies as Json,
+    // Cast MovieOrShow[] to Json with a type assertion
+    movies: list.movies as unknown as Json,
     updated_at: new Date().toISOString()
   };
   
@@ -139,7 +141,8 @@ export const addMovieToList = async (listId: string, media: MovieOrShow): Promis
   const movieExists = currentMovies.some((m: any) => m.id === media.id);
   
   if (!movieExists) {
-    const updatedMovies = [...currentMovies, media] as Json;
+    // Properly cast the array to Json with a type assertion
+    const updatedMovies = [...currentMovies, media] as unknown as Json;
     
     const { data, error } = await supabase
       .from('custom_lists')
@@ -175,7 +178,8 @@ export const removeMovieFromList = async (listId: string, mediaId: number): Prom
   }
   
   const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
-  const updatedMovies = currentMovies.filter((media: any) => media.id !== mediaId) as Json;
+  // Use proper type casting for the filtered movies
+  const updatedMovies = currentMovies.filter((media: any) => media.id !== mediaId) as unknown as Json;
   
   const { data, error } = await supabase
     .from('custom_lists')
