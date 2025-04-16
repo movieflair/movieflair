@@ -18,6 +18,8 @@ import RandomLists from '@/components/discover/RandomLists';
 import FreeMoviesSection from '@/components/discover/FreeMoviesSection';
 import TrailersSection from '@/components/discover/TrailersSection';
 import { toast } from 'sonner';
+import { Seo } from '@/components/seo/Seo';
+import { createCanonicalUrl } from '@/utils/seoHelpers';
 
 const container = {
   hidden: { opacity: 0 },
@@ -41,7 +43,7 @@ const Discover = () => {
   const [trailerMovies, setTrailerMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Trending Movies Query mit automatischer Aktualisierung
+  // Trending Movies Query with automatic updates
   const { data: popularMovies = [] } = useQuery({
     queryKey: ['popularMovies'],
     queryFn: async () => {
@@ -49,8 +51,8 @@ const Discover = () => {
       const movies = await getPopularMovies();
       return movies.slice(0, 8);
     },
-    refetchInterval: 5 * 60 * 1000, // Aktualisiert alle 5 Minuten
-    staleTime: 4 * 60 * 1000, // Daten werden nach 4 Minuten als veraltet markiert
+    refetchInterval: 5 * 60 * 1000, // Updates every 5 minutes
+    staleTime: 4 * 60 * 1000, // Data marked as stale after 4 minutes
   });
 
   useEffect(() => {
@@ -80,9 +82,24 @@ const Discover = () => {
   }, []);
 
   const firstTrendingMovie = popularMovies[0];
+  const seoTitle = "Filme und Serien entdecken | MovieFlair";
+  const seoDescription = "Entdecke aktuelle Filme und Serien, die neuesten Trailer und kostenlose Streaming-Optionen auf MovieFlair - dein Portal für die perfekte Filmentdeckung.";
+  const seoImage = firstTrendingMovie?.backdrop_path 
+    ? `https://image.tmdb.org/t/p/original${firstTrendingMovie.backdrop_path}` 
+    : '/movieflair-logo.png';
+  const canonical = createCanonicalUrl('/entdecken');
 
   return (
     <MainLayout>
+      <Seo
+        title={seoTitle}
+        description={seoDescription}
+        ogImage={seoImage}
+        ogType="website"
+        canonical={canonical}
+        keywords="Filme entdecken, Serien streamen, neue Filme, Filmempfehlungen, kostenlose Filme, Trailer, Movie Streaming"
+      />
+      
       <div className="min-h-screen bg-background">
         <HeroSection firstMovie={firstTrendingMovie} />
         

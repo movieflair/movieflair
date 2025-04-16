@@ -20,7 +20,7 @@ async function startServer() {
   let vite;
   
   if (!isProduction) {
-    // Entwicklungsmodus: Vite-Dev-Server für HMR
+    // Development mode: Use Vite dev server for HMR
     vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'custom',
@@ -28,27 +28,32 @@ async function startServer() {
     
     app.use(vite.middlewares);
   } else {
-    // Produktionsmodus: Statische Assets ausliefern
+    // Production mode: Serve static assets
     app.use(express.static(path.resolve(__dirname, 'dist/client')));
   }
   
-  // Sitemap.xml Route
-  app.get('/sitemap.xml', (req, res) => {
-    const sitemap = generateSitemapXml();
-    res.header('Content-Type', 'application/xml');
-    res.send(sitemap);
+  // Sitemap.xml Route - now async to fetch all data from DB
+  app.get('/sitemap.xml', async (req, res) => {
+    try {
+      const sitemap = await generateSitemapXml();
+      res.header('Content-Type', 'application/xml');
+      res.send(sitemap);
+    } catch (error) {
+      console.error('Error generating sitemap:', error);
+      res.status(500).send('Error generating sitemap');
+    }
   });
 
   app.use('*', async (req, res, next) => {
     const url = req.originalUrl;
 
     try {
-      // Movie und TV Show Muster, die wir vorrendern wollen
+      // Patterns for routes we want to pre-render
       const isCrawler = req.get('User-Agent')?.toLowerCase().includes('bot') ||
                         req.get('User-Agent')?.toLowerCase().includes('crawler') ||
                         req.query.forceSSR === 'true';
       
-      // Prüfen, ob es eine wichtige Route ist, die vorgerendert werden sollte
+      // Check if it's an important route that should be pre-rendered
       const isImportantRoute = 
         url.match(/^\/film\/\d+/) || 
         url.match(/^\/serie\/\d+/) || 
@@ -59,27 +64,27 @@ async function startServer() {
         url === '/entdecken' ||
         url === '/filmlisten';
 
-      // Der folgende Bereich wurde optimiert, um immer gültige Meta-Tags für wichtige Routen zu generieren
-      // Bei Crawlern rendern wir immer, bei normalen Nutzern nur für wichtige Routen
+      // This section has been optimized to always generate valid meta tags for important routes
+      // For crawlers we always render, for normal users only for important routes
       if ((!isCrawler && !isImportantRoute) && !req.query.forceSSR) {
         if (isProduction) {
-          // In Produktion: Index-HTML direkt ausliefern
+          // In production: Serve index.html directly
           const indexHtml = fs.readFileSync(
             path.resolve(__dirname, 'dist/client/index.html'),
             'utf-8'
           );
           return res.status(200).set({ 'Content-Type': 'text/html' }).end(indexHtml);
         } else {
-          // In Entwicklung: Vite transformiert HTML
+          // In development: Vite transforms HTML
           let template = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8');
           template = await vite.transformIndexHtml(url, template);
           return res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
         }
       }
 
-      // Ab hier: SSR für wichtige Routen oder Crawler
+      // From here: SSR for important routes or crawlers
 
-      // Template laden
+      // Load template
       let template;
       if (!isProduction) {
         template = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8');
@@ -91,18 +96,18 @@ async function startServer() {
         );
       }
 
-      // App entrypoint laden
+      // Load app entry point
       let App;
       if (!isProduction) {
         const { default: entryServer } = await vite.ssrLoadModule('/src/App.tsx');
         App = entryServer;
       } else {
-        // In Produktion: gebautes Modul aus dist/server importieren
+        // In production: Import built module from dist/server
         const { default: entryServer } = await import('./dist/server/App.js');
         App = entryServer;
       }
 
-      // React-Router und Helmet-Kontext für SSR
+      // React Router and Helmet context for SSR
       const helmetContext = {};
 
       // Render app to stream with Helmet context
@@ -153,7 +158,7 @@ async function startServer() {
   });
 
   app.listen(PORT, () => {
-    console.log(`Server läuft auf http://localhost:${PORT}`);
+    console.log(`Server running at http://localhost:${PORT}`);
   });
 }
 

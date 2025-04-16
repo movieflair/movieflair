@@ -2,9 +2,9 @@
 import { supabase } from '@/integrations/supabase/client';
 
 // Base URL of your website
-const BASE_URL = 'https://movieflair.lovable.app'; // Ersetze dies mit deiner tatsächlichen Domain
+const BASE_URL = 'https://movieflair.lovable.app'; // Replace with your actual domain
 
-// Statische Routen
+// Static routes
 const routes = [
   '/',
   '/neue-trailer',
@@ -18,7 +18,7 @@ const routes = [
   '/nutzungsbedingungen',
 ];
 
-// Auszuschließende Routen
+// Routes to exclude
 const excludedRoutes = [
   '/admin',
   '/auth',
@@ -26,7 +26,7 @@ const excludedRoutes = [
   '/merkliste',
 ];
 
-// Funktion zum Abrufen von allen Filmen aus der Datenbank
+// Function to fetch all movies from the database
 async function fetchAllMovies() {
   try {
     const { data, error } = await supabase
@@ -46,7 +46,7 @@ async function fetchAllMovies() {
   }
 }
 
-// Funktion zum Abrufen von allen TV-Shows aus der Datenbank
+// Function to fetch all TV shows from the database
 async function fetchAllTvShows() {
   try {
     const { data, error } = await supabase
@@ -66,7 +66,7 @@ async function fetchAllTvShows() {
   }
 }
 
-// Funktion zum Abrufen aller benutzerdefinierten Listen aus der Datenbank
+// Function to fetch all custom lists from the database
 async function fetchAllCustomLists() {
   try {
     const { data, error } = await supabase
@@ -86,12 +86,12 @@ async function fetchAllCustomLists() {
   }
 }
 
-// Funktion zum Erzeugen des Sitemap-XML-Inhalts
+// Function to generate sitemap XML content
 export async function generateSitemapXml() {
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
   
-  // Statische Routen hinzufügen
+  // Add static routes
   routes.forEach(route => {
     xml += '  <url>\n';
     xml += `    <loc>${BASE_URL}${route}</loc>\n`;
@@ -100,7 +100,7 @@ export async function generateSitemapXml() {
     xml += '  </url>\n';
   });
   
-  // Filme aus der Datenbank hinzufügen
+  // Add movies from the database
   const movies = await fetchAllMovies();
   movies.forEach(movie => {
     const slug = movie.title ? encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-')) : '';
@@ -114,7 +114,7 @@ export async function generateSitemapXml() {
     xml += '  </url>\n';
   });
   
-  // TV-Shows aus der Datenbank hinzufügen
+  // Add TV shows from the database
   const tvShows = await fetchAllTvShows();
   tvShows.forEach(show => {
     const slug = show.name ? encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-')) : '';
@@ -128,7 +128,7 @@ export async function generateSitemapXml() {
     xml += '  </url>\n';
   });
   
-  // Benutzerdefinierte Listen aus der Datenbank hinzufügen
+  // Add custom lists from the database
   const customLists = await fetchAllCustomLists();
   customLists.forEach(list => {
     const slug = list.title ? encodeURIComponent(list.title.toLowerCase().replace(/\s+/g, '-')) : '';
@@ -147,12 +147,12 @@ export async function generateSitemapXml() {
   return xml;
 }
 
-// Synchrone Version für den Einsatz in der Entwicklung
+// Synchronous version for use in development
 export function generateSitemapXmlSync() {
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
   
-  // Statische Routen hinzufügen
+  // Add static routes
   routes.forEach(route => {
     xml += '  <url>\n';
     xml += `    <loc>${BASE_URL}${route}</loc>\n`;
@@ -166,7 +166,7 @@ export function generateSitemapXmlSync() {
   return xml;
 }
 
-// Funktion zum Schreiben der Sitemap in eine Datei
+// Function to write sitemap to a file
 export function writeSitemapToFile() {
   const fs = require('fs');
   const path = require('path');
@@ -178,8 +178,7 @@ export function writeSitemapToFile() {
   console.log(`Sitemap written to ${outputPath}`);
 }
 
-// Nur ausführen, wenn diese Datei direkt ausgeführt wird (nicht importiert)
+// Only execute if this file is run directly (not imported)
 if (typeof require !== 'undefined' && require.main === module) {
   writeSitemapToFile();
 }
-

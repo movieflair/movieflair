@@ -8,9 +8,16 @@ import { BrowserRouter } from 'react-router-dom'
 import { AdminSettingsProvider } from './hooks/useAdminSettings'
 
 // Create a client
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1
+    }
+  }
+})
 
-// Client-Side Rendering - wird nicht für SSR verwendet, sondern nur beim Hydration
+// Client-Side Rendering - used for hydration, not for SSR
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
