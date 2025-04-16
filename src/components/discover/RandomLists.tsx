@@ -34,9 +34,6 @@ const RandomLists = () => {
     fetchLists();
   }, []);
   
-  // Only show lists that have movies
-  const listsWithContent = customLists.filter(list => list.movies?.length > 0);
-  
   if (isLoading) {
     return (
       <section className="mb-12">
@@ -58,8 +55,34 @@ const RandomLists = () => {
     );
   }
   
-  if (listsWithContent.length === 0) {
-    return null;
+  // If no lists were found, show a placeholder instead of returning null
+  if (customLists.length === 0) {
+    return (
+      <section className="mb-12">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <ListPlus className="w-6 h-6 text-theme-black" />
+            <h2 className="text-2xl font-bold text-theme-black">Neuste Filmliste</h2>
+          </div>
+          <Link to="/filmlisten">
+            <Button variant="outline">
+              Alle anzeigen
+            </Button>
+          </Link>
+        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 max-w-4xl mx-auto text-center"
+        >
+          <p className="text-gray-500 mb-4">Es wurden noch keine Filmlisten erstellt.</p>
+          <Link to="/filmlisten">
+            <Button>Filmlisten erkunden</Button>
+          </Link>
+        </motion.div>
+      </section>
+    );
   }
 
   return (
@@ -77,12 +100,40 @@ const RandomLists = () => {
       </div>
       
       <motion.div 
-        key={listsWithContent[0].id}
+        key={customLists[0].id}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <DiscoverListCarousel list={listsWithContent[0]} />
+        {customLists[0].movies && customLists[0].movies.length > 0 ? (
+          <DiscoverListCarousel list={customLists[0]} />
+        ) : (
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 max-w-4xl mx-auto relative"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <ListPlus className="w-6 h-6 text-black" />
+              <Link 
+                to={`/liste/${createUrlSlug(customLists[0].title)}`}
+                className="text-2xl font-semibold hover:text-gray-800 transition-colors"
+              >
+                {customLists[0].title}
+              </Link>
+            </div>
+            
+            {customLists[0].description && (
+              <p className="text-sm text-gray-600 mb-4">
+                {customLists[0].description}
+              </p>
+            )}
+            
+            <p className="text-gray-500 py-4 text-center">
+              Diese Liste enthält noch keine Filme.
+            </p>
+          </motion.div>
+        )}
       </motion.div>
     </section>
   );

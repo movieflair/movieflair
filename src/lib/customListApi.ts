@@ -48,7 +48,6 @@ export const getCustomLists = async (): Promise<CustomList[]> => {
   }
 };
 
-// Function to get a specific custom list by ID
 export const getCustomList = async (id: string): Promise<CustomList> => {
   console.log(`Fetching custom list with ID: ${id}`);
   try {
@@ -75,14 +74,14 @@ export const getCustomList = async (id: string): Promise<CustomList> => {
   }
 };
 
-// Function to get random custom lists
 export const getRandomCustomLists = async (count: number = 2): Promise<CustomList[]> => {
   console.log(`Fetching ${count} random custom lists...`);
   try {
     const { data, error } = await supabase
       .from('custom_lists')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(count);
       
     if (error) {
       console.error('Error getting random custom lists from Supabase:', error);
@@ -96,18 +95,9 @@ export const getRandomCustomLists = async (count: number = 2): Promise<CustomLis
       })
     );
     
-    // Filter lists that have movies
-    const listsWithMovies = lists.filter(list => Array.isArray(list.movies) && list.movies.length > 0);
-    console.log(`Found ${listsWithMovies.length} lists with movies`);
+    console.log(`Found ${lists.length} lists`);
     
-    // If we don't have enough lists, return all we have
-    if (listsWithMovies.length <= count) {
-      return listsWithMovies;
-    }
-    
-    // Shuffle the lists and take the requested count
-    const shuffled = [...listsWithMovies].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
+    return lists;
   } catch (error) {
     console.error('Error getting random custom lists:', error);
     return [];

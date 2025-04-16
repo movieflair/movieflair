@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ListPlus, ArrowUpRight } from 'lucide-react';
@@ -21,7 +22,8 @@ interface DiscoverListCarouselProps {
 const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
   const isMobile = useIsMobile();
   
-  if (!list.movies.length) return null;
+  // Return null if no movies and empty arrays should be handled by parent
+  if (!list.movies || !Array.isArray(list.movies)) return null;
 
   const handlePrevClick = () => {
     const prevButton = document.querySelector(`#discover-list-${list.id} .embla__prev`) as HTMLElement;
@@ -32,6 +34,9 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
     const nextButton = document.querySelector(`#discover-list-${list.id} .embla__next`) as HTMLElement;
     if (nextButton) nextButton.click();
   };
+
+  // If list has no movies, don't render carousel
+  if (list.movies.length === 0) return null;
 
   return (
     <motion.div 
