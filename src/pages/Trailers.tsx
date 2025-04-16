@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
@@ -5,7 +6,7 @@ import MovieCard from '@/components/movies/MovieCard';
 import { PlayCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import SEOHead from '@/components/seo/SEOHead';
-import { truncateText } from '@/utils/seoHelpers';
+import { DEFAULT_SEO, formatListTitle, formatListDescription } from '@/utils/seoHelpers';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
@@ -36,19 +37,24 @@ const Trailers = () => {
     fetchTrailerItems();
   }, []);
 
-  const seoTitle = "Neue Film & Serien Trailer Online anschauen | MovieFlair";
-  const seoDescription = "Jetzt die neuesten Film & Serien Trailer Online anschauen - Entdecke die aktuellsten Trailer für kommende Filme und Serien";
+  const seoTitle = formatListTitle("Neue Film & Serien Trailer");
+  const seoDescription = formatListDescription(
+    "Neue Film & Serien Trailer", 
+    "Entdecke die aktuellsten Trailer für kommende Filme und Serien"
+  );
   const seoOgImage = trailerItems[0]?.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${trailerItems[0].backdrop_path}` 
-    : '/movieflair-logo.png';
+    : DEFAULT_SEO.ogImage;
+  const canonical = `${window.location.origin}/neue-trailer`;
 
   return (
     <MainLayout>
       <SEOHead 
         title={seoTitle}
-        description={truncateText(seoDescription, 140)}
+        description={seoDescription}
         ogImage={seoOgImage}
         ogType="website"
+        canonical={canonical}
         keywords="Filmtrailer, Serientrailer, neue Trailer, Kinotrailer, Online Stream, Trailer anschauen"
       />
 

@@ -47,3 +47,17 @@ export const formatListDescription = (title: string, description: string, maxLen
   const baseDesc = `${title} Online anschauen - ${description}`;
   return truncateText(baseDesc, maxLength);
 };
+
+// Generate breadcrumb structured data
+export const generateBreadcrumbSchema = (items: {name: string, url: string}[]) => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": items.map((item, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": item.name,
+      "item": item.url
+    }))
+  };
+};

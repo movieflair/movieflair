@@ -73,6 +73,7 @@ const TvShowDetails = () => {
   const seoOgImage = show.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` 
     : '/movieflair-logo.png';
+  const canonical = `${window.location.origin}/serie/${show.id}${show.name ? `/${encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
 
   const getTrailerUrl = () => {
     if (show?.trailerUrl) {
@@ -124,6 +125,7 @@ const TvShowDetails = () => {
         description={seoDescription}
         ogType="tv_show"
         ogImage={seoOgImage}
+        canonical={canonical}
         keywords={`${show.name}, ${show.genres?.map(g => g.name).join(', ')}, Serie Stream, Online anschauen, ${firstAirYear}`}
       />
 

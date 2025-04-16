@@ -82,6 +82,7 @@ const MovieDetails = () => {
   const seoOgImage = movie.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` 
     : '/movieflair-logo.png';
+  const canonical = `${window.location.origin}/film/${movie.id}${movie.title ? `/${encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
 
   const getTrailerUrl = () => {
     if (movie?.trailerUrl) {
@@ -133,6 +134,7 @@ const MovieDetails = () => {
         description={seoDescription}
         ogType="movie"
         ogImage={seoOgImage}
+        canonical={canonical}
         keywords={`${movie.title}, ${movie.genres?.map(g => g.name).join(', ')}, Film Stream, Online anschauen, ${releaseYear}`}
       />
       <MovieStructuredData movie={movie} director={director} />

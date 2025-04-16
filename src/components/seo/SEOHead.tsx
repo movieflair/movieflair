@@ -1,5 +1,6 @@
 
 import { Helmet } from 'react-helmet-async';
+import { DEFAULT_SEO } from '@/utils/seoHelpers';
 
 interface SEOHeadProps {
   title?: string;
@@ -13,10 +14,10 @@ interface SEOHeadProps {
 }
 
 const SEOHead = ({
-  title = 'MovieFlair – Finde den perfekten Film für deine Stimmung',
-  description = 'Jeder Moment hat seinen Film. MovieFlair zeigt dir Filme, die zu deiner Stimmung passen – persönlich, emotional und genau im richtigen Moment.',
-  keywords = 'filme, serien, streaming, filmempfehlungen, filmtipps',
-  ogImage = '/movieflair-logo.png',
+  title = DEFAULT_SEO.title,
+  description = DEFAULT_SEO.description,
+  keywords = DEFAULT_SEO.keywords,
+  ogImage = DEFAULT_SEO.ogImage,
   ogType = 'website',
   canonical,
   noindex = false,
@@ -42,14 +43,16 @@ const SEOHead = ({
       <meta property="og:type" content={ogType} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={ogImage} />
+      <meta property="og:image" content={ogImage.startsWith('/') && !ogImage.startsWith('//') ? `${window.location.origin}${ogImage}` : ogImage} />
       <meta property="og:url" content={currentUrl} />
+      <meta property="og:site_name" content={DEFAULT_SEO.siteName} />
+      <meta property="og:locale" content="de_DE" />
       
       {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image" content={ogImage.startsWith('/') && !ogImage.startsWith('//') ? `${window.location.origin}${ogImage}` : ogImage} />
       
       {/* Structured Data / JSON-LD */}
       {structuredData && (
@@ -62,4 +65,3 @@ const SEOHead = ({
 };
 
 export default SEOHead;
-
