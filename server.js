@@ -94,53 +94,49 @@ async function startServer() {
       // React-Router und Helmet-Kontext für SSR
       const helmetContext = {};
 
-      // Server-side Rendering mit renderToPipeableStream
-      const stream = await new Promise((resolve) => {
-        let html = '';
-        const stream = renderToPipeableStream(
+      // Render app to stream with Helmet context
+      const { pipe } = renderToPipeableStream(
+        React.createElement(
+          HelmetProvider, 
+          { context: helmetContext },
           React.createElement(
-            HelmetProvider, 
-            { context: helmetContext },
-            React.createElement(
-              StaticRouter,
-              { location: url },
-              React.createElement(App)
-            )
-          ),
-          {
-            onAllReady() {
-              resolve(stream);
-            },
-            onError(error) {
-              console.error('SSR-Fehler:', error);
-              res.status(500).send('Interner Serverfehler während SSR');
+            StaticRouter,
+            { location: url },
+            React.createElement(App)
+          )
+        ),
+        {
+          onShellReady() {
+            // Extract helmet data after rendering
+            const { helmet } = helmetContext;
+            
+            // Update HTML template with helmet data
+            const htmlWithHelmet = template
+              .replace('<!--app-head-->', `
+                ${helmet.title.toString()}
+                ${helmet.meta.toString()}
+                ${helmet.link.toString()}
+                ${helmet.script.toString()}
+              `);
+            
+            res.status(200).set({ 'Content-Type': 'text/html' });
+            res.write(htmlWithHelmet.split('<!--app-html-->')[0]);
+            pipe(res);
+          },
+          onError(error) {
+            console.error('SSR error:', error);
+            if (!isProduction && vite) {
+              vite.ssrFixStacktrace(error);
             }
+            next(error);
           }
-        );
-      });
-
-      // Helmet-Daten extrahieren
-      const { helmet } = helmetContext;
-      
-      // HTML mit SSR-Daten ergänzen
-      const head = `
-        ${helmet.title.toString()}
-        ${helmet.meta.toString()}
-        ${helmet.link.toString()}
-        ${helmet.script.toString()}
-      `;
-      
-      const htmlWithHelmet = template.replace('<!--app-head-->', head);
-      
-      res.status(200).set({ 'Content-Type': 'text/html' });
-      res.write(htmlWithHelmet);
-      
-      stream.pipe(res);
+        }
+      );
     } catch (error) {
       if (!isProduction && vite) {
         vite.ssrFixStacktrace(error);
       }
-      console.error('SSR-Fehler:', error);
+      console.error('SSR error:', error);
       next(error);
     }
   });
