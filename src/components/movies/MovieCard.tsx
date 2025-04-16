@@ -18,9 +18,9 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
   const slug = createUrlSlug(title);
   
   const imageSizes = {
-    small: 'h-[300px] w-[200px]',   // Increased from 250x170
-    medium: 'h-[300px] w-[200px]',  // Increased from 250x170
-    large: 'h-[400px] w-[270px]'    // Slightly larger
+    small: 'h-[250px] w-[170px]',  // Slightly larger
+    medium: 'h-[250px] w-[170px]', // Slightly larger
+    large: 'h-[350px] w-[235px]'   // Slightly larger
   };
   
   const textSizes = {
@@ -29,16 +29,10 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
     large: 'text-lg'
   };
 
-  const handleClick = () => {
-    // Scroll to top when navigating to a new page
-    window.scrollTo(0, 0);
-  };
-
   return (
     <Link 
       to={`/${mediaType}/${movie.id}/${slug}`} 
       className="group block overflow-hidden rounded-xl"
-      onClick={handleClick}
     >
       <div className={`relative ${imageSizes[size]} bg-muted overflow-hidden rounded-xl`}>
         {movie.poster_path ? (

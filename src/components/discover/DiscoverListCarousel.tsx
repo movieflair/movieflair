@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ListPlus, ArrowUpRight } from 'lucide-react';
@@ -34,10 +33,6 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
     if (nextButton) nextButton.click();
   };
 
-  const handleListClick = () => {
-    window.scrollTo(0, 0);
-  };
-
   return (
     <motion.div 
       whileHover={{ scale: 1.01 }}
@@ -50,7 +45,6 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
           <Link 
             to={`/liste/${createUrlSlug(list.title)}`}
             className="text-lg md:text-2xl font-semibold hover:text-gray-800 transition-colors"
-            onClick={handleListClick}
           >
             {list.title}
           </Link>
@@ -101,7 +95,6 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
       <Link 
         to={`/liste/${createUrlSlug(list.title)}`}
         className="absolute bottom-2 right-2 text-xs text-gray-400 hover:text-gray-800 transition-colors duration-300 flex items-center gap-1 opacity-50 hover:opacity-100"
-        onClick={handleListClick}
       >
         <span>Liste ansehen</span>
         <ArrowUpRight className="w-3 h-3" />
