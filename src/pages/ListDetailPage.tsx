@@ -93,7 +93,6 @@ const ListDetailPage = () => {
   if (list) {
     const listDescription = list.description || `Entdecke ${list.movies.length} ausgewählte Filme in dieser kuratierten Sammlung.`;
     
-    // New SEO title and description formatting
     const seoTitle = formatListTitle(list.title);
     const seoDescription = formatListDescription(list.title, listDescription);
     const seoOgImage = list.movies[0]?.backdrop_path 

@@ -21,6 +21,7 @@ import MainLayout from './components/layout/MainLayout';
 import Discover from './pages/Discover';
 import ListDetailPage from './pages/ListDetailPage';
 import AllLists from './pages/AllLists';
+import NotFound from './pages/NotFound';
 
 const PrivacyPolicy = () => (
   <MainLayout>
@@ -76,11 +77,11 @@ const App = () => {
           <Route path="/suche" element={<Search />} />
           <Route path="/search" element={<Navigate to="/suche" replace />} />
           <Route path="/entdecken" element={<Discover />} />
-          <Route path="/discover" element={<Discover />} /> {/* Added new route for /discover */}
+          <Route path="/discover" element={<Discover />} />
           <Route path="/liste/:slug" element={<ListDetailPage />} />
           <Route path="/liste/:id/:slug" element={<Navigate to={`/liste/${window.location.pathname.split('/').pop()}`} replace />} />
           <Route path="/filmlisten" element={<AllLists />} />
-          <Route path="/listen" element={<Navigate to="/filmlisten" replace />} /> {/* Added redirect for /listen */}
+          <Route path="/listen" element={<Navigate to="/filmlisten" replace />} />
           <Route path="/genres" element={<Genres />} />
           <Route path="/quick-tipp" element={<QuickTipp />} />
           <Route path="/merkliste" element={<Watchlist />} />
@@ -91,6 +92,7 @@ const App = () => {
           <Route path="/nutzungsbedingungen" element={<TermsOfService />} />
           <Route path="/ueber-uns" element={<About />} />
           <Route path="/about" element={<About />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Toaster />
       </AuthProvider>
