@@ -1,6 +1,5 @@
-
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, ListPlus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ListPlus, ArrowUpRight } from 'lucide-react';
 import { CustomList } from '@/lib/api';
 import MovieCard from '../movies/MovieCard';
 import {
@@ -12,6 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from '@/hooks/use-mobile';
+import { createUrlSlug } from '@/lib/urlUtils';
 
 interface DiscoverListCarouselProps {
   list: CustomList;
@@ -33,7 +33,7 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100 max-w-4xl mx-auto">
+    <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100 max-w-4xl mx-auto relative">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <ListPlus className="w-4 h-4 md:w-6 md:h-6 text-theme-accent-red" />
@@ -87,14 +87,13 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
         </Carousel>
       </div>
       
-      <div className="mt-4 text-right">
-        <Link 
-          to={`/liste/${list.id}`}
-          className="text-xs md:text-sm text-theme-accent-red hover:underline inline-flex items-center"
-        >
-          Alle Filme in dieser Liste anzeigen
-        </Link>
-      </div>
+      <Link 
+        to={`/liste/${list.id}/${createUrlSlug(list.title)}`}
+        className="absolute bottom-2 right-2 text-xs text-gray-400 hover:text-theme-accent-red transition-colors duration-300 flex items-center gap-1 opacity-50 hover:opacity-100"
+      >
+        <span>Liste ansehen</span>
+        <ArrowUpRight className="w-3 h-3" />
+      </Link>
     </div>
   );
 };
