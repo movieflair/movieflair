@@ -18,7 +18,6 @@ import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
 
-// Helper function to truncate text
 const truncate = (text: string, maxLength: number) => {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength - 3) + '...';
