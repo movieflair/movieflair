@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { ListPlus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ListPlus } from 'lucide-react';
 import { CustomList } from '@/lib/api';
 import MovieCard from './MovieCard';
 import { Button } from "@/components/ui/button";
