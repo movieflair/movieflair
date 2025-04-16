@@ -91,7 +91,7 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
             placeholder="Filme & Genres suchen..."
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
-            className="pl-12 pr-4 py-3 w-full bg-white rounded-lg border border-gray-200 focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-colors text-lg"
+            className="pl-12 pr-4 py-3 w-full bg-white rounded-lg border border-gray-200 focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors text-lg"
             autoFocus
             onClick={(e) => {
               e.stopPropagation();
@@ -130,7 +130,7 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                     <CommandItem 
                       key={genre.id}
                       onSelect={() => handleGenreSelect(genre.id, genre.name)}
-                      className="cursor-pointer"
+                      className="cursor-pointer hover:bg-gray-100"
                     >
                       <span className="text-sm">{genre.name}</span>
                     </CommandItem>
@@ -147,7 +147,7 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                         navigate(`/${result.media_type === 'movie' ? 'film' : 'serie'}/${result.id}`);
                         setOpen(false);
                       }}
-                      className="cursor-pointer"
+                      className="cursor-pointer hover:bg-gray-100"
                     >
                       <div className="flex items-center">
                         {result.poster_path && (
@@ -161,7 +161,7 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                       </div>
                     </CommandItem>
                   ))}
-                  <CommandItem onSelect={() => handleSubmit()} className="cursor-pointer text-blue-500">
+                  <CommandItem onSelect={() => handleSubmit()} className="cursor-pointer hover:bg-gray-100 text-blue-500">
                     Alle Ergebnisse anzeigen...
                   </CommandItem>
                 </CommandGroup>

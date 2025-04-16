@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getGenres, Genre, getRecommendationByFilters, MovieOrShow } from '@/lib/api';
@@ -231,8 +232,8 @@ const Genres = () => {
             
             <div className="lg:col-span-2">
               {isLoading ? (
-                <div className="grid grid-cols-2 gap-6">
-                  {[...Array(4)].map((_, index) => (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {[...Array(12)].map((_, index) => (
                     <div key={index} className="aspect-[2/3]">
                       <div className="animate-pulse h-full">
                         <div className="bg-muted rounded-lg h-full"></div>
@@ -269,8 +270,8 @@ const Genres = () => {
                       <span className="text-sm text-gray-500 ml-2">({movies.length})</span>
                     </h2>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {movies.map((movie) => (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+                    {movies.slice(0, 12).map((movie) => (
                       <div key={movie.id} className="aspect-[2/3]">
                         <MovieCard movie={movie} />
                       </div>
