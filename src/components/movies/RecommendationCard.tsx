@@ -15,6 +15,11 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
   const mediaType = getMediaTypeInGerman(movie.media_type);
   const slug = createUrlSlug(title);
   
+  const handleClick = () => {
+    // Scroll to top when navigating to a new page
+    window.scrollTo(0, 0);
+  };
+  
   return (
     <div className="glass-card overflow-hidden rounded-xl">
       <div className="md:flex h-full">
@@ -72,6 +77,7 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
             <Link
               to={`/${mediaType}/${movie.id}/${slug}`}
               className="button-primary inline-flex items-center"
+              onClick={handleClick}
             >
               Details ansehen
               <ArrowRight className="ml-2 w-4 h-4" />

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -41,6 +42,11 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
     if (nextButton) nextButton.click();
   };
 
+  const handleQuickTippClick = () => {
+    // Scroll to top when navigating to a new page
+    window.scrollTo(0, 0);
+  };
+
   return (
     <div className="container-custom mt-16">
       <div className="glass-card overflow-hidden rounded-xl p-8">
@@ -49,6 +55,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             <Link 
               to="/discover" 
               className="flex items-center gap-2 text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
+              onClick={() => window.scrollTo(0, 0)}
             >
               <Zap className="w-6 h-6" />
               Ähnliche Filme
@@ -62,7 +69,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 className="w-fit bg-[#ff3131] text-white hover:bg-[#ff3131]/90 border-0 shadow-lg"
                 asChild
               >
-                <Link to="/quick-tipp">
+                <Link to="/quick-tipp" onClick={handleQuickTippClick}>
                   <Zap className="w-4 h-4 mr-2" />
                   Quick Tipp
                 </Link>

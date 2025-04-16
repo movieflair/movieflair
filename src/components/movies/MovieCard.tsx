@@ -29,10 +29,16 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
     large: 'text-lg'
   };
 
+  const handleClick = () => {
+    // Scroll to top when navigating to a new page
+    window.scrollTo(0, 0);
+  };
+
   return (
     <Link 
       to={`/${mediaType}/${movie.id}/${slug}`} 
       className="group block overflow-hidden rounded-xl"
+      onClick={handleClick}
     >
       <div className={`relative ${imageSizes[size]} bg-muted overflow-hidden rounded-xl`}>
         {movie.poster_path ? (
