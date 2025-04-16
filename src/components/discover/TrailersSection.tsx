@@ -24,7 +24,7 @@ const TrailersSection = ({ movies }: TrailersSectionProps) => {
           <h2 className="text-xl font-bold">Neueste Trailer</h2>
         </div>
         <Button asChild variant="outline" size="sm">
-          <Link to="/trailers">
+          <Link to="/neue-trailer">
             Alle anzeigen
           </Link>
         </Button>
