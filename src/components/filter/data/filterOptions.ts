@@ -40,10 +40,10 @@ export const decades = [
 
 // Diese Übersetzungstabelle für die Jahrzehnte wird für die benutzerfreundliche Anzeige verwendet
 export const decadeRanges = {
-  '1970': '1970er (1970-1979)',
-  '1980': '1980er (1980-1989)',
-  '1990': '1990er (1990-1999)',
-  '2000': '2000er (2000-2009)',
-  '2010': '2010er (2010-2019)',
-  '2020': '2020er (2020-2029)'
+  '1970': '1970er',
+  '1980': '1980er',
+  '1990': '1990er',
+  '2000': '2000er',
+  '2010': '2010er',
+  '2020': '2020er'
 };
