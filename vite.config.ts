@@ -11,10 +11,7 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react({
-      // Aktiviere SSR-Funktionen im React-Plugin
-      fastRefresh: true,
-    }),
+    react(),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),

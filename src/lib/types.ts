@@ -51,6 +51,12 @@ export interface MovieDetail extends MovieOrShow {
       site?: string;
     }[];
   };
+  external_ids?: {
+    imdb_id?: string;
+    facebook_id?: string;
+    instagram_id?: string;
+    twitter_id?: string;
+  };
 }
 
 export interface FilterOptions {
