@@ -20,58 +20,52 @@ export const DEFAULT_SEO = {
   defaultPostfix: ' | MovieFlair'
 };
 
-// Format movie or show title with year
+/**
+ * Format movie or show title
+ * Format: "[Title] (Year) Online Stream anschauen | MovieFlair"
+ */
 export const formatMediaTitle = (title: string, year?: string): string => {
   if (!title) return DEFAULT_SEO.title;
+  
   const yearPart = year ? ` (${year})` : '';
   return `${title}${yearPart} Online Stream anschauen${DEFAULT_SEO.defaultPostfix}`;
 };
 
-// Format movie or show description
-export const formatMediaDescription = (title: string, year: string, description: string, maxLength: number = 160): string => {
+/**
+ * Format movie or show description
+ * Format: "Jetzt [Title] (Year) Online Stream anschauen - [Description]"
+ * Limited to 140 characters
+ */
+export const formatMediaDescription = (title: string, year: string, description: string, maxLength: number = 140): string => {
   if (!title) return DEFAULT_SEO.description;
+  
   const yearPart = year ? ` (${year})` : '';
   const baseDesc = `Jetzt ${title}${yearPart} Online Stream anschauen - ${description || 'Entdecke diesen Film auf MovieFlair.'}`;
   return truncateText(baseDesc, maxLength);
 };
 
-// Format list title
+/**
+ * Format list title
+ * Format: "[List Title] Online anschauen | MovieFlair"
+ */
 export const formatListTitle = (title: string): string => {
   if (!title) return DEFAULT_SEO.title;
   return `${title} Online anschauen${DEFAULT_SEO.defaultPostfix}`;
 };
 
-// Format list description
-export const formatListDescription = (title: string, description: string, maxLength: number = 160): string => {
+/**
+ * Format list description
+ * Format: "[List Title] Online anschauen - [List Description]"
+ * Limited to 140 characters
+ */
+export const formatListDescription = (title: string, description: string, maxLength: number = 140): string => {
   if (!title) return DEFAULT_SEO.description;
   const baseDesc = `${title} Online anschauen - ${description || 'Entdecke diese Filmauswahl auf MovieFlair.'}`;
   return truncateText(baseDesc, maxLength);
 };
 
 /**
- * Create the canonical URL for a movie
- */
-export const getMovieCanonicalUrl = (id: string, title?: string): string => {
-  if (typeof window === 'undefined') return '';
-  
-  const baseUrl = window.location.origin;
-  const slug = title ? `/${encodeURIComponent(title.toLowerCase().replace(/\s+/g, '-'))}` : '';
-  return `${baseUrl}/film/${id}${slug}`;
-};
-
-/**
- * Create the canonical URL for a TV show
- */
-export const getTvShowCanonicalUrl = (id: string, name?: string): string => {
-  if (typeof window === 'undefined') return '';
-  
-  const baseUrl = window.location.origin;
-  const slug = name ? `/${encodeURIComponent(name.toLowerCase().replace(/\s+/g, '-'))}` : '';
-  return `${baseUrl}/serie/${id}${slug}`;
-};
-
-/**
- * Get absolute OG image URL
+ * Get absolute URL for image
  */
 export const getAbsoluteImageUrl = (imagePath: string): string => {
   if (!imagePath) return '';

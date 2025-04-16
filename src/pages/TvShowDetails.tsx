@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -67,6 +68,8 @@ const TvShowDetails = () => {
   }
 
   const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear().toString() : '';
+  
+  // New SEO title and description formatting
   const seoTitle = formatMediaTitle(show.name || '', firstAirYear);
   const seoDescription = formatMediaDescription(show.name || '', firstAirYear, show.overview);
   const seoOgImage = show.backdrop_path 
