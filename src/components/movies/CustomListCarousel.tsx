@@ -42,14 +42,14 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
             </p>
           </div>
 
-          <div className="relative">
-            <div className="flex justify-center items-center relative h-[180px]">
+          <div className="relative py-8">
+            <div className="flex justify-center items-center relative h-[200px]">
               {list.movies.slice(0, 3).map((movie, index) => (
                 <div 
                   key={movie.id}
                   className="absolute w-[120px] transition-transform duration-300 hover:z-20 hover:scale-105 cursor-pointer"
                   style={{
-                    transform: `translateX(${(index - 1) * 45}px)`,
+                    transform: `translateX(${(index - 1) * 65}px)`,
                     zIndex: 10 + index,
                   }}
                 >
