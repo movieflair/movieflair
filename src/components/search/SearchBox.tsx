@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search as SearchIcon } from 'lucide-react';
@@ -126,9 +127,9 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                     <CommandItem 
                       key={genre.id}
                       onSelect={() => handleGenreSelect(genre.id, genre.name)}
-                      className="cursor-default"
+                      className="cursor-default !bg-transparent focus:!bg-transparent data-[selected]:!bg-transparent"
                     >
-                      <span className="text-sm text-gray-800">{genre.name}</span>
+                      <span className="text-sm font-medium text-gray-800">{genre.name}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -143,7 +144,7 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                         navigate(`/${result.media_type === 'movie' ? 'film' : 'serie'}/${result.id}`);
                         setOpen(false);
                       }}
-                      className="cursor-default"
+                      className="cursor-default !bg-transparent focus:!bg-transparent data-[selected]:!bg-transparent"
                     >
                       <div className="flex items-center">
                         {result.poster_path && (
@@ -153,15 +154,15 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                             className="w-8 h-12 object-cover mr-2 rounded"
                           />
                         )}
-                        <span className="text-sm text-gray-800">{result.title || result.name}</span>
+                        <span className="text-sm font-medium text-gray-800">{result.title || result.name}</span>
                       </div>
                     </CommandItem>
                   ))}
                   <CommandItem 
                     onSelect={() => handleSubmit()} 
-                    className="cursor-default text-gray-700"
+                    className="cursor-default !bg-transparent focus:!bg-transparent data-[selected]:!bg-transparent"
                   >
-                    Alle Ergebnisse anzeigen...
+                    <span className="text-sm text-gray-700">Alle Ergebnisse anzeigen...</span>
                   </CommandItem>
                 </CommandGroup>
               )}
