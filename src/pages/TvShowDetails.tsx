@@ -16,6 +16,8 @@ import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
+import TvShowStructuredData from '@/components/seo/TvShowStructuredData';
+import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
 
 const TvShowDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -68,8 +70,8 @@ const TvShowDetails = () => {
 
   const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear().toString() : '';
   
-  const seoTitle = `${show.name} ${firstAirYear ? `(${firstAirYear})` : ''} Online Stream anschauen | MovieFlair`;
-  const seoDescription = `Jetzt ${show.name} ${firstAirYear ? `(${firstAirYear})` : ''} Online Stream anschauen – ${show.overview}`;
+  const seoTitle = formatMediaTitle(show.name || '', firstAirYear);
+  const seoDescription = formatMediaDescription(show.name || '', firstAirYear, show.overview);
   const seoOgImage = show.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${show.backdrop_path}`
     : '/movieflair-logo.png';
@@ -127,6 +129,7 @@ const TvShowDetails = () => {
         canonical={canonical}
         keywords={`${show.name}, ${show.genres?.map(g => g.name).join(', ')}, Serie Stream, Online anschauen, ${firstAirYear}`}
       />
+      <TvShowStructuredData show={show} />
 
       <div className="min-h-screen bg-white">
         <MovieBackdrop backdropPath={show.backdrop_path} title={show.name} />

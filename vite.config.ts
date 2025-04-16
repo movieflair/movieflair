@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -10,7 +11,10 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
   },
   plugins: [
-    react(),
+    react({
+      // Aktiviere SSR-Funktionen im React-Plugin
+      fastRefresh: true,
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
@@ -18,5 +22,13 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  // SSR-Konfiguration
+  build: {
+    // Commonjs für den Server
+    outDir: mode === 'production' ? 'dist/client' : 'dist',
+    // Separate SSR-Build-Konfiguration
+    ssr: mode === 'ssr' ? './src/App.tsx' : undefined,
+    ssrManifest: mode === 'production',
   },
 }));
