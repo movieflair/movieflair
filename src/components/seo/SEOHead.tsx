@@ -26,6 +26,13 @@ const SEOHead = ({
   // Get the current URL for canonical link if not provided
   const currentUrl = canonical || window.location.href;
   
+  // Ensure image URLs are absolute
+  const absoluteOgImage = ogImage.startsWith('http') 
+    ? ogImage 
+    : ogImage.startsWith('/') && !ogImage.startsWith('//') 
+      ? `${window.location.origin}${ogImage}` 
+      : ogImage;
+  
   return (
     <Helmet>
       {/* Basic Meta Tags */}
@@ -43,7 +50,7 @@ const SEOHead = ({
       <meta property="og:type" content={ogType} />
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={ogImage.startsWith('/') && !ogImage.startsWith('//') ? `${window.location.origin}${ogImage}` : ogImage} />
+      <meta property="og:image" content={absoluteOgImage} />
       <meta property="og:url" content={currentUrl} />
       <meta property="og:site_name" content={DEFAULT_SEO.siteName} />
       <meta property="og:locale" content="de_DE" />
@@ -52,7 +59,7 @@ const SEOHead = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage.startsWith('/') && !ogImage.startsWith('//') ? `${window.location.origin}${ogImage}` : ogImage} />
+      <meta name="twitter:image" content={absoluteOgImage} />
       
       {/* Structured Data / JSON-LD */}
       {structuredData && (
