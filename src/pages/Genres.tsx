@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getGenres, Genre, getRecommendationByFilters, MovieOrShow } from '@/lib/api';
@@ -37,20 +38,32 @@ const Genres = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>(initialState.preloadedMovies || []);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'movies' | 'tv'>('movies');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     trackPageVisit('genres');
     
     const fetchGenres = async () => {
       try {
+        setIsLoading(true);
         const genresList = await getGenres();
-        setGenres(genresList);
-        
-        if (initialState.selectedGenre && !initialState.preloadedMovies) {
-          handleGenreClick(initialState.selectedGenre);
+        if (genresList && Array.isArray(genresList)) {
+          setGenres(genresList);
+          
+          if (initialState.selectedGenre && !initialState.preloadedMovies) {
+            handleGenreClick(initialState.selectedGenre);
+          }
+        } else {
+          setGenres([]);
+          setError('Fehler beim Laden der Genres');
+          console.error('Genres data is not an array:', genresList);
         }
       } catch (error) {
         console.error('Error fetching genres:', error);
+        setError('Fehler beim Laden der Genres');
+        setGenres([]);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -61,6 +74,7 @@ const Genres = () => {
     setIsLoading(true);
     setSelectedGenre(genreId);
     setSelectedMood(null);
+    setError(null);
     
     try {
       const results = await getRecommendationByFilters({
@@ -68,9 +82,11 @@ const Genres = () => {
         mediaType: 'movie'
       });
       
-      setMovies(results);
+      setMovies(results || []);
     } catch (error) {
       console.error('Error fetching content by genre:', error);
+      setError('Fehler beim Laden der Filme');
+      setMovies([]);
     } finally {
       setIsLoading(false);
     }
@@ -80,6 +96,7 @@ const Genres = () => {
     setIsLoading(true);
     setSelectedMood(moodId);
     setSelectedGenre(null);
+    setError(null);
     
     const moodFilters: Record<string, any> = {
       'action': { genres: [28, 12, 14], rating: 7 },
@@ -96,9 +113,11 @@ const Genres = () => {
         mediaType: 'movie'
       });
       
-      setMovies(results);
+      setMovies(results || []);
     } catch (error) {
       console.error('Error fetching by mood:', error);
+      setError('Fehler beim Laden der Filme');
+      setMovies([]);
     } finally {
       setIsLoading(false);
     }
@@ -108,6 +127,7 @@ const Genres = () => {
     setSelectedGenre(null);
     setSelectedMood(null);
     setMovies([]);
+    setError(null);
   };
 
   const navigateToQuickTipp = () => {
@@ -195,19 +215,27 @@ const Genres = () => {
                       Nach Genre
                     </h3>
                     <div className="flex flex-wrap gap-2">
-                      {genres.map((genre) => (
-                        <Button
-                          key={genre.id}
-                          variant={selectedGenre === genre.id ? "default" : "outline"}
-                          size="sm"
-                          className={`
-                            ${selectedGenre === genre.id ? 'bg-[#ea384c] hover:bg-[#ea384c]/90' : ''}
-                          `}
-                          onClick={() => handleGenreClick(genre.id)}
-                        >
-                          {genre.name}
-                        </Button>
-                      ))}
+                      {genres && genres.length > 0 ? (
+                        genres.map((genre) => (
+                          <Button
+                            key={genre.id}
+                            variant={selectedGenre === genre.id ? "default" : "outline"}
+                            size="sm"
+                            className={`
+                              ${selectedGenre === genre.id ? 'bg-[#ea384c] hover:bg-[#ea384c]/90' : ''}
+                            `}
+                            onClick={() => handleGenreClick(genre.id)}
+                          >
+                            {genre.name}
+                          </Button>
+                        ))
+                      ) : error ? (
+                        <p className="text-sm text-gray-500">{error}</p>
+                      ) : isLoading ? (
+                        <p className="text-sm text-gray-500">Lade Genres...</p>
+                      ) : (
+                        <p className="text-sm text-gray-500">Keine Genres verfügbar</p>
+                      )}
                     </div>
                   </div>
                   
@@ -240,6 +268,19 @@ const Genres = () => {
                     </div>
                   ))}
                 </div>
+              ) : error ? (
+                <div className="text-center py-12 bg-muted/30 rounded-lg h-full flex flex-col items-center justify-center">
+                  <div className="mb-4">
+                    <Film className="w-12 h-12 text-muted-foreground opacity-50" />
+                  </div>
+                  <p className="text-muted-foreground mb-6">{error}</p>
+                  <Button 
+                    variant="outline" 
+                    onClick={clearFilters}
+                  >
+                    Filter zurücksetzen
+                  </Button>
+                </div>
               ) : movies.length === 0 ? (
                 <div className="text-center py-12 bg-muted/30 rounded-lg h-full flex flex-col items-center justify-center">
                   <div className="mb-4">
@@ -268,7 +309,7 @@ const Genres = () => {
                     </h2>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    {movies.slice(0, 9).map((movie) => (
+                    {movies && movies.slice(0, 9).map((movie) => (
                       <div key={movie.id} className="aspect-[2/3]">
                         <MovieCard movie={movie} />
                       </div>
