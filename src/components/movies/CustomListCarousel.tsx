@@ -10,6 +10,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
 
 interface CustomListCarouselProps {
   list: CustomList;
@@ -33,10 +34,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
             <p className="text-gray-600 max-w-[350px]">
               {list.description}
             </p>
-            <div className="flex items-center gap-2 mt-2">
-              <CarouselPrevious className="relative static translate-y-0 h-8 w-8 rounded-full bg-white/90 backdrop-blur hover:bg-white/95" />
-              <CarouselNext className="relative static translate-y-0 h-8 w-8 rounded-full bg-white/90 backdrop-blur hover:bg-white/95" />
-            </div>
+            {/* Navigation buttons will be moved inside the Carousel */}
           </div>
 
           <div className="relative">
@@ -56,6 +54,12 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
+              
+              {/* Place navigation elements within Carousel */}
+              <div className="flex items-center gap-2 mt-4 absolute bottom-[-40px] left-0">
+                <CarouselPrevious className="relative static translate-y-0 h-8 w-8 rounded-full bg-white/90 backdrop-blur hover:bg-white/95" />
+                <CarouselNext className="relative static translate-y-0 h-8 w-8 rounded-full bg-white/90 backdrop-blur hover:bg-white/95" />
+              </div>
             </Carousel>
           </div>
         </div>
