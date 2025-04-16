@@ -11,6 +11,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { useRef } from 'react';
 
 interface CustomListCarouselProps {
   list: CustomList;
@@ -18,9 +19,23 @@ interface CustomListCarouselProps {
 
 const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
   if (!list.movies.length) return null;
+  
+  // Create a ref for the carousel
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Handle manual navigation
+  const handlePrevious = () => {
+    const prevButton = carouselRef.current?.querySelector('[data-carousel-prev]') as HTMLButtonElement;
+    if (prevButton) prevButton.click();
+  };
+
+  const handleNext = () => {
+    const nextButton = carouselRef.current?.querySelector('[data-carousel-next]') as HTMLButtonElement;
+    if (nextButton) nextButton.click();
+  };
 
   return (
-    <div className="w-full max-w-[800px] mx-auto">
+    <div className="w-full max-w-[800px] mx-auto mb-8">
       <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100">
         <div className="flex flex-row gap-4">
           {/* Text section - 1/3 width */}
@@ -42,10 +57,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
                 variant="outline"
                 size="icon"
                 className="h-7 w-7 rounded-full bg-white/90 backdrop-blur p-0 hover:bg-white/95"
-                onClick={() => {
-                  const prevButton = document.querySelector(`#carousel-${list.id} [data-carousel-prev]`) as HTMLButtonElement;
-                  if (prevButton) prevButton.click();
-                }}
+                onClick={handlePrevious}
               >
                 <span className="sr-only">Previous</span>
                 <ChevronLeft className="h-3 w-3" />
@@ -54,10 +66,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
                 variant="outline"
                 size="icon"
                 className="h-7 w-7 rounded-full bg-white/90 backdrop-blur p-0 hover:bg-white/95"
-                onClick={() => {
-                  const nextButton = document.querySelector(`#carousel-${list.id} [data-carousel-next]`) as HTMLButtonElement;
-                  if (nextButton) nextButton.click();
-                }}
+                onClick={handleNext}
               >
                 <span className="sr-only">Next</span>
                 <ChevronRight className="h-3 w-3" />
@@ -68,6 +77,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
           {/* Movie covers section - 2/3 width */}
           <div className="w-2/3">
             <Carousel
+              ref={carouselRef}
               id={`carousel-${list.id}`}
               className="w-full"
               opts={{
@@ -84,8 +94,8 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="hidden" />
-              <CarouselNext className="hidden" />
+              <CarouselPrevious className="hidden" data-carousel-prev />
+              <CarouselNext className="hidden" data-carousel-next />
             </Carousel>
           </div>
         </div>
