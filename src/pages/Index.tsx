@@ -61,11 +61,9 @@ Wir finden ihn für dich!</h1>
           <HomeFilterBox />
           <PrimeVideoAd className="mt-6 md:mt-8" />
           {!isLoading && customLists.length > 0 && (
-            <div className="mt-6 md:mt-8">
+            <div className="mt-6 md:mt-8 space-y-4">
               {customLists.map(list => (
-                <div key={list.id} className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100 mb-4">
-                  <CustomListCarousel list={list} />
-                </div>
+                <CustomListCarousel key={list.id} list={list} />
               ))}
             </div>
           )}
