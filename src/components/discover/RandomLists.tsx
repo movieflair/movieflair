@@ -37,7 +37,7 @@ const RandomLists = () => {
     return (
       <section className="mb-12">
         <div className="flex items-center gap-2 mb-6">
-          <Shuffle className="w-6 h-6 text-purple-500" />
+          <Shuffle className="w-6 h-6 text-theme-accent-red" />
           <h2 className="text-2xl font-semibold">Filmlisten</h2>
         </div>
         <div className="animate-pulse space-y-4">
@@ -54,7 +54,7 @@ const RandomLists = () => {
   return (
     <section className="mb-12">
       <div className="flex items-center gap-2 mb-6">
-        <Shuffle className="w-6 h-6 text-purple-500" />
+        <Shuffle className="w-6 h-6 text-theme-accent-red" />
         <h2 className="text-2xl font-semibold">Filmlisten</h2>
       </div>
       
