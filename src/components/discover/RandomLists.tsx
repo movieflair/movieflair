@@ -5,6 +5,7 @@ import { CustomList } from '@/lib/types';
 import DiscoverListCarousel from './DiscoverListCarousel';
 import { getRandomCustomLists } from '@/lib/api';
 import { toast } from 'sonner';
+import { createUrlSlug } from '@/lib/urlUtils';
 
 const RandomLists = () => {
   const [customLists, setCustomLists] = useState<CustomList[]>([]);

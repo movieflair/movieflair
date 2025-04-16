@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ListPlus, ArrowUpRight } from 'lucide-react';
 import { CustomList } from '@/lib/api';
@@ -36,10 +37,10 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
     <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100 max-w-4xl mx-auto relative">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <ListPlus className="w-4 h-4 md:w-6 md:h-6 text-theme-accent-red" />
+          <ListPlus className="w-4 h-4 md:w-6 md:h-6 text-black" />
           <Link 
-            to={`/liste/${list.id}`} 
-            className="text-lg md:text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
+            to={`/liste/${list.id}/${createUrlSlug(list.title)}`} 
+            className="text-lg md:text-2xl font-semibold hover:text-gray-800 transition-colors"
           >
             {list.title}
           </Link>
