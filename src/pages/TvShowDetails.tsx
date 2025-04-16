@@ -71,8 +71,8 @@ const TvShowDetails = () => {
   const seoTitle = formatMediaTitle(show.name || '', firstAirYear);
   const seoDescription = formatMediaDescription(show.name || '', firstAirYear, show.overview);
   const seoOgImage = show.backdrop_path 
-    ? getAbsoluteImageUrl(`https://image.tmdb.org/t/p/original${show.backdrop_path}`)
-    : getAbsoluteImageUrl('/movieflair-logo.png');
+    ? `https://image.tmdb.org/t/p/original${show.backdrop_path}`
+    : '/movieflair-logo.png';
   const canonical = `${window.location.origin}/serie/${show.id}${show.name ? `/${encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
 
   console.log('TV Show SEO data:', { 

@@ -72,13 +72,10 @@ export const getAbsoluteImageUrl = (imagePath: string): string => {
   
   if (imagePath.startsWith('http')) return imagePath;
   
-  // When running server-side (like in SSR), window is not available
-  if (typeof window === 'undefined') {
-    // Providing a fallback that will be replaced on client-side
-    return `https://movieflair.lovable.app${imagePath.startsWith('/') ? imagePath : `/${imagePath}`}`;
-  }
+  // Ensure we always have a fallback for server-side rendering
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://movieflair.lovable.app';
   
   return imagePath.startsWith('/') 
-    ? `${window.location.origin}${imagePath}`
-    : imagePath;
+    ? `${origin}${imagePath}`
+    : `${origin}/${imagePath}`;
 };

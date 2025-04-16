@@ -81,8 +81,8 @@ const MovieDetails = () => {
   const seoTitle = formatMediaTitle(movie.title, releaseYear);
   const seoDescription = formatMediaDescription(movie.title, releaseYear, movie.overview);
   const seoOgImage = movie.backdrop_path 
-    ? getAbsoluteImageUrl(`https://image.tmdb.org/t/p/original${movie.backdrop_path}`)
-    : getAbsoluteImageUrl('/movieflair-logo.png');
+    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
+    : '/movieflair-logo.png';
   const canonical = `${window.location.origin}/film/${movie.id}${movie.title ? `/${encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
 
   console.log('Movie SEO data:', { 

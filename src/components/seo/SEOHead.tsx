@@ -41,12 +41,13 @@ const SEOHead = ({
     ogType 
   });
   
+  // Force a rebuild of the document head with Helmet
   return (
     <Helmet>
       {/* Basic Meta Tags */}
       <title>{title}</title>
       <meta name="description" content={description} />
-      <meta name="keywords" content={keywords} />
+      {keywords && <meta name="keywords" content={keywords} />}
       
       {/* Canonical URL */}
       <link rel="canonical" href={currentUrl} />
