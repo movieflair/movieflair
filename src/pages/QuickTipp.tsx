@@ -1,13 +1,14 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star } from 'lucide-react';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { Button } from '@/components/ui/button';
 import { getRandomMovie, MovieDetail } from '@/lib/api';
-import { Sparkles, Film, Clock, Calendar, ArrowRight, Wand2, Target, Rocket } from 'lucide-react';
+import { Sparkles, ArrowRight, Wand2, Target, Rocket, RefreshCcw } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
 import { toast } from 'sonner';
+import { scrollToTop } from '@/utils/scrollUtils';
 
 const QuickTipp = () => {
   const [movie, setMovie] = useState<MovieDetail | null>(null);
@@ -29,6 +30,11 @@ const QuickTipp = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const truncateOverview = (text: string, maxLength: number = 400) => {
+    if (!text || text.length <= maxLength) return text || '';
+    return text.slice(0, maxLength).trim() + '...';
   };
 
   return (
@@ -57,124 +63,83 @@ const QuickTipp = () => {
         </div>
 
         {movie && (
-          <div className="max-w-4xl mx-auto mb-12">
-            <Card className="overflow-hidden bg-white/80 backdrop-blur-sm border border-gray-100 shadow-xl">
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row gap-4 relative">
-                  {movie.backdrop_path && (
-                    <div 
-                      className="absolute inset-0 -z-0" 
-                      style={{
-                        backgroundImage: `url(https://image.tmdb.org/t/p/w1280${movie.backdrop_path})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        opacity: 0.8,
-                        borderTopRightRadius: '0.75rem',
-                        borderBottomRightRadius: '0.75rem'
-                      }}
-                    >
-                      <div 
-                        className="absolute inset-0" 
-                        style={{
-                          background: `
-                            linear-gradient(to left,
-                              rgba(255, 255, 255, 0.6) 0%,
-                              rgba(255, 255, 255, 0.7) 20%,
-                              rgba(255, 255, 255, 0.8) 40%,
-                              rgba(255, 255, 255, 0.9) 60%,
-                              rgba(255, 255, 255, 1) 100%
-                            )
-                          `,
-                          borderTopRightRadius: '0.75rem',
-                          borderBottomRightRadius: '0.75rem'
-                        }}
-                      />
-                    </div>
-                  )}
-                  
-                  {movie.poster_path ? (
-                    <div className="w-full md:w-[200px] h-[300px] bg-muted overflow-hidden rounded-xl relative z-10">
+          <div className="mt-8 animate-fade-in">
+            <div className="rounded-xl p-6 shadow-lg border border-gray-100 relative overflow-hidden">
+              <div className="flex justify-between items-center mb-4 relative z-10">
+                <h3 className="text-lg font-medium text-gray-800">
+                  Deine Filmempfehlung
+                </h3>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleGetRandomMovie}
+                  disabled={loading}
+                  className="border-gray-200 text-gray-600 bg-white"
+                >
+                  <RefreshCcw className="w-4 h-4 mr-2" />
+                  <span>Neuer Vorschlag</span>
+                </Button>
+              </div>
+              
+              <div className="flex flex-col md:flex-row gap-6 relative z-10">
+                {movie.poster_path ? (
+                  <Link 
+                    to={`/film/${movie.id}`}
+                    className="group block overflow-hidden rounded-xl w-full md:w-[200px]"
+                    onClick={scrollToTop}
+                  >
+                    <div className="relative h-[300px] bg-muted overflow-hidden rounded-xl">
                       <img
                         src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                         alt={movie.title || movie.name}
                         className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
                       />
                       <div className="absolute top-2 right-2 flex items-center bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full">
-                        <Star className="w-3 h-3 text-yellow-500 mr-1" />
                         <span className="text-xs font-medium">{movie.vote_average.toFixed(1)}</span>
                       </div>
                     </div>
-                  ) : (
-                    <div className="w-full md:w-[200px] h-[300px] bg-muted rounded-xl flex items-center justify-center relative z-10">
-                      <Film className="w-16 h-16 text-muted-foreground" />
-                    </div>
-                  )}
+                  </Link>
+                ) : (
+                  <div className="w-full md:w-[200px] h-[300px] bg-muted rounded-xl flex items-center justify-center">
+                    <span className="text-muted-foreground">No Image</span>
+                  </div>
+                )}
 
-                  <div className="md:w-2/3 flex flex-col justify-between relative z-10">
-                    <div>
-                      <h2 className="text-xl font-bold mb-2">
-                        {movie.title || movie.name}
-                      </h2>
-
-                      <div className="flex items-center gap-4 mb-4">
-                        {movie.release_date && (
-                          <div className="flex items-center gap-2 text-gray-600 text-sm">
-                            <Calendar className="w-4 h-4" />
-                            <span>{new Date(movie.release_date).getFullYear()}</span>
-                          </div>
-                        )}
-                        {movie.runtime && (
-                          <div className="flex items-center gap-2 text-gray-600 text-sm">
-                            <Clock className="w-4 h-4" />
-                            <span>{movie.runtime} min</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 text-gray-600 text-sm">
-                          <Star className="w-4 h-4 text-yellow-500" />
-                          <span>{movie.vote_average.toFixed(1)}/10</span>
-                        </div>
+                <div className="flex-1 text-gray-900">
+                  <h4 className="text-xl font-medium mb-2">
+                    {movie.title || movie.name}
+                  </h4>
+                  <p className="text-sm mb-4">
+                    {movie.release_date?.substring(0, 4) || ''}
+                  </p>
+                  <p className="text-sm mb-6">
+                    {truncateOverview(movie.overview)}
+                  </p>
+                  <div className="flex items-center gap-4">
+                    <Button 
+                      onClick={() => {
+                        scrollToTop();
+                        window.location.href = `/film/${movie.id}`;
+                      }}
+                      className="w-full md:w-auto bg-[#ff3131] hover:bg-[#ff3131]/90 text-white flex items-center"
+                    >
+                      Details ansehen
+                      <ArrowRight className="ml-2 w-4 h-4" />
+                    </Button>
+                    
+                    {movie.id && (
+                      <div className="text-xs text-gray-600">
+                        <MovieRatingFeedback movieId={movie.id} />
                       </div>
-
-                      {movie.genres && (
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {movie.genres.map((genre) => (
-                            <span 
-                              key={genre.id}
-                              className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600"
-                            >
-                              {genre.name}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      <p className="text-gray-600 mb-8 text-sm">
-                        {movie.overview?.length > 400 
-                          ? `${movie.overview.substring(0, 400)}...` 
-                          : movie.overview || 'Keine Beschreibung verfügbar.'}
-                      </p>
-
-                      <div className="flex items-center gap-6 mb-4">
-                        <Link 
-                          to={`/movie/${movie.id}`}
-                          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-[#ff3131] text-white rounded-lg hover:bg-[#ff3131]/90 transition-colors"
-                        >
-                          Details ansehen
-                          <ArrowRight className="w-4 h-4" />
-                        </Link>
-                        <div className="text-sm text-gray-600 flex items-center">
-                          <MovieRatingFeedback movieId={movie.id} />
-                        </div>
-                      </div>
-                    </div>
+                    )}
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         )}
 
-        <div className="max-w-5xl mx-auto mb-16">
+        <div className="max-w-5xl mx-auto mb-16 mt-16">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-semibold mb-4">Warum Quick Tipp?</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
