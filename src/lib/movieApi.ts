@@ -1,4 +1,3 @@
-
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,7 +37,8 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     const { data: trailerMovies, error: moviesError } = await supabase
       .from('admin_movies')
       .select('*')
-      .eq('isnewtrailer', true);
+      .eq('isnewtrailer', true)
+      .order('updated_at', { ascending: false });
     
     if (moviesError) {
       console.error('Error fetching trailer movies from Supabase:', moviesError);
@@ -50,7 +50,8 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     const { data: trailerShows, error: showsError } = await supabase
       .from('admin_shows')
       .select('*')
-      .eq('hastrailer', true);
+      .eq('hastrailer', true)
+      .order('updated_at', { ascending: false });
     
     if (showsError) {
       console.error('Error fetching trailer shows from Supabase:', showsError);
@@ -59,10 +60,11 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       console.log(`Found ${trailerShows.length} TV shows with trailers from Supabase`);
     }
     
+    // Sort all items by updated_at
     trailerItems.sort((a, b) => {
-      const dateA = new Date(a.release_date || a.first_air_date || '');
-      const dateB = new Date(b.release_date || b.first_air_date || '');
-      return dateB.getTime() - dateA.getTime();
+      const dateA = new Date(b.updated_at || '');
+      const dateB = new Date(a.updated_at || '');
+      return dateA.getTime() - dateB.getTime();
     });
     
     console.log(`Total trailer items: ${trailerItems.length}`);
@@ -80,7 +82,8 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
     const { data: freeMovies, error } = await supabase
       .from('admin_movies')
       .select('*')
-      .eq('isfreemovie', true);
+      .eq('isfreemovie', true)
+      .order('updated_at', { ascending: false });
     
     if (error) {
       console.error('Error fetching free movies from Supabase:', error);
@@ -93,15 +96,8 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
     }
     
     const mappedMovies = freeMovies.map(mapSupabaseMovieToMovieObject);
-    
-    const sortedFreeMovies = [...mappedMovies].sort((a, b) => {
-      const dateA = new Date(a.release_date || a.first_air_date || '');
-      const dateB = new Date(b.release_date || b.first_air_date || '');
-      return dateB.getTime() - dateA.getTime();
-    });
-    
-    console.log(`Found ${sortedFreeMovies.length} free movies from Supabase`);
-    return sortedFreeMovies as MovieOrShow[];
+    console.log(`Found ${mappedMovies.length} free movies from Supabase`);
+    return mappedMovies as MovieOrShow[];
   } catch (e) {
     console.error('Error processing free movies:', e);
     return [];
