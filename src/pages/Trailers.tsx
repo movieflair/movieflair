@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
@@ -14,7 +13,6 @@ const Trailers = () => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    // Track page visit
     trackPageVisit('trailers');
     
     const fetchTrailerItems = async () => {
@@ -37,7 +35,6 @@ const Trailers = () => {
     fetchTrailerItems();
   }, []);
 
-  // Prepare SEO data
   const seoTitle = formatListTitle("Neue Film & Serien Trailer");
   const seoDescription = formatListDescription(
     "Neue Film & Serien Trailer", 
@@ -75,10 +72,10 @@ const Trailers = () => {
         </div>
         
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {[...Array(isMobile ? 2 : 4)].map((_, index) => (
               <div key={index} className="animate-pulse">
-                <div className="bg-muted aspect-[2/3] rounded-lg mb-2"></div>
+                <div className="bg-muted aspect-[2/3] rounded-lg mb-2 h-[350px]"></div>
                 <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
                 <div className="h-3 bg-muted rounded w-1/2"></div>
               </div>
@@ -89,9 +86,9 @@ const Trailers = () => {
             <p className="text-muted-foreground">Keine neuen Trailer gefunden.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {trailerItems.map((item) => (
-              <MovieCard key={item.id} movie={item} />
+              <MovieCard key={item.id} movie={item} size="large" />
             ))}
           </div>
         )}

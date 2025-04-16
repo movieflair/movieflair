@@ -30,14 +30,15 @@ const FreeMoviesSection = ({ movies }: FreeMoviesSectionProps) => {
         </Button>
       </div>
       
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         {newestMovies.map((movie, index) => (
           <motion.div 
             key={movie.id}
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.2 }}
+            className="flex justify-center"
           >
-            <MovieCard movie={movie} size="small" />
+            <MovieCard movie={movie} size="large" />
           </motion.div>
         ))}
       </div>
