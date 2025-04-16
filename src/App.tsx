@@ -20,6 +20,7 @@ import { Toaster } from '@/components/ui/toaster';
 import MainLayout from './components/layout/MainLayout';
 import Discover from './pages/Discover';
 import ListDetailPage from './pages/ListDetailPage';
+import AllLists from './pages/AllLists';
 
 const PrivacyPolicy = () => (
   <MainLayout>
@@ -77,6 +78,7 @@ const App = () => {
             <Route path="/search" element={<Navigate to="/suche" replace />} />
             <Route path="/entdecken" element={<Discover />} />
             <Route path="/liste/:id" element={<ListDetailPage />} />
+            <Route path="/filmlisten" element={<AllLists />} />
             <Route path="/genres" element={<Genres />} />
             <Route path="/quick-tipp" element={<QuickTipp />} />
             <Route path="/merkliste" element={<Watchlist />} />
