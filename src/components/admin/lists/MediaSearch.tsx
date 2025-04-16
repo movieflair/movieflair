@@ -54,6 +54,19 @@ const MediaSearch = ({ onAddMedia, selectedListId, existingMediaIds }: MediaSear
     }
   };
 
+  const handleAddMedia = (media: MovieOrShow) => {
+    if (selectedListId) {
+      // Make sure media.media_type is set
+      const mediaWithType = {
+        ...media,
+        media_type: media.media_type || searchType
+      };
+      
+      onAddMedia(mediaWithType);
+      toast.success(`${media.title || media.name} wurde zur Liste hinzugefügt`);
+    }
+  };
+
   return (
     <form onSubmit={handleSearch} className="flex flex-col gap-4 max-w-md mb-6">
       <div className="flex gap-2">
@@ -99,7 +112,7 @@ const MediaSearch = ({ onAddMedia, selectedListId, existingMediaIds }: MediaSear
             <MediaSearchResult
               key={media.id}
               media={media}
-              onAdd={onAddMedia}
+              onAdd={handleAddMedia}
               isAdded={existingMediaIds.includes(media.id)}
             />
           ))}

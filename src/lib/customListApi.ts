@@ -151,23 +151,46 @@ export const deleteCustomList = async (listId: string): Promise<boolean> => {
 };
 
 export const addMovieToList = async (listId: string, media: MovieOrShow): Promise<CustomList> => {
-  const { data: currentList, error: fetchError } = await supabase
-    .from('custom_lists')
-    .select('*')
-    .eq('id', listId)
-    .single();
-  
-  if (fetchError || !currentList) {
-    console.error('Error fetching list to add movie:', fetchError);
-    throw fetchError;
-  }
-  
-  const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
-  const movieExists = currentMovies.some((m: any) => m.id === media.id);
-  
-  if (!movieExists) {
-    // Properly cast the array to Json with a type assertion
-    const updatedMovies = [...currentMovies, media] as unknown as Json;
+  try {
+    console.log('Adding movie to list:', listId, media);
+    
+    const { data: currentList, error: fetchError } = await supabase
+      .from('custom_lists')
+      .select('*')
+      .eq('id', listId)
+      .single();
+    
+    if (fetchError) {
+      console.error('Error fetching list to add movie:', fetchError);
+      throw fetchError;
+    }
+    
+    if (!currentList) {
+      throw new Error(`List with ID ${listId} not found`);
+    }
+    
+    // Make sure media has media_type
+    const mediaToAdd = {
+      ...media,
+      media_type: media.media_type || 'movie'
+    };
+    
+    console.log('Current movies in list:', currentList.movies);
+    
+    // Ensure currentList.movies is an array
+    const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
+    
+    // Check if movie already exists in the list
+    const movieExists = currentMovies.some((m: any) => m.id === mediaToAdd.id);
+    
+    if (movieExists) {
+      console.log('Movie already exists in list:', mediaToAdd.id);
+      return mapSupabaseListToCustomList(currentList as SupabaseCustomList);
+    }
+    
+    // Add movie to list
+    console.log('Adding movie to list:', mediaToAdd);
+    const updatedMovies = [...currentMovies, mediaToAdd] as unknown as Json;
     
     const { data, error } = await supabase
       .from('custom_lists')
@@ -184,42 +207,60 @@ export const addMovieToList = async (listId: string, media: MovieOrShow): Promis
       throw error;
     }
     
+    console.log('Movie added successfully:', mediaToAdd.id);
     return mapSupabaseListToCustomList(data as SupabaseCustomList);
+  } catch (error) {
+    console.error('Error in addMovieToList:', error);
+    throw error;
   }
-  
-  return mapSupabaseListToCustomList(currentList as SupabaseCustomList);
 };
 
 export const removeMovieFromList = async (listId: string, mediaId: number): Promise<CustomList> => {
-  const { data: currentList, error: fetchError } = await supabase
-    .from('custom_lists')
-    .select('*')
-    .eq('id', listId)
-    .single();
-  
-  if (fetchError || !currentList) {
-    console.error('Error fetching list to remove movie:', fetchError);
-    throw fetchError;
-  }
-  
-  const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
-  // Use proper type casting for the filtered movies
-  const updatedMovies = currentMovies.filter((media: any) => media.id !== mediaId) as unknown as Json;
-  
-  const { data, error } = await supabase
-    .from('custom_lists')
-    .update({ 
-      movies: updatedMovies,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', listId)
-    .select()
-    .single();
-  
-  if (error) {
-    console.error('Error removing movie from list in Supabase:', error);
+  try {
+    console.log('Removing movie from list:', listId, mediaId);
+    
+    const { data: currentList, error: fetchError } = await supabase
+      .from('custom_lists')
+      .select('*')
+      .eq('id', listId)
+      .single();
+    
+    if (fetchError) {
+      console.error('Error fetching list to remove movie:', fetchError);
+      throw fetchError;
+    }
+    
+    if (!currentList) {
+      throw new Error(`List with ID ${listId} not found`);
+    }
+    
+    console.log('Current movies in list:', currentList.movies);
+    
+    // Ensure currentList.movies is an array
+    const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
+    
+    // Remove movie from list
+    const updatedMovies = currentMovies.filter((media: any) => media.id !== mediaId) as unknown as Json;
+    
+    const { data, error } = await supabase
+      .from('custom_lists')
+      .update({ 
+        movies: updatedMovies,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', listId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error removing movie from list in Supabase:', error);
+      throw error;
+    }
+    
+    console.log('Movie removed successfully:', mediaId);
+    return mapSupabaseListToCustomList(data as SupabaseCustomList);
+  } catch (error) {
+    console.error('Error in removeMovieFromList:', error);
     throw error;
   }
-  
-  return mapSupabaseListToCustomList(data as SupabaseCustomList);
 };
