@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ListPlus } from 'lucide-react';
 import { CustomList } from '@/lib/api';
@@ -74,7 +75,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
           </div>
 
           {/* Movie covers section - 2/3 width */}
-          <div className="w-2/3 pl-8 pr-8">
+          <div className="w-2/3 pl-12 pr-12">
             <Carousel
               ref={carouselRef}
               id={`carousel-${list.id}`}
@@ -86,7 +87,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
             >
               <CarouselContent className="-ml-2 md:-ml-4">
                 {list.movies.map((movie) => (
-                  <CarouselItem key={movie.id} className="pl-2 md:pl-1 basis-1/3">
+                  <CarouselItem key={movie.id} className="pl-1 md:pl-1 basis-1/3">
                     <div className="w-full transition-transform duration-300 hover:scale-105 cursor-pointer">
                       <MovieCard movie={movie} size="small" hideDetails />
                     </div>
@@ -104,3 +105,4 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
 };
 
 export default CustomListCarousel;
+
