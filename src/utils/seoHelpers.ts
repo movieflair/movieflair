@@ -32,9 +32,8 @@ export const formatMediaTitle = (title: string, year?: string): string => {
 };
 
 /**
- * Format movie or show description
- * Format: "Jetzt [Title] (Year) Online Stream anschauen - [Description]"
- * Limited to 140 characters
+ * Format media description
+ * Limit to 140 characters
  */
 export const formatMediaDescription = (title: string, year: string, description: string, maxLength: number = 140): string => {
   if (!title) return DEFAULT_SEO.description;
@@ -55,8 +54,7 @@ export const formatListTitle = (title: string): string => {
 
 /**
  * Format list description
- * Format: "[List Title] Online anschauen - [List Description]"
- * Limited to 140 characters
+ * Limit to 140 characters
  */
 export const formatListDescription = (title: string, description: string, maxLength: number = 140): string => {
   if (!title) return DEFAULT_SEO.description;
@@ -65,10 +63,10 @@ export const formatListDescription = (title: string, description: string, maxLen
 };
 
 /**
- * Get absolute URL for image
+ * Get absolute URL for SEO images
  */
 export const getAbsoluteImageUrl = (imagePath: string): string => {
-  if (!imagePath) return '';
+  if (!imagePath) return DEFAULT_SEO.ogImage;
   
   if (imagePath.startsWith('http')) return imagePath;
   
