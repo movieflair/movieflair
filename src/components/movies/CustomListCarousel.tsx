@@ -81,7 +81,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
               id={`carousel-${list.id}`}
               className="w-full"
               opts={{
-                align: "start",
+                align: "end", // Changed from "start" to "end" to align from right to left
                 loop: true,
               }}
             >
@@ -105,4 +105,3 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
 };
 
 export default CustomListCarousel;
-
