@@ -34,7 +34,10 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
             <p className="text-gray-600 max-w-[350px]">
               {list.description}
             </p>
-            {/* Navigation buttons will be moved inside the Carousel */}
+            <div className="flex items-center gap-2 mt-2">
+              <CarouselPrevious className="relative static translate-y-0 h-8 w-8 rounded-full bg-white/90 backdrop-blur hover:bg-white/95" />
+              <CarouselNext className="relative static translate-y-0 h-8 w-8 rounded-full bg-white/90 backdrop-blur hover:bg-white/95" />
+            </div>
           </div>
 
           <div className="relative">
@@ -54,12 +57,6 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              
-              {/* Place navigation elements within Carousel */}
-              <div className="flex items-center gap-2 mt-4 absolute bottom-[-40px] left-0">
-                <CarouselPrevious className="relative static translate-y-0 h-8 w-8 rounded-full bg-white/90 backdrop-blur hover:bg-white/95" />
-                <CarouselNext className="relative static translate-y-0 h-8 w-8 rounded-full bg-white/90 backdrop-blur hover:bg-white/95" />
-              </div>
             </Carousel>
           </div>
         </div>
