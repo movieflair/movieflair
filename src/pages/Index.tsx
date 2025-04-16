@@ -1,29 +1,28 @@
-
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
 import SEOHead from '@/components/seo/SEOHead';
-import { getRandomCustomLists, CustomList } from '@/lib/api';
+import { getRandomCustomLists } from '@/lib/api';
 import CustomListCarousel from '@/components/movies/CustomListCarousel';
 import PrimeVideoAd from '@/components/ads/PrimeVideoAd';
 
 const Index = () => {
-  const [customLists, setCustomLists] = useState<CustomList[]>([]);
+  const [customList, setCustomList] = useState<CustomList | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    const fetchLists = async () => {
+    const fetchList = async () => {
       try {
-        const lists = await getRandomCustomLists(2);
-        setCustomLists(lists);
+        const lists = await getRandomCustomLists(1);
+        setCustomList(lists[0] || null);
       } catch (error) {
-        console.error('Error fetching random custom lists:', error);
+        console.error('Error fetching random custom list:', error);
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchLists();
+    fetchList();
   }, []);
 
   const websiteStructuredData = {
@@ -60,11 +59,9 @@ Wir finden ihn für dich!</h1>
           </div>
           <HomeFilterBox />
           <PrimeVideoAd className="mt-6 md:mt-8" />
-          {!isLoading && customLists.length > 0 && (
-            <div className="mt-6 md:mt-8 space-y-4">
-              {customLists.map(list => (
-                <CustomListCarousel key={list.id} list={list} />
-              ))}
+          {!isLoading && customList && (
+            <div className="mt-6 md:mt-8">
+              <CustomListCarousel list={customList} />
             </div>
           )}
         </div>
