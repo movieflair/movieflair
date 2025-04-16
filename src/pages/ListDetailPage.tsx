@@ -91,10 +91,17 @@ const ListDetailPage = () => {
   }
 
   if (list) {
+    // Implement truncate function for description
+    const truncate = (text: string, maxLength: number) => {
+      if (text.length <= maxLength) return text;
+      return text.slice(0, maxLength - 3) + '...';
+    };
+
     const truncatedDescription = truncate(
       list.description || `Entdecke ${list.movies.length} ausgewählte Filme in dieser kuratierten Sammlung.`, 
       140
     );
+    
     const seoTitle = `${list.title} Online anschauen | MovieFlair`;
     const seoDescription = `${list.title} Online anschauen - ${truncatedDescription}`;
     const seoOgImage = list.movies[0]?.backdrop_path 
@@ -199,9 +206,5 @@ const ListDetailPage = () => {
   return null;
 };
 
-const truncate = (text: string, maxLength: number) => {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - 3) + '...';
-};
-
 export default ListDetailPage;
+
