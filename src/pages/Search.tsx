@@ -1,19 +1,23 @@
 
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import SearchBox from '@/components/search/SearchBox';
 import { searchMovies, searchTvShows, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Film, Tv, Loader } from 'lucide-react';
+import { Film, Tv, Loader, Tag } from 'lucide-react';
+import { genres } from '@/components/filter/data/filterOptions';
+import { Button } from '@/components/ui/button';
 
 const Search = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const query = searchParams.get('q') || '';
   
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
   const [tvShows, setTvShows] = useState<MovieOrShow[]>([]);
+  const [matchingGenres, setMatchingGenres] = useState<typeof genres>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   
@@ -25,6 +29,13 @@ const Search = () => {
     const performSearch = async () => {
       setIsLoading(true);
       try {
+        // Suche nach Genres
+        const genreMatches = genres.filter(genre => 
+          genre.name.toLowerCase().includes(query.toLowerCase())
+        );
+        setMatchingGenres(genreMatches);
+        
+        // Suche nach Filmen und Serien
         const [moviesResults, tvResults] = await Promise.all([
           searchMovies(query),
           searchTvShows(query)
@@ -48,6 +59,12 @@ const Search = () => {
       ? movies 
       : tvShows;
   
+  const handleGenreClick = (genreId: number, genreName: string) => {
+    navigate('/genres', { 
+      state: { selectedGenre: genreId, genreName }
+    });
+  };
+  
   return (
     <EnhancedLayout>
       <div className="container-custom py-12">
@@ -63,6 +80,27 @@ const Search = () => {
                 ? 'Suche läuft...' 
                 : `Suchergebnisse für "${query}"`}
             </h2>
+            
+            {matchingGenres.length > 0 && (
+              <div className="mb-8">
+                <h3 className="flex items-center gap-2 text-lg font-medium mb-3">
+                  <Tag className="h-5 w-5" />
+                  Passende Genres
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {matchingGenres.map(genre => (
+                    <Button
+                      key={genre.id}
+                      variant="outline"
+                      className="border-red-200 hover:bg-red-50 hover:text-red-700"
+                      onClick={() => handleGenreClick(genre.id, genre.name)}
+                    >
+                      {genre.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
               <TabsList>
@@ -114,7 +152,7 @@ const Search = () => {
         
         {!query && (
           <div className="text-center py-12">
-            <p className="text-gray-500">Gib einen Suchbegriff ein, um Filme und Serien zu finden.</p>
+            <p className="text-gray-500">Gib einen Suchbegriff ein, um Filme, Serien und Genres zu finden.</p>
           </div>
         )}
       </div>
