@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Shuffle } from 'lucide-react';
 import { CustomList } from '@/lib/types';
-import CustomListCarousel from '../movies/CustomListCarousel';
+import DiscoverListCarousel from './DiscoverListCarousel';
 import { getRandomCustomLists } from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -60,7 +60,7 @@ const RandomLists = () => {
       
       <div>
         {listsWithContent.map(list => (
-          <CustomListCarousel key={list.id} list={list} />
+          <DiscoverListCarousel key={list.id} list={list} />
         ))}
       </div>
     </section>
