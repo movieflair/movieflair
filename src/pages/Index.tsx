@@ -1,8 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
 import SEOHead from '@/components/seo/SEOHead';
 import { getRandomCustomLists } from '@/lib/api';
+import { CustomList } from '@/lib/types';
 import CustomListCarousel from '@/components/movies/CustomListCarousel';
 import PrimeVideoAd from '@/components/ads/PrimeVideoAd';
 
