@@ -114,6 +114,13 @@ const MovieDetails = () => {
       : text;
   };
 
+  console.log('Movie details:', { 
+    id: movie.id, 
+    title: movie.title, 
+    isFreeMovie: movie.isFreeMovie, 
+    streamUrl: movie.streamUrl 
+  });
+
   return (
     <MainLayout>
       <SEOHead 

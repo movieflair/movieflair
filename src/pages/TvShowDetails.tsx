@@ -106,6 +106,13 @@ const TvShowDetails = () => {
       : text;
   };
 
+  console.log('TV Show details:', { 
+    id: show.id, 
+    name: show.name, 
+    hasStream: show.hasStream, 
+    streamUrl: show.streamUrl 
+  });
+
   return (
     <MainLayout>
       <SEOHead 
