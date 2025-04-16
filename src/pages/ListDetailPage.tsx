@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, List } from 'lucide-react';
@@ -107,11 +108,12 @@ const ListDetailPage = () => {
           description={seoDescription}
           ogImage={seoOgImage}
           ogType="website"
+          keywords={`Filmliste, ${list.title}, Filme, Streaming, ${list.movies.map(m => m.title).join(', ')}`}
           structuredData={{
             "@context": "https://schema.org",
             "@type": "ItemList",
             "name": list.title,
-            "description": list.description,
+            "description": list.description || `Liste mit ${list.movies.length} Filmen`,
             "numberOfItems": list.movies.length,
             "itemListElement": list.movies.map((movie, index) => ({
               "@type": "ListItem",
@@ -119,7 +121,8 @@ const ListDetailPage = () => {
               "item": {
                 "@type": "Movie",
                 "name": movie.title,
-                "image": movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : undefined
+                "image": movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : undefined,
+                "url": `/film/${movie.id}/${createUrlSlug(movie.title)}`
               }
             }))
           }}
