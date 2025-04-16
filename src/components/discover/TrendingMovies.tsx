@@ -30,7 +30,7 @@ const TrendingMovies = ({ movies }: TrendingMoviesProps) => {
             transition={{ delay: index * 0.1, duration: 0.5 }}
             className="flex justify-center"
           >
-            <MovieCard movie={movie} />
+            <MovieCard movie={movie} size="large" />
           </motion.div>
         ))}
       </div>
