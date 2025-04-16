@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ListPlus } from 'lucide-react';
 import { CustomList } from '@/lib/api';
@@ -33,7 +32,7 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100 max-w-[800px] mx-auto">
+    <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <ListPlus className="w-4 h-4 md:w-6 md:h-6" />
