@@ -39,7 +39,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
       <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100">
         <div className="flex flex-row gap-4">
           {/* Text section */}
-          <div className="w-[200px] space-y-4">
+          <div className="w-[350px] space-y-4">
             <div className="space-y-1">
               <Link 
                 to="/discover" 
