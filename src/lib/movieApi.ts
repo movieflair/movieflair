@@ -5,12 +5,13 @@ import { callTMDB } from './apiUtils';
 export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching trailer movies...');
   
+  // Abrufen der vom Admin konfigurierten Filme und Serien
   const savedMoviesJson = localStorage.getItem('adminMovies');
   const savedShowsJson = localStorage.getItem('adminShows');
   let trailerItems: MovieOrShow[] = [];
   
   try {
-    // Process movies with trailers (now public access)
+    // Verarbeite Filme mit Trailern (öffentlicher Zugriff)
     if (savedMoviesJson) {
       const savedMovies = JSON.parse(savedMoviesJson);
       const trailerMovies = savedMovies
@@ -22,7 +23,7 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       console.log('No saved movies found in localStorage');
     }
     
-    // Process TV shows with trailers (now public access)
+    // Verarbeite TV-Shows mit Trailern (öffentlicher Zugriff)
     if (savedShowsJson) {
       const savedShows = JSON.parse(savedShowsJson);
       const trailerShows = savedShows
@@ -34,11 +35,11 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       console.log('No saved TV shows found in localStorage');
     }
     
-    // Sort all trailer items by release date, NEWEST first (changed from oldest)
+    // Sortiere nach Erscheinungsdatum, NEUESTE zuerst
     trailerItems.sort((a: MovieOrShow, b: MovieOrShow) => {
       const dateA = new Date(a.release_date || a.first_air_date || '');
       const dateB = new Date(b.release_date || b.first_air_date || '');
-      return dateB.getTime() - dateA.getTime(); // Changed to show newest first
+      return dateB.getTime() - dateA.getTime();
     });
     
     console.log(`Total trailer items: ${trailerItems.length}`);
@@ -52,6 +53,7 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
 export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching free movies...');
   
+  // Abrufen der vom Admin konfigurierten kostenlosen Filme
   const savedMoviesJson = localStorage.getItem('adminMovies');
   let freeMovies: MovieOrShow[] = [];
   
@@ -61,11 +63,11 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
       freeMovies = savedMovies
         .filter((movie: MovieOrShow) => movie.isFreeMovie === true);
       
-      // Sort by release date, NEWEST first (changed from oldest)
+      // Sortiere nach Erscheinungsdatum, NEUESTE zuerst
       freeMovies.sort((a: MovieOrShow, b: MovieOrShow) => {
         const dateA = new Date(a.release_date || a.first_air_date || '');
         const dateB = new Date(b.release_date || b.first_air_date || '');
-        return dateB.getTime() - dateA.getTime(); // Changed to show newest first
+        return dateB.getTime() - dateA.getTime();
       });
       
       console.log(`Found ${freeMovies.length} free movies`);
