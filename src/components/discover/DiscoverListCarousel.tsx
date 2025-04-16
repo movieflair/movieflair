@@ -89,7 +89,7 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
       
       <Link 
         to={`/liste/${list.id}/${createUrlSlug(list.title)}`}
-        className="absolute bottom-2 right-2 text-xs text-gray-400 hover:text-theme-accent-red transition-colors duration-300 flex items-center gap-1 opacity-50 hover:opacity-100"
+        className="absolute bottom-2 right-2 text-xs text-gray-400 hover:text-gray-800 transition-colors duration-300 flex items-center gap-1 opacity-50 hover:opacity-100"
       >
         <span>Liste ansehen</span>
         <ArrowUpRight className="w-3 h-3" />
