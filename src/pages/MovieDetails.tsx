@@ -17,7 +17,7 @@ import MovieLoadingState from '@/components/movies/MovieLoadingState';
 import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
-import { formatMediaTitle, formatMediaDescription, getAbsoluteImageUrl } from '@/utils/seoHelpers';
+import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
 
 const MovieDetails = () => {
   const { id, slug } = useParams<{ id: string, slug?: string }>();

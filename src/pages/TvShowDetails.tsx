@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { MovieDetail } from '@/lib/types';
 import { getTvShowDetails, getCast } from '@/lib/tvShowApi';
 import SEOHead from '@/components/seo/SEOHead';
-import { formatMediaTitle, formatMediaDescription, getAbsoluteImageUrl } from '@/utils/seoHelpers';
+import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
 import MovieMeta from '@/components/movies/MovieMeta';
 import MovieHeader from '@/components/movies/MovieHeader';
 import MovieStreamButtons from '@/components/movies/MovieStreamButtons';

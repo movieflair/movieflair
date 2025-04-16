@@ -6,7 +6,7 @@ import MovieCard from '@/components/movies/MovieCard';
 import { PlayCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import SEOHead from '@/components/seo/SEOHead';
-import { DEFAULT_SEO, formatListTitle, formatListDescription, getAbsoluteImageUrl } from '@/utils/seoHelpers';
+import { DEFAULT_SEO, formatListTitle, formatListDescription } from '@/utils/seoHelpers';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
