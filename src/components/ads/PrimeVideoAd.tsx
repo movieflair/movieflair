@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
+import { trackInteraction } from '@/lib/analyticsApi';
 
 interface PrimeVideoAdProps {
   className?: string;

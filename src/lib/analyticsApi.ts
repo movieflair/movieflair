@@ -13,6 +13,12 @@ interface TrackOptions {
   mediaType?: 'movie' | 'tv';
 }
 
+export interface VisitorStat {
+  date: string;
+  count: number;
+  page: string;
+}
+
 export const trackInteraction = async (type: InteractionType, options: TrackOptions = {}) => {
   try {
     // Don't track if user is admin
@@ -62,5 +68,19 @@ export const trackPageVisit = (page: string) => {
     localStorage.setItem('pageVisits', JSON.stringify(visits));
   } catch (error) {
     console.error('Error tracking page visit:', error);
+  }
+};
+
+// Function to get visitor stats from localStorage
+export const getVisitorStats = (): VisitorStat[] => {
+  try {
+    const visitsJson = localStorage.getItem('pageVisits');
+    if (!visitsJson) return [];
+    
+    const visits = JSON.parse(visitsJson);
+    return visits;
+  } catch (error) {
+    console.error('Error getting visitor stats:', error);
+    return [];
   }
 };
