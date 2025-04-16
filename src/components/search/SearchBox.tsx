@@ -126,9 +126,9 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                     <CommandItem 
                       key={genre.id}
                       onSelect={() => handleGenreSelect(genre.id, genre.name)}
-                      className="cursor-pointer hover:bg-gray-100 data-[selected]:bg-gray-100"
+                      className="cursor-default"
                     >
-                      <span className="text-sm">{genre.name}</span>
+                      <span className="text-sm text-gray-800">{genre.name}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
@@ -143,7 +143,7 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                         navigate(`/${result.media_type === 'movie' ? 'film' : 'serie'}/${result.id}`);
                         setOpen(false);
                       }}
-                      className="cursor-pointer hover:bg-gray-100 data-[selected]:bg-gray-100"
+                      className="cursor-default"
                     >
                       <div className="flex items-center">
                         {result.poster_path && (
@@ -153,13 +153,13 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                             className="w-8 h-12 object-cover mr-2 rounded"
                           />
                         )}
-                        <span className="text-sm">{result.title || result.name}</span>
+                        <span className="text-sm text-gray-800">{result.title || result.name}</span>
                       </div>
                     </CommandItem>
                   ))}
                   <CommandItem 
                     onSelect={() => handleSubmit()} 
-                    className="cursor-pointer hover:bg-gray-100 data-[selected]:bg-gray-100 text-gray-700"
+                    className="cursor-default text-gray-700"
                   >
                     Alle Ergebnisse anzeigen...
                   </CommandItem>
