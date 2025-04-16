@@ -1,12 +1,20 @@
 
 import { CustomList, MovieOrShow } from './types';
+import { supabase } from '@/integrations/supabase/client';
 
-// Benutzerdefinierte Listen aus dem localStorage abrufen
-export const getCustomLists = (): CustomList[] => {
+// Benutzerdefinierte Listen aus Supabase abrufen
+export const getCustomLists = async (): Promise<CustomList[]> => {
   try {
-    const listsJson = localStorage.getItem('customLists');
-    if (!listsJson) return [];
-    return JSON.parse(listsJson);
+    const { data, error } = await supabase
+      .from('custom_lists')
+      .select('*');
+      
+    if (error) {
+      console.error('Error getting custom lists from Supabase:', error);
+      return [];
+    }
+    
+    return data || [];
   } catch (error) {
     console.error('Error getting custom lists:', error);
     return [];
@@ -14,11 +22,8 @@ export const getCustomLists = (): CustomList[] => {
 };
 
 // Eine neue benutzerdefinierte Liste erstellen
-export const createCustomList = (title: string, description: string): CustomList => {
-  const lists = getCustomLists();
-  
-  const newList: CustomList = {
-    id: Date.now().toString(),
+export const createCustomList = async (title: string, description: string): Promise<CustomList | null> => {
+  const newList: Omit<CustomList, 'id'> = {
     title,
     description,
     movies: [],
@@ -26,83 +31,142 @@ export const createCustomList = (title: string, description: string): CustomList
     updatedAt: new Date().toISOString()
   };
   
-  lists.push(newList);
-  localStorage.setItem('customLists', JSON.stringify(lists));
+  const { data, error } = await supabase
+    .from('custom_lists')
+    .insert(newList)
+    .select()
+    .single();
   
-  return newList;
+  if (error) {
+    console.error('Error creating custom list in Supabase:', error);
+    return null;
+  }
+  
+  return data;
 };
 
 // Eine benutzerdefinierte Liste aktualisieren
-export const updateCustomList = (updatedList: CustomList): CustomList => {
-  const lists = getCustomLists();
+export const updateCustomList = async (updatedList: CustomList): Promise<CustomList | null> => {
+  const listToUpdate = {
+    ...updatedList,
+    updatedAt: new Date().toISOString()
+  };
   
-  const index = lists.findIndex(list => list.id === updatedList.id);
+  const { data, error } = await supabase
+    .from('custom_lists')
+    .update(listToUpdate)
+    .eq('id', updatedList.id)
+    .select()
+    .single();
   
-  if (index >= 0) {
-    updatedList.updatedAt = new Date().toISOString();
-    lists[index] = updatedList;
-    localStorage.setItem('customLists', JSON.stringify(lists));
+  if (error) {
+    console.error('Error updating custom list in Supabase:', error);
+    return null;
   }
   
-  return updatedList;
+  return data;
 };
 
 // Film oder Serie zu einer benutzerdefinierten Liste hinzufügen
-export const addMovieToList = (listId: string, media: MovieOrShow): CustomList | null => {
-  const lists = getCustomLists();
+export const addMovieToList = async (listId: string, media: MovieOrShow): Promise<CustomList | null> => {
+  // Erst die aktuelle Liste abrufen
+  const { data: currentList, error: fetchError } = await supabase
+    .from('custom_lists')
+    .select('*')
+    .eq('id', listId)
+    .single();
   
-  const listIndex = lists.findIndex(list => list.id === listId);
-  
-  if (listIndex >= 0) {
-    // Überprüfen, ob der Film oder die Serie bereits in der Liste ist
-    const mediaExists = lists[listIndex].movies.some(m => m.id === media.id);
-    
-    if (!mediaExists) {
-      lists[listIndex].movies.push(media);
-      lists[listIndex].updatedAt = new Date().toISOString();
-      localStorage.setItem('customLists', JSON.stringify(lists));
-    }
-    
-    return lists[listIndex];
+  if (fetchError || !currentList) {
+    console.error('Error fetching list to add movie:', fetchError);
+    return null;
   }
   
-  return null;
+  // Überprüfen, ob der Film oder die Serie bereits in der Liste ist
+  const movieExists = currentList.movies.some((m: MovieOrShow) => m.id === media.id);
+  
+  if (!movieExists) {
+    const updatedMovies = [...currentList.movies, media];
+    
+    const { data, error } = await supabase
+      .from('custom_lists')
+      .update({ 
+        movies: updatedMovies,
+        updatedAt: new Date().toISOString()
+      })
+      .eq('id', listId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error adding movie to list in Supabase:', error);
+      return null;
+    }
+    
+    return data;
+  }
+  
+  return currentList;
 };
 
 // Film oder Serie aus einer benutzerdefinierten Liste entfernen
-export const removeMovieFromList = (listId: string, mediaId: number): CustomList | null => {
-  const lists = getCustomLists();
+export const removeMovieFromList = async (listId: string, mediaId: number): Promise<CustomList | null> => {
+  // Erst die aktuelle Liste abrufen
+  const { data: currentList, error: fetchError } = await supabase
+    .from('custom_lists')
+    .select('*')
+    .eq('id', listId)
+    .single();
   
-  const listIndex = lists.findIndex(list => list.id === listId);
-  
-  if (listIndex >= 0) {
-    lists[listIndex].movies = lists[listIndex].movies.filter(media => media.id !== mediaId);
-    lists[listIndex].updatedAt = new Date().toISOString();
-    localStorage.setItem('customLists', JSON.stringify(lists));
-    
-    return lists[listIndex];
+  if (fetchError || !currentList) {
+    console.error('Error fetching list to remove movie:', fetchError);
+    return null;
   }
   
-  return null;
+  const updatedMovies = currentList.movies.filter((media: MovieOrShow) => media.id !== mediaId);
+  
+  const { data, error } = await supabase
+    .from('custom_lists')
+    .update({ 
+      movies: updatedMovies,
+      updatedAt: new Date().toISOString()
+    })
+    .eq('id', listId)
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error removing movie from list in Supabase:', error);
+    return null;
+  }
+  
+  return data;
 };
 
 // Eine benutzerdefinierte Liste löschen
-export const deleteCustomList = (listId: string): boolean => {
-  const lists = getCustomLists();
+export const deleteCustomList = async (listId: string): Promise<boolean> => {
+  const { error } = await supabase
+    .from('custom_lists')
+    .delete()
+    .eq('id', listId);
   
-  const filteredLists = lists.filter(list => list.id !== listId);
-  
-  if (filteredLists.length !== lists.length) {
-    localStorage.setItem('customLists', JSON.stringify(filteredLists));
-    return true;
+  if (error) {
+    console.error('Error deleting custom list from Supabase:', error);
+    return false;
   }
   
-  return false;
+  return true;
 };
 
 // Zufällige Listen für die Anzeige abrufen
-export const getRandomCustomLists = (limit = 3): CustomList[] => {
-  const lists = getCustomLists();
+export const getRandomCustomLists = async (limit = 3): Promise<CustomList[]> => {
+  const { data: lists, error } = await supabase
+    .from('custom_lists')
+    .select('*');
+  
+  if (error || !lists) {
+    console.error('Error fetching random custom lists:', error);
+    return [];
+  }
   
   // Nur Listen mit mindestens einem Film zurückgeben
   const listsWithMovies = lists.filter(list => list.movies.length > 0);

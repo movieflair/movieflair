@@ -1,38 +1,38 @@
+
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { callTMDB } from './apiUtils';
+import { supabase } from '@/integrations/supabase/client';
 
 export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching trailer movies...');
-  
-  // Abrufen der vom Admin konfigurierten Filme und Serien
-  const savedMoviesJson = localStorage.getItem('adminMovies');
-  const savedShowsJson = localStorage.getItem('adminShows');
   let trailerItems: MovieOrShow[] = [];
   
   try {
-    // Verarbeite Filme mit Trailern (öffentlicher Zugriff)
-    if (savedMoviesJson) {
-      const savedMovies = JSON.parse(savedMoviesJson);
-      const trailerMovies = savedMovies
-        .filter((movie: MovieOrShow) => movie.isNewTrailer === true);
-      
+    // Fetch movies with trailers from Supabase
+    const { data: trailerMovies, error: moviesError } = await supabase
+      .from('admin_movies')
+      .select('*')
+      .eq('isNewTrailer', true);
+    
+    if (moviesError) {
+      console.error('Error fetching trailer movies from Supabase:', moviesError);
+    } else if (trailerMovies) {
       trailerItems = [...trailerItems, ...trailerMovies];
-      console.log(`Found ${trailerMovies.length} trailer movies`);
-    } else {
-      console.log('No saved movies found in localStorage');
+      console.log(`Found ${trailerMovies.length} trailer movies from Supabase`);
     }
     
-    // Verarbeite TV-Shows mit Trailern (öffentlicher Zugriff)
-    if (savedShowsJson) {
-      const savedShows = JSON.parse(savedShowsJson);
-      const trailerShows = savedShows
-        .filter((show: MovieOrShow) => show.hasTrailer === true);
-      
+    // Fetch TV shows with trailers from Supabase
+    const { data: trailerShows, error: showsError } = await supabase
+      .from('admin_shows')
+      .select('*')
+      .eq('hasTrailer', true);
+    
+    if (showsError) {
+      console.error('Error fetching trailer shows from Supabase:', showsError);
+    } else if (trailerShows) {
       trailerItems = [...trailerItems, ...trailerShows];
-      console.log(`Found ${trailerShows.length} TV shows with trailers`);
-    } else {
-      console.log('No saved TV shows found in localStorage');
+      console.log(`Found ${trailerShows.length} TV shows with trailers from Supabase`);
     }
     
     // Sortiere nach Erscheinungsdatum, NEUESTE zuerst
@@ -53,29 +53,32 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
 export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching free movies...');
   
-  // Abrufen der vom Admin konfigurierten kostenlosen Filme
-  const savedMoviesJson = localStorage.getItem('adminMovies');
-  let freeMovies: MovieOrShow[] = [];
-  
   try {
-    if (savedMoviesJson) {
-      const savedMovies = JSON.parse(savedMoviesJson);
-      freeMovies = savedMovies
-        .filter((movie: MovieOrShow) => movie.isFreeMovie === true);
-      
-      // Sortiere nach Erscheinungsdatum, NEUESTE zuerst
-      freeMovies.sort((a: MovieOrShow, b: MovieOrShow) => {
-        const dateA = new Date(a.release_date || a.first_air_date || '');
-        const dateB = new Date(b.release_date || b.first_air_date || '');
-        return dateB.getTime() - dateA.getTime();
-      });
-      
-      console.log(`Found ${freeMovies.length} free movies`);
-    } else {
-      console.log('No saved movies found in localStorage');
+    // Fetch free movies from Supabase
+    const { data: freeMovies, error } = await supabase
+      .from('admin_movies')
+      .select('*')
+      .eq('isFreeMovie', true);
+    
+    if (error) {
+      console.error('Error fetching free movies from Supabase:', error);
+      return [];
     }
     
-    return freeMovies;
+    if (!freeMovies) {
+      console.log('No free movies found in Supabase');
+      return [];
+    }
+    
+    // Sortiere nach Erscheinungsdatum, NEUESTE zuerst
+    const sortedFreeMovies = [...freeMovies].sort((a: MovieOrShow, b: MovieOrShow) => {
+      const dateA = new Date(a.release_date || a.first_air_date || '');
+      const dateB = new Date(b.release_date || b.first_air_date || '');
+      return dateB.getTime() - dateA.getTime();
+    });
+    
+    console.log(`Found ${sortedFreeMovies.length} free movies from Supabase`);
+    return sortedFreeMovies;
   } catch (e) {
     console.error('Error processing free movies:', e);
     return [];

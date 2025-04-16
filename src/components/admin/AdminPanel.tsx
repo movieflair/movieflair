@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileEdit } from 'lucide-react';
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { MovieOrShow } from "@/lib/types";
@@ -180,7 +180,7 @@ const AdminPanel = () => {
     setTrailerUrl(show.trailerUrl || '');
   };
 
-  const handleSaveMovie = () => {
+  const handleSaveMovie = async () => {
     if (!selectedMovie) return;
 
     console.log("Saving movie with these settings:", {
@@ -192,52 +192,73 @@ const AdminPanel = () => {
       trailerUrl: isNewTrailer ? trailerUrl : ''
     });
 
-    const savedMoviesJson = localStorage.getItem('adminMovies');
-    let savedMovies: any[] = [];
-    
-    if (savedMoviesJson) {
-      try {
-        savedMovies = JSON.parse(savedMoviesJson);
-        console.log("Found existing saved movies:", savedMovies.length);
-      } catch (e) {
-        console.error('Error parsing saved movies:', e);
+    try {
+      // Check if movie already exists in Supabase
+      const { data: existingMovie, error: checkError } = await supabase
+        .from('admin_movies')
+        .select('*')
+        .eq('id', selectedMovie.id)
+        .maybeSingle();
+        
+      if (checkError) {
+        console.error('Error checking if movie exists:', checkError);
+        toast.error("Fehler beim Überprüfen des Films");
+        return;
       }
+      
+      const updatedMovie = {
+        ...selectedMovie,
+        isFreeMovie,
+        isNewTrailer,
+        hasStream: isFreeMovie, 
+        streamUrl: isFreeMovie ? streamUrl : '',
+        hasTrailer: isNewTrailer,
+        trailerUrl: isNewTrailer ? trailerUrl : ''
+      };
+      
+      let saveError;
+      
+      if (existingMovie) {
+        // Update existing movie
+        const { error } = await supabase
+          .from('admin_movies')
+          .update(updatedMovie)
+          .eq('id', selectedMovie.id);
+          
+        saveError = error;
+      } else {
+        // Insert new movie
+        const { error } = await supabase
+          .from('admin_movies')
+          .insert(updatedMovie);
+          
+        saveError = error;
+      }
+      
+      if (saveError) {
+        console.error('Error saving movie to Supabase:', saveError);
+        toast.error("Fehler beim Speichern des Films");
+        return;
+      }
+      
+      console.log("Movie saved to Supabase successfully");
+      
+      // Force a refresh of the data
+      queryClient.invalidateQueries({ queryKey: ['admin-movies'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-free-movies'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-trailer-movies'] });
+      queryClient.invalidateQueries({ queryKey: ['search-movies'] });
+      
+      toast.success("Änderungen gespeichert");
+      
+      setSelectedMovie(null);
+    } catch (error) {
+      console.error('Error saving movie:', error);
+      toast.error("Fehler beim Speichern des Films");
     }
-    
-    const existingIndex = savedMovies.findIndex(m => m.id === selectedMovie.id);
-    
-    const updatedMovie = {
-      ...selectedMovie,
-      isFreeMovie,
-      isNewTrailer,
-      hasStream: isFreeMovie, 
-      streamUrl: isFreeMovie ? streamUrl : '',
-      hasTrailer: isNewTrailer,
-      trailerUrl: isNewTrailer ? trailerUrl : ''
-    };
-    
-    if (existingIndex >= 0) {
-      console.log("Updating existing movie at index:", existingIndex);
-      savedMovies[existingIndex] = updatedMovie;
-    } else {
-      console.log("Adding new movie to saved movies");
-      savedMovies.push(updatedMovie);
-    }
-    
-    localStorage.setItem('adminMovies', JSON.stringify(savedMovies));
-    console.log("Saved movies to localStorage, count:", savedMovies.length);
-    
-    queryClient.invalidateQueries({ queryKey: ['admin-movies'] });
-    queryClient.invalidateQueries({ queryKey: ['admin-free-movies'] });
-    queryClient.invalidateQueries({ queryKey: ['admin-trailer-movies'] });
-    queryClient.invalidateQueries({ queryKey: ['search-movies'] });
-    
-    toast.success("Änderungen gespeichert");
-    
-    setSelectedMovie(null);
   };
   
-  const handleSaveTvShow = () => {
+  const handleSaveTvShow = async () => {
     if (!selectedTvShow) return;
 
     console.log("Saving TV show with these settings:", {
@@ -249,45 +270,66 @@ const AdminPanel = () => {
       trailerUrl: hasTrailer ? trailerUrl : ''
     });
 
-    const savedShowsJson = localStorage.getItem('adminShows');
-    let savedShows: any[] = [];
-    
-    if (savedShowsJson) {
-      try {
-        savedShows = JSON.parse(savedShowsJson);
-        console.log("Found existing saved shows:", savedShows.length);
-      } catch (e) {
-        console.error('Error parsing saved shows:', e);
+    try {
+      // Check if show already exists in Supabase
+      const { data: existingShow, error: checkError } = await supabase
+        .from('admin_shows')
+        .select('*')
+        .eq('id', selectedTvShow.id)
+        .maybeSingle();
+        
+      if (checkError) {
+        console.error('Error checking if show exists:', checkError);
+        toast.error("Fehler beim Überprüfen der Serie");
+        return;
       }
+      
+      const updatedShow = {
+        ...selectedTvShow,
+        hasStream,
+        streamUrl: hasStream ? streamUrl : '',
+        hasTrailer,
+        trailerUrl: hasTrailer ? trailerUrl : ''
+      };
+      
+      let saveError;
+      
+      if (existingShow) {
+        // Update existing show
+        const { error } = await supabase
+          .from('admin_shows')
+          .update(updatedShow)
+          .eq('id', selectedTvShow.id);
+          
+        saveError = error;
+      } else {
+        // Insert new show
+        const { error } = await supabase
+          .from('admin_shows')
+          .insert(updatedShow);
+          
+        saveError = error;
+      }
+      
+      if (saveError) {
+        console.error('Error saving show to Supabase:', saveError);
+        toast.error("Fehler beim Speichern der Serie");
+        return;
+      }
+      
+      console.log("TV show saved to Supabase successfully");
+      
+      // Force a refresh of the data
+      queryClient.invalidateQueries({ queryKey: ['admin-tv-shows'] });
+      queryClient.invalidateQueries({ queryKey: ['search-tv-shows'] });
+      
+      toast.success("Änderungen gespeichert");
+      
+      setSelectedTvShow(null);
+    } catch (error) {
+      console.error('Error saving TV show:', error);
+      toast.error("Fehler beim Speichern der Serie");
     }
-    
-    const existingIndex = savedShows.findIndex(s => s.id === selectedTvShow.id);
-    
-    const updatedShow = {
-      ...selectedTvShow,
-      hasStream,
-      streamUrl: hasStream ? streamUrl : '',
-      hasTrailer,
-      trailerUrl: hasTrailer ? trailerUrl : ''
-    };
-    
-    if (existingIndex >= 0) {
-      console.log("Updating existing show at index:", existingIndex);
-      savedShows[existingIndex] = updatedShow;
-    } else {
-      console.log("Adding new show to saved shows");
-      savedShows.push(updatedShow);
-    }
-    
-    localStorage.setItem('adminShows', JSON.stringify(savedShows));
-    console.log("Saved shows to localStorage, count:", savedShows.length);
-    
-    queryClient.invalidateQueries({ queryKey: ['admin-tv-shows'] });
-    queryClient.invalidateQueries({ queryKey: ['search-tv-shows'] });
-    
-    toast.success("Änderungen gespeichert");
-    
-    setSelectedTvShow(null);
   };
 
   const handleViewChange = (view: 'all' | 'free' | 'trailers') => {

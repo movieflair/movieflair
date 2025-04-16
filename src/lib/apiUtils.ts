@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 export async function callTMDB(path: string, searchParams: Record<string, any> = {}) {
@@ -33,15 +34,23 @@ export async function callTMDB(path: string, searchParams: Record<string, any> =
 }
 
 export const getAdminMovieSettings = async () => {
-  const savedMoviesJson = localStorage.getItem('adminMovies');
-  if (!savedMoviesJson) {
-    console.log('No saved movie settings found in localStorage');
-    return {};
-  }
-  
   try {
-    const savedMovies = JSON.parse(savedMoviesJson);
-    console.log(`Found ${savedMovies.length} saved movie settings in localStorage`);
+    // Fetch movie settings from Supabase
+    const { data: savedMovies, error } = await supabase
+      .from('admin_movies')
+      .select('*');
+    
+    if (error) {
+      console.error('Error fetching movie settings from Supabase:', error);
+      return {};
+    }
+    
+    if (!savedMovies || savedMovies.length === 0) {
+      console.log('No saved movie settings found in Supabase');
+      return {};
+    }
+    
+    console.log(`Found ${savedMovies.length} saved movie settings in Supabase`);
     
     // Convert array to object indexed by movie ID
     const movieSettings = savedMovies.reduce((acc: Record<number, any>, movie: any) => {
@@ -53,21 +62,29 @@ export const getAdminMovieSettings = async () => {
     
     return movieSettings;
   } catch (e) {
-    console.error('Error parsing saved movies:', e);
+    console.error('Error processing saved movies:', e);
     return {};
   }
 };
 
 export const getAdminTvShowSettings = async () => {
-  const savedShowsJson = localStorage.getItem('adminShows');
-  if (!savedShowsJson) {
-    console.log('No saved TV show settings found in localStorage');
-    return {};
-  }
-  
   try {
-    const savedShows = JSON.parse(savedShowsJson);
-    console.log(`Found ${savedShows.length} saved TV show settings in localStorage`);
+    // Fetch TV show settings from Supabase
+    const { data: savedShows, error } = await supabase
+      .from('admin_shows')
+      .select('*');
+    
+    if (error) {
+      console.error('Error fetching TV show settings from Supabase:', error);
+      return {};
+    }
+    
+    if (!savedShows || savedShows.length === 0) {
+      console.log('No saved TV show settings found in Supabase');
+      return {};
+    }
+    
+    console.log(`Found ${savedShows.length} saved TV show settings in Supabase`);
     
     return savedShows.reduce((acc: Record<number, any>, show: any) => {
       if (show.id) {
@@ -76,7 +93,7 @@ export const getAdminTvShowSettings = async () => {
       return acc;
     }, {});
   } catch (e) {
-    console.error('Error parsing saved shows:', e);
+    console.error('Error processing saved shows:', e);
     return {};
   }
 };
