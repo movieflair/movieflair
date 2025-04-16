@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ListPlus, ArrowUpRight } from 'lucide-react';
 import { CustomList } from '@/lib/api';
@@ -39,8 +38,8 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
         <div className="flex items-center gap-2">
           <ListPlus className="w-4 h-4 md:w-6 md:h-6" />
           <Link 
-            to="/discover" 
-            className="text-lg md:text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
+            to={`/liste/${list.id}/${createUrlSlug(list.title)}`}
+            className="text-lg md:text-2xl font-semibold hover:text-gray-800 transition-colors"
           >
             {list.title}
           </Link>
