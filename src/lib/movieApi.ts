@@ -1,7 +1,8 @@
+
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
-import { callTMDB } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
+import { callTMDB } from './apiUtils';
 
 const mapSupabaseMovieToMovieObject = (movie: any): MovieOrShow => {
   const genres = movie.genre_ids || [];
@@ -150,12 +151,43 @@ export const searchMovies = async (query: string): Promise<MovieOrShow[]> => {
 };
 
 export const getMovieById = async (id: number): Promise<MovieDetail> => {
+  // First check if movie exists in our database with custom settings
+  const { data: adminMovie, error: adminError } = await supabase
+    .from('admin_movies')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+    
+  if (adminError) {
+    console.error('Error fetching movie from Supabase:', adminError);
+  }
+
+  // Then fetch the movie data from TMDB API
   const [movieData, videos, credits] = await Promise.all([
     callTMDB(`/movie/${id}`),
     callTMDB(`/movie/${id}/videos`),
     callTMDB(`/movie/${id}/credits`),
   ]);
 
+  // If we have admin settings, use those values
+  if (adminMovie) {
+    console.log('Found movie in admin_movies table:', adminMovie);
+    return {
+      ...movieData,
+      media_type: 'movie',
+      videos: { results: videos.results },
+      cast: credits.cast?.slice(0, 10),
+      crew: credits.crew,
+      hasTrailer: adminMovie.hastrailer || videos.results?.some((v: any) => v.type === 'Trailer'),
+      hasStream: adminMovie.hasstream || false,
+      streamUrl: adminMovie.streamurl || '',
+      trailerUrl: adminMovie.trailerurl || '',
+      isFreeMovie: adminMovie.isfreemovie || false,
+      isNewTrailer: adminMovie.isnewtrailer || false,
+    };
+  }
+
+  // Fallback to the general admin settings
   const savedSettings = await getAdminMovieSettings();
   const savedMovie = savedSettings[id] || {};
 
@@ -166,7 +198,7 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
     cast: credits.cast?.slice(0, 10),
     crew: credits.crew,
     hasTrailer: savedMovie.hasTrailer ?? videos.results?.some((v: any) => v.type === 'Trailer'),
-    hasStream: savedMovie.isFreeMovie || false,
+    hasStream: savedMovie.hasStream || false,
     streamUrl: savedMovie.streamUrl || '',
     trailerUrl: savedMovie.trailerUrl || '',
     isFreeMovie: savedMovie.isFreeMovie || false,
