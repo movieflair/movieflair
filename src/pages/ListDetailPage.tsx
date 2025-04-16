@@ -1,19 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Copy, CheckCheck, Share2, List } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, List } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { CustomList, getCustomList } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import SEOHead from '@/components/seo/SEOHead';
 import MovieCard from '@/components/movies/MovieCard';
+import { createUrlSlug } from '@/lib/urlUtils';
 
 const ListDetailPage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, slug } = useParams<{ id: string; slug?: string }>();
+  const navigate = useNavigate();
   const [list, setList] = useState<CustomList | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchList = async () => {
@@ -23,6 +23,12 @@ const ListDetailPage = () => {
         setLoading(true);
         const fetchedList = await getCustomList(id);
         setList(fetchedList);
+        
+        const correctSlug = createUrlSlug(fetchedList.title);
+        if (!slug || slug !== correctSlug) {
+          navigate(`/liste/${id}/${correctSlug}`, { replace: true });
+        }
+        
         setError(null);
       } catch (err) {
         console.error('Error fetching list:', err);
@@ -33,22 +39,7 @@ const ListDetailPage = () => {
     };
 
     fetchList();
-  }, [id]);
-
-  const copyToClipboard = () => {
-    if (!list) return;
-    
-    const url = window.location.href;
-    navigator.clipboard.writeText(url)
-      .then(() => {
-        setCopied(true);
-        toast.success('Link in die Zwischenablage kopiert');
-        setTimeout(() => setCopied(false), 2000);
-      })
-      .catch(() => {
-        toast.error('Link konnte nicht kopiert werden');
-      });
-  };
+  }, [id, slug, navigate]);
 
   if (loading) {
     return (
@@ -100,10 +91,28 @@ const ListDetailPage = () => {
 
   return (
     <MainLayout>
-      <SEOHead 
-        title={`${list.title} | MovieFlair`}
-        description={list.description || `Eine Filmliste mit ${list.movies.length} Filmen auf MovieFlair`}
-      />
+      {list && (
+        <SEOHead 
+          title={`${list.title} online anschauen | MovieFlair`}
+          description={`Entdecke ${list.movies.length} ausgewählte Filme in der Liste "${list.title}". Eine kuratierte Sammlung der besten Filme auf MovieFlair.`}
+          structuredData={{
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": list.title,
+            "description": list.description,
+            "numberOfItems": list.movies.length,
+            "itemListElement": list.movies.map((movie, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "Movie",
+                "name": movie.title,
+                "image": `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+              }
+            }))
+          }}
+        />
+      )}
       
       <div className="container-custom py-8">
         <div className="flex items-center gap-2 mb-6">
@@ -113,7 +122,6 @@ const ListDetailPage = () => {
           </Link>
         </div>
         
-        {/* Hero Section with Gradient Background */}
         <div className="relative overflow-hidden rounded-2xl mb-10">
           <div className="absolute inset-0 bg-gradient-to-r from-theme-accent-red/90 to-primary/50 mix-blend-multiply"></div>
           
@@ -151,7 +159,6 @@ const ListDetailPage = () => {
           </div>
         </div>
         
-        {/* Movies Grid */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold">Filme in dieser Liste</h2>

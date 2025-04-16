@@ -77,7 +77,7 @@ const App = () => {
             <Route path="/suche" element={<Search />} />
             <Route path="/search" element={<Navigate to="/suche" replace />} />
             <Route path="/entdecken" element={<Discover />} />
-            <Route path="/liste/:id" element={<ListDetailPage />} />
+            <Route path="/liste/:id/:slug?" element={<ListDetailPage />} />
             <Route path="/filmlisten" element={<AllLists />} />
             <Route path="/genres" element={<Genres />} />
             <Route path="/quick-tipp" element={<QuickTipp />} />

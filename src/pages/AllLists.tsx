@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { getCustomLists } from '@/lib/api';
 import { CustomList } from '@/lib/types';
@@ -7,6 +6,7 @@ import { toast } from 'sonner';
 import { List, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SEOHead from '@/components/seo/SEOHead';
+import { createUrlSlug } from '@/lib/urlUtils';
 
 const AllLists = () => {
   const [lists, setLists] = useState<CustomList[]>([]);
@@ -16,7 +16,6 @@ const AllLists = () => {
     const fetchLists = async () => {
       try {
         const fetchedLists = await getCustomLists();
-        // Only show lists that have movies
         setLists(fetchedLists.filter(list => list.movies?.length > 0));
       } catch (error) {
         console.error('Error fetching lists:', error);
@@ -32,8 +31,8 @@ const AllLists = () => {
   return (
     <MainLayout>
       <SEOHead
-        title="Alle Filmlisten | MovieFlair"
-        description="Entdecke kuratierte Filmlisten auf MovieFlair"
+        title="Filmlisten | MovieFlair"
+        description="Entdecke kuratierte Filmlisten auf MovieFlair. Von Klassikern bis zu versteckten Perlen - finde die perfekte Auswahl für deinen nächsten Filmabend."
       />
       
       <div className="container-custom py-12">
@@ -56,7 +55,7 @@ const AllLists = () => {
               {lists.map((list) => (
                 <Link
                   key={list.id}
-                  to={`/liste/${list.id}`}
+                  to={`/liste/${list.id}/${createUrlSlug(list.title)}`}
                   className="group block bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100 hover:border-theme-accent-red/30 transition-all duration-300"
                 >
                   <div className="flex justify-between items-start mb-4">
