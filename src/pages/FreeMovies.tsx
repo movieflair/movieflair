@@ -60,6 +60,9 @@ const FreeMovies = () => {
         ) : movies.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Keine kostenlosen Filme gefunden.</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Füge im Admin-Bereich kostenlose Filme hinzu, damit sie hier angezeigt werden.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">

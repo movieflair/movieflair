@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Shuffle } from 'lucide-react';
 import { CustomList } from '@/lib/types';
 import CustomListCarousel from '../movies/CustomListCarousel';
-import { getRandomCustomLists } from '@/lib/customListApi';
+import { getRandomCustomLists } from '@/lib/api';
 import { toast } from 'sonner';
 
 const RandomLists = () => {
@@ -15,7 +15,7 @@ const RandomLists = () => {
       try {
         setIsLoading(true);
         console.log('RandomLists: Fetching custom lists...');
-        // Get 3 random lists instead of all lists
+        // Get 3 random lists from Supabase
         const lists = await getRandomCustomLists(3);
         console.log(`RandomLists: Fetched ${lists.length} custom lists`);
         setCustomLists(lists);
