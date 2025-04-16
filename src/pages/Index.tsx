@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
@@ -14,7 +15,8 @@ const Index = () => {
   useEffect(() => {
     const fetchList = async () => {
       try {
-        const lists = await getRandomCustomLists(1);
+        // Get a truly random list for the homepage
+        const lists = await getRandomCustomLists(1, true);
         setCustomList(lists[0] || null);
       } catch (error) {
         console.error('Error fetching random custom list:', error);

@@ -17,7 +17,6 @@ const mapSupabaseListToCustomList = (list: SupabaseCustomList): CustomList => ({
   id: list.id,
   title: list.title,
   description: list.description,
-  // Properly cast the JSON data to MovieOrShow[] with a type assertion
   movies: Array.isArray(list.movies) ? (list.movies as unknown as MovieOrShow[]) : [],
   createdAt: list.created_at || list.createdat,
   updatedAt: list.updated_at || list.updatedat
@@ -74,17 +73,23 @@ export const getCustomList = async (id: string): Promise<CustomList> => {
   }
 };
 
-export const getRandomCustomLists = async (count: number = 2): Promise<CustomList[]> => {
-  console.log(`Fetching ${count} random custom lists...`);
+export const getRandomCustomLists = async (count: number = 2, random: boolean = false): Promise<CustomList[]> => {
+  console.log(`Fetching ${count} ${random ? 'random' : 'newest'} custom lists...`);
   try {
-    const { data, error } = await supabase
+    let query = supabase
       .from('custom_lists')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(count);
+      .select('*');
+      
+    if (random) {
+      query = query.order('created_at', { ascending: false });
+    } else {
+      query = query.order('created_at', { ascending: false });
+    }
+    
+    const { data, error } = await query.limit(count);
       
     if (error) {
-      console.error('Error getting random custom lists from Supabase:', error);
+      console.error('Error getting custom lists from Supabase:', error);
       return [];
     }
     
@@ -132,7 +137,6 @@ export const updateCustomList = async (list: CustomList): Promise<CustomList> =>
     id: list.id,
     title: list.title,
     description: list.description,
-    // Cast MovieOrShow[] to Json with a type assertion
     movies: list.movies as unknown as Json,
     updated_at: new Date().toISOString()
   };
@@ -185,7 +189,6 @@ export const addMovieToList = async (listId: string, media: MovieOrShow): Promis
       throw new Error(`List with ID ${listId} not found`);
     }
     
-    // Make sure media has media_type
     const mediaToAdd = {
       ...media,
       media_type: media.media_type || 'movie'
@@ -193,10 +196,8 @@ export const addMovieToList = async (listId: string, media: MovieOrShow): Promis
     
     console.log('Current movies in list:', currentList.movies);
     
-    // Ensure currentList.movies is an array
     const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
     
-    // Check if movie already exists in the list
     const movieExists = currentMovies.some((m: any) => m.id === mediaToAdd.id);
     
     if (movieExists) {
@@ -204,7 +205,6 @@ export const addMovieToList = async (listId: string, media: MovieOrShow): Promis
       return mapSupabaseListToCustomList(currentList as SupabaseCustomList);
     }
     
-    // Add movie to list
     console.log('Adding movie to list:', mediaToAdd);
     const updatedMovies = [...currentMovies, mediaToAdd] as unknown as Json;
     
@@ -252,10 +252,8 @@ export const removeMovieFromList = async (listId: string, mediaId: number): Prom
     
     console.log('Current movies in list:', currentList.movies);
     
-    // Ensure currentList.movies is an array
     const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
     
-    // Remove movie from list
     const updatedMovies = currentMovies.filter((media: any) => media.id !== mediaId) as unknown as Json;
     
     const { data, error } = await supabase

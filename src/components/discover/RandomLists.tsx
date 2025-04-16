@@ -19,7 +19,7 @@ const RandomLists = () => {
       try {
         setIsLoading(true);
         console.log('RandomLists: Fetching custom lists...');
-        // Get only 1 newest list
+        // Always get the newest list for the Discover page
         const lists = await getRandomCustomLists(1);
         console.log(`RandomLists: Fetched ${lists.length} custom lists`);
         setCustomLists(lists);
