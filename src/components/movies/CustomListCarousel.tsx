@@ -28,36 +28,22 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
   return (
     <div className="w-full max-w-[800px] mx-auto">
       <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100">
-        <div className="flex flex-col gap-4">
-          <div className="space-y-1">
-            <Link 
-              to="/discover" 
-              className="flex items-center gap-2 text-lg font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
-            >
-              <ListPlus className="w-4 h-4" />
-              {list.title}
-            </Link>
-            <p className="text-sm text-gray-600 line-clamp-1">
-              {list.description}
-            </p>
-          </div>
-
-          <div className="relative py-8">
-            <div className="flex justify-center items-center relative h-[200px]">
-              {list.movies.slice(0, 3).map((movie, index) => (
-                <div 
-                  key={movie.id}
-                  className="absolute w-[120px] transition-transform duration-300 hover:z-20 hover:scale-105 cursor-pointer"
-                  style={{
-                    transform: `translateX(${(index - 1) * 65}px)`,
-                    zIndex: 10 + index,
-                  }}
-                >
-                  <MovieCard movie={movie} size="small" hideDetails />
-                </div>
-              ))}
+        <div className="flex flex-row gap-4">
+          {/* Text section - 1/3 width */}
+          <div className="w-1/3 space-y-4">
+            <div className="space-y-1">
+              <Link 
+                to="/discover" 
+                className="flex items-center gap-2 text-lg font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
+              >
+                <ListPlus className="w-4 h-4" />
+                {list.title}
+              </Link>
+              <p className="text-sm text-gray-600 line-clamp-2">
+                {list.description}
+              </p>
             </div>
-            <div className="flex items-center justify-center gap-2 mt-3">
+            <div className="flex items-center gap-2">
               <Button 
                 variant="outline" 
                 size="icon" 
@@ -76,6 +62,24 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
               </Button>
             </div>
           </div>
+
+          {/* Movie covers section - 2/3 width */}
+          <div className="w-2/3 relative">
+            <div className="flex justify-center items-center relative h-[200px]">
+              {list.movies.slice(0, 3).map((movie, index) => (
+                <div 
+                  key={movie.id}
+                  className="absolute w-[120px] transition-transform duration-300 hover:z-20 hover:scale-105 cursor-pointer"
+                  style={{
+                    transform: `translateX(${(index - 1) * 65}px)`,
+                    zIndex: 10 + index,
+                  }}
+                >
+                  <MovieCard movie={movie} size="small" hideDetails />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -83,3 +87,4 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
 };
 
 export default CustomListCarousel;
+
