@@ -1,0 +1,208 @@
+
+import { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft, Copy, CheckCheck, Share2 } from 'lucide-react';
+import MainLayout from '@/components/layout/MainLayout';
+import { CustomList, getCustomList } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import SEOHead from '@/components/seo/SEOHead';
+import MovieCard from '@/components/movies/MovieCard';
+
+const ListDetailPage = () => {
+  const { id } = useParams<{ id: string }>();
+  const [list, setList] = useState<CustomList | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const fetchList = async () => {
+      if (!id) return;
+      
+      try {
+        setLoading(true);
+        const fetchedList = await getCustomList(id);
+        setList(fetchedList);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching list:', err);
+        setError('Diese Liste konnte nicht gefunden werden.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchList();
+  }, [id]);
+
+  const copyToClipboard = () => {
+    if (!list) return;
+    
+    const url = window.location.href;
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        setCopied(true);
+        toast.success('Link in die Zwischenablage kopiert');
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => {
+        toast.error('Link konnte nicht kopiert werden');
+      });
+  };
+
+  if (loading) {
+    return (
+      <MainLayout>
+        <div className="container-custom py-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Link to="/entdecken" className="inline-flex items-center text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Zurück zu Entdecken
+            </Link>
+          </div>
+          
+          <div className="animate-pulse space-y-8">
+            <div className="h-10 bg-muted rounded-lg w-2/3"></div>
+            <div className="h-6 bg-muted rounded-lg w-1/2"></div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="aspect-[2/3] bg-muted rounded-lg"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (error || !list) {
+    return (
+      <MainLayout>
+        <div className="container-custom py-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Link to="/entdecken" className="inline-flex items-center text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Zurück zu Entdecken
+            </Link>
+          </div>
+          
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <h2 className="text-2xl font-semibold mb-4">Liste nicht gefunden</h2>
+            <p className="text-muted-foreground mb-6">{error || 'Diese Liste existiert nicht oder wurde gelöscht.'}</p>
+            <Button asChild>
+              <Link to="/entdecken">Alle Listen entdecken</Link>
+            </Button>
+          </div>
+        </div>
+      </MainLayout>
+    );
+  }
+
+  return (
+    <MainLayout>
+      <SEOHead 
+        title={`${list.title} | MovieFlair`}
+        description={list.description || `Eine Filmliste mit ${list.movies.length} Filmen auf MovieFlair`}
+      />
+      
+      <div className="container-custom py-8">
+        <div className="flex items-center gap-2 mb-6">
+          <Link to="/entdecken" className="inline-flex items-center text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Zurück zu Entdecken
+          </Link>
+        </div>
+        
+        {/* Hero Section with Gradient Background */}
+        <div className="relative overflow-hidden rounded-2xl mb-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-theme-accent-red/90 to-primary/50 mix-blend-multiply"></div>
+          
+          {list.movies.length > 0 && list.movies[0].backdrop_path && (
+            <div className="absolute inset-0">
+              <img 
+                src={`https://image.tmdb.org/t/p/w1280${list.movies[0].backdrop_path}`} 
+                alt={list.title}
+                className="w-full h-full object-cover opacity-20"
+              />
+            </div>
+          )}
+          
+          <div className="relative z-10 p-8 md:p-12">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{list.title}</h1>
+                {list.description && (
+                  <p className="text-white/80 max-w-2xl text-lg">{list.description}</p>
+                )}
+              </div>
+              
+              <div className="flex space-x-2">
+                <Button 
+                  onClick={copyToClipboard} 
+                  variant="secondary"
+                  size="sm"
+                  className="flex items-center gap-1"
+                >
+                  {copied ? (
+                    <>
+                      <CheckCheck className="w-4 h-4" />
+                      Kopiert
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4" />
+                      Link kopieren
+                    </>
+                  )}
+                </Button>
+                
+                <Button 
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: list.title,
+                        text: list.description || `Eine Filmliste auf MovieFlair`,
+                        url: window.location.href,
+                      }).catch(console.error);
+                    } else {
+                      copyToClipboard();
+                    }
+                  }} 
+                  variant="secondary"
+                  size="sm"
+                  className="flex items-center gap-1"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Teilen
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Movies Grid */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-semibold">Filme in dieser Liste</h2>
+            <span className="text-muted-foreground">{list.movies.length} Filme</span>
+          </div>
+          
+          {list.movies.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {list.movies.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 border rounded-lg bg-background/50">
+              <p className="text-muted-foreground">Diese Liste enthält noch keine Filme</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </MainLayout>
+  );
+};
+
+export default ListDetailPage;

@@ -1,4 +1,3 @@
-
 import { CustomList, MovieOrShow } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { Json } from '@/integrations/supabase/types';
@@ -46,6 +45,33 @@ export const getCustomLists = async (): Promise<CustomList[]> => {
   } catch (error) {
     console.error('Error getting custom lists:', error);
     return [];
+  }
+};
+
+// Function to get a specific custom list by ID
+export const getCustomList = async (id: string): Promise<CustomList> => {
+  console.log(`Fetching custom list with ID: ${id}`);
+  try {
+    const { data, error } = await supabase
+      .from('custom_lists')
+      .select('*')
+      .eq('id', id)
+      .single();
+      
+    if (error) {
+      console.error('Error getting custom list from Supabase:', error);
+      throw error;
+    }
+    
+    console.log('Custom list fetched successfully:', data);
+    
+    return mapSupabaseListToCustomList({
+      ...data,
+      movies: data.movies
+    } as SupabaseCustomList);
+  } catch (error) {
+    console.error('Error getting custom list:', error);
+    throw error;
   }
 };
 

@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CustomList, MovieOrShow } from '@/lib/api';
-import { Edit, Film, Save, X, Trash2 } from 'lucide-react';
+import { Edit, Film, Save, X, Trash2, Copy, CheckCheck, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface ListContentProps {
   list: CustomList;
@@ -30,6 +32,26 @@ const ListContent = ({
   onCancel,
   onRemoveMovie
 }: ListContentProps) => {
+  const [copied, setCopied] = useState(false);
+  
+  const listUrl = `${window.location.origin}/liste/${list.id}`;
+  
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(listUrl)
+      .then(() => {
+        setCopied(true);
+        toast.success('Link in die Zwischenablage kopiert');
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch(() => {
+        toast.error('Link konnte nicht kopiert werden');
+      });
+  };
+  
+  const visitListPage = () => {
+    window.open(`/liste/${list.id}`, '_blank');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start">
@@ -63,6 +85,28 @@ const ListContent = ({
             <div>
               <h2 className="text-xl font-semibold mb-2">{list.title}</h2>
               <p className="text-muted-foreground">{list.description}</p>
+              
+              <div className="mt-4 flex items-center text-sm gap-2">
+                <div className="bg-muted text-muted-foreground px-3 py-1.5 rounded-md flex-1 truncate">
+                  {listUrl}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={copyToClipboard}
+                  className="shrink-0"
+                >
+                  {copied ? <CheckCheck size={16} /> : <Copy size={16} />}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={visitListPage}
+                  className="shrink-0"
+                >
+                  <ExternalLink size={16} />
+                </Button>
+              </div>
             </div>
             <Button variant="outline" size="sm" onClick={onEdit} className="flex items-center gap-1">
               <Edit size={16} />

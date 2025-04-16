@@ -38,7 +38,7 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
         <div className="flex items-center gap-2">
           <ListPlus className="w-4 h-4 md:w-6 md:h-6 text-theme-accent-red" />
           <Link 
-            to="/discover" 
+            to={`/liste/${list.id}`} 
             className="text-lg md:text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
           >
             {list.title}
@@ -85,6 +85,15 @@ const DiscoverListCarousel = ({ list }: DiscoverListCarouselProps) => {
             <CarouselNext className="embla__next" />
           </div>
         </Carousel>
+      </div>
+      
+      <div className="mt-4 text-right">
+        <Link 
+          to={`/liste/${list.id}`}
+          className="text-xs md:text-sm text-theme-accent-red hover:underline inline-flex items-center"
+        >
+          Alle Filme in dieser Liste anzeigen
+        </Link>
       </div>
     </div>
   );

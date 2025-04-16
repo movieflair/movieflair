@@ -12,6 +12,7 @@ export {
 } from './analyticsApi';
 export { 
   getCustomLists,
+  getCustomList,
   getRandomCustomLists,
   createCustomList,
   updateCustomList,
