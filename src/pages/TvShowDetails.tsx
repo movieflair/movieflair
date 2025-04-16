@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
-import { MovieOrShow } from '@/lib/types';
+import { MovieDetail } from '@/lib/types';
 import { getTvShowDetails, getCast } from '@/lib/tvShowApi';
 import SEOHead from '@/components/seo/SEOHead';
 import { generateTVShowSchema } from '@/utils/seoUtils';
@@ -20,7 +20,7 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
 
 const TvShowDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const [show, setShow] = useState<MovieOrShow | null>(null);
+  const [show, setShow] = useState<MovieDetail | null>(null);
   const [cast, setCast] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
