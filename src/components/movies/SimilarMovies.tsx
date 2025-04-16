@@ -91,7 +91,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               <CarouselContent className="-ml-4">
                 {filteredMovies.map((movie) => (
                   <CarouselItem key={movie.id} className="pl-4 basis-1/2">
-                    <MovieCard movie={movie} size="small" />
+                    <MovieCard movie={movie} size="large" />
                   </CarouselItem>
                 ))}
               </CarouselContent>
