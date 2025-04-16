@@ -43,14 +43,6 @@ const MovieStreamButtons = ({
     onStreamClick();
   };
 
-  // Add console logs to help debug
-  console.log('MovieStreamButtons props:', { 
-    streamUrl, 
-    isFreeMovie, 
-    hasStream,
-    shouldShowKostenlosButton: !!(streamUrl || isFreeMovie === true || hasStream === true)
-  });
-
   return (
     <div className="flex flex-wrap gap-3 mb-8">
       {hasTrailer && trailerUrl && (
@@ -64,15 +56,15 @@ const MovieStreamButtons = ({
         </Button>
       )}
       <Button
-        className="bg-[rgba(26,152,255,255)] text-white hover:bg-[rgba(26,152,255,255)]/90"
+        className="bg-[#0678ff] text-white hover:bg-[#0678ff]/90 flex items-center gap-1"
         onClick={handlePrimeClick}
       >
-        <Play className="w-4 h-4 mr-2" />
+        <Play className="w-4 h-4" />
         Prime Video
       </Button>
       {(streamUrl || isFreeMovie === true || hasStream === true) && (
         <Button
-          className="bg-[#ea384c] text-white hover:bg-[#ea384c]/90 flex items-center gap-2"
+          className="bg-[#ff3131] text-white hover:bg-[#ff3131]/90 flex items-center gap-1"
           onClick={handleStreamClick}
         >
           <Play className="w-4 h-4" />
