@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getVisitorStats, VisitorStat } from '@/lib/analyticsApi';
-import { BarChart2, CalendarIcon, EyeIcon, PieChart, TrendingUp, Clock, Users, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { BarChart2, Globe, Users, ArrowUpRight, ArrowDownRight, ThumbsUp } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { 
   LineChart, 
@@ -19,6 +20,7 @@ import {
 } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CalendarIcon, EyeIcon, PieChart, TrendingUp, Clock } from 'lucide-react';
 
 interface PageTotals {
   [key: string]: number;
@@ -49,8 +51,51 @@ const AdminVisitorStats = () => {
   const [hourlyDistribution, setHourlyDistribution] = useState<HourlyDistribution[]>([]);
   const [deviceDistribution, setDeviceDistribution] = useState<{name: string, value: number}[]>([]);
   const [averageSessionDuration, setAverageSessionDuration] = useState(0);
+  const [originDistribution, setOriginDistribution] = useState<{name: string, value: number}[]>([]);
+  const [feedbackStats, setFeedbackStats] = useState<{helpful: number, total: number}>({ helpful: 0, total: 0 });
+  const [userCount, setUserCount] = useState(0);
 
   useEffect(() => {
+    const fetchVisitorOrigins = async () => {
+      const { data: interactionData } = await supabase
+        .from('interaction_stats')
+        .select('country')
+        .is('is_admin', false);
+
+      const countryDistribution = interactionData?.reduce((acc, curr) => {
+        if (curr.country) {
+          acc[curr.country] = (acc[curr.country] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>) || {};
+
+      const distribution = Object.entries(countryDistribution)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 5);
+
+      setOriginDistribution(distribution);
+    };
+
+    const fetchFeedbackStats = async () => {
+      const { data: feedbackData } = await supabase
+        .from('quick_tipp_ratings')
+        .select('is_helpful');
+
+      const total = feedbackData?.length || 0;
+      const helpful = feedbackData?.filter(f => f.is_helpful).length || 0;
+
+      setFeedbackStats({ helpful, total });
+    };
+
+    const fetchUserCount = async () => {
+      const { count } = await supabase
+        .from('user_roles')
+        .select('id', { count: 'exact' });
+
+      setUserCount(count || 0);
+    };
+
     const visitorStats = getVisitorStats();
     setStats(visitorStats);
     
@@ -121,6 +166,10 @@ const AdminVisitorStats = () => {
     ]);
     
     setAverageSessionDuration(183);
+
+    fetchVisitorOrigins();
+    fetchFeedbackStats();
+    fetchUserCount();
   }, []);
 
   const getFilteredData = () => {
@@ -257,14 +306,49 @@ const AdminVisitorStats = () => {
             }
           </div>
         </Card>
+        
+        <Card className="p-4 flex flex-col">
+          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+            <Globe className="h-4 w-4" />
+            <span>Top Herkunftsländer</span>
+          </div>
+          <div className="text-2xl font-bold">
+            {originDistribution[0]?.name || 'N/A'}
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {originDistribution[0]?.value || 0} Besuche
+          </div>
+        </Card>
+
+        <Card className="p-4 flex flex-col">
+          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+            <Users className="h-4 w-4" />
+            <span>Registrierte Benutzer</span>
+          </div>
+          <div className="text-3xl font-bold">{userCount}</div>
+        </Card>
+
+        <Card className="p-4 flex flex-col">
+          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+            <ThumbsUp className="h-4 w-4" />
+            <span>Feedback-Statistik</span>
+          </div>
+          <div className="text-3xl font-bold">
+            {Math.round((feedbackStats.helpful / (feedbackStats.total || 1)) * 100) || 0}%
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {feedbackStats.helpful} von {feedbackStats.total} Feedbacks
+          </div>
+        </Card>
       </div>
-      
+
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Übersicht</TabsTrigger>
           <TabsTrigger value="pages">Seitenaufrufe</TabsTrigger>
           <TabsTrigger value="time">Zeitverteilung</TabsTrigger>
           <TabsTrigger value="devices">Geräte</TabsTrigger>
+          <TabsTrigger value="origin">Herkunft</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
@@ -360,6 +444,27 @@ const AdminVisitorStats = () => {
                   <Legend />
                   <RechartsTooltip />
                 </RechartsPieChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="origin">
+          <Card className="p-6">
+            <h3 className="text-lg font-medium mb-4">Herkunftsländer der Besucher</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={originDistribution}
+                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
+                  layout="vertical"
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={100} />
+                  <RechartsTooltip />
+                  <Bar dataKey="value" fill="#4f46e5" />
+                </BarChart>
               </ResponsiveContainer>
             </div>
           </Card>
