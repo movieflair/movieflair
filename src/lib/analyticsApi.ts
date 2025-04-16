@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 type InteractionType = 
@@ -6,7 +5,8 @@ type InteractionType =
   | 'trailer_click'
   | 'free_movie_click'
   | 'amazon_ad_click'
-  | 'page_visit';
+  | 'page_visit'
+  | 'trailer_view';
 
 interface TrackOptions {
   mediaId?: number;
