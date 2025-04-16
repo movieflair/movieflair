@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
@@ -6,11 +5,7 @@ import MovieCard from '@/components/movies/MovieCard';
 import { PlayCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import SEOHead from '@/components/seo/SEOHead';
-
-const truncate = (text: string, maxLength: number) => {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - 3) + '...';
-};
+import { truncateText } from '@/utils/seoHelpers';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
@@ -51,7 +46,7 @@ const Trailers = () => {
     <MainLayout>
       <SEOHead 
         title={seoTitle}
-        description={truncate(seoDescription, 140)}
+        description={truncateText(seoDescription, 140)}
         ogImage={seoOgImage}
         ogType="website"
         keywords="Filmtrailer, Serientrailer, neue Trailer, Kinotrailer, Online Stream, Trailer anschauen"

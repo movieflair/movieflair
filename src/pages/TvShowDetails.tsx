@@ -16,11 +16,7 @@ import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
-
-const truncate = (text: string, maxLength: number) => {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - 3) + '...';
-};
+import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
 
 const TvShowDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -72,9 +68,8 @@ const TvShowDetails = () => {
   }
 
   const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear().toString() : '';
-  const truncatedOverview = truncate(show.overview, 140);
-  const seoTitle = `${show.name} (${firstAirYear}) Online Stream anschauen | MovieFlair`;
-  const seoDescription = `Jetzt ${show.name} (${firstAirYear}) Online Stream anschauen - ${truncatedOverview}`;
+  const seoTitle = formatMediaTitle(show.name || '', firstAirYear);
+  const seoDescription = formatMediaDescription(show.name || '', firstAirYear, show.overview);
   const seoOgImage = show.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` 
     : '/movieflair-logo.png';
@@ -129,6 +124,7 @@ const TvShowDetails = () => {
         description={seoDescription}
         ogType="tv_show"
         ogImage={seoOgImage}
+        keywords={`${show.name}, ${show.genres?.map(g => g.name).join(', ')}, Serie Stream, Online anschauen, ${firstAirYear}`}
       />
 
       <div className="min-h-screen bg-white">

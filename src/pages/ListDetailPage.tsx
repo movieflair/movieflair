@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, List } from 'lucide-react';
@@ -8,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import SEOHead from '@/components/seo/SEOHead';
 import MovieCard from '@/components/movies/MovieCard';
 import { createUrlSlug } from '@/lib/urlUtils';
+import { formatListTitle, formatListDescription } from '@/utils/seoHelpers';
 
 const ListDetailPage = () => {
   const { slug } = useParams<{ slug?: string }>();
@@ -91,19 +91,10 @@ const ListDetailPage = () => {
   }
 
   if (list) {
-    // Implement truncate function for description
-    const truncate = (text: string, maxLength: number) => {
-      if (text.length <= maxLength) return text;
-      return text.slice(0, maxLength - 3) + '...';
-    };
-
-    const truncatedDescription = truncate(
-      list.description || `Entdecke ${list.movies.length} ausgewählte Filme in dieser kuratierten Sammlung.`, 
-      140
-    );
+    const listDescription = list.description || `Entdecke ${list.movies.length} ausgewählte Filme in dieser kuratierten Sammlung.`;
     
-    const seoTitle = `${list.title} Online anschauen | MovieFlair`;
-    const seoDescription = `${list.title} Online anschauen - ${truncatedDescription}`;
+    const seoTitle = formatListTitle(list.title);
+    const seoDescription = formatListDescription(list.title, listDescription);
     const seoOgImage = list.movies[0]?.backdrop_path 
       ? `https://image.tmdb.org/t/p/original${list.movies[0].backdrop_path}` 
       : '/movieflair-logo.png';
@@ -207,4 +198,3 @@ const ListDetailPage = () => {
 };
 
 export default ListDetailPage;
-

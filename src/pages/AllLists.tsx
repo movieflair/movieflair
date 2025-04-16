@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { getCustomLists } from '@/lib/api';
 import { CustomList } from '@/lib/types';
@@ -33,6 +34,8 @@ const AllLists = () => {
       <SEOHead
         title="Filmlisten | MovieFlair"
         description="Entdecke kuratierte Filmlisten auf MovieFlair. Von Klassikern bis zu versteckten Perlen - finde die perfekte Auswahl für deinen nächsten Filmabend."
+        keywords="Filmlisten, Filmsammlungen, Filmempfehlungen, kuratierte Listen, Filmtipps, Filmkategorien, Filmgenres"
+        ogType="website"
       />
       
       <div className="container-custom py-12">

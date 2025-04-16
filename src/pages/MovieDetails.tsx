@@ -17,11 +17,7 @@ import MovieLoadingState from '@/components/movies/MovieLoadingState';
 import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
-
-const truncate = (text: string, maxLength: number) => {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength - 3) + '...';
-};
+import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
 
 const MovieDetails = () => {
   const { id, slug } = useParams<{ id: string, slug?: string }>();
@@ -81,9 +77,8 @@ const MovieDetails = () => {
 
   const director = movie.crew?.find(person => person.job === 'Director');
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
-  const truncatedOverview = truncate(movie.overview, 140);
-  const seoTitle = `${movie.title} (${releaseYear}) Online Stream anschauen | MovieFlair`;
-  const seoDescription = `Jetzt ${movie.title} (${releaseYear}) Online Stream anschauen - ${truncatedOverview}`;
+  const seoTitle = formatMediaTitle(movie.title, releaseYear);
+  const seoDescription = formatMediaDescription(movie.title, releaseYear, movie.overview);
   const seoOgImage = movie.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` 
     : '/movieflair-logo.png';
@@ -138,6 +133,7 @@ const MovieDetails = () => {
         description={seoDescription}
         ogType="movie"
         ogImage={seoOgImage}
+        keywords={`${movie.title}, ${movie.genres?.map(g => g.name).join(', ')}, Film Stream, Online anschauen, ${releaseYear}`}
       />
       <MovieStructuredData movie={movie} director={director} />
 
