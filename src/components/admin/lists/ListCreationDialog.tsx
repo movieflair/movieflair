@@ -10,10 +10,10 @@ import { toast } from "sonner";
 interface ListCreationDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onListCreated: () => void;
+  onCreateList: (title: string, description: string) => void;
 }
 
-const ListCreationDialog: React.FC<ListCreationDialogProps> = ({ isOpen, onClose, onListCreated }) => {
+const ListCreationDialog: React.FC<ListCreationDialogProps> = ({ isOpen, onClose, onCreateList }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isCreating, setIsCreating] = useState(false);
@@ -27,11 +27,7 @@ const ListCreationDialog: React.FC<ListCreationDialogProps> = ({ isOpen, onClose
     setIsCreating(true);
     
     try {
-      createCustomList(title.trim(), description.trim());
-      toast.success('Liste erfolgreich erstellt');
-      
-      onListCreated();
-      onClose();
+      onCreateList(title.trim(), description.trim());
       
       // Reset form
       setTitle('');
