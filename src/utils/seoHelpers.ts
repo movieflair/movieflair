@@ -28,10 +28,10 @@ export const formatMediaTitle = (title: string, year?: string): string => {
 };
 
 // Format movie or show description
-export const formatMediaDescription = (title: string, year: string, description: string, maxLength: number = 140): string => {
+export const formatMediaDescription = (title: string, year: string, description: string, maxLength: number = 160): string => {
   if (!title) return DEFAULT_SEO.description;
   const yearPart = year ? ` (${year})` : '';
-  const baseDesc = `Jetzt ${title}${yearPart} Online Stream anschauen - ${description}`;
+  const baseDesc = `Jetzt ${title}${yearPart} Online Stream anschauen - ${description || 'Entdecke diesen Film auf MovieFlair.'}`;
   return truncateText(baseDesc, maxLength);
 };
 
@@ -42,8 +42,45 @@ export const formatListTitle = (title: string): string => {
 };
 
 // Format list description
-export const formatListDescription = (title: string, description: string, maxLength: number = 140): string => {
+export const formatListDescription = (title: string, description: string, maxLength: number = 160): string => {
   if (!title) return DEFAULT_SEO.description;
-  const baseDesc = `${title} Online anschauen - ${description}`;
+  const baseDesc = `${title} Online anschauen - ${description || 'Entdecke diese Filmauswahl auf MovieFlair.'}`;
   return truncateText(baseDesc, maxLength);
+};
+
+/**
+ * Create the canonical URL for a movie
+ */
+export const getMovieCanonicalUrl = (id: string, title?: string): string => {
+  if (typeof window === 'undefined') return '';
+  
+  const baseUrl = window.location.origin;
+  const slug = title ? `/${encodeURIComponent(title.toLowerCase().replace(/\s+/g, '-'))}` : '';
+  return `${baseUrl}/film/${id}${slug}`;
+};
+
+/**
+ * Create the canonical URL for a TV show
+ */
+export const getTvShowCanonicalUrl = (id: string, name?: string): string => {
+  if (typeof window === 'undefined') return '';
+  
+  const baseUrl = window.location.origin;
+  const slug = name ? `/${encodeURIComponent(name.toLowerCase().replace(/\s+/g, '-'))}` : '';
+  return `${baseUrl}/serie/${id}${slug}`;
+};
+
+/**
+ * Get absolute OG image URL
+ */
+export const getAbsoluteImageUrl = (imagePath: string): string => {
+  if (!imagePath) return '';
+  
+  if (imagePath.startsWith('http')) return imagePath;
+  
+  if (typeof window === 'undefined') return imagePath;
+  
+  return imagePath.startsWith('/') 
+    ? `${window.location.origin}${imagePath}`
+    : imagePath;
 };

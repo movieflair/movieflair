@@ -1,4 +1,6 @@
 
+import { trackInteraction } from '@/lib/analyticsApi';
+
 interface MovieTrailerDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -8,6 +10,11 @@ interface MovieTrailerDialogProps {
 
 const MovieTrailerDialog = ({ isOpen, onClose, trailerUrl, movieTitle }: MovieTrailerDialogProps) => {
   if (!isOpen || !trailerUrl) return null;
+
+  // Track trailer view
+  if (isOpen) {
+    trackInteraction('trailer_view', { title: movieTitle });
+  }
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
@@ -21,7 +28,7 @@ const MovieTrailerDialog = ({ isOpen, onClose, trailerUrl, movieTitle }: MovieTr
         <div className="aspect-video">
           <iframe
             src={trailerUrl}
-            title={`${movieTitle} Stream`}
+            title={`${movieTitle} Trailer`}
             className="w-full h-full"
             allowFullScreen
           />

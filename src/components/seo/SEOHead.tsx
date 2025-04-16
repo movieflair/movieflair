@@ -43,7 +43,7 @@ const SEOHead = ({
       <meta name="keywords" content={keywords} />
       
       {/* Canonical URL */}
-      {canonical && <link rel="canonical" href={currentUrl} />}
+      <link rel="canonical" href={currentUrl} />
       
       {/* Robots control */}
       {noindex && <meta name="robots" content="noindex, nofollow" />}

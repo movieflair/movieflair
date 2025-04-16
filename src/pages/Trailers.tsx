@@ -6,7 +6,7 @@ import MovieCard from '@/components/movies/MovieCard';
 import { PlayCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import SEOHead from '@/components/seo/SEOHead';
-import { DEFAULT_SEO, formatListTitle, formatListDescription } from '@/utils/seoHelpers';
+import { DEFAULT_SEO, formatListTitle, formatListDescription, getAbsoluteImageUrl } from '@/utils/seoHelpers';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
@@ -37,20 +37,23 @@ const Trailers = () => {
     fetchTrailerItems();
   }, []);
 
+  // Prepare SEO data
   const seoTitle = formatListTitle("Neue Film & Serien Trailer");
   const seoDescription = formatListDescription(
     "Neue Film & Serien Trailer", 
     "Entdecke die aktuellsten Trailer für kommende Filme und Serien"
   );
-  const seoOgImage = trailerItems[0]?.backdrop_path 
+  
+  const featuredBackdrop = trailerItems[0]?.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${trailerItems[0].backdrop_path}` 
     : DEFAULT_SEO.ogImage;
-  const canonical = `${window.location.origin}/neue-trailer`;
+  
+  const canonical = typeof window !== 'undefined' ? `${window.location.origin}/neue-trailer` : '';
 
   console.log('Trailers SEO data:', { 
     title: seoTitle,
     description: seoDescription,
-    image: seoOgImage,
+    image: featuredBackdrop,
     canonical: canonical
   });
 
@@ -59,7 +62,7 @@ const Trailers = () => {
       <SEOHead 
         title={seoTitle}
         description={seoDescription}
-        ogImage={seoOgImage}
+        ogImage={featuredBackdrop}
         ogType="website"
         canonical={canonical}
         keywords="Filmtrailer, Serientrailer, neue Trailer, Kinotrailer, Online Stream, Trailer anschauen"
