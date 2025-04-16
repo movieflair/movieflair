@@ -2,9 +2,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Download, ArrowRight } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
+import { Button } from '@/components/ui/button';
 
 interface FreeMoviesSectionProps {
   movies: MovieOrShow[];
@@ -13,24 +14,24 @@ interface FreeMoviesSectionProps {
 const FreeMoviesSection = ({ movies }: FreeMoviesSectionProps) => {
   if (!movies || movies.length === 0) return null;
 
+  const newestMovies = movies.slice(0, 2);
+
   return (
     <section className="rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 p-6 h-full">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Download className="w-5 h-5 text-emerald-600" />
-          <h2 className="text-xl font-bold text-slate-900">Kostenlose Filme</h2>
+          <Download className="w-5 h-5 text-theme-black" />
+          <h2 className="text-xl font-bold text-theme-black">Neuste kostenlose Filme</h2>
         </div>
-        <Link 
-          to="/kostenlos" 
-          className="text-sm font-medium flex items-center text-slate-600 hover:text-slate-900 transition-colors"
-        >
-          Alle anzeigen
-          <ArrowRight className="ml-1 w-4 h-4" />
+        <Link to="/kostenlos">
+          <Button variant="outline" size="sm">
+            Alle anzeigen
+          </Button>
         </Link>
       </div>
       
       <div className="grid grid-cols-2 gap-3">
-        {movies.map((movie, index) => (
+        {newestMovies.map((movie, index) => (
           <motion.div 
             key={movie.id}
             whileHover={{ scale: 1.03 }}

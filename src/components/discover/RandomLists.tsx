@@ -1,13 +1,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ListPlus, ArrowRight } from 'lucide-react';
+import { ListPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CustomList } from '@/lib/types';
 import DiscoverListCarousel from './DiscoverListCarousel';
 import { getRandomCustomLists } from '@/lib/api';
 import { toast } from 'sonner';
 import { createUrlSlug } from '@/lib/urlUtils';
+import { Button } from '@/components/ui/button';
 
 const RandomLists = () => {
   const [customLists, setCustomLists] = useState<CustomList[]>([]);
@@ -18,8 +19,8 @@ const RandomLists = () => {
       try {
         setIsLoading(true);
         console.log('RandomLists: Fetching custom lists...');
-        // Get 3 random lists from Supabase
-        const lists = await getRandomCustomLists(3);
+        // Get only 1 newest list
+        const lists = await getRandomCustomLists(1);
         console.log(`RandomLists: Fetched ${lists.length} custom lists`);
         setCustomLists(lists);
       } catch (error) {
@@ -33,7 +34,7 @@ const RandomLists = () => {
     fetchLists();
   }, []);
   
-  // Only show lists that have movies (now public access)
+  // Only show lists that have movies
   const listsWithContent = customLists.filter(list => list.movies?.length > 0);
   
   if (isLoading) {
@@ -41,15 +42,13 @@ const RandomLists = () => {
       <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <ListPlus className="w-6 h-6 text-red-500" />
-            <h2 className="text-2xl font-bold text-slate-900">Filmlisten</h2>
+            <ListPlus className="w-6 h-6 text-theme-black" />
+            <h2 className="text-2xl font-bold text-theme-black">Neuste Filmliste</h2>
           </div>
-          <Link 
-            to="/filmlisten" 
-            className="text-sm font-medium flex items-center text-slate-600 hover:text-slate-900 transition-colors"
-          >
-            Alle anzeigen
-            <ArrowRight className="ml-1 w-4 h-4" />
+          <Link to="/filmlisten">
+            <Button variant="outline">
+              Alle anzeigen
+            </Button>
           </Link>
         </div>
         <div className="animate-pulse space-y-4">
@@ -67,30 +66,24 @@ const RandomLists = () => {
     <section className="mb-12">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <ListPlus className="w-6 h-6 text-red-500" />
-          <h2 className="text-2xl font-bold text-slate-900">Filmlisten</h2>
+          <ListPlus className="w-6 h-6 text-theme-black" />
+          <h2 className="text-2xl font-bold text-theme-black">Neuste Filmliste</h2>
         </div>
-        <Link 
-          to="/filmlisten" 
-          className="text-sm font-medium flex items-center text-slate-600 hover:text-slate-900 transition-colors"
-        >
-          Alle anzeigen
-          <ArrowRight className="ml-1 w-4 h-4" />
+        <Link to="/filmlisten">
+          <Button variant="outline">
+            Alle anzeigen
+          </Button>
         </Link>
       </div>
       
-      <div className="space-y-8">
-        {listsWithContent.map((list, index) => (
-          <motion.div 
-            key={list.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.2, duration: 0.5 }}
-          >
-            <DiscoverListCarousel key={list.id} list={list} />
-          </motion.div>
-        ))}
-      </div>
+      <motion.div 
+        key={listsWithContent[0].id}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <DiscoverListCarousel list={listsWithContent[0]} />
+      </motion.div>
     </section>
   );
 };

@@ -2,9 +2,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Play, ArrowRight } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
+import { Button } from '@/components/ui/button';
 
 interface TrailersSectionProps {
   movies: MovieOrShow[];
@@ -13,24 +14,24 @@ interface TrailersSectionProps {
 const TrailersSection = ({ movies }: TrailersSectionProps) => {
   if (!movies || movies.length === 0) return null;
 
+  const newestTrailers = movies.slice(0, 2);
+
   return (
     <section className="rounded-2xl bg-gradient-to-br from-rose-50 to-red-50 p-6 h-full">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Play className="w-5 h-5 text-red-600" />
-          <h2 className="text-xl font-bold text-slate-900">Neue Trailer</h2>
+          <Play className="w-5 h-5 text-theme-black" />
+          <h2 className="text-xl font-bold text-theme-black">Neuste Trailer</h2>
         </div>
-        <Link 
-          to="/trailers" 
-          className="text-sm font-medium flex items-center text-slate-600 hover:text-slate-900 transition-colors"
-        >
-          Alle anzeigen
-          <ArrowRight className="ml-1 w-4 h-4" />
+        <Link to="/trailers">
+          <Button variant="outline" size="sm">
+            Alle anzeigen
+          </Button>
         </Link>
       </div>
       
       <div className="grid grid-cols-2 gap-3">
-        {movies.map((movie, index) => (
+        {newestTrailers.map((movie, index) => (
           <motion.div 
             key={movie.id}
             whileHover={{ scale: 1.03 }}

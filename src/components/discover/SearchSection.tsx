@@ -16,10 +16,10 @@ const SearchSection = () => {
 
   return (
     <div className="text-center mb-12">
-      <h1 className="text-3xl font-semibold mb-6">Entdecke neue Filme und Serien</h1>
+      <h1 className="text-3xl font-semibold mb-6">Entdecke neue Filme</h1>
       <Command className="rounded-lg border shadow-md max-w-2xl mx-auto">
         <CommandInput 
-          placeholder="Suche nach Filmen, Serien oder Kategorien..." 
+          placeholder="Suche nach Filmen oder Kategorien..." 
           value={searchQuery}
           onValueChange={handleSearch}
           className="h-12"
