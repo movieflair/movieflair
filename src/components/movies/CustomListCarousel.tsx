@@ -38,8 +38,8 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
     <div className="w-full max-w-[800px] mx-auto mb-8">
       <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100">
         <div className="flex flex-row gap-4">
-          {/* Text section - 1/3 width */}
-          <div className="w-1/3 space-y-4 pr-4">
+          {/* Text section */}
+          <div className="w-[200px] space-y-4">
             <div className="space-y-1">
               <Link 
                 to="/discover" 
@@ -74,14 +74,14 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
             </div>
           </div>
 
-          {/* Movie covers section - 2/3 width */}
-          <div className="w-2/3 pl-12 pr-12">
+          {/* Movie covers section */}
+          <div className="flex-1 pl-16 pr-16">
             <Carousel
               ref={carouselRef}
               id={`carousel-${list.id}`}
               className="w-full"
               opts={{
-                align: "end", // Changed from "start" to "end" to align from right to left
+                align: "end",
                 loop: true,
               }}
             >
