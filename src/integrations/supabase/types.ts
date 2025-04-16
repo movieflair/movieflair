@@ -9,6 +9,159 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_movies: {
+        Row: {
+          backdrop_path: string | null
+          created_at: string | null
+          hasstream: boolean | null
+          hastrailer: boolean | null
+          id: number
+          isfreemovie: boolean | null
+          isnewtrailer: boolean | null
+          media_type: string
+          overview: string | null
+          popularity: number | null
+          poster_path: string | null
+          release_date: string | null
+          streamurl: string | null
+          title: string
+          trailerurl: string | null
+          updated_at: string | null
+          vote_average: number | null
+          vote_count: number | null
+        }
+        Insert: {
+          backdrop_path?: string | null
+          created_at?: string | null
+          hasstream?: boolean | null
+          hastrailer?: boolean | null
+          id: number
+          isfreemovie?: boolean | null
+          isnewtrailer?: boolean | null
+          media_type?: string
+          overview?: string | null
+          popularity?: number | null
+          poster_path?: string | null
+          release_date?: string | null
+          streamurl?: string | null
+          title: string
+          trailerurl?: string | null
+          updated_at?: string | null
+          vote_average?: number | null
+          vote_count?: number | null
+        }
+        Update: {
+          backdrop_path?: string | null
+          created_at?: string | null
+          hasstream?: boolean | null
+          hastrailer?: boolean | null
+          id?: number
+          isfreemovie?: boolean | null
+          isnewtrailer?: boolean | null
+          media_type?: string
+          overview?: string | null
+          popularity?: number | null
+          poster_path?: string | null
+          release_date?: string | null
+          streamurl?: string | null
+          title?: string
+          trailerurl?: string | null
+          updated_at?: string | null
+          vote_average?: number | null
+          vote_count?: number | null
+        }
+        Relationships: []
+      }
+      admin_shows: {
+        Row: {
+          backdrop_path: string | null
+          created_at: string | null
+          first_air_date: string | null
+          hasstream: boolean | null
+          hastrailer: boolean | null
+          id: number
+          media_type: string
+          name: string
+          overview: string | null
+          popularity: number | null
+          poster_path: string | null
+          streamurl: string | null
+          trailerurl: string | null
+          updated_at: string | null
+          vote_average: number | null
+          vote_count: number | null
+        }
+        Insert: {
+          backdrop_path?: string | null
+          created_at?: string | null
+          first_air_date?: string | null
+          hasstream?: boolean | null
+          hastrailer?: boolean | null
+          id: number
+          media_type?: string
+          name: string
+          overview?: string | null
+          popularity?: number | null
+          poster_path?: string | null
+          streamurl?: string | null
+          trailerurl?: string | null
+          updated_at?: string | null
+          vote_average?: number | null
+          vote_count?: number | null
+        }
+        Update: {
+          backdrop_path?: string | null
+          created_at?: string | null
+          first_air_date?: string | null
+          hasstream?: boolean | null
+          hastrailer?: boolean | null
+          id?: number
+          media_type?: string
+          name?: string
+          overview?: string | null
+          popularity?: number | null
+          poster_path?: string | null
+          streamurl?: string | null
+          trailerurl?: string | null
+          updated_at?: string | null
+          vote_average?: number | null
+          vote_count?: number | null
+        }
+        Relationships: []
+      }
+      custom_lists: {
+        Row: {
+          created_at: string | null
+          createdat: string | null
+          description: string | null
+          id: string
+          movies: Json | null
+          title: string
+          updated_at: string | null
+          updatedat: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          createdat?: string | null
+          description?: string | null
+          id?: string
+          movies?: Json | null
+          title: string
+          updated_at?: string | null
+          updatedat?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          createdat?: string | null
+          description?: string | null
+          id?: string
+          movies?: Json | null
+          title?: string
+          updated_at?: string | null
+          updatedat?: string | null
+        }
+        Relationships: []
+      }
       feedback_stats: {
         Row: {
           created_at: string | null

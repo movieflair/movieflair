@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export async function callTMDB(path: string, searchParams: Record<string, any> = {}) {
@@ -35,8 +34,7 @@ export async function callTMDB(path: string, searchParams: Record<string, any> =
 
 export const getAdminMovieSettings = async () => {
   try {
-    // Fetch movie settings from Supabase
-    const { data: savedMovies, error } = await supabase
+    const { data: adminMovies, error } = await supabase
       .from('admin_movies')
       .select('*');
     
@@ -45,18 +43,16 @@ export const getAdminMovieSettings = async () => {
       return {};
     }
     
-    if (!savedMovies || savedMovies.length === 0) {
+    if (!adminMovies || adminMovies.length === 0) {
       console.log('No saved movie settings found in Supabase');
       return {};
     }
     
-    console.log(`Found ${savedMovies.length} saved movie settings in Supabase`);
+    console.log(`Found ${adminMovies.length} saved movie settings in Supabase`);
     
     // Convert array to object indexed by movie ID
-    const movieSettings = savedMovies.reduce((acc: Record<number, any>, movie: any) => {
-      if (movie.id) {
-        acc[movie.id] = movie;
-      }
+    const movieSettings = adminMovies.reduce((acc: Record<number, any>, movie: any) => {
+      acc[movie.id] = movie;
       return acc;
     }, {});
     
@@ -69,8 +65,7 @@ export const getAdminMovieSettings = async () => {
 
 export const getAdminTvShowSettings = async () => {
   try {
-    // Fetch TV show settings from Supabase
-    const { data: savedShows, error } = await supabase
+    const { data: adminShows, error } = await supabase
       .from('admin_shows')
       .select('*');
     
@@ -79,17 +74,15 @@ export const getAdminTvShowSettings = async () => {
       return {};
     }
     
-    if (!savedShows || savedShows.length === 0) {
+    if (!adminShows || adminShows.length === 0) {
       console.log('No saved TV show settings found in Supabase');
       return {};
     }
     
-    console.log(`Found ${savedShows.length} saved TV show settings in Supabase`);
+    console.log(`Found ${adminShows.length} saved TV show settings in Supabase`);
     
-    return savedShows.reduce((acc: Record<number, any>, show: any) => {
-      if (show.id) {
-        acc[show.id] = show;
-      }
+    return adminShows.reduce((acc: Record<number, any>, show: any) => {
+      acc[show.id] = show;
       return acc;
     }, {});
   } catch (e) {

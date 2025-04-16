@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Shuffle } from 'lucide-react';
-import { CustomList } from '@/lib/api';
+import { CustomList } from '@/lib/types';
 import CustomListCarousel from '../movies/CustomListCarousel';
 import { getCustomLists } from '@/lib/customListApi';
 
@@ -26,7 +26,7 @@ const RandomLists = () => {
   }, []);
   
   // Only show lists that have movies (now public access)
-  const listsWithContent = customLists.filter(list => list.movies.length > 0);
+  const listsWithContent = customLists.filter(list => list.movies?.length > 0);
   
   if (isLoading) {
     return (
