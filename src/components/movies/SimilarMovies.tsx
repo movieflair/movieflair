@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -45,7 +46,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
     <div className="container-custom mt-16">
       <div className="glass-card overflow-hidden rounded-xl p-8">
         <div className="grid grid-cols-[1fr,auto] gap-8">
-          <div className="space-y-4">
+          <div className="space-y-4 relative">
             <Link 
               to="/discover" 
               className="flex items-center gap-2 text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
@@ -56,7 +57,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             <p className="text-gray-600">
               Entdecke weitere Filme, die dir gefallen könnten. Basierend auf deinem aktuellen Film haben wir eine Auswahl an ähnlichen Titeln zusammengestellt.
             </p>
-            <div className="absolute bottom-32 left-8">
+            <div className="absolute bottom-24 left-8">
               <Button 
                 variant="outline" 
                 className="w-fit bg-[#ff3131] text-white hover:bg-[#ff3131]/90 border-0 shadow-lg"
