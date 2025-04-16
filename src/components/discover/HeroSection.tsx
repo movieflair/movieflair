@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -18,7 +17,7 @@ const HeroSection = () => {
   };
 
   return (
-    <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
+    <div className="relative bg-gradient-to-br from-[#9b87f5] via-[#7E69AB] to-[#6E59A5] text-white overflow-hidden">
       {/* Background animated elements */}
       <div className="absolute inset-0 overflow-hidden">
         {Array.from({ length: 20 }).map((_, i) => (

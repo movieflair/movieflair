@@ -17,11 +17,11 @@ const FreeMoviesSection = ({ movies }: FreeMoviesSectionProps) => {
   const newestMovies = movies.slice(0, 2);
 
   return (
-    <section className="rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 p-6 h-full">
+    <section className="rounded-2xl bg-gradient-to-br from-[#D6BCFA] to-[#9b87f5] p-6 h-full">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Download className="w-5 h-5 text-theme-black" />
-          <h2 className="text-xl font-bold text-theme-black">Neuste kostenlose Filme</h2>
+          <h2 className="text-xl font-bold text-theme-black">Neueste kostenlose Filme</h2>
         </div>
         <Link to="/kostenlos">
           <Button variant="outline" size="sm">
