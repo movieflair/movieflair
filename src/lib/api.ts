@@ -10,5 +10,5 @@ export {
   trackPageVisit, 
   getVisitorStats 
 } from './analyticsApi';
-export * from './customListApi'; // This will now include getRandomCustomLists
+export * from './customListApi'; // This specifically includes getRandomCustomLists
 export * from './apiUtils';

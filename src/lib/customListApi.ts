@@ -1,12 +1,13 @@
 
 import { CustomList, MovieOrShow } from './types';
 import { supabase } from '@/integrations/supabase/client';
+import { Json } from '@/integrations/supabase/types';
 
 interface SupabaseCustomList {
   id: string;
   title: string;
   description: string;
-  movies: any; // Using any to handle the JSON type from Supabase
+  movies: Json;
   created_at: string;
   updated_at: string;
   createdat: string;
@@ -17,7 +18,7 @@ const mapSupabaseListToCustomList = (list: SupabaseCustomList): CustomList => ({
   id: list.id,
   title: list.title,
   description: list.description,
-  movies: Array.isArray(list.movies) ? list.movies : [],
+  movies: Array.isArray(list.movies) ? list.movies as MovieOrShow[] : [],
   createdAt: list.created_at || list.createdat,
   updatedAt: list.updated_at || list.updatedat
 });
@@ -34,10 +35,10 @@ export const getCustomLists = async (): Promise<CustomList[]> => {
       return [];
     }
     
-    return (data || []).map((item) => mapSupabaseListToCustomList({
+    return (data || []).map((item: SupabaseCustomList) => mapSupabaseListToCustomList({
       ...item,
       movies: item.movies
-    } as SupabaseCustomList));
+    }));
   } catch (error) {
     console.error('Error getting custom lists:', error);
     return [];
@@ -45,7 +46,7 @@ export const getCustomLists = async (): Promise<CustomList[]> => {
 };
 
 // Function to get random custom lists
-export const getRandomCustomLists = (count: number = 2): Promise<CustomList[]> => {
+export const getRandomCustomLists = async (count: number = 2): Promise<CustomList[]> => {
   return getCustomLists().then(lists => {
     // Filter lists that have movies
     const listsWithMovies = lists.filter(list => Array.isArray(list.movies) && list.movies.length > 0);
@@ -86,8 +87,10 @@ export const createCustomList = async (title: string, description: string): Prom
 
 export const updateCustomList = async (list: CustomList): Promise<CustomList> => {
   const supabaseList = {
-    ...list,
-    movies: list.movies,
+    id: list.id,
+    title: list.title,
+    description: list.description,
+    movies: list.movies as Json,
     updated_at: new Date().toISOString()
   };
   
@@ -136,7 +139,7 @@ export const addMovieToList = async (listId: string, media: MovieOrShow): Promis
   const movieExists = currentMovies.some((m: any) => m.id === media.id);
   
   if (!movieExists) {
-    const updatedMovies = [...currentMovies, media];
+    const updatedMovies = [...currentMovies, media] as Json;
     
     const { data, error } = await supabase
       .from('custom_lists')
@@ -172,7 +175,7 @@ export const removeMovieFromList = async (listId: string, mediaId: number): Prom
   }
   
   const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
-  const updatedMovies = currentMovies.filter((media: any) => media.id !== mediaId);
+  const updatedMovies = currentMovies.filter((media: any) => media.id !== mediaId) as Json;
   
   const { data, error } = await supabase
     .from('custom_lists')

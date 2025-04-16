@@ -25,17 +25,17 @@ const Discover = () => {
     const fetchInitialData = async () => {
       setIsLoading(true);
       try {
-        const [genresList, movies] = await Promise.all([
+        const [genresList, movies, userCustomLists] = await Promise.all([
           getGenres(),
           getPopularMovies(),
+          getCustomLists()
         ]);
+        
         setGenres(genresList);
         setPopularMovies(movies.slice(0, 4));
-        
-        // Get custom lists from user
-        const userCustomLists = getCustomLists();
-        console.log('Geladene benutzerdefinierte Listen:', userCustomLists);
         setCustomLists(userCustomLists);
+        
+        console.log('Geladene benutzerdefinierte Listen:', userCustomLists);
       } catch (error) {
         console.error('Error fetching initial data:', error);
         toast.error('Fehler beim Laden der Daten');
@@ -59,7 +59,7 @@ const Discover = () => {
               <p className="mt-2 text-muted-foreground">Lade Inhalte...</p>
             </div>
           ) : (
-            <RandomLists customLists={customLists} />
+            <RandomLists />
           )}
         </div>
       </div>

@@ -1,15 +1,39 @@
-
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { callTMDB } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
+
+const mapSupabaseMovieToMovieObject = (movie: any): MovieOrShow => {
+  const genres = movie.genre_ids || [];
+  
+  return {
+    id: movie.id,
+    title: movie.title,
+    name: movie.name,
+    poster_path: movie.poster_path,
+    backdrop_path: movie.backdrop_path,
+    overview: movie.overview,
+    vote_average: movie.vote_average,
+    vote_count: movie.vote_count,
+    release_date: movie.release_date,
+    first_air_date: movie.first_air_date,
+    genre_ids: genres,
+    media_type: movie.media_type || 'movie',
+    hasStream: movie.hasstream || false,
+    streamUrl: movie.streamurl || '',
+    hasTrailer: movie.hastrailer || false,
+    trailerUrl: movie.trailerurl || '',
+    isFreeMovie: movie.isfreemovie || false,
+    isNewTrailer: movie.isnewtrailer || false,
+    popularity: movie.popularity || 0
+  };
+};
 
 export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching trailer movies...');
   let trailerItems: any[] = [];
   
   try {
-    // Fetch movies with trailers from Supabase
     const { data: trailerMovies, error: moviesError } = await supabase
       .from('admin_movies')
       .select('*')
@@ -18,15 +42,10 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     if (moviesError) {
       console.error('Error fetching trailer movies from Supabase:', moviesError);
     } else if (trailerMovies) {
-      trailerItems = [...trailerItems, ...trailerMovies.map(movie => ({
-        ...movie,
-        genre_ids: [], // Add missing required property
-        media_type: movie.media_type || 'movie'
-      }))];
+      trailerItems = [...trailerItems, ...trailerMovies.map(mapSupabaseMovieToMovieObject)];
       console.log(`Found ${trailerMovies.length} trailer movies from Supabase`);
     }
     
-    // Fetch TV shows with trailers from Supabase
     const { data: trailerShows, error: showsError } = await supabase
       .from('admin_shows')
       .select('*')
@@ -35,15 +54,10 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     if (showsError) {
       console.error('Error fetching trailer shows from Supabase:', showsError);
     } else if (trailerShows) {
-      trailerItems = [...trailerItems, ...trailerShows.map(show => ({
-        ...show,
-        genre_ids: [], // Add missing required property
-        media_type: show.media_type || 'tv'
-      }))];
+      trailerItems = [...trailerItems, ...trailerShows.map(mapSupabaseMovieToMovieObject)];
       console.log(`Found ${trailerShows.length} TV shows with trailers from Supabase`);
     }
     
-    // Sortiere nach Erscheinungsdatum, NEUESTE zuerst
     trailerItems.sort((a, b) => {
       const dateA = new Date(a.release_date || a.first_air_date || '');
       const dateB = new Date(b.release_date || b.first_air_date || '');
@@ -62,7 +76,6 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching free movies...');
   
   try {
-    // Fetch free movies from Supabase
     const { data: freeMovies, error } = await supabase
       .from('admin_movies')
       .select('*')
@@ -78,14 +91,8 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
       return [];
     }
     
-    // Map the movies to include required properties
-    const mappedMovies = freeMovies.map(movie => ({
-      ...movie,
-      genre_ids: [], // Add missing required property
-      media_type: movie.media_type || 'movie'
-    }));
+    const mappedMovies = freeMovies.map(mapSupabaseMovieToMovieObject);
     
-    // Sortiere nach Erscheinungsdatum, NEUESTE zuerst
     const sortedFreeMovies = [...mappedMovies].sort((a, b) => {
       const dateA = new Date(a.release_date || a.first_air_date || '');
       const dateB = new Date(b.release_date || b.first_air_date || '');
@@ -180,15 +187,12 @@ export const getSimilarMovies = async (id: number): Promise<MovieOrShow[]> => {
 export const getRandomMovie = async (): Promise<MovieDetail> => {
   console.log('Getting random movie with improved decade selection...');
   
-  // Definiere alle möglichen Jahrzehnte
   const allDecades = ['1970', '1980', '1990', '2000', '2010', '2020'];
   
-  // Wähle zufällig ein Jahrzehnt
   const randomDecade = allDecades[Math.floor(Math.random() * allDecades.length)];
   console.log(`Selected random decade: ${randomDecade}`);
   
   try {
-    // Grundlegende Parameter für die API-Anfrage
     let params: Record<string, any> = {
       'sort_by': 'popularity.desc',
       'vote_count.gte': '5',
@@ -197,7 +201,6 @@ export const getRandomMovie = async (): Promise<MovieDetail> => {
       'page': '1',
     };
     
-    // Setze den Jahrzehnt-Filter
     const decade = parseInt(randomDecade);
     if (!isNaN(decade)) {
       const startYear = decade;
@@ -212,13 +215,11 @@ export const getRandomMovie = async (): Promise<MovieDetail> => {
       console.log(`Searching for movies between ${startYear}-${endYear}`);
     }
     
-    // API-Aufruf für das ausgewählte Jahrzehnt
     const data = await callTMDB('/discover/movie', params);
     
     if (!data.results || data.results.length === 0) {
       console.log('No results found, trying with fewer restrictions');
       
-      // Fallback mit weniger Einschränkungen für ältere Filme
       params.vote_count_gte = '3';
       const fallbackData = await callTMDB('/discover/movie', params);
       
@@ -226,7 +227,6 @@ export const getRandomMovie = async (): Promise<MovieDetail> => {
         throw new Error('No movies found for the selected decade');
       }
       
-      // Filter valid results
       const validResults = fallbackData.results
         .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '');
       
@@ -234,12 +234,10 @@ export const getRandomMovie = async (): Promise<MovieDetail> => {
         throw new Error('No valid movies found for the selected decade');
       }
       
-      // Randomly select one movie from valid results
       const randomMovie = validResults[Math.floor(Math.random() * validResults.length)];
       return getMovieById(randomMovie.id);
     }
     
-    // Filter valid results from initial search
     const validResults = data.results
       .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '');
     
@@ -247,13 +245,11 @@ export const getRandomMovie = async (): Promise<MovieDetail> => {
       throw new Error('No valid movies found for the selected decade');
     }
     
-    // Randomly select one movie from valid results
     const randomMovie = validResults[Math.floor(Math.random() * validResults.length)];
     return getMovieById(randomMovie.id);
     
   } catch (error) {
     console.error('Error getting random movie:', error);
-    // Fallback to original popular movies if everything else fails
     const popularMovies = await getPopularMovies();
     const randomIndex = Math.floor(Math.random() * popularMovies.length);
     return getMovieById(popularMovies[randomIndex].id);
