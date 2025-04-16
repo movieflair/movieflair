@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
@@ -35,14 +34,14 @@ const Trailers = () => {
 
   return (
     <MainLayout>
-      <div className="container-custom py-12">
+      <div className="container-custom py-12 px-4">
         <div className="flex items-center mb-8">
           <PlayCircle className="w-6 h-6 text-theme-accent-blue mr-2" />
           <h1 className="text-3xl font-semibold">Neue Trailer</h1>
         </div>
         
         {isLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {[...Array(4)].map((_, index) => (
               <div key={index} className="animate-pulse">
                 <div className="bg-muted aspect-[2/3] rounded-lg mb-2"></div>
@@ -53,10 +52,10 @@ const Trailers = () => {
           </div>
         ) : trailerItems.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Keine neuen Trailer gefunden. Bitte markiere Filme oder Serien im Admin-Bereich als Trailer.</p>
+            <p className="text-muted-foreground">Keine neuen Trailer gefunden.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {trailerItems.map((item) => (
               <MovieCard key={item.id} movie={item} />
             ))}

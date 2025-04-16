@@ -4,16 +4,27 @@ import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { MovieOrShow } from '@/lib/types';
 import { getTvShowDetails, getCast } from '@/lib/tvShowApi';
-import MovieCard from '@/components/movies/MovieCard';
-import { PlayCircle } from 'lucide-react';
 import SEOHead from '@/components/seo/SEOHead';
 import { generateTVShowSchema } from '@/utils/seoUtils';
+import MovieMeta from '@/components/movies/MovieMeta';
+import MovieHeader from '@/components/movies/MovieHeader';
+import MovieStreamButtons from '@/components/movies/MovieStreamButtons';
+import MovieTrailerDialog from '@/components/movies/MovieTrailerDialog';
+import MovieBackdrop from '@/components/movies/MovieBackdrop';
+import MoviePoster from '@/components/movies/MoviePoster';
+import MovieLoadingState from '@/components/movies/MovieLoadingState';
+import MovieErrorState from '@/components/movies/MovieErrorState';
+import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
+import SimilarMovies from '@/components/movies/SimilarMovies';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
 
 const TvShowDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [show, setShow] = useState<MovieOrShow | null>(null);
   const [cast, setCast] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showTrailer, setShowTrailer] = useState(false);
+  const { amazonAffiliateId } = useAdminSettings();
 
   useEffect(() => {
     const fetchShowDetails = async () => {
@@ -43,16 +54,7 @@ const TvShowDetails = () => {
   if (isLoading) {
     return (
       <MainLayout>
-        <div className="container-custom py-12">
-          <div className="animate-pulse">
-            <div className="bg-muted h-6 w-3/4 mb-4"></div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[...Array(8)].map((_, index) => (
-                <div key={index} className="bg-muted aspect-[2/3] rounded-lg"></div>
-              ))}
-            </div>
-          </div>
-        </div>
+        <MovieLoadingState />
       </MainLayout>
     );
   }
@@ -60,20 +62,50 @@ const TvShowDetails = () => {
   if (!show) {
     return (
       <MainLayout>
-        <div className="container-custom py-12">
-          <div className="text-center">
-            <p className="text-muted-foreground">Serie nicht gefunden.</p>
-          </div>
-        </div>
+        <MovieErrorState />
       </MainLayout>
     );
   }
 
-  const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear() : '';
+  const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear().toString() : '';
   const seoTitle = `${show.name} (${firstAirYear}) Online Stream anschauen | MovieFlair`;
   const seoDescription = `${show.name} (${firstAirYear}) kostenlos online streamen. ${show.overview?.slice(0, 150)}...`;
-
   const tvShowStructuredData = generateTVShowSchema(show);
+
+  const getTrailerUrl = () => {
+    if (show?.trailerUrl) {
+      return show.trailerUrl;
+    }
+    
+    if (show?.videos?.results?.length > 0) {
+      const firstTrailer = show.videos.results.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+      if (firstTrailer) {
+        return `https://www.youtube.com/embed/${firstTrailer.key}`;
+      }
+    }
+    
+    if (show?.streamUrl) {
+      return show.streamUrl;
+    }
+    
+    return null;
+  };
+
+  const handleStreamClick = () => {
+    if (!show?.streamUrl) return;
+    
+    if (show?.streamUrl.includes('embed')) {
+      setShowTrailer(true);
+    } else {
+      window.open(show.streamUrl, '_blank');
+    }
+  };
+
+  const truncateOverview = (text: string, maxLength: number = 500) => {
+    return text.length > maxLength 
+      ? `${text.slice(0, maxLength)}...` 
+      : text;
+  };
 
   return (
     <MainLayout>
@@ -84,36 +116,67 @@ const TvShowDetails = () => {
         ogImage={show.backdrop_path ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` : undefined}
         structuredData={tvShowStructuredData}
       />
-      <div className="container-custom py-12">
-        <h1 className="text-3xl font-semibold mb-6">{show.name}</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <img
-              src={`https://image.tmdb.org/t/p/w500${show.poster_path}`}
-              alt={show.name}
-              className="rounded-lg shadow-md"
-            />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Übersicht</h2>
-            <p className="text-muted-foreground mb-6">{show.overview}</p>
 
-            <h2 className="text-xl font-semibold mb-4">Besetzung</h2>
-            <div className="flex overflow-x-auto space-x-4">
-              {cast.map((actor) => (
-                <div key={actor.id} className="flex-shrink-0">
-                  <img
-                    src={`https://image.tmdb.org/t/p/w200${actor.profile_path}`}
-                    alt={actor.name}
-                    className="w-20 h-20 rounded-full object-cover"
-                  />
-                  <p className="text-sm text-center mt-2">{actor.name}</p>
+      <div className="min-h-screen bg-white">
+        <MovieBackdrop backdropPath={show.backdrop_path} title={show.name} />
+
+        <div className="container-custom -mt-20 md:-mt-40 relative z-20 px-3 md:px-8">
+          <div className="glass-card overflow-hidden rounded-xl">
+            <div className="grid md:grid-cols-[300px,1fr] gap-4 md:gap-8 p-4 md:p-8">
+              <div className="flex justify-center md:block">
+                <MoviePoster 
+                  id={show.id} 
+                  title={show.name || ''} 
+                  posterPath={show.poster_path}
+                />
+              </div>
+
+              <div className="text-gray-800">
+                <MovieHeader 
+                  title={show.name || ''}
+                  tagline={show.tagline}
+                  releaseYear={firstAirYear}
+                  genres={show.genres}
+                />
+
+                <MovieMeta
+                  year={firstAirYear}
+                  rating={show.vote_average}
+                  seasons={show.number_of_seasons}
+                  episodes={show.number_of_episodes}
+                  mediaType="tv"
+                  className="mb-4"
+                />
+
+                <p className="text-gray-600 mb-6 md:mb-8 leading-relaxed text-sm md:text-base">
+                  {truncateOverview(show.overview)}
+                </p>
+
+                <MovieStreamButtons
+                  hasTrailer={show.hasTrailer}
+                  trailerUrl={getTrailerUrl()}
+                  streamUrl={show.streamUrl}
+                  title={show.name || ''}
+                  amazonAffiliateId={amazonAffiliateId}
+                  onTrailerClick={() => setShowTrailer(true)}
+                  onStreamClick={handleStreamClick}
+                />
+
+                <div className="mt-6 md:mt-8">
+                  <CastAndCrewSection cast={cast} />
                 </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <MovieTrailerDialog
+        isOpen={showTrailer}
+        onClose={() => setShowTrailer(false)}
+        trailerUrl={getTrailerUrl() || ''}
+        movieTitle={show.name || ''}
+      />
     </MainLayout>
   );
 };
