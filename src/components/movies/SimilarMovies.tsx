@@ -55,7 +55,7 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
             <p className="text-gray-600">
               Entdecke weitere Filme, die dir gefallen könnten. Basierend auf deinem aktuellen Film haben wir eine Auswahl an ähnlichen Titeln zusammengestellt.
             </p>
-            <div className="absolute bottom-24 left-0">
+            <div className="absolute bottom-0 left-0">
               <Button 
                 variant="outline" 
                 className="w-fit bg-[#ff3131] text-white hover:bg-[#ff3131]/90 border-0 shadow-lg"
