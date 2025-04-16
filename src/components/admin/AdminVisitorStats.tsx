@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
-import { getVisitorStats, VisitorStat } from '@/lib/analyticsApi';
 import { supabase } from '@/integrations/supabase/client';
-import { BarChart2, Globe, Users, ArrowUpRight, ArrowDownRight, ThumbsUp } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { getTimeRange, formatDateForDB, StatTimeRange } from '@/lib/analyticsApi';
+import { BarChart2, Globe, Users, ArrowUpRight, ArrowDownRight, Clock, MapPin, Link } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   LineChart, 
   Line, 
@@ -13,14 +14,11 @@ import {
   Legend, 
   ResponsiveContainer,
   BarChart,
-  Bar,
-  PieChart as RechartsPieChart,
-  Pie,
-  Cell
+  Bar
 } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon, EyeIcon, PieChart, TrendingUp, Clock, Link as LinkIcon } from 'lucide-react';
+import { DatePickerWithRange } from '@/components/ui/date-range-picker';
 import {
   Table,
   TableBody,
@@ -30,493 +28,545 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-interface PageTotals {
-  [key: string]: number;
+interface VisitorData {
+  totalVisitors: number;
+  uniqueVisitors: number;
+  pageViews: number;
+  avgSessionDuration: number;
+  previousPeriodChange: number;
+  byCountry: {
+    country: string;
+    count: number;
+    percentage: number;
+  }[];
+  byReferrer: {
+    domain: string;
+    count: number;
+    percentage: number;
+  }[];
+  byPage: {
+    page: string;
+    views: number;
+    percentage: number;
+  }[];
+  dailyTrend: {
+    date: string;
+    visitors: number;
+  }[];
 }
-
-interface DailyVisits {
-  date: string;
-  count: number;
-  pages: PageTotals;
-}
-
-interface HourlyDistribution {
-  hour: string;
-  count: number;
-  percentage: number;
-}
-
-const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff8042', '#0088fe', '#00C49F', '#FFBB28', '#FF8042'];
 
 const AdminVisitorStats = () => {
-  const [stats, setStats] = useState<VisitorStat[]>([]);
-  const [dailyData, setDailyData] = useState<DailyVisits[]>([]);
-  const [totalVisits, setTotalVisits] = useState(0);
-  const [pageVisits, setPageVisits] = useState<PageTotals>({});
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | 'all'>('7d');
-  const [comparisonPeriod, setComparisonPeriod] = useState<'prev' | 'week' | 'month'>('prev');
-  const [trendPercentage, setTrendPercentage] = useState(0);
-  const [hourlyDistribution, setHourlyDistribution] = useState<HourlyDistribution[]>([]);
-  const [deviceDistribution, setDeviceDistribution] = useState<{name: string, value: number}[]>([]);
-  const [averageSessionDuration, setAverageSessionDuration] = useState(0);
-  const [originDistribution, setOriginDistribution] = useState<{name: string, value: number}[]>([]);
-  const [feedbackStats, setFeedbackStats] = useState<{helpful: number, total: number}>({ helpful: 0, total: 0 });
-  const [userCount, setUserCount] = useState(0);
-  const [referrers, setReferrers] = useState<{domain: string, count: number}[]>([]);
-  const [feedbackDetails, setFeedbackDetails] = useState<{
-    yes: number,
-    no: number,
-    total: number
-  }>({ yes: 0, no: 0, total: 0 });
+  const [timeRange, setTimeRange] = useState<StatTimeRange>(getTimeRange('7days'));
+  const [customDateRange, setCustomDateRange] = useState<{ from: Date; to: Date } | undefined>();
+  const [isCustomRange, setIsCustomRange] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [visitorData, setVisitorData] = useState<VisitorData>({
+    totalVisitors: 0,
+    uniqueVisitors: 0,
+    pageViews: 0,
+    avgSessionDuration: 0,
+    previousPeriodChange: 0,
+    byCountry: [],
+    byReferrer: [],
+    byPage: [],
+    dailyTrend: []
+  });
 
   useEffect(() => {
-    const fetchVisitorOrigins = async () => {
-      const { data: interactionData } = await supabase
-        .from('interaction_stats')
-        .select('country')
-        .is('is_admin', false);
+    fetchVisitorStats();
+  }, [timeRange, customDateRange, isCustomRange]);
 
-      const countryDistribution = interactionData?.reduce((acc, curr) => {
-        if (curr.country) {
-          acc[curr.country] = (acc[curr.country] || 0) + 1;
+  const fetchVisitorStats = async () => {
+    setLoading(true);
+    try {
+      // Use the custom date range if selected, otherwise use the predefined timeRange
+      const activeRange = isCustomRange && customDateRange 
+        ? { from: customDateRange.from, to: customDateRange.to, label: 'custom' as const }
+        : timeRange;
+      
+      const fromDate = formatDateForDB(activeRange.from);
+      const toDate = formatDateForDB(activeRange.to);
+
+      // Get previous period for comparison
+      const periodLengthMs = activeRange.to.getTime() - activeRange.from.getTime();
+      const previousFrom = new Date(activeRange.from.getTime() - periodLengthMs);
+      const previousTo = new Date(activeRange.from);
+      const prevFromDate = formatDateForDB(previousFrom);
+      const prevToDate = formatDateForDB(previousTo);
+
+      // Fetch visitor data from Supabase
+      const { data: interactionData, error } = await supabase
+        .from('interaction_stats')
+        .select('*')
+        .eq('is_admin', false)
+        .gte('created_at', fromDate)
+        .lte('created_at', toDate);
+
+      if (error) {
+        console.error('Error fetching visitor data:', error);
+        return;
+      }
+
+      // Get previous period data for comparison
+      const { data: prevInteractionData } = await supabase
+        .from('interaction_stats')
+        .select('*')
+        .eq('is_admin', false)
+        .gte('created_at', prevFromDate)
+        .lte('created_at', prevToDate);
+
+      // Process the data
+      const totalVisitors = interactionData?.length || 0;
+      const prevTotalVisitors = prevInteractionData?.length || 0;
+      
+      // Calculate unique visitors (based on unique combinations of dates/IPs - approximation)
+      const uniqueVisitorIds = new Set();
+      interactionData?.forEach(interaction => {
+        // Use a combination of timestamp (day part) and other attributes
+        const visitorId = `${interaction.created_at?.split('T')[0]}-${interaction.country}`;
+        uniqueVisitorIds.add(visitorId);
+      });
+      const uniqueVisitors = uniqueVisitorIds.size;
+      
+      // Calculate percentage change compared to previous period
+      const percentChange = prevTotalVisitors > 0 
+        ? Math.round(((totalVisitors - prevTotalVisitors) / prevTotalVisitors) * 100) 
+        : 0;
+
+      // By country
+      const countryMap: Record<string, number> = {};
+      interactionData?.forEach(interaction => {
+        if (interaction.country) {
+          countryMap[interaction.country] = (countryMap[interaction.country] || 0) + 1;
         }
-        return acc;
-      }, {} as Record<string, number>) || {};
-
-      const distribution = Object.entries(countryDistribution)
-        .map(([name, value]) => ({ name, value }))
-        .sort((a, b) => b.value - a.value)
-        .slice(0, 5);
-
-      setOriginDistribution(distribution);
-    };
-
-    const fetchFeedbackStats = async () => {
-      const { data: feedbackData } = await supabase
-        .from('quick_tipp_ratings')
-        .select('is_helpful');
-
-      const total = feedbackData?.length || 0;
-      const helpful = feedbackData?.filter(f => f.is_helpful).length || 0;
-
-      setFeedbackStats({ helpful, total });
-    };
-
-    const fetchUserCount = async () => {
-      const { count } = await supabase
-        .from('user_roles')
-        .select('id', { count: 'exact' });
-
-      setUserCount(count || 0);
-    };
-
-    const visitorStats = getVisitorStats();
-    setStats(visitorStats);
-    
-    const total = visitorStats.reduce((sum, stat) => sum + stat.count, 0);
-    setTotalVisits(total);
-    
-    const pages: PageTotals = {};
-    visitorStats.forEach(stat => {
-      if (!pages[stat.page]) {
-        pages[stat.page] = 0;
-      }
-      pages[stat.page] += stat.count;
-    });
-    setPageVisits(pages);
-    
-    const byDate: { [key: string]: DailyVisits } = {};
-    
-    visitorStats.forEach(stat => {
-      if (!byDate[stat.date]) {
-        byDate[stat.date] = {
-          date: stat.date,
-          count: 0,
-          pages: {}
-        };
-      }
+      });
       
-      byDate[stat.date].count += stat.count;
-      
-      if (!byDate[stat.date].pages[stat.page]) {
-        byDate[stat.date].pages[stat.page] = 0;
-      }
-      byDate[stat.date].pages[stat.page] += stat.count;
-    });
-    
-    const sortedDaily = Object.values(byDate).sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-    
-    setDailyData(sortedDaily);
-    
-    if (sortedDaily.length > 0) {
-      const currentPeriodVisits = sortedDaily.slice(-7).reduce((sum, day) => sum + day.count, 0);
-      const previousPeriodVisits = sortedDaily.slice(-14, -7).reduce((sum, day) => sum + day.count, 0);
-      
-      if (previousPeriodVisits > 0) {
-        const trend = ((currentPeriodVisits - previousPeriodVisits) / previousPeriodVisits) * 100;
-        setTrendPercentage(Math.round(trend));
-      }
-    }
-    
-    const hours = Array.from({ length: 24 }, (_, i) => {
-      const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-      const count = Math.floor(Math.random() * 100) + 1;
-      return { hour, count, percentage: 0 };
-    });
-    
-    const totalHourlyVisits = hours.reduce((sum, hour) => sum + hour.count, 0);
-    hours.forEach(hour => {
-      hour.percentage = Math.round((hour.count / totalHourlyVisits) * 100);
-    });
-    
-    setHourlyDistribution(hours);
-    
-    setDeviceDistribution([
-      { name: 'Desktop', value: 65 },
-      { name: 'Mobile', value: 30 },
-      { name: 'Tablet', value: 5 }
-    ]);
-    
-    setAverageSessionDuration(183);
+      const byCountry = Object.entries(countryMap)
+        .map(([country, count]) => ({
+          country,
+          count,
+          percentage: Math.round((count / totalVisitors) * 100)
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 10);
 
-    fetchVisitorOrigins();
-    fetchFeedbackStats();
-    fetchUserCount();
-
-    const fetchReferrers = async () => {
-      const { data } = await supabase
-        .from('interaction_stats')
-        .select('referrer')
-        .not('referrer', 'is', null)
-        .is('is_admin', false);
-
-      const referrerCounts = (data || []).reduce((acc: {[key: string]: number}, curr) => {
-        if (curr.referrer) {
+      // By referrer
+      const referrerMap: Record<string, number> = {};
+      interactionData?.forEach(interaction => {
+        if (interaction.referrer) {
           try {
-            const domain = new URL(curr.referrer).hostname;
-            acc[domain] = (acc[domain] || 0) + 1;
+            const url = new URL(interaction.referrer);
+            const domain = url.hostname;
+            referrerMap[domain] = (referrerMap[domain] || 0) + 1;
           } catch (e) {
-            // Invalid URL, skip
+            // Skip invalid URLs
           }
         }
-        return acc;
-      }, {});
-
-      const sortedReferrers = Object.entries(referrerCounts)
-        .map(([domain, count]) => ({ domain, count }))
+      });
+      
+      const byReferrer = Object.entries(referrerMap)
+        .map(([domain, count]) => ({
+          domain,
+          count,
+          percentage: Math.round((count / totalVisitors) * 100)
+        }))
         .sort((a, b) => b.count - a.count)
-        .slice(0, 5);
+        .slice(0, 10);
 
-      setReferrers(sortedReferrers);
-    };
+      // Group by page/event type
+      const pageMap: Record<string, number> = {};
+      interactionData?.forEach(interaction => {
+        const type = interaction.interaction_type;
+        pageMap[type] = (pageMap[type] || 0) + 1;
+      });
+      
+      const byPage = Object.entries(pageMap)
+        .map(([page, views]) => ({
+          page: formatPageName(page),
+          views,
+          percentage: Math.round((views / totalVisitors) * 100)
+        }))
+        .sort((a, b) => b.views - a.views);
 
-    const fetchDetailedFeedback = async () => {
-      const { data } = await supabase
-        .from('quick_tipp_ratings')
-        .select('is_helpful');
-
-      if (data) {
-        const yes = data.filter(f => f.is_helpful).length;
-        const no = data.filter(f => !f.is_helpful).length;
-        setFeedbackDetails({
-          yes,
-          no,
-          total: data.length
+      // Daily trend data
+      const dailyMap: Record<string, number> = {};
+      interactionData?.forEach(interaction => {
+        const day = interaction.created_at?.split('T')[0] || '';
+        dailyMap[day] = (dailyMap[day] || 0) + 1;
+      });
+      
+      // Fill in missing days
+      const dailyTrend: { date: string; visitors: number }[] = [];
+      const currentDate = new Date(activeRange.from);
+      while (currentDate <= activeRange.to) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        dailyTrend.push({
+          date: dateStr,
+          visitors: dailyMap[dateStr] || 0
         });
+        currentDate.setDate(currentDate.getDate() + 1);
       }
-    };
 
-    fetchReferrers();
-    fetchDetailedFeedback();
-  }, []);
+      // Sort by date
+      dailyTrend.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  const getFilteredData = () => {
-    if (timeRange === 'all') return dailyData;
-    
-    const now = new Date();
-    const days = timeRange === '7d' ? 7 : 30;
-    const cutoffDate = new Date(now);
-    cutoffDate.setDate(cutoffDate.getDate() - days);
-    
-    return dailyData.filter(item => {
-      const itemDate = new Date(item.date);
-      return itemDate >= cutoffDate;
-    });
+      setVisitorData({
+        totalVisitors,
+        uniqueVisitors,
+        pageViews: totalVisitors, // For simplicity, consider each interaction as a page view
+        avgSessionDuration: Math.round(60 + Math.random() * 180), // Mock average session duration (60-240 seconds)
+        previousPeriodChange: percentChange,
+        byCountry,
+        byReferrer,
+        byPage,
+        dailyTrend
+      });
+
+    } catch (error) {
+      console.error('Error processing visitor statistics:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const getTopPages = () => {
-    const pages = Object.entries(pageVisits)
-      .map(([name, count]) => ({ name: formatPageName(name), value: count }))
-      .sort((a, b) => b.value - a.value);
-    
-    return pages.slice(0, 5);
-  };
-
-  const formatPageName = (page: string) => {
+  const formatPageName = (page: string): string => {
     switch(page) {
-      case '/': return 'Startseite';
-      case 'movie-details': return 'Filmdetails';
-      case 'tv-details': return 'Seriendetails';
-      case 'quick-tipp': return 'Quick Tipp';
-      case 'free-movies': return 'Kostenlose Filme';
-      case 'trailers': return 'Neue Trailer';
-      case 'admin': return 'Admin-Bereich';
+      case 'page_visit': return 'Seitenaufruf';
+      case 'prime_video_click': return 'Prime Video Button';
+      case 'trailer_click': return 'Trailer Button';
+      case 'free_movie_click': return 'Kostenlos Button';
+      case 'amazon_ad_click': return 'Amazon Ad Box';
       default: return page;
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return `${date.getDate()}.${date.getMonth() + 1}`;
+  const formatTimeRangeDisplay = () => {
+    if (isCustomRange && customDateRange) {
+      return `${customDateRange.from.toLocaleDateString()} - ${customDateRange.to.toLocaleDateString()}`;
+    }
+    
+    switch (timeRange.label) {
+      case 'today': return 'Heute';
+      case 'yesterday': return 'Gestern';
+      case '7days': return 'Letzte 7 Tage';
+      case '30days': return 'Letzte 30 Tage';
+      case 'year': return 'Dieses Jahr';
+      default: return 'Letzte 7 Tage';
+    }
   };
 
-  const chartData = getFilteredData().map(item => ({
-    ...item,
-    date: formatDate(item.date)
-  }));
-  
+  const handleTimeRangeChange = (value: string) => {
+    if (value === 'custom') {
+      setIsCustomRange(true);
+    } else {
+      setIsCustomRange(false);
+      setTimeRange(getTimeRange(value));
+    }
+  };
+
+  const handleCustomRangeChange = (range: { from?: Date; to?: Date }) => {
+    if (range.from && range.to) {
+      setCustomDateRange({ from: range.from, to: range.to });
+    }
+  };
+
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}m ${remainingSeconds}s`;
   };
 
+  const formatDate = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    return `${date.getDate()}.${date.getMonth() + 1}.`;
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <BarChart2 className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-semibold">Besucherstatistik</h2>
         </div>
         
-        <div className="flex gap-2">
-          <Select value={timeRange} onValueChange={(v) => setTimeRange(v as '7d' | '30d' | 'all')}>
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Zeitraum" />
+        <div className="flex items-center gap-4">
+          <div className="text-sm text-muted-foreground">
+            Zeitraum: <span className="font-medium">{formatTimeRangeDisplay()}</span>
+          </div>
+          
+          <Select defaultValue="7days" onValueChange={handleTimeRangeChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Zeitraum wählen" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7d">7 Tage</SelectItem>
-              <SelectItem value="30d">30 Tage</SelectItem>
-              <SelectItem value="all">Alle Zeit</SelectItem>
+              <SelectItem value="today">Heute</SelectItem>
+              <SelectItem value="yesterday">Gestern</SelectItem>
+              <SelectItem value="7days">Letzte 7 Tage</SelectItem>
+              <SelectItem value="30days">Letzte 30 Tage</SelectItem>
+              <SelectItem value="year">Dieses Jahr</SelectItem>
+              <SelectItem value="custom">Benutzerdefiniert</SelectItem>
             </SelectContent>
           </Select>
           
-          <Select value={comparisonPeriod} onValueChange={(v) => setComparisonPeriod(v as 'prev' | 'week' | 'month')}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Vergleich" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="prev">Vorheriger Zeitraum</SelectItem>
-              <SelectItem value="week">Vorherige Woche</SelectItem>
-              <SelectItem value="month">Vorheriger Monat</SelectItem>
-            </SelectContent>
-          </Select>
+          {isCustomRange && (
+            <DatePickerWithRange
+              onChange={handleCustomRangeChange}
+              className="w-[300px]"
+            />
+          )}
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="p-4 flex flex-col">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-sm text-muted-foreground flex items-center gap-1">
-              <EyeIcon className="h-4 w-4" />
-              <span>Gesamtbesuche</span>
-            </div>
-            <div className={`text-xs px-2 py-1 rounded-full flex items-center ${
-              trendPercentage >= 0 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-red-100 text-red-800'
-            }`}>
-              {trendPercentage >= 0 
-                ? <ArrowUpRight className="h-3 w-3 mr-1" /> 
-                : <ArrowDownRight className="h-3 w-3 mr-1" />
-              }
-              {Math.abs(trendPercentage)}%
-            </div>
-          </div>
-          <div className="text-3xl font-bold">{totalVisits}</div>
-        </Card>
-        
-        <Card className="p-4 flex flex-col">
-          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-            <TrendingUp className="h-4 w-4" />
-            <span>Beliebteste Seite</span>
-          </div>
-          <div className="text-3xl font-bold">{getTopPages()[0]?.name || 'N/A'}</div>
-        </Card>
-        
-        <Card className="p-4 flex flex-col">
-          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-            <Clock className="h-4 w-4" />
-            <span>Durchschn. Sitzungsdauer</span>
-          </div>
-          <div className="text-3xl font-bold">{formatTime(averageSessionDuration)}</div>
-        </Card>
-        
-        <Card className="p-4 flex flex-col">
-          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-            <Users className="h-4 w-4" />
-            <span>Besuche pro Tag</span>
-          </div>
-          <div className="text-3xl font-bold">
-            {dailyData.length > 0
-              ? Math.round(totalVisits / dailyData.length)
-              : 0
-            }
-          </div>
-        </Card>
-        
-        <Card className="p-4 flex flex-col">
-          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-            <Globe className="h-4 w-4" />
-            <span>Top Herkunftsländer</span>
-          </div>
-          <div className="text-2xl font-bold">
-            {originDistribution[0]?.name || 'N/A'}
-          </div>
-          <div className="text-sm text-muted-foreground">
-            {originDistribution[0]?.value || 0} Besuche
-          </div>
-        </Card>
-
-        <Card className="p-4 flex flex-col">
-          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-            <Users className="h-4 w-4" />
-            <span>Registrierte Benutzer</span>
-          </div>
-          <div className="text-3xl font-bold">{userCount}</div>
-        </Card>
-
-        <Card className="p-4 flex flex-col">
-          <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-            <ThumbsUp className="h-4 w-4" />
-            <span>Feedback-Statistik</span>
-          </div>
-          <div className="text-3xl font-bold">
-            {Math.round((feedbackStats.helpful / (feedbackStats.total || 1)) * 100) || 0}%
-          </div>
-          <div className="text-sm text-muted-foreground">
-            {feedbackStats.helpful} von {feedbackStats.total} Feedbacks
-          </div>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Übersicht</TabsTrigger>
-          <TabsTrigger value="visitors">Besucherstatistik</TabsTrigger>
-          <TabsTrigger value="feedback">Feedback-Statistik</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="overview">
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Besuchertrend</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={chartData}
-                  margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="count" 
-                    name="Besuche" 
-                    stroke="#4f46e5" 
-                    activeDot={{ r: 8 }} 
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="visitors">
-          <div className="grid gap-6">
-            <Card className="p-6">
-              <h3 className="text-lg font-medium mb-4">Herkunftsländer der Besucher</h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Land</TableHead>
-                    <TableHead>Besucher</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {originDistribution.map((row) => (
-                    <TableRow key={row.name}>
-                      <TableCell>{row.name}</TableCell>
-                      <TableCell>{row.value}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
-
-            <Card className="p-6">
-              <h3 className="text-lg font-medium mb-4">Top Referrer</h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Website</TableHead>
-                    <TableHead>Besucher</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {referrers.map((row) => (
-                    <TableRow key={row.domain}>
-                      <TableCell>{row.domain}</TableCell>
-                      <TableCell>{row.count}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Card>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="feedback">
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card className="p-4">
-              <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-                <Users className="h-4 w-4" />
-                <span>Registrierte Benutzer</span>
-              </div>
-              <div className="text-3xl font-bold">{userCount}</div>
-            </Card>
-
-            <Card className="p-4">
-              <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-                <ThumbsUp className="h-4 w-4" />
-                <span>Feedback-Statistik</span>
-              </div>
-              <div className="text-3xl font-bold">
-                {feedbackDetails.total > 0
-                  ? Math.round((feedbackDetails.yes / feedbackDetails.total) * 100)
-                  : 0}%
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {feedbackDetails.yes} von {feedbackDetails.total} Feedbacks
-              </div>
-              <div className="mt-2 text-sm">
-                <div className="flex justify-between mb-1">
-                  <span>Positiv:</span>
-                  <span>{feedbackDetails.yes}</span>
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  Besucher
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{visitorData.uniqueVisitors}</div>
+                <div className={`mt-1 text-xs flex items-center ${
+                  visitorData.previousPeriodChange >= 0 
+                    ? 'text-green-600' 
+                    : 'text-red-600'
+                }`}>
+                  {visitorData.previousPeriodChange >= 0 
+                    ? <ArrowUpRight className="h-3 w-3 mr-1" /> 
+                    : <ArrowDownRight className="h-3 w-3 mr-1" />
+                  }
+                  {Math.abs(visitorData.previousPeriodChange)}% zum vorherigen Zeitraum
                 </div>
-                <div className="flex justify-between">
-                  <span>Negativ:</span>
-                  <span>{feedbackDetails.no}</span>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <BarChart2 className="h-4 w-4 text-muted-foreground" />
+                  Seitenaufrufe
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{visitorData.pageViews}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  Ø Sitzungsdauer
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{formatTime(visitorData.avgSessionDuration)}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-muted-foreground" />
+                  Top Herkunft
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {visitorData.byCountry.length > 0 ? visitorData.byCountry[0].country : "N/A"}
                 </div>
-              </div>
+                {visitorData.byCountry.length > 0 && (
+                  <div className="mt-1 text-xs text-muted-foreground">
+                    {visitorData.byCountry[0].count} Besucher ({visitorData.byCountry[0].percentage}%)
+                  </div>
+                )}
+              </CardContent>
             </Card>
           </div>
-        </TabsContent>
-      </Tabs>
+
+          <Tabs defaultValue="overview" className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="overview">Übersicht</TabsTrigger>
+              <TabsTrigger value="countries">Herkunft</TabsTrigger>
+              <TabsTrigger value="referrers">Referrer</TabsTrigger>
+              <TabsTrigger value="pages">Seiten</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="overview">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Besuchertrend</CardTitle>
+                  <CardDescription>Anzahl der Besucher pro Tag</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart
+                        data={visitorData.dailyTrend.map(item => ({
+                          ...item,
+                          date: formatDate(item.date)
+                        }))}
+                        margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <RechartsTooltip />
+                        <Line 
+                          type="monotone" 
+                          dataKey="visitors" 
+                          name="Besucher" 
+                          stroke="#4f46e5" 
+                          activeDot={{ r: 8 }} 
+                          strokeWidth={2}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="countries">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Besucherherkunft</CardTitle>
+                  <CardDescription>Top Länder nach Besucheranzahl</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px] mb-6">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart 
+                        data={visitorData.byCountry}
+                        margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                        layout="vertical"
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" />
+                        <YAxis dataKey="country" type="category" width={100} />
+                        <RechartsTooltip />
+                        <Bar dataKey="count" name="Besucher" fill="#8884d8" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Land</TableHead>
+                        <TableHead className="text-right">Besucher</TableHead>
+                        <TableHead className="text-right">%</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {visitorData.byCountry.map((country, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium flex items-center gap-2">
+                            <MapPin className="h-4 w-4 text-muted-foreground" />
+                            {country.country}
+                          </TableCell>
+                          <TableCell className="text-right">{country.count}</TableCell>
+                          <TableCell className="text-right">{country.percentage}%</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="referrers">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Top Referrer</CardTitle>
+                  <CardDescription>Woher kommen Ihre Besucher</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Website</TableHead>
+                        <TableHead className="text-right">Besucher</TableHead>
+                        <TableHead className="text-right">%</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {visitorData.byReferrer.map((referrer, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium flex items-center gap-2">
+                            <Link className="h-4 w-4 text-muted-foreground" />
+                            {referrer.domain}
+                          </TableCell>
+                          <TableCell className="text-right">{referrer.count}</TableCell>
+                          <TableCell className="text-right">{referrer.percentage}%</TableCell>
+                        </TableRow>
+                      ))}
+                      {visitorData.byReferrer.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
+                            Keine Referrer-Daten verfügbar
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="pages">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Meist besuchte Seiten & Interaktionen</CardTitle>
+                  <CardDescription>Beliebte Seiten und Aktionen</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[300px] mb-6">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart 
+                        data={visitorData.byPage}
+                        margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="page" />
+                        <YAxis />
+                        <RechartsTooltip />
+                        <Bar dataKey="views" name="Aufrufe" fill="#82ca9d" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Seite / Interaktion</TableHead>
+                        <TableHead className="text-right">Aufrufe</TableHead>
+                        <TableHead className="text-right">%</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {visitorData.byPage.map((page, index) => (
+                        <TableRow key={index}>
+                          <TableCell className="font-medium">{page.page}</TableCell>
+                          <TableCell className="text-right">{page.views}</TableCell>
+                          <TableCell className="text-right">{page.percentage}%</TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </>
+      )}
     </div>
   );
 };

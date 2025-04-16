@@ -27,7 +27,7 @@ const MovieStreamButtons = ({
   onStreamClick
 }: MovieStreamButtonsProps) => {
   const handlePrimeClick = () => {
-    trackInteraction('prime_video_click');
+    trackInteraction('prime_video_click', {});
     const formattedTitle = encodeURIComponent(title);
     const tag = amazonAffiliateId || 'movieflair-21';
     window.open(`https://www.amazon.de/gp/video/search?phrase=${formattedTitle}&tag=${tag}`, '_blank');

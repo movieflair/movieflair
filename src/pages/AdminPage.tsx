@@ -19,8 +19,14 @@ const AdminPage = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    trackPageVisit('admin');
+    // Set admin flag in localStorage to prevent tracking
+    localStorage.setItem('isAdminLoggedIn', 'true');
     checkAdminAccess();
+
+    // Clean up function to remove the flag when leaving the admin area
+    return () => {
+      localStorage.removeItem('isAdminLoggedIn');
+    };
   }, [user]);
 
   const checkAdminAccess = async () => {
