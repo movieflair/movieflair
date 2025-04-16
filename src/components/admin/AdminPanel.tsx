@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileEdit } from 'lucide-react';
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -18,18 +17,11 @@ import {
 } from '@/lib/api';
 
 import AdminHeader from './header/AdminHeader';
-import AdminSearch from './search/AdminSearch';
-import MovieGrid from './movies/MovieGrid';
-import ShowGrid from './shows/ShowGrid';
-import MovieEditForm from './MovieEditForm';
-import TvShowEditForm from './TvShowEditForm';
-import AdminContentTabs from './AdminContentTabs';
+import AdminSettings from './settings/AdminSettings';
+import ContentManager from './content/ContentManager';
 import CustomListManager from './CustomListManager';
 import AdminStats from './AdminStats';
 import AdminVisitorStats from './AdminVisitorStats';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
 
 const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('movies');
@@ -183,18 +175,27 @@ const AdminPanel = () => {
   const handleSaveMovie = async () => {
     if (!selectedMovie) return;
 
-    console.log("Saving movie with these settings:", {
-      id: selectedMovie.id,
-      title: selectedMovie.title,
-      isFreeMovie,
-      isNewTrailer,
-      streamUrl: isFreeMovie ? streamUrl : '',
-      trailerUrl: isNewTrailer ? trailerUrl : ''
-    });
-
     try {
-      // Check if movie already exists in Supabase
-      const { data: existingMovie, error: checkError } = await supabase
+      const updatedMovie = {
+        id: selectedMovie.id,
+        title: selectedMovie.title,
+        poster_path: selectedMovie.poster_path,
+        backdrop_path: selectedMovie.backdrop_path,
+        overview: selectedMovie.overview,
+        release_date: selectedMovie.release_date,
+        vote_average: selectedMovie.vote_average,
+        vote_count: selectedMovie.vote_count,
+        popularity: selectedMovie.popularity,
+        media_type: selectedMovie.media_type,
+        isfreemovie: isFreeMovie,
+        isnewtrailer: isNewTrailer,
+        hasstream: isFreeMovie,
+        streamurl: isFreeMovie ? streamUrl : '',
+        hastrailer: isNewTrailer,
+        trailerurl: isNewTrailer ? trailerUrl : ''
+      };
+
+      const { error: checkError } = await supabase
         .from('admin_movies')
         .select('*')
         .eq('id', selectedMovie.id)
@@ -206,34 +207,9 @@ const AdminPanel = () => {
         return;
       }
       
-      const updatedMovie = {
-        ...selectedMovie,
-        isFreeMovie,
-        isNewTrailer,
-        hasStream: isFreeMovie, 
-        streamUrl: isFreeMovie ? streamUrl : '',
-        hasTrailer: isNewTrailer,
-        trailerUrl: isNewTrailer ? trailerUrl : ''
-      };
-      
-      let saveError;
-      
-      if (existingMovie) {
-        // Update existing movie
-        const { error } = await supabase
-          .from('admin_movies')
-          .update(updatedMovie)
-          .eq('id', selectedMovie.id);
-          
-        saveError = error;
-      } else {
-        // Insert new movie
-        const { error } = await supabase
-          .from('admin_movies')
-          .insert(updatedMovie);
-          
-        saveError = error;
-      }
+      const { error: saveError } = await supabase
+        .from('admin_movies')
+        .upsert(updatedMovie);
       
       if (saveError) {
         console.error('Error saving movie to Supabase:', saveError);
@@ -241,16 +217,12 @@ const AdminPanel = () => {
         return;
       }
       
-      console.log("Movie saved to Supabase successfully");
-      
-      // Force a refresh of the data
       queryClient.invalidateQueries({ queryKey: ['admin-movies'] });
       queryClient.invalidateQueries({ queryKey: ['admin-free-movies'] });
       queryClient.invalidateQueries({ queryKey: ['admin-trailer-movies'] });
       queryClient.invalidateQueries({ queryKey: ['search-movies'] });
       
       toast.success("Änderungen gespeichert");
-      
       setSelectedMovie(null);
     } catch (error) {
       console.error('Error saving movie:', error);
@@ -261,55 +233,27 @@ const AdminPanel = () => {
   const handleSaveTvShow = async () => {
     if (!selectedTvShow) return;
 
-    console.log("Saving TV show with these settings:", {
-      id: selectedTvShow.id,
-      name: selectedTvShow.name,
-      hasStream,
-      hasTrailer,
-      streamUrl: hasStream ? streamUrl : '',
-      trailerUrl: hasTrailer ? trailerUrl : ''
-    });
-
     try {
-      // Check if show already exists in Supabase
-      const { data: existingShow, error: checkError } = await supabase
-        .from('admin_shows')
-        .select('*')
-        .eq('id', selectedTvShow.id)
-        .maybeSingle();
-        
-      if (checkError) {
-        console.error('Error checking if show exists:', checkError);
-        toast.error("Fehler beim Überprüfen der Serie");
-        return;
-      }
-      
       const updatedShow = {
-        ...selectedTvShow,
-        hasStream,
-        streamUrl: hasStream ? streamUrl : '',
-        hasTrailer,
-        trailerUrl: hasTrailer ? trailerUrl : ''
+        id: selectedTvShow.id,
+        name: selectedTvShow.name || selectedTvShow.title,
+        poster_path: selectedTvShow.poster_path,
+        backdrop_path: selectedTvShow.backdrop_path,
+        overview: selectedTvShow.overview,
+        first_air_date: selectedTvShow.first_air_date || selectedTvShow.release_date,
+        vote_average: selectedTvShow.vote_average,
+        vote_count: selectedTvShow.vote_count,
+        popularity: selectedTvShow.popularity,
+        media_type: selectedTvShow.media_type,
+        hasstream: hasStream,
+        streamurl: hasStream ? streamUrl : '',
+        hastrailer: hasTrailer,
+        trailerurl: hasTrailer ? trailerUrl : ''
       };
-      
-      let saveError;
-      
-      if (existingShow) {
-        // Update existing show
-        const { error } = await supabase
-          .from('admin_shows')
-          .update(updatedShow)
-          .eq('id', selectedTvShow.id);
-          
-        saveError = error;
-      } else {
-        // Insert new show
-        const { error } = await supabase
-          .from('admin_shows')
-          .insert(updatedShow);
-          
-        saveError = error;
-      }
+
+      const { error: saveError } = await supabase
+        .from('admin_shows')
+        .upsert(updatedShow);
       
       if (saveError) {
         console.error('Error saving show to Supabase:', saveError);
@@ -317,14 +261,10 @@ const AdminPanel = () => {
         return;
       }
       
-      console.log("TV show saved to Supabase successfully");
-      
-      // Force a refresh of the data
       queryClient.invalidateQueries({ queryKey: ['admin-tv-shows'] });
       queryClient.invalidateQueries({ queryKey: ['search-tv-shows'] });
       
       toast.success("Änderungen gespeichert");
-      
       setSelectedTvShow(null);
     } catch (error) {
       console.error('Error saving TV show:', error);
@@ -359,107 +299,47 @@ const AdminPanel = () => {
         </TabsList>
         
         <TabsContent value="content">
-          <div className="bg-card rounded-lg shadow-sm overflow-hidden">
-            <AdminContentTabs 
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
-              currentView={currentView}
-              handleViewChange={handleViewChange}
-            />
-
-            <div className="p-4">
-              <AdminSearch
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                onSearch={handleSearch}
-                isLoading={isSearchLoading || isSearchTvLoading}
-                activeTab={activeTab}
-              />
-
-              {activeTab === 'movies' && selectedMovie && (
-                <MovieEditForm
-                  selectedMovie={selectedMovie}
-                  isNewTrailer={isNewTrailer}
-                  isFreeMovie={isFreeMovie}
-                  streamUrl={streamUrl}
-                  streamType={streamType}
-                  trailerUrl={trailerUrl}
-                  onTrailerChange={(checked) => {
-                    setIsNewTrailer(checked);
-                    setHasTrailer(checked);
-                  }}
-                  onFreeMovieChange={(checked) => {
-                    setIsFreeMovie(checked);
-                    setHasStream(checked);
-                  }}
-                  setStreamType={setStreamType}
-                  setStreamUrl={setStreamUrl}
-                  setTrailerUrl={setTrailerUrl}
-                  onSave={handleSaveMovie}
-                  onCancel={() => setSelectedMovie(null)}
-                />
-              )}
-
-              {activeTab === 'shows' && selectedTvShow && (
-                <TvShowEditForm
-                  selectedTvShow={selectedTvShow}
-                  hasStream={hasStream}
-                  hasTrailer={hasTrailer}
-                  streamUrl={streamUrl}
-                  streamType={streamType}
-                  trailerUrl={trailerUrl}
-                  setHasStream={setHasStream}
-                  setHasTrailer={setHasTrailer}
-                  setStreamType={setStreamType}
-                  setStreamUrl={setStreamUrl}
-                  setTrailerUrl={setTrailerUrl}
-                  onSave={handleSaveTvShow}
-                  onCancel={() => setSelectedTvShow(null)}
-                />
-              )}
-
-              {activeTab === 'movies' && !selectedMovie && (
-                <div className="mt-6">
-                  <h3 className="text-lg font-medium mb-4">
-                    {isSearching 
-                      ? `Suchergebnisse für "${searchQuery}"`
-                      : currentView === 'free' 
-                        ? 'Kostenlose Filme'
-                        : currentView === 'trailers'
-                          ? 'Neue Trailer'
-                          : 'Beliebte Filme'
-                    }
-                  </h3>
-                  
-                  <MovieGrid
-                    movies={filteredMovies}
-                    onEditMovie={handleEditMovie}
-                    isLoading={isSearchLoading || isLoadingMovies || isLoadingFreeMovies || isLoadingTrailerMovies}
-                    searchQuery={searchQuery}
-                    currentView={currentView}
-                  />
-                </div>
-              )}
-
-              {activeTab === 'shows' && !selectedTvShow && (
-                <div className="mt-6">
-                  <h3 className="text-lg font-medium mb-4">
-                    {isSearching 
-                      ? `Suchergebnisse für "${searchQuery}"`
-                      : 'Beliebte Serien'
-                    }
-                  </h3>
-                  
-                  <ShowGrid
-                    shows={filteredTvShows}
-                    onEditShow={handleEditTvShow}
-                    isLoading={isSearchTvLoading || isLoadingTvShows}
-                    searchQuery={searchQuery}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
+          <ContentManager
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            currentView={currentView}
+            handleViewChange={handleViewChange}
+            filteredMovies={filteredMovies}
+            filteredTvShows={filteredTvShows}
+            isSearchLoading={isSearchLoading}
+            isSearchTvLoading={isSearchTvLoading}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            onSearch={handleSearch}
+            handleEditMovie={handleEditMovie}
+            handleEditTvShow={handleEditTvShow}
+            selectedMovie={selectedMovie}
+            selectedTvShow={selectedTvShow}
+            onMovieSave={handleSaveMovie}
+            onTvShowSave={handleSaveTvShow}
+            onMovieCancel={() => setSelectedMovie(null)}
+            onTvShowCancel={() => setSelectedTvShow(null)}
+            isNewTrailer={isNewTrailer}
+            isFreeMovie={isFreeMovie}
+            streamUrl={streamUrl}
+            streamType={streamType}
+            trailerUrl={trailerUrl}
+            hasStream={hasStream}
+            hasTrailer={hasTrailer}
+            onTrailerChange={(checked) => {
+              setIsNewTrailer(checked);
+              setHasTrailer(checked);
+            }}
+            onFreeMovieChange={(checked) => {
+              setIsFreeMovie(checked);
+              setHasStream(checked);
+            }}
+            setStreamType={setStreamType}
+            setStreamUrl={setStreamUrl}
+            setTrailerUrl={setTrailerUrl}
+            setHasStream={setHasStream}
+            setHasTrailer={setHasTrailer}
+          />
         </TabsContent>
         
         <TabsContent value="custom-lists">
@@ -475,33 +355,11 @@ const AdminPanel = () => {
         </TabsContent>
         
         <TabsContent value="settings">
-          <div className="space-y-6">
-            <div className="flex items-center gap-2 mb-4">
-              <FileEdit className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">Einstellungen</h2>
-            </div>
-            
-            <div className="border border-border rounded-md p-6">
-              <h3 className="text-lg font-medium mb-4">Amazon Affiliate</h3>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="amazonAffiliateId">Amazon Affiliate ID</Label>
-                  <Input 
-                    id="amazonAffiliateId" 
-                    placeholder="dein-20" 
-                    className="max-w-md mt-1"
-                    value={amazonAffiliateId}
-                    onChange={(e) => setAmazonAffiliateId(e.target.value)}
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Deine Amazon Affiliate ID, die für Amazon-Links verwendet wird.
-                  </p>
-                </div>
-
-                <Button onClick={saveSettings}>Einstellungen speichern</Button>
-              </div>
-            </div>
-          </div>
+          <AdminSettings 
+            amazonAffiliateId={amazonAffiliateId}
+            setAmazonAffiliateId={setAmazonAffiliateId}
+            saveSettings={saveSettings}
+          />
         </TabsContent>
       </Tabs>
     </div>

@@ -2,6 +2,26 @@
 import { CustomList, MovieOrShow } from './types';
 import { supabase } from '@/integrations/supabase/client';
 
+interface SupabaseCustomList {
+  id: string;
+  title: string;
+  description: string;
+  movies: MovieOrShow[];
+  created_at: string;
+  updated_at: string;
+  createdat: string;
+  updatedat: string;
+}
+
+const mapSupabaseListToCustomList = (list: SupabaseCustomList): CustomList => ({
+  id: list.id,
+  title: list.title,
+  description: list.description,
+  movies: Array.isArray(list.movies) ? list.movies : [],
+  createdAt: list.created_at || list.createdat,
+  updatedAt: list.updated_at || list.updatedat
+});
+
 export const getCustomLists = async (): Promise<CustomList[]> => {
   try {
     const { data, error } = await supabase
@@ -14,20 +34,20 @@ export const getCustomLists = async (): Promise<CustomList[]> => {
       return [];
     }
     
-    return data || [];
+    return (data || []).map(mapSupabaseListToCustomList);
   } catch (error) {
     console.error('Error getting custom lists:', error);
     return [];
   }
 };
 
-export const createCustomList = async (title: string, description: string): Promise<CustomList | null> => {
+export const createCustomList = async (title: string, description: string): Promise<CustomList> => {
   const newList = {
     title,
     description,
     movies: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   };
   
   const { data, error } = await supabase
@@ -38,29 +58,31 @@ export const createCustomList = async (title: string, description: string): Prom
   
   if (error) {
     console.error('Error creating custom list in Supabase:', error);
-    return null;
+    throw error;
   }
   
-  return data;
+  return mapSupabaseListToCustomList(data);
 };
 
-export const updateCustomList = async (list: CustomList): Promise<CustomList | null> => {
+export const updateCustomList = async (list: CustomList): Promise<CustomList> => {
+  const supabaseList = {
+    ...list,
+    updated_at: new Date().toISOString()
+  };
+  
   const { data, error } = await supabase
     .from('custom_lists')
-    .update({
-      ...list,
-      updatedAt: new Date().toISOString()
-    })
+    .update(supabaseList)
     .eq('id', list.id)
     .select()
-    .maybeSingle();
+    .single();
   
   if (error) {
     console.error('Error updating custom list in Supabase:', error);
-    return null;
+    throw error;
   }
   
-  return data;
+  return mapSupabaseListToCustomList(data);
 };
 
 export const deleteCustomList = async (listId: string): Promise<boolean> => {
@@ -77,72 +99,74 @@ export const deleteCustomList = async (listId: string): Promise<boolean> => {
   return true;
 };
 
-export const addMovieToList = async (listId: string, media: MovieOrShow): Promise<CustomList | null> => {
+export const addMovieToList = async (listId: string, media: MovieOrShow): Promise<CustomList> => {
   const { data: currentList, error: fetchError } = await supabase
     .from('custom_lists')
     .select('*')
     .eq('id', listId)
-    .maybeSingle();
+    .single();
   
   if (fetchError || !currentList) {
     console.error('Error fetching list to add movie:', fetchError);
-    return null;
+    throw fetchError;
   }
   
-  const movieExists = currentList.movies.some((m: MovieOrShow) => m.id === media.id);
+  const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
+  const movieExists = currentMovies.some((m: MovieOrShow) => m.id === media.id);
   
   if (!movieExists) {
-    const updatedMovies = [...currentList.movies, media];
+    const updatedMovies = [...currentMovies, media];
     
     const { data, error } = await supabase
       .from('custom_lists')
       .update({ 
         movies: updatedMovies,
-        updatedAt: new Date().toISOString()
+        updated_at: new Date().toISOString()
       })
       .eq('id', listId)
       .select()
-      .maybeSingle();
+      .single();
     
     if (error) {
       console.error('Error adding movie to list in Supabase:', error);
-      return null;
+      throw error;
     }
     
-    return data;
+    return mapSupabaseListToCustomList(data);
   }
   
-  return currentList;
+  return mapSupabaseListToCustomList(currentList);
 };
 
-export const removeMovieFromList = async (listId: string, mediaId: number): Promise<CustomList | null> => {
+export const removeMovieFromList = async (listId: string, mediaId: number): Promise<CustomList> => {
   const { data: currentList, error: fetchError } = await supabase
     .from('custom_lists')
     .select('*')
     .eq('id', listId)
-    .maybeSingle();
+    .single();
   
   if (fetchError || !currentList) {
     console.error('Error fetching list to remove movie:', fetchError);
-    return null;
+    throw fetchError;
   }
   
-  const updatedMovies = currentList.movies.filter((media: MovieOrShow) => media.id !== mediaId);
+  const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
+  const updatedMovies = currentMovies.filter((media: MovieOrShow) => media.id !== mediaId);
   
   const { data, error } = await supabase
     .from('custom_lists')
     .update({ 
       movies: updatedMovies,
-      updatedAt: new Date().toISOString()
+      updated_at: new Date().toISOString()
     })
     .eq('id', listId)
     .select()
-    .maybeSingle();
+    .single();
   
   if (error) {
     console.error('Error removing movie from list in Supabase:', error);
-    return null;
+    throw error;
   }
   
-  return data;
+  return mapSupabaseListToCustomList(data);
 };
