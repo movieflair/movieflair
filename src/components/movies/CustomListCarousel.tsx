@@ -1,9 +1,8 @@
 
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, ListPlus } from 'lucide-react';
+import { ListPlus } from 'lucide-react';
 import { CustomList } from '@/lib/api';
 import MovieCard from './MovieCard';
-import { Button } from "@/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -11,7 +10,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { useRef } from 'react';
 
 interface CustomListCarouselProps {
   list: CustomList;
@@ -19,83 +17,49 @@ interface CustomListCarouselProps {
 
 const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
   if (!list.movies.length) return null;
-  
-  // Create a ref for the carousel
-  const carouselRef = useRef<HTMLDivElement>(null);
-
-  // Handle manual navigation
-  const handlePrevious = () => {
-    const prevButton = carouselRef.current?.querySelector('[data-carousel-prev]') as HTMLButtonElement;
-    if (prevButton) prevButton.click();
-  };
-
-  const handleNext = () => {
-    const nextButton = carouselRef.current?.querySelector('[data-carousel-next]') as HTMLButtonElement;
-    if (nextButton) nextButton.click();
-  };
 
   return (
-    <div className="w-full max-w-[800px] mx-auto mb-8">
-      <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100">
-        <div className="flex flex-row gap-4">
-          {/* Text section */}
-          <div className="w-[350px] space-y-4">
-            <div className="space-y-1">
+    <div className="w-full mb-8">
+      <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-sm border border-gray-100/50">
+        <div className="flex flex-col gap-6">
+          {/* Header section */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-1.5">
               <Link 
                 to="/discover" 
-                className="flex items-center gap-2 text-lg font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
+                className="group flex items-center gap-2 text-lg font-semibold text-gray-900 hover:text-theme-accent-blue transition-colors"
               >
-                <ListPlus className="w-4 h-4" />
+                <ListPlus className="w-5 h-5 text-theme-accent-blue group-hover:scale-110 transition-transform" />
                 {list.title}
               </Link>
-              <p className="text-sm text-gray-600 line-clamp-2">
+              <p className="text-sm text-gray-600 max-w-[500px]">
                 {list.description}
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-7 w-7 rounded-full bg-white/90 backdrop-blur p-0 hover:bg-white/95"
-                onClick={handlePrevious}
-              >
-                <span className="sr-only">Previous</span>
-                <ChevronLeft className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="h-7 w-7 rounded-full bg-white/90 backdrop-blur p-0 hover:bg-white/95"
-                onClick={handleNext}
-              >
-                <span className="sr-only">Next</span>
-                <ChevronRight className="h-3 w-3" />
-              </Button>
-            </div>
           </div>
 
-          {/* Movie covers section */}
-          <div className="flex-1 pl-16 pr-16">
+          {/* Movie carousel section */}
+          <div className="w-full">
             <Carousel
-              ref={carouselRef}
-              id={`carousel-${list.id}`}
-              className="w-full"
               opts={{
-                align: "end",
+                align: "start",
                 loop: true,
               }}
+              className="w-full"
             >
-              <CarouselContent className="-ml-2 md:-ml-4">
+              <CarouselContent className="-ml-4">
                 {list.movies.map((movie) => (
-                  <CarouselItem key={movie.id} className="pl-1 md:pl-1 basis-1/3">
-                    <div className="w-full transition-transform duration-300 hover:scale-105 cursor-pointer">
+                  <CarouselItem key={movie.id} className="pl-4 basis-1/5">
+                    <div className="transition-all duration-300 hover:scale-105">
                       <MovieCard movie={movie} size="small" hideDetails />
                     </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious className="hidden" data-carousel-prev />
-              <CarouselNext className="hidden" data-carousel-next />
+              <div className="flex justify-end gap-2 mt-4">
+                <CarouselPrevious className="relative static translate-y-0 h-8 w-8 rounded-full bg-white/90 backdrop-blur hover:bg-white/95" />
+                <CarouselNext className="relative static translate-y-0 h-8 w-8 rounded-full bg-white/90 backdrop-blur hover:bg-white/95" />
+              </div>
             </Carousel>
           </div>
         </div>
