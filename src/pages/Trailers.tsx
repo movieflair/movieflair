@@ -89,9 +89,9 @@ const Trailers = () => {
             <p className="text-muted-foreground">Keine neuen Trailer gefunden.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {trailerItems.map((item) => (
-              <MovieCard key={item.id} movie={item} size="medium" />
+              <MovieCard key={item.id} movie={item} />
             ))}
           </div>
         )}

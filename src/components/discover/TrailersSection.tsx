@@ -37,7 +37,7 @@ const TrailersSection = ({ movies }: TrailersSectionProps) => {
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.2 }}
           >
-            <MovieCard movie={movie} size="medium" />
+            <MovieCard movie={movie} size="small" />
           </motion.div>
         ))}
       </div>

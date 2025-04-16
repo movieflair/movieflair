@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -40,11 +39,6 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
   const handleNextClick = () => {
     const nextButton = document.querySelector('.embla__next') as HTMLElement;
     if (nextButton) nextButton.click();
-  };
-
-  const handleCardClick = () => {
-    // Scroll to top when clicking a movie card
-    window.scrollTo(0, 0);
   };
 
   return (
@@ -92,14 +86,12 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
                 dragFree: true,
                 skipSnaps: true,
               }}
-              className="w-[550px]"
+              className="w-[450px]"
             >
               <CarouselContent className="-ml-4">
                 {filteredMovies.map((movie) => (
                   <CarouselItem key={movie.id} className="pl-4 basis-1/2">
-                    <div onClick={handleCardClick}>
-                      <MovieCard movie={movie} size="medium" />
-                    </div>
+                    <MovieCard movie={movie} size="small" />
                   </CarouselItem>
                 ))}
               </CarouselContent>
