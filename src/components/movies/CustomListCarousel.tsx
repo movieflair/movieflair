@@ -26,7 +26,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
   };
 
   return (
-    <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow p-4 md:p-6">
+    <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100">
       <div className="flex flex-col gap-4">
         <div className="space-y-1">
           <Link 
