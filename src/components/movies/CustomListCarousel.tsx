@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ListPlus } from 'lucide-react';
 import { CustomList } from '@/lib/api';
@@ -75,7 +74,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
           </div>
 
           {/* Movie covers section - 2/3 width */}
-          <div className="w-2/3 pl-4 pr-4">
+          <div className="w-2/3 pl-8 pr-8">
             <Carousel
               ref={carouselRef}
               id={`carousel-${list.id}`}
@@ -105,4 +104,3 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
 };
 
 export default CustomListCarousel;
-
