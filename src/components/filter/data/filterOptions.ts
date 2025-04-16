@@ -30,12 +30,12 @@ export const moods = [
 ];
 
 export const decades = [
-  '1970', // 1970-1979
-  '1980', // 1980-1989
-  '1990', // 1990-1999
-  '2000', // 2000-2009
-  '2010', // 2010-2019
-  '2020'  // 2020-2029
+  '2020',  // 2020-2029
+  '2010',  // 2010-2019
+  '2000',  // 2000-2009
+  '1990',  // 1990-1999
+  '1980',  // 1980-1989
+  '1970'   // 1970-1979
 ];
 
 // Diese Übersetzungstabelle für die Jahrzehnte wird für die benutzerfreundliche Anzeige verwendet
