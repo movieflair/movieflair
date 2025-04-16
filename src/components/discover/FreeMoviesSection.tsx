@@ -2,26 +2,26 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { TrendingUp, ArrowRight } from 'lucide-react';
+import { Download, ArrowRight } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 
-interface TrendingMoviesProps {
+interface FreeMoviesSectionProps {
   movies: MovieOrShow[];
 }
 
-const TrendingMovies = ({ movies }: TrendingMoviesProps) => {
-  if (movies.length === 0) return null;
-  
+const FreeMoviesSection = ({ movies }: FreeMoviesSectionProps) => {
+  if (!movies || movies.length === 0) return null;
+
   return (
-    <section>
+    <section className="rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50 p-6 h-full">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <TrendingUp className="w-6 h-6 text-red-500" />
-          <h2 className="text-2xl font-bold text-slate-900">Trending Filme</h2>
+          <Download className="w-5 h-5 text-emerald-600" />
+          <h2 className="text-xl font-bold text-slate-900">Kostenlose Filme</h2>
         </div>
         <Link 
-          to="/popular" 
+          to="/kostenlos" 
           className="text-sm font-medium flex items-center text-slate-600 hover:text-slate-900 transition-colors"
         >
           Alle anzeigen
@@ -29,15 +29,14 @@ const TrendingMovies = ({ movies }: TrendingMoviesProps) => {
         </Link>
       </div>
       
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-2 gap-3">
         {movies.map((movie, index) => (
           <motion.div 
             key={movie.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.5 }}
+            whileHover={{ scale: 1.03 }}
+            transition={{ duration: 0.2 }}
           >
-            <MovieCard movie={movie} />
+            <MovieCard movie={movie} size="small" />
           </motion.div>
         ))}
       </div>
@@ -45,4 +44,4 @@ const TrendingMovies = ({ movies }: TrendingMoviesProps) => {
   );
 };
 
-export default TrendingMovies;
+export default FreeMoviesSection;

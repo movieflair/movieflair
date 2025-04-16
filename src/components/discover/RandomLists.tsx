@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { Shuffle } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ListPlus, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { CustomList } from '@/lib/types';
 import DiscoverListCarousel from './DiscoverListCarousel';
 import { getRandomCustomLists } from '@/lib/api';
@@ -37,12 +39,21 @@ const RandomLists = () => {
   if (isLoading) {
     return (
       <section className="mb-12">
-        <div className="flex items-center gap-2 mb-6">
-          <Shuffle className="w-6 h-6 text-theme-accent-red" />
-          <h2 className="text-2xl font-semibold">Filmlisten</h2>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <ListPlus className="w-6 h-6 text-red-500" />
+            <h2 className="text-2xl font-bold text-slate-900">Filmlisten</h2>
+          </div>
+          <Link 
+            to="/listen" 
+            className="text-sm font-medium flex items-center text-slate-600 hover:text-slate-900 transition-colors"
+          >
+            Alle anzeigen
+            <ArrowRight className="ml-1 w-4 h-4" />
+          </Link>
         </div>
         <div className="animate-pulse space-y-4">
-          <div className="h-40 bg-muted rounded-lg"></div>
+          <div className="h-40 bg-slate-200 rounded-lg"></div>
         </div>
       </section>
     );
@@ -54,14 +65,30 @@ const RandomLists = () => {
 
   return (
     <section className="mb-12">
-      <div className="flex items-center gap-2 mb-6">
-        <Shuffle className="w-6 h-6 text-theme-accent-red" />
-        <h2 className="text-2xl font-semibold">Filmlisten</h2>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-2">
+          <ListPlus className="w-6 h-6 text-red-500" />
+          <h2 className="text-2xl font-bold text-slate-900">Filmlisten</h2>
+        </div>
+        <Link 
+          to="/listen" 
+          className="text-sm font-medium flex items-center text-slate-600 hover:text-slate-900 transition-colors"
+        >
+          Alle anzeigen
+          <ArrowRight className="ml-1 w-4 h-4" />
+        </Link>
       </div>
       
-      <div>
-        {listsWithContent.map(list => (
-          <DiscoverListCarousel key={list.id} list={list} />
+      <div className="space-y-8">
+        {listsWithContent.map((list, index) => (
+          <motion.div 
+            key={list.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.2, duration: 0.5 }}
+          >
+            <DiscoverListCarousel key={list.id} list={list} />
+          </motion.div>
         ))}
       </div>
     </section>
