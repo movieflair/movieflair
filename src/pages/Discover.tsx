@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
+import { useQuery } from '@tanstack/react-query';
 import MainLayout from '@/components/layout/MainLayout';
 import { 
   Genre, 
@@ -35,25 +37,34 @@ const item = {
 
 const Discover = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [popularMovies, setPopularMovies] = useState<MovieOrShow[]>([]);
   const [freeMovies, setFreeMovies] = useState<MovieOrShow[]>([]);
   const [trailerMovies, setTrailerMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Trending Movies Query mit automatischer Aktualisierung
+  const { data: popularMovies = [] } = useQuery({
+    queryKey: ['popularMovies'],
+    queryFn: async () => {
+      console.log('Fetching trending movies...');
+      const movies = await getPopularMovies();
+      return movies.slice(0, 8);
+    },
+    refetchInterval: 5 * 60 * 1000, // Aktualisiert alle 5 Minuten
+    staleTime: 4 * 60 * 1000, // Daten werden nach 4 Minuten als veraltet markiert
+  });
 
   useEffect(() => {
     const fetchInitialData = async () => {
       setIsLoading(true);
       try {
         console.log('Discover: Fetching initial data...');
-        const [genresList, movies, freeMoviesList, trailersList] = await Promise.all([
+        const [genresList, freeMoviesList, trailersList] = await Promise.all([
           getGenres(),
-          getPopularMovies(),
           getFreeMovies(),
           getTrailerMovies(),
         ]);
         
         setGenres(genresList);
-        setPopularMovies(movies.slice(0, 8));
         setFreeMovies(freeMoviesList.slice(0, 4));
         setTrailerMovies(trailersList.slice(0, 4));
         
