@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { MovieDetail } from '@/lib/types';
 import { getTvShowDetails, getCast } from '@/lib/tvShowApi';
 import SEOHead from '@/components/seo/SEOHead';
-import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
+import { formatMediaTitle, formatMediaDescription, getAbsoluteImageUrl } from '@/utils/seoHelpers';
 import MovieMeta from '@/components/movies/MovieMeta';
 import MovieHeader from '@/components/movies/MovieHeader';
 import MovieStreamButtons from '@/components/movies/MovieStreamButtons';
@@ -69,12 +68,11 @@ const TvShowDetails = () => {
 
   const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear().toString() : '';
   
-  // New SEO title and description formatting
   const seoTitle = formatMediaTitle(show.name || '', firstAirYear);
   const seoDescription = formatMediaDescription(show.name || '', firstAirYear, show.overview);
   const seoOgImage = show.backdrop_path 
-    ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` 
-    : '/movieflair-logo.png';
+    ? getAbsoluteImageUrl(`https://image.tmdb.org/t/p/original${show.backdrop_path}`)
+    : getAbsoluteImageUrl('/movieflair-logo.png');
   const canonical = `${window.location.origin}/serie/${show.id}${show.name ? `/${encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
 
   console.log('TV Show SEO data:', { 

@@ -33,7 +33,13 @@ const SEOHead = ({
       ? `${typeof window !== 'undefined' ? window.location.origin : ''}${ogImage}` 
       : ogImage;
   
-  console.log('SEOHead rendering with:', { title, description, ogImage: absoluteOgImage, currentUrl });
+  console.log('SEOHead rendering with:', { 
+    title, 
+    description, 
+    ogImage: absoluteOgImage, 
+    currentUrl,
+    ogType 
+  });
   
   return (
     <Helmet>

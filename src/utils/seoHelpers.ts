@@ -33,7 +33,8 @@ export const formatMediaTitle = (title: string, year?: string): string => {
 
 /**
  * Format media description
- * Limit to 140 characters
+ * Format: "Jetzt [Title] (Year) Online Stream anschauen - [Description]"
+ * Limited to 140 characters
  */
 export const formatMediaDescription = (title: string, year: string, description: string, maxLength: number = 140): string => {
   if (!title) return DEFAULT_SEO.description;
@@ -54,7 +55,8 @@ export const formatListTitle = (title: string): string => {
 
 /**
  * Format list description
- * Limit to 140 characters
+ * Format: "[List Title] Online anschauen - [List Description]"
+ * Limited to 140 characters
  */
 export const formatListDescription = (title: string, description: string, maxLength: number = 140): string => {
   if (!title) return DEFAULT_SEO.description;
@@ -70,7 +72,11 @@ export const getAbsoluteImageUrl = (imagePath: string): string => {
   
   if (imagePath.startsWith('http')) return imagePath;
   
-  if (typeof window === 'undefined') return imagePath;
+  // When running server-side (like in SSR), window is not available
+  if (typeof window === 'undefined') {
+    // Providing a fallback that will be replaced on client-side
+    return `https://movieflair.lovable.app${imagePath.startsWith('/') ? imagePath : `/${imagePath}`}`;
+  }
   
   return imagePath.startsWith('/') 
     ? `${window.location.origin}${imagePath}`
