@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Search } from 'lucide-react';
+import { List, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
@@ -35,6 +35,18 @@ const HeroSection = () => {
               Finde deine nächsten Lieblingsfilme und entdecke kostenlose Angebote
             </p>
           </div>
+          
+          <Button 
+            asChild
+            variant="secondary"
+            size="sm"
+            className="flex items-center gap-1"
+          >
+            <Link to="/filmlisten">
+              <List className="w-4 h-4" />
+              Alle Listen
+            </Link>
+          </Button>
         </div>
         
         <motion.div
