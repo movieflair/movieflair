@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { getVisitorStats, VisitorStat } from '@/lib/api';
+import { getVisitorStats, VisitorStat } from '@/lib/analyticsApi';
 import { BarChart2, CalendarIcon, EyeIcon, PieChart, TrendingUp, Clock, Users, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { 
@@ -52,15 +51,12 @@ const AdminVisitorStats = () => {
   const [averageSessionDuration, setAverageSessionDuration] = useState(0);
 
   useEffect(() => {
-    // Besucherstatistiken laden
     const visitorStats = getVisitorStats();
     setStats(visitorStats);
     
-    // Berechne Gesamtzahlen
     const total = visitorStats.reduce((sum, stat) => sum + stat.count, 0);
     setTotalVisits(total);
     
-    // Berechne Seitenzahlen
     const pages: PageTotals = {};
     visitorStats.forEach(stat => {
       if (!pages[stat.page]) {
@@ -70,7 +66,6 @@ const AdminVisitorStats = () => {
     });
     setPageVisits(pages);
     
-    // Gruppiere nach Datum für Tagesstatistiken
     const byDate: { [key: string]: DailyVisits } = {};
     
     visitorStats.forEach(stat => {
@@ -90,14 +85,12 @@ const AdminVisitorStats = () => {
       byDate[stat.date].pages[stat.page] += stat.count;
     });
     
-    // Sortiere nach Datum
     const sortedDaily = Object.values(byDate).sort((a, b) => 
       new Date(a.date).getTime() - new Date(b.date).getTime()
     );
     
     setDailyData(sortedDaily);
     
-    // Berechne Trend im Vergleich zum vorherigen Zeitraum
     if (sortedDaily.length > 0) {
       const currentPeriodVisits = sortedDaily.slice(-7).reduce((sum, day) => sum + day.count, 0);
       const previousPeriodVisits = sortedDaily.slice(-14, -7).reduce((sum, day) => sum + day.count, 0);
@@ -108,10 +101,9 @@ const AdminVisitorStats = () => {
       }
     }
     
-    // Simuliere stündliche Verteilung (in einer realen App würde dies aus den tatsächlichen Daten kommen)
     const hours = Array.from({ length: 24 }, (_, i) => {
       const hour = i < 10 ? `0${i}:00` : `${i}:00`;
-      const count = Math.floor(Math.random() * 100) + 1; // Simulierte Daten
+      const count = Math.floor(Math.random() * 100) + 1;
       return { hour, count, percentage: 0 };
     });
     
@@ -122,19 +114,15 @@ const AdminVisitorStats = () => {
     
     setHourlyDistribution(hours);
     
-    // Simuliere Geräteverteilung
     setDeviceDistribution([
       { name: 'Desktop', value: 65 },
       { name: 'Mobile', value: 30 },
       { name: 'Tablet', value: 5 }
     ]);
     
-    // Simuliere durchschnittliche Sitzungsdauer (in Sekunden)
-    setAverageSessionDuration(183); // 3 Minuten und 3 Sekunden
-    
+    setAverageSessionDuration(183);
   }, []);
 
-  // Filtere nach Zeitraum
   const getFilteredData = () => {
     if (timeRange === 'all') return dailyData;
     
@@ -149,13 +137,12 @@ const AdminVisitorStats = () => {
     });
   };
 
-  // Berechne die beliebtesten Seiten
   const getTopPages = () => {
     const pages = Object.entries(pageVisits)
       .map(([name, count]) => ({ name: formatPageName(name), value: count }))
       .sort((a, b) => b.value - a.value);
     
-    return pages.slice(0, 5); // Top 5 Seiten
+    return pages.slice(0, 5);
   };
 
   const formatPageName = (page: string) => {
