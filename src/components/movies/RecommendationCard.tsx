@@ -15,10 +15,15 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
   const mediaType = getMediaTypeInGerman(movie.media_type);
   const slug = createUrlSlug(title);
   
+  const handleClick = () => {
+    // Scroll to top when clicking a recommendation card
+    window.scrollTo(0, 0);
+  };
+  
   return (
     <div className="glass-card overflow-hidden rounded-xl">
       <div className="md:flex h-full">
-        <div className="w-full md:w-[300px] h-[450px] flex-shrink-0">
+        <div className="w-full md:w-[350px] h-[500px] flex-shrink-0">
           {movie.poster_path ? (
             <img
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -72,6 +77,7 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
             <Link
               to={`/${mediaType}/${movie.id}/${slug}`}
               className="button-primary inline-flex items-center"
+              onClick={handleClick}
             >
               Details ansehen
               <ArrowRight className="ml-2 w-4 h-4" />
