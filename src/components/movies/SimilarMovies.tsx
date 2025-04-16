@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
@@ -11,6 +12,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
+import { scrollToTop } from '@/utils/scrollUtils';
 
 interface SimilarMoviesProps {
   movies: MovieOrShow[];
@@ -90,7 +92,9 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
               <CarouselContent className="-ml-4">
                 {filteredMovies.map((movie) => (
                   <CarouselItem key={movie.id} className="pl-4 basis-1/2">
-                    <MovieCard movie={movie} size="large" />
+                    <div onClick={scrollToTop}>
+                      <MovieCard movie={movie} size="large" />
+                    </div>
                   </CarouselItem>
                 ))}
               </CarouselContent>

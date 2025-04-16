@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ListPlus, ArrowUpRight } from 'lucide-react';
 import { CustomList } from '@/lib/api';
@@ -12,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from '@/hooks/use-mobile';
 import { createUrlSlug } from '@/lib/urlUtils';
+import { scrollToTop } from '@/utils/scrollUtils';
 
 interface CustomListCarouselProps {
   list: CustomList;
@@ -32,6 +34,10 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
     if (nextButton) nextButton.click();
   };
 
+  const handleListClick = () => {
+    scrollToTop();
+  };
+
   return (
     <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100 max-w-[800px] mx-auto relative">
       <div className="flex items-center justify-between mb-4">
@@ -40,6 +46,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
           <Link 
             to={`/liste/${createUrlSlug(list.title)}`}
             className="text-lg md:text-2xl font-semibold hover:text-gray-800 transition-colors"
+            onClick={handleListClick}
           >
             {list.title}
           </Link>
@@ -90,6 +97,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
       <Link 
         to={`/liste/${createUrlSlug(list.title)}`}
         className="absolute bottom-2 right-2 text-xs text-gray-400 hover:text-gray-800 transition-colors duration-300 flex items-center gap-1 opacity-50 hover:opacity-100"
+        onClick={handleListClick}
       >
         <span>Liste ansehen</span>
         <ArrowUpRight className="w-3 h-3" />

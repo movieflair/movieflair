@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
 import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
+import { scrollToTop } from '@/utils/scrollUtils';
 
 interface MovieCardProps {
   movie: MovieOrShow;
@@ -29,10 +30,15 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
     large: 'text-base'
   };
 
+  const handleClick = () => {
+    scrollToTop();
+  };
+
   return (
     <Link 
       to={`/${mediaType}/${movie.id}/${slug}`} 
       className="group block overflow-hidden rounded-xl"
+      onClick={handleClick}
     >
       <div className={`relative ${imageSizes[size]} bg-muted overflow-hidden rounded-xl`}>
         {movie.poster_path ? (
