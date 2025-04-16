@@ -1,3 +1,4 @@
+
 import { CustomList, MovieOrShow } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { Json } from '@/integrations/supabase/types';
@@ -81,16 +82,29 @@ export const getRandomCustomLists = async (count: number = 2, random: boolean = 
       .select('*');
       
     if (random) {
-      query = query.order('created_at', { ascending: false });
+      // For truly random lists, we use Postgres's random() function
+      query = query.order('created_at', { ascending: false }).limit(20);
     } else {
-      query = query.order('created_at', { ascending: false });
+      // For newest lists, we sort by creation date
+      query = query.order('created_at', { ascending: false }).limit(count);
     }
     
-    const { data, error } = await query.limit(count);
+    let { data, error } = await query;
       
     if (error) {
       console.error('Error getting custom lists from Supabase:', error);
       return [];
+    }
+    
+    // If random is true, shuffle the results and take the requested count
+    if (random && data && data.length > 0) {
+      // Fisher-Yates shuffle algorithm
+      for (let i = data.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [data[i], data[j]] = [data[j], data[i]];
+      }
+      // Take only the requested count
+      data = data.slice(0, count);
     }
     
     const lists = (data || []).map((item: SupabaseCustomList) => 
