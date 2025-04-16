@@ -21,7 +21,7 @@ const TrendingMovies = ({ movies }: TrendingMoviesProps) => {
           <h2 className="text-2xl font-bold text-slate-900">Trending Filme</h2>
         </div>
         <Link 
-          to="/popular" 
+          to="/kostenlose-filme" 
           className="text-sm font-medium flex items-center text-slate-600 hover:text-slate-900 transition-colors"
         >
           Alle anzeigen

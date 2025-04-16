@@ -17,7 +17,7 @@ const SearchSection = () => {
   return (
     <div className="text-center mb-12">
       <h1 className="text-3xl font-semibold mb-6">Entdecke neue Filme und Serien</h1>
-      <Command className="border-none shadow-lg">
+      <Command className="rounded-lg border shadow-md max-w-2xl mx-auto">
         <CommandInput 
           placeholder="Suche nach Filmen, Serien oder Kategorien..." 
           value={searchQuery}

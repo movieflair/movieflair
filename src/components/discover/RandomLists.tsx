@@ -45,7 +45,7 @@ const RandomLists = () => {
             <h2 className="text-2xl font-bold text-slate-900">Filmlisten</h2>
           </div>
           <Link 
-            to="/listen" 
+            to="/filmlisten" 
             className="text-sm font-medium flex items-center text-slate-600 hover:text-slate-900 transition-colors"
           >
             Alle anzeigen
@@ -71,7 +71,7 @@ const RandomLists = () => {
           <h2 className="text-2xl font-bold text-slate-900">Filmlisten</h2>
         </div>
         <Link 
-          to="/listen" 
+          to="/filmlisten" 
           className="text-sm font-medium flex items-center text-slate-600 hover:text-slate-900 transition-colors"
         >
           Alle anzeigen
