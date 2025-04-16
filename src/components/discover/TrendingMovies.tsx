@@ -16,7 +16,7 @@ const TrendingMovies = ({ movies }: TrendingMoviesProps) => {
   
   return (
     <section>
-      <div className="flex items-center gap-2 mb-6 justify-center">
+      <div className="flex items-center gap-2 mb-6">
         <TrendingUp className="w-6 h-6 text-theme-red" />
         <h2 className="text-2xl font-bold text-theme-black">Trending Filme</h2>
       </div>
