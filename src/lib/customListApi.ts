@@ -1,4 +1,3 @@
-
 import { CustomList, MovieOrShow } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { Json } from '@/integrations/supabase/types';
@@ -26,6 +25,7 @@ const mapSupabaseListToCustomList = (list: SupabaseCustomList): CustomList => ({
 
 export const getCustomLists = async (): Promise<CustomList[]> => {
   try {
+    console.log('Fetching custom lists from Supabase...');
     const { data, error } = await supabase
       .from('custom_lists')
       .select('*')
@@ -35,6 +35,8 @@ export const getCustomLists = async (): Promise<CustomList[]> => {
       console.error('Error getting custom lists from Supabase:', error);
       return [];
     }
+    
+    console.log('Custom lists fetched successfully:', data?.length || 0);
     
     return (data || []).map((item: SupabaseCustomList) => mapSupabaseListToCustomList({
       ...item,
@@ -48,9 +50,11 @@ export const getCustomLists = async (): Promise<CustomList[]> => {
 
 // Function to get random custom lists
 export const getRandomCustomLists = async (count: number = 2): Promise<CustomList[]> => {
+  console.log(`Fetching ${count} random custom lists...`);
   return getCustomLists().then(lists => {
     // Filter lists that have movies
     const listsWithMovies = lists.filter(list => Array.isArray(list.movies) && list.movies.length > 0);
+    console.log(`Found ${listsWithMovies.length} lists with movies`);
     
     // If we don't have enough lists, return all we have
     if (listsWithMovies.length <= count) {

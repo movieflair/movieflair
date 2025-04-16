@@ -6,7 +6,7 @@ import {
   getGenres, 
   getPopularMovies,
   MovieOrShow,
-  getCustomLists,
+  getRandomCustomLists,
   CustomList
 } from '@/lib/api';
 
@@ -18,24 +18,21 @@ import { toast } from 'sonner';
 const Discover = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [popularMovies, setPopularMovies] = useState<MovieOrShow[]>([]);
-  const [customLists, setCustomLists] = useState<CustomList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchInitialData = async () => {
       setIsLoading(true);
       try {
-        const [genresList, movies, userCustomLists] = await Promise.all([
+        console.log('Discover: Fetching initial data...');
+        const [genresList, movies] = await Promise.all([
           getGenres(),
-          getPopularMovies(),
-          getCustomLists()
+          getPopularMovies()
         ]);
         
         setGenres(genresList);
         setPopularMovies(movies.slice(0, 4));
-        setCustomLists(userCustomLists);
         
-        console.log('Geladene benutzerdefinierte Listen:', userCustomLists);
       } catch (error) {
         console.error('Error fetching initial data:', error);
         toast.error('Fehler beim Laden der Daten');

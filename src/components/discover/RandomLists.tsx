@@ -3,7 +3,8 @@ import { useState, useEffect } from 'react';
 import { Shuffle } from 'lucide-react';
 import { CustomList } from '@/lib/types';
 import CustomListCarousel from '../movies/CustomListCarousel';
-import { getCustomLists } from '@/lib/customListApi';
+import { getRandomCustomLists } from '@/lib/customListApi';
+import { toast } from 'sonner';
 
 const RandomLists = () => {
   const [customLists, setCustomLists] = useState<CustomList[]>([]);
@@ -13,10 +14,14 @@ const RandomLists = () => {
     const fetchLists = async () => {
       try {
         setIsLoading(true);
-        const lists = await getCustomLists();
+        console.log('RandomLists: Fetching custom lists...');
+        // Get 3 random lists instead of all lists
+        const lists = await getRandomCustomLists(3);
+        console.log(`RandomLists: Fetched ${lists.length} custom lists`);
         setCustomLists(lists);
       } catch (error) {
-        console.error('Error fetching custom lists:', error);
+        console.error('Error fetching random custom lists:', error);
+        toast.error('Fehler beim Laden der Listen');
       } finally {
         setIsLoading(false);
       }

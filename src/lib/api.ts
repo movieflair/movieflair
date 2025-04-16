@@ -10,5 +10,13 @@ export {
   trackPageVisit, 
   getVisitorStats 
 } from './analyticsApi';
-export * from './customListApi'; // This specifically includes getRandomCustomLists
+export { 
+  getCustomLists,
+  getRandomCustomLists,
+  createCustomList,
+  updateCustomList,
+  deleteCustomList,
+  addMovieToList,
+  removeMovieFromList
+} from './customListApi';
 export * from './apiUtils';

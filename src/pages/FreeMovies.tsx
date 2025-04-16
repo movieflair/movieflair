@@ -5,6 +5,7 @@ import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { Gift } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from 'sonner';
 
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
@@ -21,10 +22,15 @@ const FreeMovies = () => {
         console.log('FreeMovies page: Fetching free movies...');
         const data = await getFreeMovies();
         console.log('FreeMovies page: Fetched free movies:', data.length);
-        console.log('FreeMovies page: Sample free movie:', data[0]);
+        if (data.length > 0) {
+          console.log('FreeMovies page: Sample free movie:', data[0]);
+        } else {
+          console.log('FreeMovies page: No free movies found');
+        }
         setMovies(data);
       } catch (error) {
         console.error('Error fetching free movies:', error);
+        toast.error('Fehler beim Laden der kostenlosen Filme');
       } finally {
         setIsLoading(false);
       }
