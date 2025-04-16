@@ -1,4 +1,3 @@
-
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { callTMDB } from './apiUtils';
@@ -11,7 +10,7 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   let trailerItems: MovieOrShow[] = [];
   
   try {
-    // Process movies with trailers
+    // Process movies with trailers (now public access)
     if (savedMoviesJson) {
       const savedMovies = JSON.parse(savedMoviesJson);
       const trailerMovies = savedMovies
@@ -23,7 +22,7 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       console.log('No saved movies found in localStorage');
     }
     
-    // Process TV shows with trailers
+    // Process TV shows with trailers (now public access)
     if (savedShowsJson) {
       const savedShows = JSON.parse(savedShowsJson);
       const trailerShows = savedShows
@@ -35,11 +34,11 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       console.log('No saved TV shows found in localStorage');
     }
     
-    // Sort all trailer items by release date, OLDEST first
+    // Sort all trailer items by release date, NEWEST first (changed from oldest)
     trailerItems.sort((a: MovieOrShow, b: MovieOrShow) => {
       const dateA = new Date(a.release_date || a.first_air_date || '');
       const dateB = new Date(b.release_date || b.first_air_date || '');
-      return dateA.getTime() - dateB.getTime();
+      return dateB.getTime() - dateA.getTime(); // Changed to show newest first
     });
     
     console.log(`Total trailer items: ${trailerItems.length}`);
@@ -62,11 +61,11 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
       freeMovies = savedMovies
         .filter((movie: MovieOrShow) => movie.isFreeMovie === true);
       
-      // Sort by release date, OLDEST first (same as trailers page)
+      // Sort by release date, NEWEST first (changed from oldest)
       freeMovies.sort((a: MovieOrShow, b: MovieOrShow) => {
         const dateA = new Date(a.release_date || a.first_air_date || '');
         const dateB = new Date(b.release_date || b.first_air_date || '');
-        return dateA.getTime() - dateB.getTime();
+        return dateB.getTime() - dateA.getTime(); // Changed to show newest first
       });
       
       console.log(`Found ${freeMovies.length} free movies`);
@@ -240,4 +239,3 @@ export const getRandomMovie = async (): Promise<MovieDetail> => {
     return getMovieById(popularMovies[randomIndex].id);
   }
 };
-
