@@ -9,6 +9,7 @@ interface MovieStreamButtonsProps {
   streamUrl?: string;
   title: string;
   amazonAffiliateId?: string;
+  isFreeMovie?: boolean;
   onTrailerClick: () => void;
   onStreamClick: () => void;
 }
@@ -19,6 +20,7 @@ const MovieStreamButtons = ({
   streamUrl,
   title,
   amazonAffiliateId,
+  isFreeMovie,
   onTrailerClick,
   onStreamClick
 }: MovieStreamButtonsProps) => {
@@ -58,7 +60,7 @@ const MovieStreamButtons = ({
         <Play className="w-4 h-4 mr-2" />
         Prime Video
       </Button>
-      {streamUrl && (
+      {(streamUrl || isFreeMovie) && (
         <Button
           className="bg-[#ea384c] text-white hover:bg-[#ea384c]/90 flex items-center gap-2"
           onClick={handleStreamClick}

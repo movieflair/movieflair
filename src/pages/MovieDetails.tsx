@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
@@ -165,6 +164,7 @@ const MovieDetails = () => {
                   streamUrl={movie.streamUrl}
                   title={movie.title}
                   amazonAffiliateId={amazonAffiliateId}
+                  isFreeMovie={movie.isFreeMovie}
                   onTrailerClick={() => setShowTrailer(true)}
                   onStreamClick={handleStreamClick}
                 />

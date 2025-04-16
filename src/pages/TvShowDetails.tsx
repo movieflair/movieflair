@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -158,6 +157,7 @@ const TvShowDetails = () => {
                   streamUrl={show.streamUrl}
                   title={show.name || ''}
                   amazonAffiliateId={amazonAffiliateId}
+                  isFreeMovie={show.hasStream}
                   onTrailerClick={() => setShowTrailer(true)}
                   onStreamClick={handleStreamClick}
                 />
