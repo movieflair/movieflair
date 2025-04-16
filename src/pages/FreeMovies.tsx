@@ -13,7 +13,6 @@ const FreeMovies = () => {
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    // Track page visit
     trackPageVisit('free-movies');
     
     const fetchMovies = async () => {
@@ -48,10 +47,10 @@ const FreeMovies = () => {
         </div>
         
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(isMobile ? 2 : 4)].map((_, index) => (
               <div key={index} className="animate-pulse">
-                <div className="bg-muted aspect-[2/3] rounded-lg mb-2 h-[350px]"></div>
+                <div className="bg-muted aspect-[2/3] rounded-lg mb-2 h-[300px]"></div>
                 <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
                 <div className="h-3 bg-muted rounded w-1/2"></div>
               </div>
@@ -65,9 +64,9 @@ const FreeMovies = () => {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {movies.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} size="large" />
+              <MovieCard key={movie.id} movie={movie} size="medium" />
             ))}
           </div>
         )}

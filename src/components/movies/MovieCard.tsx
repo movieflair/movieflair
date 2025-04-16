@@ -18,15 +18,15 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
   const slug = createUrlSlug(title);
   
   const imageSizes = {
-    small: 'h-[250px] w-[170px]',  // Slightly larger
-    medium: 'h-[250px] w-[170px]', // Slightly larger
-    large: 'h-[350px] w-[235px]'   // Slightly larger
+    small: 'h-[250px] w-[170px]',
+    medium: 'h-[250px] w-[170px]',
+    large: 'h-[300px] w-[200px]'  // Etwas kleiner als vorher
   };
   
   const textSizes = {
     small: 'text-sm',
     medium: 'text-base',
-    large: 'text-lg'
+    large: 'text-base'  // Text-Größe etwas reduziert
   };
 
   return (

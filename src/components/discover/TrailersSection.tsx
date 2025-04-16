@@ -30,15 +30,14 @@ const TrailersSection = ({ movies }: TrailersSectionProps) => {
         </Button>
       </div>
       
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         {newestTrailers.map((movie, index) => (
           <motion.div 
             key={movie.id}
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.2 }}
-            className="flex justify-center"
           >
-            <MovieCard movie={movie} size="large" />
+            <MovieCard movie={movie} size="medium" />
           </motion.div>
         ))}
       </div>
