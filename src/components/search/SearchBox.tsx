@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search as SearchIcon } from 'lucide-react';
@@ -26,7 +25,6 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
     enabled: query.length >= 2,
   });
   
-  // Filter genres based on query
   const filteredGenres = query.length >= 2 
     ? genres.filter(genre => 
         genre.name.toLowerCase().includes(query.toLowerCase()))
@@ -56,7 +54,6 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
     }
   };
   
-  // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = () => setOpen(false);
     document.addEventListener('click', handleClickOutside);
@@ -129,7 +126,7 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                     <CommandItem 
                       key={genre.id}
                       onSelect={() => handleGenreSelect(genre.id, genre.name)}
-                      className="cursor-pointer hover:bg-gray-100"
+                      className="cursor-pointer hover:bg-gray-100 data-[selected]:bg-gray-100"
                     >
                       <span className="text-sm">{genre.name}</span>
                     </CommandItem>
@@ -146,7 +143,7 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                         navigate(`/${result.media_type === 'movie' ? 'film' : 'serie'}/${result.id}`);
                         setOpen(false);
                       }}
-                      className="cursor-pointer hover:bg-gray-100"
+                      className="cursor-pointer hover:bg-gray-100 data-[selected]:bg-gray-100"
                     >
                       <div className="flex items-center">
                         {result.poster_path && (
@@ -160,7 +157,10 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
                       </div>
                     </CommandItem>
                   ))}
-                  <CommandItem onSelect={() => handleSubmit()} className="cursor-pointer hover:bg-gray-100 text-blue-500">
+                  <CommandItem 
+                    onSelect={() => handleSubmit()} 
+                    className="cursor-pointer hover:bg-gray-100 data-[selected]:bg-gray-100 text-gray-700"
+                  >
                     Alle Ergebnisse anzeigen...
                   </CommandItem>
                 </CommandGroup>
