@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import AdminPanel from '@/components/admin/AdminPanel';
 import { trackPageVisit } from '@/lib/api';
-import { AdminSettingsProvider } from '@/hooks/useAdminSettings';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -86,9 +85,7 @@ const AdminPage = () => {
       <div className="py-12">
         {isLoggedIn ? (
           <QueryClientProvider client={queryClient}>
-            <AdminSettingsProvider>
-              <AdminPanel />
-            </AdminSettingsProvider>
+            <AdminPanel />
           </QueryClientProvider>
         ) : null}
       </div>
