@@ -47,6 +47,13 @@ const Trailers = () => {
     : DEFAULT_SEO.ogImage;
   const canonical = `${window.location.origin}/neue-trailer`;
 
+  console.log('Trailers SEO data:', { 
+    title: seoTitle,
+    description: seoDescription,
+    image: seoOgImage,
+    canonical: canonical
+  });
+
   return (
     <MainLayout>
       <SEOHead 

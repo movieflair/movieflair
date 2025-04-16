@@ -124,7 +124,10 @@ const MovieDetails = () => {
     title: movie.title, 
     isFreeMovie: movie.isFreeMovie, 
     hasStream: movie.hasStream,
-    streamUrl: movie.streamUrl 
+    streamUrl: movie.streamUrl,
+    seoTitle,
+    seoDescription,
+    canonical
   });
 
   return (

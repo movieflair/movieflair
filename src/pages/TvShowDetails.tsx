@@ -4,7 +4,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { MovieDetail } from '@/lib/types';
 import { getTvShowDetails, getCast } from '@/lib/tvShowApi';
 import SEOHead from '@/components/seo/SEOHead';
-import { generateTVShowSchema } from '@/utils/seoUtils';
+import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
 import MovieMeta from '@/components/movies/MovieMeta';
 import MovieHeader from '@/components/movies/MovieHeader';
 import MovieStreamButtons from '@/components/movies/MovieStreamButtons';
@@ -16,7 +16,6 @@ import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
 
 const TvShowDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -74,6 +73,13 @@ const TvShowDetails = () => {
     ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` 
     : '/movieflair-logo.png';
   const canonical = `${window.location.origin}/serie/${show.id}${show.name ? `/${encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
+
+  console.log('TV Show SEO data:', { 
+    title: seoTitle,
+    description: seoDescription,
+    image: seoOgImage,
+    canonical: canonical
+  });
 
   const getTrailerUrl = () => {
     if (show?.trailerUrl) {

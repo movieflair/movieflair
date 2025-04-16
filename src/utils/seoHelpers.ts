@@ -47,4 +47,3 @@ export const formatListDescription = (title: string, description: string, maxLen
   const baseDesc = `${title} Online anschauen - ${description}`;
   return truncateText(baseDesc, maxLength);
 };
-

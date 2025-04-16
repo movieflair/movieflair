@@ -24,14 +24,16 @@ const SEOHead = ({
   structuredData,
 }: SEOHeadProps) => {
   // Get the current URL for canonical link if not provided
-  const currentUrl = canonical || window.location.href;
+  const currentUrl = canonical || (typeof window !== 'undefined' ? window.location.href : '');
   
   // Ensure image URLs are absolute
   const absoluteOgImage = ogImage.startsWith('http') 
     ? ogImage 
     : ogImage.startsWith('/') && !ogImage.startsWith('//') 
-      ? `${window.location.origin}${ogImage}` 
+      ? `${typeof window !== 'undefined' ? window.location.origin : ''}${ogImage}` 
       : ogImage;
+  
+  console.log('SEOHead rendering with:', { title, description, ogImage: absoluteOgImage, currentUrl });
   
   return (
     <Helmet>
@@ -41,7 +43,7 @@ const SEOHead = ({
       <meta name="keywords" content={keywords} />
       
       {/* Canonical URL */}
-      <link rel="canonical" href={currentUrl} />
+      {canonical && <link rel="canonical" href={currentUrl} />}
       
       {/* Robots control */}
       {noindex && <meta name="robots" content="noindex, nofollow" />}
