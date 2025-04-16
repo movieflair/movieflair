@@ -22,10 +22,13 @@ export default defineConfig(({ mode }) => ({
   },
   // SSR-Konfiguration
   build: {
-    // Commonjs für den Server
+    // Client build output
     outDir: mode === 'production' ? 'dist/client' : 'dist',
-    // Separate SSR-Build-Konfiguration
+    
+    // SSR specific build configuration
     ssr: mode === 'ssr' ? './src/App.tsx' : undefined,
+    
+    // Generate SSR manifest in production
     ssrManifest: mode === 'production',
   },
 }));

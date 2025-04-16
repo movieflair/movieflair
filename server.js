@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { renderToPipeableStream } from 'react-dom/server';
 import React from 'react';
-import { HelmetProvider, HelmetServerState } from 'react-helmet-async';
+import { HelmetProvider } from 'react-helmet-async';
 import { StaticRouter } from 'react-router-dom/server';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -113,10 +113,10 @@ async function startServer() {
             // Update HTML template with helmet data
             const htmlWithHelmet = template
               .replace('<!--app-head-->', `
-                ${helmet.title.toString()}
-                ${helmet.meta.toString()}
-                ${helmet.link.toString()}
-                ${helmet.script.toString()}
+                ${helmet?.title?.toString() || ''}
+                ${helmet?.meta?.toString() || ''}
+                ${helmet?.link?.toString() || ''}
+                ${helmet?.script?.toString() || ''}
               `);
             
             res.status(200).set({ 'Content-Type': 'text/html' });
