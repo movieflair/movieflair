@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Search, Film, Tv, Check, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -107,7 +106,7 @@ const MediaSearch = ({ onAddMedia, selectedListId, existingMediaIds }: MediaSear
       </div>
 
       {searchResults.length > 0 && (
-        <div className="grid grid-cols-2 gap-4 max-h-[300px] overflow-y-auto">
+        <div className="flex flex-col gap-4 max-h-[500px] overflow-y-auto">
           {searchResults.map(media => (
             <MediaSearchResult
               key={media.id}
