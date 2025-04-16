@@ -34,18 +34,15 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
 
   return (
     <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100 max-w-[800px] mx-auto">
-      <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <ListPlus className="w-4 h-4 md:w-6 md:h-6" />
           <Link 
             to="/discover" 
-            className="flex items-center gap-1 md:gap-2 text-lg md:text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
+            className="text-lg md:text-2xl font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
           >
-            <ListPlus className="w-4 h-4 md:w-6 md:h-6" />
             {list.title}
           </Link>
-          <p className="text-xs md:text-base text-gray-600">
-            {list.description}
-          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -56,32 +53,38 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
             <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
           </Button>
         </div>
+      </div>
 
-        <div className="relative w-full md:w-[450px]">
-          <Carousel
-            id={`list-${list.id}`}
-            opts={{
-              align: "start",
-              loop: true,
-              dragFree: true,
-              skipSnaps: true,
-            }}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-2 md:-ml-4">
-              {list.movies.map((movie) => (
-                <CarouselItem key={movie.id} className="pl-2 md:pl-4 basis-1/2">
-                  <MovieCard movie={movie} size="small" />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            
-            <div className="hidden">
-              <CarouselPrevious className="embla__prev" />
-              <CarouselNext className="embla__next" />
-            </div>
-          </Carousel>
-        </div>
+      {list.description && (
+        <p className="text-xs md:text-sm text-gray-600 mb-4">
+          {list.description}
+        </p>
+      )}
+
+      <div className="relative">
+        <Carousel
+          id={`list-${list.id}`}
+          opts={{
+            align: "start",
+            loop: true,
+            dragFree: true,
+            skipSnaps: true,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {list.movies.map((movie) => (
+              <CarouselItem key={movie.id} className="pl-2 md:pl-4 basis-1/2 md:basis-1/4">
+                <MovieCard movie={movie} size="small" />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          
+          <div className="hidden">
+            <CarouselPrevious className="embla__prev" />
+            <CarouselNext className="embla__next" />
+          </div>
+        </Carousel>
       </div>
     </div>
   );
