@@ -9,8 +9,6 @@ import {
   getFreeMovies,
   getTrailerMovies,
   MovieOrShow,
-  getRandomCustomLists,
-  CustomList
 } from '@/lib/api';
 
 import HeroSection from '@/components/discover/HeroSection';
@@ -73,7 +71,7 @@ const Discover = () => {
 
   return (
     <MainLayout>
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <div className="min-h-screen bg-background">
         <HeroSection />
         
         <motion.div 
@@ -89,21 +87,23 @@ const Discover = () => {
             </div>
           ) : (
             <>
-              <motion.div variants={item} className="mb-16">
-                <TrendingMovies movies={popularMovies} />
-              </motion.div>
-              
-              <motion.div variants={item} className="mb-16">
-                <RandomLists />
-              </motion.div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+              <div className="space-y-16">
                 <motion.div variants={item}>
-                  <FreeMoviesSection movies={freeMovies} />
+                  <TrendingMovies movies={popularMovies} />
                 </motion.div>
+                
                 <motion.div variants={item}>
-                  <TrailersSection movies={trailerMovies} />
+                  <RandomLists />
                 </motion.div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <motion.div variants={item}>
+                    <FreeMoviesSection movies={freeMovies} />
+                  </motion.div>
+                  <motion.div variants={item}>
+                    <TrailersSection movies={trailerMovies} />
+                  </motion.div>
+                </div>
               </div>
             </>
           )}

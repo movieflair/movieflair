@@ -17,17 +17,17 @@ const TrailersSection = ({ movies }: TrailersSectionProps) => {
   const newestTrailers = movies.slice(0, 2);
 
   return (
-    <section className="rounded-2xl bg-gradient-to-br from-rose-50 to-red-50 p-6 h-full">
+    <section className="rounded-2xl bg-card p-6 border shadow-sm h-full">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Play className="w-5 h-5 text-theme-black" />
-          <h2 className="text-xl font-bold text-theme-black">Neuste Trailer</h2>
+          <Play className="w-5 h-5 text-primary" />
+          <h2 className="text-xl font-bold">Neueste Trailer</h2>
         </div>
-        <Link to="/trailers">
-          <Button variant="outline" size="sm">
+        <Button asChild variant="outline" size="sm">
+          <Link to="/trailers">
             Alle anzeigen
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
       
       <div className="grid grid-cols-2 gap-3">
