@@ -20,13 +20,13 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
   const imageSizes = {
     small: 'h-[250px] w-[170px]',
     medium: 'h-[250px] w-[170px]',
-    large: 'h-[300px] w-[200px]'  // Etwas kleiner als vorher
+    large: 'h-[270px] w-[190px]'  // Updated size for specific pages
   };
   
   const textSizes = {
     small: 'text-sm',
     medium: 'text-base',
-    large: 'text-base'  // Text-Größe etwas reduziert
+    large: 'text-base'
   };
 
   return (
