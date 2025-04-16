@@ -69,10 +69,12 @@ const Discover = () => {
     fetchInitialData();
   }, []);
 
+  const firstTrendingMovie = popularMovies[0];
+
   return (
     <MainLayout>
       <div className="min-h-screen bg-background">
-        <HeroSection />
+        <HeroSection firstMovie={firstTrendingMovie} />
         
         <motion.div 
           className="container-custom py-12 px-4"

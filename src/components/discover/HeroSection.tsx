@@ -2,11 +2,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { List, Search } from 'lucide-react';
+import { ArrowLeft, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-const HeroSection = () => {
+const HeroSection = ({ firstMovie }: { firstMovie?: { backdrop_path?: string; title?: string } }) => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = React.useState('');
 
@@ -21,13 +21,24 @@ const HeroSection = () => {
     <div className="relative overflow-hidden rounded-2xl mb-10">
       <div className="absolute inset-0 bg-gradient-to-r from-theme-accent-red/90 to-primary/50 mix-blend-multiply"></div>
       
-      {searchQuery && (
+      {firstMovie?.backdrop_path && (
         <div className="absolute inset-0">
-          <div className="w-full h-full bg-black/20" />
+          <img 
+            src={`https://image.tmdb.org/t/p/w1280${firstMovie.backdrop_path}`} 
+            alt={firstMovie.title || "Film Hintergrund"}
+            className="w-full h-full object-cover opacity-20"
+          />
         </div>
       )}
       
       <div className="relative z-10 p-8 md:p-12">
+        <div className="flex items-center gap-2 mb-6">
+          <Link to="/filmlisten" className="inline-flex items-center text-white/80 hover:text-white">
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Zurück zu allen Listen
+          </Link>
+        </div>
+        
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Entdecke neue Filme</h1>
@@ -35,20 +46,8 @@ const HeroSection = () => {
               Finde deine nächsten Lieblingsfilme und entdecke kostenlose Angebote
             </p>
           </div>
-          
-          <Button 
-            asChild
-            variant="secondary"
-            size="sm"
-            className="flex items-center gap-1"
-          >
-            <Link to="/filmlisten">
-              <List className="w-4 h-4" />
-              Alle Listen
-            </Link>
-          </Button>
         </div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
