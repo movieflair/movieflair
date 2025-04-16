@@ -36,7 +36,7 @@ export const formatMediaTitle = (title: string, year?: string): string => {
  * Format: "Jetzt [Title] (Year) Online Stream anschauen - [Description]"
  * Limited to 140 characters
  */
-export const formatMediaDescription = (title: string, year: string, description: string, maxLength: number = 140): string => {
+export const formatMediaDescription = (title: string, year: string, description: string, maxLength: number = 160): string => {
   if (!title) return DEFAULT_SEO.description;
   
   const yearPart = year ? ` (${year})` : '';
@@ -58,7 +58,7 @@ export const formatListTitle = (title: string): string => {
  * Format: "[List Title] Online anschauen - [List Description]"
  * Limited to 140 characters
  */
-export const formatListDescription = (title: string, description: string, maxLength: number = 140): string => {
+export const formatListDescription = (title: string, description: string, maxLength: number = 160): string => {
   if (!title) return DEFAULT_SEO.description;
   const baseDesc = `${title} Online anschauen - ${description || 'Entdecke diese Filmauswahl auf MovieFlair.'}`;
   return truncateText(baseDesc, maxLength);
@@ -78,4 +78,71 @@ export const getAbsoluteImageUrl = (imagePath: string): string => {
   return imagePath.startsWith('/') 
     ? `${origin}${imagePath}`
     : `${origin}/${imagePath}`;
+};
+
+/**
+ * Create canonical URL
+ */
+export const createCanonicalUrl = (path: string): string => {
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'https://movieflair.lovable.app';
+  return `${origin}${path.startsWith('/') ? path : `/${path}`}`;
+};
+
+/**
+ * Generate structured data for a movie
+ */
+export const generateMovieStructuredData = (movie: any, director?: any) => {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Movie',
+    'name': movie.title,
+    'description': movie.overview,
+    'image': movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : undefined,
+    'datePublished': movie.release_date,
+    'aggregateRating': {
+      '@type': 'AggregateRating',
+      'ratingValue': String(movie.vote_average),
+      'ratingCount': String(movie.vote_count || 0),
+      'bestRating': '10',
+      'worstRating': '0'
+    },
+    'director': director ? {
+      '@type': 'Person',
+      'name': director.name
+    } : undefined,
+    'actor': movie.cast?.slice(0, 5).map((actor: any) => ({
+      '@type': 'Person',
+      'name': actor.name
+    })),
+    'genre': movie.genres?.map((genre: any) => genre.name),
+    'duration': movie.runtime ? `PT${String(movie.runtime)}M` : undefined
+  };
+};
+
+/**
+ * Generate structured data for a TV show
+ */
+export const generateTvShowStructuredData = (show: any) => {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TVSeries',
+    'name': show.name,
+    'description': show.overview,
+    'image': show.poster_path ? `https://image.tmdb.org/t/p/w500${show.poster_path}` : undefined,
+    'datePublished': show.first_air_date,
+    'aggregateRating': {
+      '@type': 'AggregateRating',
+      'ratingValue': String(show.vote_average),
+      'ratingCount': String(show.vote_count || 0),
+      'bestRating': '10',
+      'worstRating': '0'
+    },
+    'actor': show.cast?.slice(0, 5).map((actor: any) => ({
+      '@type': 'Person',
+      'name': actor.name
+    })),
+    'genre': show.genres?.map((genre: any) => genre.name),
+    'numberOfEpisodes': show.number_of_episodes,
+    'numberOfSeasons': show.number_of_seasons
+  };
 };

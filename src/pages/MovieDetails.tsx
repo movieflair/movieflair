@@ -18,6 +18,12 @@ import MovieLoadingState from '@/components/movies/MovieLoadingState';
 import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
+import { 
+  formatMediaTitle, 
+  formatMediaDescription, 
+  getAbsoluteImageUrl,
+  createCanonicalUrl
+} from '@/utils/seoHelpers';
 
 const MovieDetails = () => {
   const { id, slug } = useParams<{ id: string, slug?: string }>();
@@ -78,12 +84,14 @@ const MovieDetails = () => {
   const director = movie.crew?.find(person => person.job === 'Director');
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
   
-  const seoTitle = `${movie.title} ${releaseYear ? `(${releaseYear})` : ''} Online Stream anschauen | MovieFlair`;
-  const seoDescription = `Jetzt ${movie.title} ${releaseYear ? `(${releaseYear})` : ''} Online Stream anschauen – ${movie.overview}`;
-  const seoOgImage = movie.backdrop_path 
-    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
-    : '/movieflair-logo.png';
-  const canonical = `${window.location.origin}/film/${movie.id}${movie.title ? `/${encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
+  // Verbesserte SEO-Daten mit den Hilfsfunktionen
+  const seoTitle = formatMediaTitle(movie.title, releaseYear);
+  const seoDescription = formatMediaDescription(movie.title, releaseYear, movie.overview, 160);
+  const seoOgImage = getAbsoluteImageUrl(
+    movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : '/movieflair-logo.png'
+  );
+  const seoPath = `/film/${movie.id}${movie.title ? `/${encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
+  const canonical = createCanonicalUrl(seoPath);
 
   console.log('Movie SEO data:', { 
     title: seoTitle,

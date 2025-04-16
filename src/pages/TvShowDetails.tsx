@@ -17,7 +17,12 @@ import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import TvShowStructuredData from '@/components/seo/TvShowStructuredData';
-import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
+import {
+  formatMediaTitle,
+  formatMediaDescription,
+  getAbsoluteImageUrl,
+  createCanonicalUrl
+} from '@/utils/seoHelpers';
 
 const TvShowDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,12 +75,14 @@ const TvShowDetails = () => {
 
   const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear().toString() : '';
   
+  // Verbesserte SEO-Daten mit den Hilfsfunktionen
   const seoTitle = formatMediaTitle(show.name || '', firstAirYear);
-  const seoDescription = formatMediaDescription(show.name || '', firstAirYear, show.overview);
-  const seoOgImage = show.backdrop_path 
-    ? `https://image.tmdb.org/t/p/original${show.backdrop_path}`
-    : '/movieflair-logo.png';
-  const canonical = `${window.location.origin}/serie/${show.id}${show.name ? `/${encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
+  const seoDescription = formatMediaDescription(show.name || '', firstAirYear, show.overview, 160);
+  const seoOgImage = getAbsoluteImageUrl(
+    show.backdrop_path ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` : '/movieflair-logo.png'
+  );
+  const seoPath = `/serie/${show.id}${show.name ? `/${encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
+  const canonical = createCanonicalUrl(seoPath);
 
   console.log('TV Show SEO data:', { 
     title: seoTitle,

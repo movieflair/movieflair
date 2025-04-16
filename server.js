@@ -6,8 +6,9 @@ import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
 import { renderToPipeableStream } from 'react-dom/server';
 import React from 'react';
-import { HelmetProvider } from 'react-helmet-async';
+import { HelmetProvider, HelmetServerState } from 'react-helmet-async';
 import { StaticRouter } from 'react-router-dom/server';
+import { generateSitemapXml } from './src/utils/generateSitemap.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
@@ -30,6 +31,13 @@ async function startServer() {
     // Produktionsmodus: Statische Assets ausliefern
     app.use(express.static(path.resolve(__dirname, 'dist/client')));
   }
+  
+  // Sitemap.xml Route
+  app.get('/sitemap.xml', (req, res) => {
+    const sitemap = generateSitemapXml();
+    res.header('Content-Type', 'application/xml');
+    res.send(sitemap);
+  });
 
   app.use('*', async (req, res, next) => {
     const url = req.originalUrl;
@@ -40,6 +48,7 @@ async function startServer() {
                         req.get('User-Agent')?.toLowerCase().includes('crawler') ||
                         req.query.forceSSR === 'true';
       
+      // Prüfen, ob es eine wichtige Route ist, die vorgerendert werden sollte
       const isImportantRoute = 
         url.match(/^\/film\/\d+/) || 
         url.match(/^\/serie\/\d+/) || 
@@ -47,10 +56,12 @@ async function startServer() {
         url === '/' ||
         url === '/neue-trailer' ||
         url === '/kostenlose-filme' ||
+        url === '/entdecken' ||
         url === '/filmlisten';
 
-      // Nur wichtige Routen für Crawler vorrendern, für normale Benutzer SPA
-      if (!isCrawler && !req.query.forceSSR) {
+      // Der folgende Bereich wurde optimiert, um immer gültige Meta-Tags für wichtige Routen zu generieren
+      // Bei Crawlern rendern wir immer, bei normalen Nutzern nur für wichtige Routen
+      if ((!isCrawler && !isImportantRoute) && !req.query.forceSSR) {
         if (isProduction) {
           // In Produktion: Index-HTML direkt ausliefern
           const indexHtml = fs.readFileSync(
@@ -66,7 +77,7 @@ async function startServer() {
         }
       }
 
-      // Ab hier: SSR nur für Crawler oder wenn explizit angefordert
+      // Ab hier: SSR für wichtige Routen oder Crawler
 
       // Template laden
       let template;
@@ -86,7 +97,7 @@ async function startServer() {
         const { default: entryServer } = await vite.ssrLoadModule('/src/App.tsx');
         App = entryServer;
       } else {
-        // In Produktion würden wir das gebaute Modul aus dist/server importieren
+        // In Produktion: gebautes Modul aus dist/server importieren
         const { default: entryServer } = await import('./dist/server/App.js');
         App = entryServer;
       }
@@ -108,7 +119,7 @@ async function startServer() {
         {
           onShellReady() {
             // Extract helmet data after rendering
-            const { helmet } = helmetContext;
+            const { helmet } = helmetContext as HelmetServerState;
             
             // Update HTML template with helmet data
             const htmlWithHelmet = template
