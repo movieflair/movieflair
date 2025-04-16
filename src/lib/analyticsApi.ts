@@ -11,6 +11,7 @@ type InteractionType =
 interface TrackOptions {
   mediaId?: number;
   mediaType?: 'movie' | 'tv';
+  title?: string;  // Added title property to support tracking with movie titles
 }
 
 export interface VisitorStat {
