@@ -20,7 +20,15 @@ import {
 } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarIcon, EyeIcon, PieChart, TrendingUp, Clock } from 'lucide-react';
+import { CalendarIcon, EyeIcon, PieChart, TrendingUp, Clock, Link as LinkIcon } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface PageTotals {
   [key: string]: number;
@@ -54,6 +62,12 @@ const AdminVisitorStats = () => {
   const [originDistribution, setOriginDistribution] = useState<{name: string, value: number}[]>([]);
   const [feedbackStats, setFeedbackStats] = useState<{helpful: number, total: number}>({ helpful: 0, total: 0 });
   const [userCount, setUserCount] = useState(0);
+  const [referrers, setReferrers] = useState<{domain: string, count: number}[]>([]);
+  const [feedbackDetails, setFeedbackDetails] = useState<{
+    yes: number,
+    no: number,
+    total: number
+  }>({ yes: 0, no: 0, total: 0 });
 
   useEffect(() => {
     const fetchVisitorOrigins = async () => {
@@ -170,6 +184,52 @@ const AdminVisitorStats = () => {
     fetchVisitorOrigins();
     fetchFeedbackStats();
     fetchUserCount();
+
+    const fetchReferrers = async () => {
+      const { data } = await supabase
+        .from('interaction_stats')
+        .select('referrer')
+        .not('referrer', 'is', null)
+        .is('is_admin', false);
+
+      const referrerCounts = (data || []).reduce((acc: {[key: string]: number}, curr) => {
+        if (curr.referrer) {
+          try {
+            const domain = new URL(curr.referrer).hostname;
+            acc[domain] = (acc[domain] || 0) + 1;
+          } catch (e) {
+            // Invalid URL, skip
+          }
+        }
+        return acc;
+      }, {});
+
+      const sortedReferrers = Object.entries(referrerCounts)
+        .map(([domain, count]) => ({ domain, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+      setReferrers(sortedReferrers);
+    };
+
+    const fetchDetailedFeedback = async () => {
+      const { data } = await supabase
+        .from('quick_tipp_ratings')
+        .select('is_helpful');
+
+      if (data) {
+        const yes = data.filter(f => f.is_helpful).length;
+        const no = data.filter(f => !f.is_helpful).length;
+        setFeedbackDetails({
+          yes,
+          no,
+          total: data.length
+        });
+      }
+    };
+
+    fetchReferrers();
+    fetchDetailedFeedback();
   }, []);
 
   const getFilteredData = () => {
@@ -345,10 +405,8 @@ const AdminVisitorStats = () => {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Übersicht</TabsTrigger>
-          <TabsTrigger value="pages">Seitenaufrufe</TabsTrigger>
-          <TabsTrigger value="time">Zeitverteilung</TabsTrigger>
-          <TabsTrigger value="devices">Geräte</TabsTrigger>
-          <TabsTrigger value="origin">Herkunft</TabsTrigger>
+          <TabsTrigger value="visitors">Besucherstatistik</TabsTrigger>
+          <TabsTrigger value="feedback">Feedback-Statistik</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview">
@@ -378,96 +436,85 @@ const AdminVisitorStats = () => {
           </Card>
         </TabsContent>
         
-        <TabsContent value="pages">
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Beliebteste Seiten</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={getTopPages()}
-                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
-                  layout="vertical"
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={100} />
-                  <RechartsTooltip />
-                  <Legend />
-                  <Bar dataKey="value" name="Besuche" fill="#4f46e5" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
+        <TabsContent value="visitors">
+          <div className="grid gap-6">
+            <Card className="p-6">
+              <h3 className="text-lg font-medium mb-4">Herkunftsländer der Besucher</h3>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Land</TableHead>
+                    <TableHead>Besucher</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {originDistribution.map((row) => (
+                    <TableRow key={row.name}>
+                      <TableCell>{row.name}</TableCell>
+                      <TableCell>{row.value}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+
+            <Card className="p-6">
+              <h3 className="text-lg font-medium mb-4">Top Referrer</h3>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Website</TableHead>
+                    <TableHead>Besucher</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {referrers.map((row) => (
+                    <TableRow key={row.domain}>
+                      <TableCell>{row.domain}</TableCell>
+                      <TableCell>{row.count}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+          </div>
         </TabsContent>
         
-        <TabsContent value="time">
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Tageszeit der Besuche</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={hourlyDistribution}
-                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="hour" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Legend />
-                  <Bar dataKey="count" name="Besuche" fill="#4f46e5" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="devices">
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Geräteverteilung</h3>
-            <div className="h-72 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <RechartsPieChart>
-                  <Pie
-                    data={deviceDistribution}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={true}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {deviceDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Legend />
-                  <RechartsTooltip />
-                </RechartsPieChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="origin">
-          <Card className="p-6">
-            <h3 className="text-lg font-medium mb-4">Herkunftsländer der Besucher</h3>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={originDistribution}
-                  margin={{ top: 5, right: 20, left: 20, bottom: 5 }}
-                  layout="vertical"
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={100} />
-                  <RechartsTooltip />
-                  <Bar dataKey="value" fill="#4f46e5" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
+        <TabsContent value="feedback">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="p-4">
+              <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+                <Users className="h-4 w-4" />
+                <span>Registrierte Benutzer</span>
+              </div>
+              <div className="text-3xl font-bold">{userCount}</div>
+            </Card>
+
+            <Card className="p-4">
+              <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+                <ThumbsUp className="h-4 w-4" />
+                <span>Feedback-Statistik</span>
+              </div>
+              <div className="text-3xl font-bold">
+                {feedbackDetails.total > 0
+                  ? Math.round((feedbackDetails.yes / feedbackDetails.total) * 100)
+                  : 0}%
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {feedbackDetails.yes} von {feedbackDetails.total} Feedbacks
+              </div>
+              <div className="mt-2 text-sm">
+                <div className="flex justify-between mb-1">
+                  <span>Positiv:</span>
+                  <span>{feedbackDetails.yes}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Negativ:</span>
+                  <span>{feedbackDetails.no}</span>
+                </div>
+              </div>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
