@@ -1,10 +1,7 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 
 const HeroSection = ({ firstMovie }: { firstMovie?: { backdrop_path?: string; title?: string } }) => {
   const navigate = useNavigate();
@@ -48,23 +45,25 @@ const HeroSection = ({ firstMovie }: { firstMovie?: { backdrop_path?: string; ti
             transition={{ delay: 0.3, duration: 0.5 }}
             className="max-w-2xl mt-8"
           >
-            <form onSubmit={handleSearch} className="relative flex w-full">
+            <form onSubmit={handleSearch} className="relative flex items-center">
               <div className="relative flex-grow">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
-                <Input
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Search className="text-slate-400 h-5 w-5" />
+                </div>
+                <input
                   type="search"
                   placeholder="Filme oder Genres suchen..."
-                  className="pl-12 pr-4 py-6 w-full bg-white text-foreground rounded-l-lg text-lg border-0"
+                  className="w-full pl-12 pr-20 py-6 bg-white text-foreground rounded-lg text-lg border-0 focus:outline-none focus:ring-2 focus:ring-primary"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
+                <button 
+                  type="submit" 
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md font-medium transition-colors"
+                >
+                  Suchen
+                </button>
               </div>
-              <Button 
-                type="submit" 
-                className="rounded-r-lg bg-red-500 hover:bg-red-600 text-white px-6 py-6 font-medium"
-              >
-                Suchen
-              </Button>
             </form>
           </motion.div>
         </div>
@@ -74,4 +73,3 @@ const HeroSection = ({ firstMovie }: { firstMovie?: { backdrop_path?: string; ti
 };
 
 export default HeroSection;
-

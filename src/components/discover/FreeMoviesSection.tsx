@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Download } from 'lucide-react';
+import { Film } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { Button } from '@/components/ui/button';
@@ -20,11 +20,11 @@ const FreeMoviesSection = ({ movies }: FreeMoviesSectionProps) => {
     <section className="rounded-2xl bg-card p-6 border shadow-sm h-full">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <Download className="w-5 h-5 text-primary" />
+          <Film className="w-5 h-5 text-primary" />
           <h2 className="text-xl font-bold">Neueste kostenlose Filme</h2>
         </div>
         <Button asChild variant="outline" size="sm">
-          <Link to="/kostenlos">
+          <Link to="/kostenlose-filme">
             Alle anzeigen
           </Link>
         </Button>

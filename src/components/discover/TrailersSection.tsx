@@ -37,12 +37,7 @@ const TrailersSection = ({ movies }: TrailersSectionProps) => {
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="relative">
-              <MovieCard movie={movie} size="small" />
-              <div className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-1">
-                <Play className="w-3 h-3" />
-              </div>
-            </div>
+            <MovieCard movie={movie} size="small" />
           </motion.div>
         ))}
       </div>
