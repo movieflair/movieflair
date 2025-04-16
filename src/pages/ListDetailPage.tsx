@@ -93,8 +93,12 @@ const ListDetailPage = () => {
     <MainLayout>
       {list && (
         <SEOHead 
-          title={`${list.title} online anschauen | MovieFlair`}
-          description={`Entdecke ${list.movies.length} ausgewählte Filme in der Liste "${list.title}". Eine kuratierte Sammlung der besten Filme auf MovieFlair.`}
+          title={`${list.title} Online anschauen | MovieFlair`}
+          description={truncate(
+            `${list.title} Online anschauen - ${list.description || `Entdecke ${list.movies.length} ausgewählte Filme in dieser kuratierten Sammlung.`}`,
+            140
+          )}
+          ogImage={list.movies[0]?.backdrop_path ? `https://image.tmdb.org/t/p/original${list.movies[0].backdrop_path}` : undefined}
           structuredData={{
             "@context": "https://schema.org",
             "@type": "ItemList",
@@ -107,7 +111,7 @@ const ListDetailPage = () => {
               "item": {
                 "@type": "Movie",
                 "name": movie.title,
-                "image": `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                "image": movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : undefined
               }
             }))
           }}
@@ -180,6 +184,12 @@ const ListDetailPage = () => {
       </div>
     </MainLayout>
   );
+};
+
+// Helper function to truncate text
+const truncate = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength - 3) + '...';
 };
 
 export default ListDetailPage;

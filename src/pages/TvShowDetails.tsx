@@ -68,8 +68,10 @@ const TvShowDetails = () => {
 
   const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear().toString() : '';
   const seoTitle = `${show.name} (${firstAirYear}) Online Stream anschauen | MovieFlair`;
-  const seoDescription = `${show.name} (${firstAirYear}) kostenlos online streamen. ${show.overview?.slice(0, 150)}...`;
-  const tvShowStructuredData = generateTVShowSchema(show);
+  const seoDescription = truncate(
+    `Jetzt ${show.name} (${firstAirYear}) Online Stream anschauen - ${show.overview}`,
+    140
+  );
 
   const getTrailerUrl = () => {
     if (show?.trailerUrl) {
@@ -106,6 +108,11 @@ const TvShowDetails = () => {
       : text;
   };
 
+  const truncate = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength - 3) + '...';
+  };
+
   console.log('TV Show details:', { 
     id: show.id, 
     name: show.name, 
@@ -121,7 +128,6 @@ const TvShowDetails = () => {
         description={seoDescription}
         ogType="tv_show"
         ogImage={show.backdrop_path ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` : undefined}
-        structuredData={tvShowStructuredData}
       />
 
       <div className="min-h-screen bg-white">

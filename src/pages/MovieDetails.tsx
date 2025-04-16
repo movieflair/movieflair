@@ -77,7 +77,10 @@ const MovieDetails = () => {
   const director = movie.crew?.find(person => person.job === 'Director');
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
   const seoTitle = `${movie.title} (${releaseYear}) Online Stream anschauen | MovieFlair`;
-  const seoDescription = `${movie.title} (${releaseYear}) kostenlos online streamen. ${movie.overview?.slice(0, 150)}...`;
+  const seoDescription = truncate(
+    `Jetzt ${movie.title} (${releaseYear}) Online Stream anschauen - ${movie.overview}`,
+    140
+  );
 
   const getTrailerUrl = () => {
     if (movie?.trailerUrl) {
@@ -112,6 +115,11 @@ const MovieDetails = () => {
     return text.length > maxLength 
       ? `${text.slice(0, maxLength)}...` 
       : text;
+  };
+
+  const truncate = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength - 3) + '...';
   };
 
   console.log('Movie details:', { 
