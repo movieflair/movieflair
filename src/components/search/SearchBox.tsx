@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search as SearchIcon } from 'lucide-react';
@@ -97,7 +96,7 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
           />
           <button 
             type="submit" 
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-red-500 text-white px-4 py-1.5 rounded-md hover:bg-red-600 transition-colors"
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#ea384c] text-white px-4 py-1.5 rounded-md hover:bg-[#ea384c]/90 transition-colors"
           >
             Suchen
           </button>
