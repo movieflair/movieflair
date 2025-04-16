@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
@@ -83,11 +82,12 @@ const MovieDetails = () => {
 
   const director = movie.crew?.find(person => person.job === 'Director');
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
+  const truncatedOverview = truncate(movie.overview, 140);
   const seoTitle = `${movie.title} (${releaseYear}) Online Stream anschauen | MovieFlair`;
-  const seoDescription = truncate(
-    `Jetzt ${movie.title} (${releaseYear}) Online Stream anschauen - ${movie.overview}`,
-    140
-  );
+  const seoDescription = `Jetzt ${movie.title} (${releaseYear}) Online Stream anschauen - ${truncatedOverview}`;
+  const seoOgImage = movie.backdrop_path 
+    ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` 
+    : '/movieflair-logo.png';
 
   const getTrailerUrl = () => {
     if (movie?.trailerUrl) {
@@ -138,7 +138,7 @@ const MovieDetails = () => {
         title={seoTitle}
         description={seoDescription}
         ogType="movie"
-        ogImage={movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : undefined}
+        ogImage={seoOgImage}
       />
       <MovieStructuredData movie={movie} director={director} />
 

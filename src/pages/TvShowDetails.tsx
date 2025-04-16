@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -18,7 +17,6 @@ import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 
-// Helper function to truncate text
 const truncate = (text: string, maxLength: number) => {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength - 3) + '...';
@@ -74,11 +72,12 @@ const TvShowDetails = () => {
   }
 
   const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear().toString() : '';
+  const truncatedOverview = truncate(show.overview, 140);
   const seoTitle = `${show.name} (${firstAirYear}) Online Stream anschauen | MovieFlair`;
-  const seoDescription = truncate(
-    `Jetzt ${show.name} (${firstAirYear}) Online Stream anschauen - ${show.overview}`,
-    140
-  );
+  const seoDescription = `Jetzt ${show.name} (${firstAirYear}) Online Stream anschauen - ${truncatedOverview}`;
+  const seoOgImage = show.backdrop_path 
+    ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` 
+    : '/movieflair-logo.png';
 
   const getTrailerUrl = () => {
     if (show?.trailerUrl) {
@@ -129,7 +128,7 @@ const TvShowDetails = () => {
         title={seoTitle}
         description={seoDescription}
         ogType="tv_show"
-        ogImage={show.backdrop_path ? `https://image.tmdb.org/t/p/original${show.backdrop_path}` : undefined}
+        ogImage={seoOgImage}
       />
 
       <div className="min-h-screen bg-white">

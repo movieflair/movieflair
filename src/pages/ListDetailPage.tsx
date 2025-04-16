@@ -89,16 +89,24 @@ const ListDetailPage = () => {
     );
   }
 
-  return (
-    <MainLayout>
-      {list && (
+  if (list) {
+    const truncatedDescription = truncate(
+      list.description || `Entdecke ${list.movies.length} ausgewählte Filme in dieser kuratierten Sammlung.`, 
+      140
+    );
+    const seoTitle = `${list.title} Online anschauen | MovieFlair`;
+    const seoDescription = `${list.title} Online anschauen - ${truncatedDescription}`;
+    const seoOgImage = list.movies[0]?.backdrop_path 
+      ? `https://image.tmdb.org/t/p/original${list.movies[0].backdrop_path}` 
+      : '/movieflair-logo.png';
+
+    return (
+      <MainLayout>
         <SEOHead 
-          title={`${list.title} Online anschauen | MovieFlair`}
-          description={truncate(
-            `${list.title} Online anschauen - ${list.description || `Entdecke ${list.movies.length} ausgewählte Filme in dieser kuratierten Sammlung.`}`,
-            140
-          )}
-          ogImage={list.movies[0]?.backdrop_path ? `https://image.tmdb.org/t/p/original${list.movies[0].backdrop_path}` : undefined}
+          title={seoTitle}
+          description={seoDescription}
+          ogImage={seoOgImage}
+          ogType="website"
           structuredData={{
             "@context": "https://schema.org",
             "@type": "ItemList",
@@ -116,77 +124,78 @@ const ListDetailPage = () => {
             }))
           }}
         />
-      )}
-      
-      <div className="container-custom py-8">
-        <div className="flex items-center gap-2 mb-6">
-          <Link to="/filmlisten" className="inline-flex items-center text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Zurück zu allen Listen
-          </Link>
-        </div>
         
-        <div className="relative overflow-hidden rounded-2xl mb-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-theme-accent-red/90 to-primary/50 mix-blend-multiply"></div>
+        <div className="container-custom py-8">
+          <div className="flex items-center gap-2 mb-6">
+            <Link to="/filmlisten" className="inline-flex items-center text-muted-foreground hover:text-foreground">
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              Zurück zu allen Listen
+            </Link>
+          </div>
           
-          {list?.movies.length > 0 && list.movies[0].backdrop_path && (
-            <div className="absolute inset-0">
-              <img 
-                src={`https://image.tmdb.org/t/p/w1280${list.movies[0].backdrop_path}`} 
-                alt={list.title}
-                className="w-full h-full object-cover opacity-20"
-              />
-            </div>
-          )}
-          
-          <div className="relative z-10 p-8 md:p-12">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{list?.title}</h1>
-                {list?.description && (
-                  <p className="text-white/80 max-w-2xl text-lg">{list.description}</p>
-                )}
+          <div className="relative overflow-hidden rounded-2xl mb-10">
+            <div className="absolute inset-0 bg-gradient-to-r from-theme-accent-red/90 to-primary/50 mix-blend-multiply"></div>
+            
+            {list?.movies.length > 0 && list.movies[0].backdrop_path && (
+              <div className="absolute inset-0">
+                <img 
+                  src={`https://image.tmdb.org/t/p/w1280${list.movies[0].backdrop_path}`} 
+                  alt={list.title}
+                  className="w-full h-full object-cover opacity-20"
+                />
               </div>
-              
-              <Button 
-                asChild
-                variant="secondary"
-                size="sm"
-                className="flex items-center gap-1"
-              >
-                <Link to="/filmlisten">
-                  <List className="w-4 h-4" />
-                  Alle Listen
-                </Link>
-              </Button>
+            )}
+            
+            <div className="relative z-10 p-8 md:p-12">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{list?.title}</h1>
+                  {list?.description && (
+                    <p className="text-white/80 max-w-2xl text-lg">{list.description}</p>
+                  )}
+                </div>
+                
+                <Button 
+                  asChild
+                  variant="secondary"
+                  size="sm"
+                  className="flex items-center gap-1"
+                >
+                  <Link to="/filmlisten">
+                    <List className="w-4 h-4" />
+                    Alle Listen
+                  </Link>
+                </Button>
+              </div>
             </div>
-          </div>
-        </div>
-        
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">Filme in dieser Liste</h2>
-            <span className="text-muted-foreground">{list?.movies.length} Filme</span>
           </div>
           
-          {list?.movies.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {list.movies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
-              ))}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold">Filme in dieser Liste</h2>
+              <span className="text-muted-foreground">{list?.movies.length} Filme</span>
             </div>
-          ) : (
-            <div className="text-center py-16 border rounded-lg bg-background/50">
-              <p className="text-muted-foreground">Diese Liste enthält noch keine Filme</p>
-            </div>
-          )}
+            
+            {list?.movies.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {list.movies.map((movie) => (
+                  <MovieCard key={movie.id} movie={movie} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 border rounded-lg bg-background/50">
+                <p className="text-muted-foreground">Diese Liste enthält noch keine Filme</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </MainLayout>
-  );
+      </MainLayout>
+    );
+  }
+
+  return null;
 };
 
-// Helper function to truncate text
 const truncate = (text: string, maxLength: number) => {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength - 3) + '...';
