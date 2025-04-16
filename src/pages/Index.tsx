@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
-import SEOHead from '@/components/seo/SEOHead';
+import { Seo } from '@/components/seo/Seo';
 import { getRandomCustomLists } from '@/lib/api';
 import { CustomList } from '@/lib/types';
 import CustomListCarousel from '@/components/movies/CustomListCarousel';
@@ -42,12 +42,9 @@ const Index = () => {
 
   return (
     <MainLayout>
-      <SEOHead 
-        title="MovieFlair – Finde den perfekten Film für deine Stimmung" 
-        description="Jeder Moment hat seinen Film. MovieFlair zeigt dir Filme, die zu deiner Stimmung passen – persönlich, emotional und genau im richtigen Moment." 
-        keywords="filmtipps, filmempfehlungen, filme entdecken, filmfinder, filme nach stimmung, was soll ich heute schauen, passende filme, streaming tipps, movieflair, bester film für jetzt, persönlicher filmvorschlag, filme für jede laune, emotional passende filme" 
-        ogType="website" 
+      <Seo 
         structuredData={websiteStructuredData} 
+        keywords="filmtipps, filmempfehlungen, filme entdecken, filmfinder, filme nach stimmung, was soll ich heute schauen, passende filme, streaming tipps, movieflair, bester film für jetzt, persönlicher filmvorschlag, filme für jede laune, emotional passende filme" 
       />
 
       <section className="py-8 md:py-32 bg-gradient-to-b from-blue-50/50 to-white relative">

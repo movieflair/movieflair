@@ -6,6 +6,7 @@ import MovieCard from '@/components/movies/MovieCard';
 import { Gift } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
+import { Seo } from '@/components/seo/Seo';
 
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
@@ -38,8 +39,24 @@ const FreeMovies = () => {
     fetchMovies();
   }, []);
 
+  const seoTitle = "Kostenlose Filme Online anschauen | MovieFlair";
+  const seoDescription = "Kostenlose Filme Online anschauen - Entdecke eine kuratierte Auswahl an Filmen, die du komplett kostenlos und legal streamen kannst.";
+  const featuredBackdrop = movies[0]?.backdrop_path 
+    ? `https://image.tmdb.org/t/p/original${movies[0].backdrop_path}` 
+    : '/movieflair-logo.png';
+  const canonical = `${window.location.origin}/kostenlose-filme`;
+
   return (
     <EnhancedLayout>
+      <Seo 
+        title={seoTitle}
+        description={seoDescription}
+        ogImage={featuredBackdrop}
+        ogType="website"
+        canonical={canonical}
+        keywords="kostenlose Filme, gratis Filme, legale Streams, Filme kostenlos anschauen, Free Movies"
+      />
+
       <div className="container-custom py-12 px-4">
         <div className="flex items-center mb-8">
           <Gift className="w-6 h-6 text-red-500 mr-2" />

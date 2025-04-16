@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, List } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { CustomList, getCustomList, getCustomLists } from '@/lib/api';
 import { Button } from '@/components/ui/button';
-import SEOHead from '@/components/seo/SEOHead';
+import { Seo } from '@/components/seo/Seo';
 import MovieCard from '@/components/movies/MovieCard';
 import { createUrlSlug } from '@/lib/urlUtils';
 import { formatListTitle, formatListDescription } from '@/utils/seoHelpers';
@@ -103,7 +102,7 @@ const ListDetailPage = () => {
 
     return (
       <MainLayout>
-        <SEOHead 
+        <Seo 
           title={seoTitle}
           description={seoDescription}
           ogImage={seoOgImage}

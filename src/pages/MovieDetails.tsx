@@ -5,7 +5,7 @@ import { useAdminSettings } from '@/hooks/useAdminSettings';
 import MainLayout from '@/components/layout/MainLayout';
 import { getMovieById, getSimilarMovies, trackPageVisit } from '@/lib/api';
 import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/types';
-import SEOHead from '@/components/seo/SEOHead';
+import { Seo } from '@/components/seo/Seo';
 import MovieHeader from '@/components/movies/MovieHeader';
 import MovieMeta from '@/components/movies/MovieMeta';
 import MovieStreamButtons from '@/components/movies/MovieStreamButtons';
@@ -17,7 +17,6 @@ import MovieLoadingState from '@/components/movies/MovieLoadingState';
 import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
-import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
 
 const MovieDetails = () => {
   const { id, slug } = useParams<{ id: string, slug?: string }>();
@@ -78,8 +77,8 @@ const MovieDetails = () => {
   const director = movie.crew?.find(person => person.job === 'Director');
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
   
-  const seoTitle = formatMediaTitle(movie.title, releaseYear);
-  const seoDescription = formatMediaDescription(movie.title, releaseYear, movie.overview);
+  const seoTitle = `${movie.title} ${releaseYear ? `(${releaseYear})` : ''} Online Stream anschauen | MovieFlair`;
+  const seoDescription = `Jetzt ${movie.title} ${releaseYear ? `(${releaseYear})` : ''} Online Stream anschauen – ${movie.overview}`;
   const seoOgImage = movie.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
     : '/movieflair-logo.png';
@@ -129,11 +128,11 @@ const MovieDetails = () => {
 
   return (
     <MainLayout>
-      <SEOHead 
+      <Seo 
         title={seoTitle}
         description={seoDescription}
-        ogType="movie"
         ogImage={seoOgImage}
+        ogType="movie"
         canonical={canonical}
         keywords={`${movie.title}, ${movie.genres?.map(g => g.name).join(', ')}, Film Stream, Online anschauen, ${releaseYear}`}
       />

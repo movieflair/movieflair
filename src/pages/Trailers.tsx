@@ -5,8 +5,7 @@ import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { PlayCircle } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import SEOHead from '@/components/seo/SEOHead';
-import { DEFAULT_SEO, formatListTitle, formatListDescription } from '@/utils/seoHelpers';
+import { Seo } from '@/components/seo/Seo';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
@@ -36,21 +35,18 @@ const Trailers = () => {
     fetchTrailerItems();
   }, []);
 
-  const seoTitle = formatListTitle("Neue Film & Serien Trailer");
-  const seoDescription = formatListDescription(
-    "Neue Film & Serien Trailer", 
-    "Entdecke die aktuellsten Trailer für kommende Filme und Serien"
-  );
+  const seoTitle = "Neue Film & Serien Trailer Online anschauen | MovieFlair";
+  const seoDescription = "Neue Film & Serien Trailer Online anschauen - Entdecke die aktuellsten Trailer für kommende Filme und Serien";
   
   const featuredBackdrop = trailerItems[0]?.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${trailerItems[0].backdrop_path}` 
-    : DEFAULT_SEO.ogImage;
+    : '/movieflair-logo.png';
   
   const canonical = typeof window !== 'undefined' ? `${window.location.origin}/neue-trailer` : '';
 
   return (
     <MainLayout>
-      <SEOHead 
+      <Seo 
         title={seoTitle}
         description={seoDescription}
         ogImage={featuredBackdrop}

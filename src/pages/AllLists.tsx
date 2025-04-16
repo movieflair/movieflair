@@ -6,9 +6,8 @@ import MainLayout from '@/components/layout/MainLayout';
 import { toast } from 'sonner';
 import { List, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import SEOHead from '@/components/seo/SEOHead';
+import { Seo } from '@/components/seo/Seo';
 import { createUrlSlug } from '@/lib/urlUtils';
-import { formatListTitle, formatListDescription, DEFAULT_SEO } from '@/utils/seoHelpers';
 
 const AllLists = () => {
   const [lists, setLists] = useState<CustomList[]>([]);
@@ -30,16 +29,13 @@ const AllLists = () => {
     fetchLists();
   }, []);
 
-  const seoTitle = formatListTitle("Filmlisten");
-  const seoDescription = formatListDescription(
-    "Filmlisten", 
-    "Entdecke kuratierte Filmlisten auf MovieFlair. Von Klassikern bis zu versteckten Perlen - finde die perfekte Auswahl für deinen nächsten Filmabend."
-  );
+  const seoTitle = "Filmlisten Online anschauen | MovieFlair";
+  const seoDescription = "Filmlisten Online anschauen - Entdecke kuratierte Filmlisten auf MovieFlair. Von Klassikern bis zu versteckten Perlen - finde die perfekte Auswahl für deinen nächsten Filmabend.";
   const canonical = `${window.location.origin}/listen`;
 
   return (
     <MainLayout>
-      <SEOHead
+      <Seo
         title={seoTitle}
         description={seoDescription}
         keywords="Filmlisten, Filmsammlungen, Filmempfehlungen, kuratierte Listen, Filmtipps, Filmkategorien, Filmgenres"

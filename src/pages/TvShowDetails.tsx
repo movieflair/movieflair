@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { MovieDetail } from '@/lib/types';
 import { getTvShowDetails, getCast } from '@/lib/tvShowApi';
-import SEOHead from '@/components/seo/SEOHead';
-import { formatMediaTitle, formatMediaDescription } from '@/utils/seoHelpers';
+import { Seo } from '@/components/seo/Seo';
 import MovieMeta from '@/components/movies/MovieMeta';
 import MovieHeader from '@/components/movies/MovieHeader';
 import MovieStreamButtons from '@/components/movies/MovieStreamButtons';
@@ -69,8 +67,8 @@ const TvShowDetails = () => {
 
   const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear().toString() : '';
   
-  const seoTitle = formatMediaTitle(show.name || '', firstAirYear);
-  const seoDescription = formatMediaDescription(show.name || '', firstAirYear, show.overview);
+  const seoTitle = `${show.name} ${firstAirYear ? `(${firstAirYear})` : ''} Online Stream anschauen | MovieFlair`;
+  const seoDescription = `Jetzt ${show.name} ${firstAirYear ? `(${firstAirYear})` : ''} Online Stream anschauen – ${show.overview}`;
   const seoOgImage = show.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${show.backdrop_path}`
     : '/movieflair-logo.png';
@@ -118,21 +116,13 @@ const TvShowDetails = () => {
       : text;
   };
 
-  console.log('TV Show details:', { 
-    id: show.id, 
-    name: show.name, 
-    hasStream: show.hasStream, 
-    streamUrl: show.streamUrl,
-    isFreeMovie: show.isFreeMovie
-  });
-
   return (
     <MainLayout>
-      <SEOHead 
+      <Seo 
         title={seoTitle}
         description={seoDescription}
-        ogType="tv_show"
         ogImage={seoOgImage}
+        ogType="tv_show"
         canonical={canonical}
         keywords={`${show.name}, ${show.genres?.map(g => g.name).join(', ')}, Serie Stream, Online anschauen, ${firstAirYear}`}
       />
