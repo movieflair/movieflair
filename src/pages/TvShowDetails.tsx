@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -16,6 +17,12 @@ import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
+
+// Helper function to truncate text
+const truncate = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength - 3) + '...';
+};
 
 const TvShowDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -106,11 +113,6 @@ const TvShowDetails = () => {
     return text.length > maxLength 
       ? `${text.slice(0, maxLength)}...` 
       : text;
-  };
-
-  const truncate = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength - 3) + '...';
   };
 
   console.log('TV Show details:', { 

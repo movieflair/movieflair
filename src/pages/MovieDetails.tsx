@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
@@ -17,6 +18,12 @@ import MovieLoadingState from '@/components/movies/MovieLoadingState';
 import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
+
+// Helper function to truncate text
+const truncate = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength - 3) + '...';
+};
 
 const MovieDetails = () => {
   const { id, slug } = useParams<{ id: string, slug?: string }>();
@@ -115,11 +122,6 @@ const MovieDetails = () => {
     return text.length > maxLength 
       ? `${text.slice(0, maxLength)}...` 
       : text;
-  };
-
-  const truncate = (text: string, maxLength: number) => {
-    if (text.length <= maxLength) return text;
-    return text.slice(0, maxLength - 3) + '...';
   };
 
   console.log('Movie details:', { 
