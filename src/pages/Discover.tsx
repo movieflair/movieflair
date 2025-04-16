@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from "framer-motion";
 import MainLayout from '@/components/layout/MainLayout';
@@ -77,7 +76,7 @@ const Discover = () => {
         <HeroSection firstMovie={firstTrendingMovie} />
         
         <motion.div 
-          className="container-custom py-12 px-4"
+          className="container-custom py-12"
           variants={container}
           initial="hidden"
           animate="show"
@@ -88,26 +87,24 @@ const Discover = () => {
               <p className="mt-2 text-muted-foreground">Lade Inhalte...</p>
             </div>
           ) : (
-            <>
-              <div className="space-y-16">
+            <div className="space-y-16">
+              <motion.div variants={item}>
+                <TrendingMovies movies={popularMovies} />
+              </motion.div>
+              
+              <motion.div variants={item}>
+                <RandomLists />
+              </motion.div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <motion.div variants={item}>
-                  <TrendingMovies movies={popularMovies} />
+                  <FreeMoviesSection movies={freeMovies} />
                 </motion.div>
-                
                 <motion.div variants={item}>
-                  <RandomLists />
+                  <TrailersSection movies={trailerMovies} />
                 </motion.div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <motion.div variants={item}>
-                    <FreeMoviesSection movies={freeMovies} />
-                  </motion.div>
-                  <motion.div variants={item}>
-                    <TrailersSection movies={trailerMovies} />
-                  </motion.div>
-                </div>
               </div>
-            </>
+            </div>
           )}
         </motion.div>
       </div>
