@@ -110,7 +110,8 @@ const TvShowDetails = () => {
     id: show.id, 
     name: show.name, 
     hasStream: show.hasStream, 
-    streamUrl: show.streamUrl 
+    streamUrl: show.streamUrl,
+    isFreeMovie: show.isFreeMovie
   });
 
   return (
@@ -164,7 +165,8 @@ const TvShowDetails = () => {
                   streamUrl={show.streamUrl}
                   title={show.name || ''}
                   amazonAffiliateId={amazonAffiliateId}
-                  isFreeMovie={show.hasStream}
+                  isFreeMovie={show.isFreeMovie}
+                  hasStream={show.hasStream}
                   onTrailerClick={() => setShowTrailer(true)}
                   onStreamClick={handleStreamClick}
                 />

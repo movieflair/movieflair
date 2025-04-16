@@ -10,6 +10,7 @@ interface MovieStreamButtonsProps {
   title: string;
   amazonAffiliateId?: string;
   isFreeMovie?: boolean;
+  hasStream?: boolean;
   onTrailerClick: () => void;
   onStreamClick: () => void;
 }
@@ -21,6 +22,7 @@ const MovieStreamButtons = ({
   title,
   amazonAffiliateId,
   isFreeMovie,
+  hasStream,
   onTrailerClick,
   onStreamClick
 }: MovieStreamButtonsProps) => {
@@ -42,7 +44,12 @@ const MovieStreamButtons = ({
   };
 
   // Add console logs to help debug
-  console.log('MovieStreamButtons props:', { streamUrl, isFreeMovie });
+  console.log('MovieStreamButtons props:', { 
+    streamUrl, 
+    isFreeMovie, 
+    hasStream,
+    shouldShowKostenlosButton: !!(streamUrl || isFreeMovie === true || hasStream === true)
+  });
 
   return (
     <div className="flex flex-wrap gap-3 mb-8">
@@ -63,7 +70,7 @@ const MovieStreamButtons = ({
         <Play className="w-4 h-4 mr-2" />
         Prime Video
       </Button>
-      {(streamUrl || isFreeMovie === true) && (
+      {(streamUrl || isFreeMovie === true || hasStream === true) && (
         <Button
           className="bg-[#ea384c] text-white hover:bg-[#ea384c]/90 flex items-center gap-2"
           onClick={handleStreamClick}

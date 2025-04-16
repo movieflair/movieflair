@@ -118,6 +118,7 @@ const MovieDetails = () => {
     id: movie.id, 
     title: movie.title, 
     isFreeMovie: movie.isFreeMovie, 
+    hasStream: movie.hasStream,
     streamUrl: movie.streamUrl 
   });
 
@@ -172,6 +173,7 @@ const MovieDetails = () => {
                   title={movie.title}
                   amazonAffiliateId={amazonAffiliateId}
                   isFreeMovie={movie.isFreeMovie}
+                  hasStream={movie.hasStream}
                   onTrailerClick={() => setShowTrailer(true)}
                   onStreamClick={handleStreamClick}
                 />
