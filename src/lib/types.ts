@@ -31,6 +31,7 @@ export interface MovieOrShow {
   trailerUrl?: string;
   isFreeMovie?: boolean;
   isNewTrailer?: boolean;
+  popularity?: number; // Added this missing property
 }
 
 export interface MovieDetail extends MovieOrShow {

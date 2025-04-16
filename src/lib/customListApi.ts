@@ -6,7 +6,7 @@ interface SupabaseCustomList {
   id: string;
   title: string;
   description: string;
-  movies: MovieOrShow[];
+  movies: any; // Using any to handle the JSON type from Supabase
   created_at: string;
   updated_at: string;
   createdat: string;
@@ -34,11 +34,31 @@ export const getCustomLists = async (): Promise<CustomList[]> => {
       return [];
     }
     
-    return (data || []).map(mapSupabaseListToCustomList);
+    return (data || []).map((item) => mapSupabaseListToCustomList({
+      ...item,
+      movies: item.movies
+    } as SupabaseCustomList));
   } catch (error) {
     console.error('Error getting custom lists:', error);
     return [];
   }
+};
+
+// Function to get random custom lists
+export const getRandomCustomLists = (count: number = 2): Promise<CustomList[]> => {
+  return getCustomLists().then(lists => {
+    // Filter lists that have movies
+    const listsWithMovies = lists.filter(list => Array.isArray(list.movies) && list.movies.length > 0);
+    
+    // If we don't have enough lists, return all we have
+    if (listsWithMovies.length <= count) {
+      return listsWithMovies;
+    }
+    
+    // Shuffle the lists and take the requested count
+    const shuffled = [...listsWithMovies].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  });
 };
 
 export const createCustomList = async (title: string, description: string): Promise<CustomList> => {
@@ -61,12 +81,13 @@ export const createCustomList = async (title: string, description: string): Prom
     throw error;
   }
   
-  return mapSupabaseListToCustomList(data);
+  return mapSupabaseListToCustomList(data as SupabaseCustomList);
 };
 
 export const updateCustomList = async (list: CustomList): Promise<CustomList> => {
   const supabaseList = {
     ...list,
+    movies: list.movies,
     updated_at: new Date().toISOString()
   };
   
@@ -82,7 +103,7 @@ export const updateCustomList = async (list: CustomList): Promise<CustomList> =>
     throw error;
   }
   
-  return mapSupabaseListToCustomList(data);
+  return mapSupabaseListToCustomList(data as SupabaseCustomList);
 };
 
 export const deleteCustomList = async (listId: string): Promise<boolean> => {
@@ -112,7 +133,7 @@ export const addMovieToList = async (listId: string, media: MovieOrShow): Promis
   }
   
   const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
-  const movieExists = currentMovies.some((m: MovieOrShow) => m.id === media.id);
+  const movieExists = currentMovies.some((m: any) => m.id === media.id);
   
   if (!movieExists) {
     const updatedMovies = [...currentMovies, media];
@@ -132,10 +153,10 @@ export const addMovieToList = async (listId: string, media: MovieOrShow): Promis
       throw error;
     }
     
-    return mapSupabaseListToCustomList(data);
+    return mapSupabaseListToCustomList(data as SupabaseCustomList);
   }
   
-  return mapSupabaseListToCustomList(currentList);
+  return mapSupabaseListToCustomList(currentList as SupabaseCustomList);
 };
 
 export const removeMovieFromList = async (listId: string, mediaId: number): Promise<CustomList> => {
@@ -151,7 +172,7 @@ export const removeMovieFromList = async (listId: string, mediaId: number): Prom
   }
   
   const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
-  const updatedMovies = currentMovies.filter((media: MovieOrShow) => media.id !== mediaId);
+  const updatedMovies = currentMovies.filter((media: any) => media.id !== mediaId);
   
   const { data, error } = await supabase
     .from('custom_lists')
@@ -168,5 +189,5 @@ export const removeMovieFromList = async (listId: string, mediaId: number): Prom
     throw error;
   }
   
-  return mapSupabaseListToCustomList(data);
+  return mapSupabaseListToCustomList(data as SupabaseCustomList);
 };

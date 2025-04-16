@@ -9,9 +9,21 @@ import PrimeVideoAd from '@/components/ads/PrimeVideoAd';
 
 const Index = () => {
   const [customLists, setCustomLists] = useState<CustomList[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
   useEffect(() => {
-    const lists = getRandomCustomLists(2);
-    setCustomLists(lists);
+    const fetchLists = async () => {
+      try {
+        const lists = await getRandomCustomLists(2);
+        setCustomLists(lists);
+      } catch (error) {
+        console.error('Error fetching random custom lists:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchLists();
   }, []);
 
   const websiteStructuredData = {
@@ -48,7 +60,7 @@ Wir finden ihn für dich!</h1>
           </div>
           <HomeFilterBox />
           <PrimeVideoAd className="mt-6 md:mt-8" />
-          {customLists.length > 0 && (
+          {!isLoading && customLists.length > 0 && (
             <div className="mt-6 md:mt-8">
               {customLists.map(list => (
                 <div key={list.id} className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100 mb-4">

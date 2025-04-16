@@ -6,19 +6,23 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching trailer movies...');
-  let trailerItems: MovieOrShow[] = [];
+  let trailerItems: any[] = [];
   
   try {
     // Fetch movies with trailers from Supabase
     const { data: trailerMovies, error: moviesError } = await supabase
       .from('admin_movies')
       .select('*')
-      .eq('isNewTrailer', true);
+      .eq('isnewtrailer', true);
     
     if (moviesError) {
       console.error('Error fetching trailer movies from Supabase:', moviesError);
     } else if (trailerMovies) {
-      trailerItems = [...trailerItems, ...trailerMovies];
+      trailerItems = [...trailerItems, ...trailerMovies.map(movie => ({
+        ...movie,
+        genre_ids: [], // Add missing required property
+        media_type: movie.media_type || 'movie'
+      }))];
       console.log(`Found ${trailerMovies.length} trailer movies from Supabase`);
     }
     
@@ -26,24 +30,28 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
     const { data: trailerShows, error: showsError } = await supabase
       .from('admin_shows')
       .select('*')
-      .eq('hasTrailer', true);
+      .eq('hastrailer', true);
     
     if (showsError) {
       console.error('Error fetching trailer shows from Supabase:', showsError);
     } else if (trailerShows) {
-      trailerItems = [...trailerItems, ...trailerShows];
+      trailerItems = [...trailerItems, ...trailerShows.map(show => ({
+        ...show,
+        genre_ids: [], // Add missing required property
+        media_type: show.media_type || 'tv'
+      }))];
       console.log(`Found ${trailerShows.length} TV shows with trailers from Supabase`);
     }
     
     // Sortiere nach Erscheinungsdatum, NEUESTE zuerst
-    trailerItems.sort((a: MovieOrShow, b: MovieOrShow) => {
+    trailerItems.sort((a, b) => {
       const dateA = new Date(a.release_date || a.first_air_date || '');
       const dateB = new Date(b.release_date || b.first_air_date || '');
       return dateB.getTime() - dateA.getTime();
     });
     
     console.log(`Total trailer items: ${trailerItems.length}`);
-    return trailerItems;
+    return trailerItems as MovieOrShow[];
   } catch (e) {
     console.error('Error processing trailers:', e);
     return [];
@@ -58,7 +66,7 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
     const { data: freeMovies, error } = await supabase
       .from('admin_movies')
       .select('*')
-      .eq('isFreeMovie', true);
+      .eq('isfreemovie', true);
     
     if (error) {
       console.error('Error fetching free movies from Supabase:', error);
@@ -70,15 +78,22 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
       return [];
     }
     
+    // Map the movies to include required properties
+    const mappedMovies = freeMovies.map(movie => ({
+      ...movie,
+      genre_ids: [], // Add missing required property
+      media_type: movie.media_type || 'movie'
+    }));
+    
     // Sortiere nach Erscheinungsdatum, NEUESTE zuerst
-    const sortedFreeMovies = [...freeMovies].sort((a: MovieOrShow, b: MovieOrShow) => {
+    const sortedFreeMovies = [...mappedMovies].sort((a, b) => {
       const dateA = new Date(a.release_date || a.first_air_date || '');
       const dateB = new Date(b.release_date || b.first_air_date || '');
       return dateB.getTime() - dateA.getTime();
     });
     
     console.log(`Found ${sortedFreeMovies.length} free movies from Supabase`);
-    return sortedFreeMovies;
+    return sortedFreeMovies as MovieOrShow[];
   } catch (e) {
     console.error('Error processing free movies:', e);
     return [];
