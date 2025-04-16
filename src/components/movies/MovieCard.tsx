@@ -18,7 +18,7 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
   const slug = createUrlSlug(title);
   
   const imageSizes = {
-    small: 'h-[180px] w-[120px]',
+    small: 'h-[300px] w-[200px]',
     medium: 'h-[300px] w-[200px]',
     large: 'h-[450px] w-[300px]'
   };
