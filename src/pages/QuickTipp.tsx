@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { Button } from '@/components/ui/button';
 import { getRandomMovie, MovieDetail } from '@/lib/api';
-import { Sparkles, ArrowRight, Wand2, Target, Rocket, RefreshCcw } from 'lucide-react';
+import { Sparkles, ArrowRight, Wand2, Target, Rocket } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
 import { toast } from 'sonner';
@@ -64,21 +64,12 @@ const QuickTipp = () => {
 
         {movie && (
           <div className="mt-8 animate-fade-in">
-            <div className="rounded-xl p-6 shadow-lg border border-gray-100 relative overflow-hidden">
+            <div className="rounded-xl p-6 shadow-lg border border-gray-100 relative overflow-hidden max-w-3xl mx-auto">
               <div className="flex justify-between items-center mb-4 relative z-10">
                 <h3 className="text-lg font-medium text-gray-800">
                   Deine Filmempfehlung
                 </h3>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={handleGetRandomMovie}
-                  disabled={loading}
-                  className="border-gray-200 text-gray-600 bg-white"
-                >
-                  <RefreshCcw className="w-4 h-4 mr-2" />
-                  <span>Neuer Vorschlag</span>
-                </Button>
+                {/* Removed "Neuer Vorschlag" button */}
               </div>
               
               <div className="flex flex-col md:flex-row gap-6 relative z-10">
