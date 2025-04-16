@@ -55,7 +55,7 @@ const AllLists = () => {
               {lists.map((list) => (
                 <Link
                   key={list.id}
-                  to={`/liste/${list.id}/${createUrlSlug(list.title)}`}
+                  to={`/liste/${createUrlSlug(list.title)}`}
                   className="group block bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-100 hover:border-theme-accent-red/30 transition-all duration-300"
                 >
                   <div className="flex justify-between items-start mb-4">

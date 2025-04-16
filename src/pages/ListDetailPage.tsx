@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, List } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
-import { CustomList, getCustomList } from '@/lib/api';
+import { CustomList, getCustomList, getCustomLists } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import SEOHead from '@/components/seo/SEOHead';
 import MovieCard from '@/components/movies/MovieCard';
 import { createUrlSlug } from '@/lib/urlUtils';
 
 const ListDetailPage = () => {
-  const { id, slug } = useParams<{ id: string; slug?: string }>();
+  const { slug } = useParams<{ slug?: string }>();
   const navigate = useNavigate();
   const [list, setList] = useState<CustomList | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,19 +17,19 @@ const ListDetailPage = () => {
 
   useEffect(() => {
     const fetchList = async () => {
-      if (!id) return;
+      if (!slug) return;
       
       try {
         setLoading(true);
-        const fetchedList = await getCustomList(id);
-        setList(fetchedList);
+        const allLists = await getCustomLists();
+        const foundList = allLists.find(list => createUrlSlug(list.title) === slug);
         
-        const correctSlug = createUrlSlug(fetchedList.title);
-        if (!slug || slug !== correctSlug) {
-          navigate(`/liste/${id}/${correctSlug}`, { replace: true });
+        if (foundList) {
+          setList(foundList);
+          setError(null);
+        } else {
+          setError('Diese Liste konnte nicht gefunden werden.');
         }
-        
-        setError(null);
       } catch (err) {
         console.error('Error fetching list:', err);
         setError('Diese Liste konnte nicht gefunden werden.');
@@ -39,7 +39,7 @@ const ListDetailPage = () => {
     };
 
     fetchList();
-  }, [id, slug, navigate]);
+  }, [slug]);
 
   if (loading) {
     return (

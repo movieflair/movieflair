@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
@@ -79,7 +78,8 @@ const App = () => {
             <Route path="/search" element={<Navigate to="/suche" replace />} />
             <Route path="/entdecken" element={<Discover />} />
             <Route path="/discover" element={<Discover />} /> {/* Added new route for /discover */}
-            <Route path="/liste/:id/:slug?" element={<ListDetailPage />} />
+            <Route path="/liste/:slug" element={<ListDetailPage />} />
+            <Route path="/liste/:id/:slug" element={<Navigate to={`/liste/${window.location.pathname.split('/').pop()}`} replace />} />
             <Route path="/filmlisten" element={<AllLists />} />
             <Route path="/listen" element={<Navigate to="/filmlisten" replace />} /> {/* Added redirect for /listen */}
             <Route path="/genres" element={<Genres />} />

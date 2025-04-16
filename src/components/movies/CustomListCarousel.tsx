@@ -38,7 +38,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
         <div className="flex items-center gap-2">
           <ListPlus className="w-4 h-4 md:w-6 md:h-6" />
           <Link 
-            to={`/liste/${list.id}/${createUrlSlug(list.title)}`}
+            to={`/liste/${createUrlSlug(list.title)}`}
             className="text-lg md:text-2xl font-semibold hover:text-gray-800 transition-colors"
           >
             {list.title}
@@ -88,7 +88,7 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
       </div>
 
       <Link 
-        to={`/liste/${list.id}/${createUrlSlug(list.title)}`}
+        to={`/liste/${createUrlSlug(list.title)}`}
         className="absolute bottom-2 right-2 text-xs text-gray-400 hover:text-gray-800 transition-colors duration-300 flex items-center gap-1 opacity-50 hover:opacity-100"
       >
         <span>Liste ansehen</span>
