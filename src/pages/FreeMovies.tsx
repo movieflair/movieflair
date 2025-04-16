@@ -1,12 +1,15 @@
+
 import { useState, useEffect } from 'react';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { Gift } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     // Track page visit
@@ -40,7 +43,7 @@ const FreeMovies = () => {
         
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {[...Array(4)].map((_, index) => (
+            {[...Array(isMobile ? 2 : 4)].map((_, index) => (
               <div key={index} className="animate-pulse">
                 <div className="bg-muted aspect-[2/3] rounded-lg mb-2"></div>
                 <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
