@@ -21,7 +21,6 @@ const SearchBox = ({ variant = 'navbar', initialQuery = '' }: SearchBoxProps) =>
     queryKey: ['quickSearch', query],
     queryFn: async () => {
       if (query.length < 2) return [];
-      // Fix: searchMovies only takes one argument according to the error
       return searchMovies(query);
     },
     enabled: query.length >= 2,
