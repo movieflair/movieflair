@@ -3,13 +3,6 @@ import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, ListPlus } from 'lucide-react';
 import { CustomList } from '@/lib/api';
 import MovieCard from './MovieCard';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -33,43 +26,53 @@ const CustomListCarousel = ({ list }: CustomListCarouselProps) => {
   };
 
   return (
-    <div className="container-custom my-3 md:my-6">
-      <div className="glass-card overflow-hidden rounded-xl p-3 md:p-6">
-        <div className="grid grid-cols-1 gap-3 md:gap-6">
-          <div className="space-y-2">
+    <div className="container-custom">
+      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow p-4 md:p-6">
+        <div className="flex flex-col gap-4">
+          <div className="space-y-1">
             <Link 
               to="/discover" 
-              className="flex items-center gap-1 md:gap-2 text-lg font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
+              className="flex items-center gap-2 text-lg font-semibold hover:text-[rgba(26,152,255,255)] transition-colors"
             >
               <ListPlus className="w-4 h-4" />
               {list.title}
             </Link>
-            <p className="text-xs text-gray-600 line-clamp-1">
+            <p className="text-sm text-gray-600 line-clamp-1">
               {list.description}
             </p>
           </div>
 
-          <div className="relative w-full">
-            <div className="flex justify-center items-center relative h-[200px]">
+          <div className="relative">
+            <div className="flex justify-center items-center relative h-[180px]">
               {list.movies.slice(0, 3).map((movie, index) => (
                 <div 
                   key={movie.id}
-                  className="absolute w-[130px] transition-all duration-300 hover:z-20 hover:scale-105"
+                  className="absolute w-[120px] transition-transform duration-300 hover:z-20 hover:scale-105 cursor-pointer"
                   style={{
-                    transform: `translateX(${(index - 1) * 30}px)`,
-                    zIndex: index,
+                    transform: `translateX(${(index - 1) * 45}px)`,
+                    zIndex: 10 + index,
                   }}
                 >
                   <MovieCard movie={movie} size="small" hideDetails />
                 </div>
               ))}
             </div>
-            <div className="flex items-center gap-2 mt-2 justify-center">
-              <Button variant="outline" size="icon" className="h-7 w-7 md:h-8 md:w-8 rounded-full p-0" onClick={handlePrevClick}>
-                <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
+            <div className="flex items-center justify-center gap-2 mt-3">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-7 w-7 rounded-full bg-white/90 backdrop-blur p-0 hover:bg-white/95" 
+                onClick={handlePrevClick}
+              >
+                <ChevronLeft className="h-3 w-3" />
               </Button>
-              <Button variant="outline" size="icon" className="h-7 w-7 md:h-8 md:w-8 rounded-full p-0" onClick={handleNextClick}>
-                <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-7 w-7 rounded-full bg-white/90 backdrop-blur p-0 hover:bg-white/95" 
+                onClick={handleNextClick}
+              >
+                <ChevronRight className="h-3 w-3" />
               </Button>
             </div>
           </div>
