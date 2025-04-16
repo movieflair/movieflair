@@ -8,6 +8,10 @@ interface PrimeVideoAdProps {
 }
 
 const PrimeVideoAd = ({ className = '' }: PrimeVideoAdProps) => {
+  const handleClick = () => {
+    trackInteraction('amazon_ad_click');
+  };
+
   return (
     <div className={`w-full ${className}`}>
       <a 
@@ -15,6 +19,7 @@ const PrimeVideoAd = ({ className = '' }: PrimeVideoAdProps) => {
         target="_blank" 
         rel="noopener noreferrer"
         className="block"
+        onClick={handleClick}
       >
         <div className="bg-white/80 backdrop-blur-sm p-3 md:p-6 rounded-2xl shadow-lg border border-gray-100 max-w-[800px] mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6">

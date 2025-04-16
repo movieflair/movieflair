@@ -1,6 +1,6 @@
-
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { trackInteraction } from '@/lib/analyticsApi';
 
 interface MovieStreamButtonsProps {
   hasTrailer: boolean;
@@ -21,10 +21,21 @@ const MovieStreamButtons = ({
   onTrailerClick,
   onStreamClick
 }: MovieStreamButtonsProps) => {
-  const getAmazonUrl = (title: string) => {
+  const handlePrimeClick = () => {
+    trackInteraction('prime_video_click');
     const formattedTitle = encodeURIComponent(title);
     const tag = amazonAffiliateId || 'movieflair-21';
-    return `https://www.amazon.de/gp/video/search?phrase=${formattedTitle}&tag=${tag}`;
+    window.open(`https://www.amazon.de/gp/video/search?phrase=${formattedTitle}&tag=${tag}`, '_blank');
+  };
+
+  const handleTrailerClick = () => {
+    trackInteraction('trailer_click');
+    onTrailerClick();
+  };
+
+  const handleStreamClick = () => {
+    trackInteraction('free_movie_click');
+    onStreamClick();
   };
 
   return (
@@ -32,26 +43,24 @@ const MovieStreamButtons = ({
       {hasTrailer && trailerUrl && (
         <Button
           variant="secondary"
-          onClick={onTrailerClick}
+          onClick={handleTrailerClick}
           className="flex items-center gap-2"
         >
           <Play className="w-4 h-4" />
           Trailer
         </Button>
       )}
-      <a
-        href={getAmazonUrl(title)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="bg-[rgba(26,152,255,255)] text-white px-6 py-2 rounded-md hover:bg-[rgba(26,152,255,255)]/90 transition-colors flex items-center gap-2"
+      <Button
+        className="bg-[rgba(26,152,255,255)] text-white hover:bg-[rgba(26,152,255,255)]/90"
+        onClick={handlePrimeClick}
       >
-        <Play className="w-4 h-4" />
+        <Play className="w-4 h-4 mr-2" />
         Prime Video
-      </a>
+      </Button>
       {streamUrl && (
         <Button
           className="bg-[#ea384c] text-white hover:bg-[#ea384c]/90 flex items-center gap-2"
-          onClick={onStreamClick}
+          onClick={handleStreamClick}
         >
           <Play className="w-4 h-4" />
           Kostenlos

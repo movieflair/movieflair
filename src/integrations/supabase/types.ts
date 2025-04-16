@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      interaction_stats: {
+        Row: {
+          country: string | null
+          created_at: string | null
+          id: string
+          interaction_type: string
+          is_admin: boolean | null
+          media_id: number | null
+          media_type: string | null
+          referrer: string | null
+          user_id: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          interaction_type: string
+          is_admin?: boolean | null
+          media_id?: number | null
+          media_type?: string | null
+          referrer?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          interaction_type?: string
+          is_admin?: boolean | null
+          media_id?: number | null
+          media_type?: string | null
+          referrer?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       quick_tipp_ratings: {
         Row: {
           created_at: string | null
