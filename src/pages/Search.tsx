@@ -140,7 +140,7 @@ const Search = () => {
                   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {displayResults.map((item) => (
                       <div key={`${item.media_type}-${item.id}`} className="aspect-[2/3]">
-                        <MovieCard movie={item} />
+                        <MovieCard movie={item} size="large" />
                       </div>
                     ))}
                   </div>
