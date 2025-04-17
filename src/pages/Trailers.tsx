@@ -74,7 +74,7 @@ const Trailers = () => {
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Neue Trailer</h1>
                 <p className="text-white/80 max-w-2xl text-lg">
-                  Die neuesten Trailer zu kommenden Filmen und Serien.
+                  Entdecke die neuesten Trailer zu kommenden Filmen und Serien – Alle Trailer auf einen Blick. Immer aktuell.
                 </p>
               </div>
               
