@@ -151,7 +151,8 @@ const fetchMoviesByFilters = async (filters: FilterOptions): Promise<MovieOrShow
             streamUrl: movie.streamurl || '',
             hasTrailer: movie.hastrailer || false,
             trailerUrl: movie.trailerurl || '',
-            isNewTrailer: movie.isnewtrailer || false
+            isNewTrailer: movie.isnewtrailer || false,
+            genre_ids: movie.genre_ids || []
           }));
         }
         
@@ -164,7 +165,8 @@ const fetchMoviesByFilters = async (filters: FilterOptions): Promise<MovieOrShow
           streamUrl: movie.streamurl || '',
           hasTrailer: movie.hastrailer || false,
           trailerUrl: movie.trailerurl || '',
-          isNewTrailer: movie.isnewtrailer || false
+          isNewTrailer: movie.isnewtrailer || false,
+          genre_ids: [] // Leeres Array als Fallback
         }));
       }
     }
@@ -192,7 +194,8 @@ const fetchMoviesByFilters = async (filters: FilterOptions): Promise<MovieOrShow
         streamUrl: movie.streamurl || '',
         hasTrailer: movie.hastrailer || false,
         trailerUrl: movie.trailerurl || '',
-        isNewTrailer: movie.isnewtrailer || false
+        isNewTrailer: movie.isnewtrailer || false,
+        genre_ids: [] // Leeres Array als Fallback hinzufügen
       }));
     }
     
@@ -221,7 +224,8 @@ const fetchMoviesByFilters = async (filters: FilterOptions): Promise<MovieOrShow
       streamUrl: movie.streamurl || '',
       hasTrailer: movie.hastrailer || false,
       trailerUrl: movie.trailerurl || '',
-      isNewTrailer: movie.isnewtrailer || false
+      isNewTrailer: movie.isnewtrailer || false,
+      genre_ids: movie.genre_ids || []
     }));
   } catch (error) {
     console.error('Error fetching movies by filters:', error);
