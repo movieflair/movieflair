@@ -1,3 +1,4 @@
+
 import WatchlistButton from '@/components/movies/WatchlistButton';
 import ShareButton from '@/components/movies/ShareButton';
 
@@ -14,7 +15,9 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
         <div className="rounded-lg overflow-hidden shadow-xl">
           {posterPath ? (
             <img
-              src={`https://image.tmdb.org/t/p/w500${posterPath}`}
+              src={posterPath.startsWith('http') || posterPath.startsWith('/storage') 
+                ? posterPath 
+                : `https://image.tmdb.org/t/p/w500${posterPath}`}
               alt={title}
               className="w-full"
             />

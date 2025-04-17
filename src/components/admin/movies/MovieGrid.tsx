@@ -26,6 +26,7 @@ const MovieGrid = ({
   const [importingIds, setImportingIds] = useState<number[]>([]);
   const [downloadingIds, setDownloadingIds] = useState<number[]>([]);
   const [totalImportedMovies, setTotalImportedMovies] = useState<number>(0);
+  const [movieNeedsImageImport, setMovieNeedsImageImport] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     // Fetch the total count of imported movies when component mounts
@@ -46,7 +47,26 @@ const MovieGrid = ({
       }
     };
 
+    // Check if any imported movies still have TMDB image URLs
+    const checkMovieImagesSource = async () => {
+      if (movies.length === 0) return;
+      
+      const needs: Record<number, boolean> = {};
+      
+      // Check each movie that's flagged as imported to see if it needs image migration
+      movies.forEach(movie => {
+        if (movie.isImported) {
+          const posterNeedsMigration = movie.poster_path && movie.poster_path.includes('tmdb.org');
+          const backdropNeedsMigration = movie.backdrop_path && movie.backdrop_path.includes('tmdb.org');
+          needs[movie.id] = posterNeedsMigration || backdropNeedsMigration;
+        }
+      });
+      
+      setMovieNeedsImageImport(needs);
+    };
+
     fetchTotalImportedMovies();
+    checkMovieImagesSource();
   }, [movies]);
 
   // Hilfsfunktion zum Prüfen, ob ein Film bereits importiert wurde
@@ -108,6 +128,8 @@ const MovieGrid = ({
       }
       
       setDownloadingIds(prev => [...prev, movie.id]);
+      
+      toast.loading('Bilder werden auf den Server geladen...');
       
       // Download poster image
       if (movie.poster_path) {
@@ -174,15 +196,66 @@ const MovieGrid = ({
         console.error('Error updating movie with local paths:', updateError);
         toast.error('Fehler beim Aktualisieren der Bildpfade');
       } else {
+        toast.dismiss();
         toast.success('Bilder erfolgreich importiert');
+        // Update the movie needs import state
+        setMovieNeedsImageImport(prev => ({...prev, [movie.id]: false}));
       }
       
     } catch (error) {
       console.error('Error downloading images:', error);
+      toast.dismiss();
       toast.error('Fehler beim Herunterladen der Bilder');
     } finally {
       setDownloadingIds(prev => prev.filter(id => id !== movie.id));
     }
+  };
+
+  // Function to import images for all imported movies
+  const importAllImagesForMovies = async () => {
+    // Get all movie IDs that need image importing
+    const movieIds = Object.entries(movieNeedsImageImport)
+      .filter(([_, needsImport]) => needsImport)
+      .map(([id]) => parseInt(id));
+    
+    if (movieIds.length === 0) {
+      toast.info('Keine Filme benötigen Bildimport');
+      return;
+    }
+    
+    toast.loading(`Starte Import von Bildern für ${movieIds.length} Filme...`);
+    
+    // Process in batches to avoid overwhelming the server
+    const batchSize = 5;
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (let i = 0; i < movieIds.length; i += batchSize) {
+      const batch = movieIds.slice(i, i + batchSize);
+      
+      // Process each movie in the batch
+      await Promise.allSettled(
+        batch.map(async (movieId) => {
+          const movie = movies.find(m => m.id === movieId);
+          if (!movie) return;
+          
+          try {
+            await handleDownloadImages(movie);
+            successCount++;
+          } catch (error) {
+            console.error(`Error importing images for movie ${movieId}:`, error);
+            errorCount++;
+          }
+        })
+      );
+      
+      // Update progress
+      toast.dismiss();
+      toast.loading(`Importiere Filme... ${i + batch.length}/${movieIds.length} abgeschlossen`);
+    }
+    
+    toast.dismiss();
+    toast.success(`Bildimport abgeschlossen: ${successCount} erfolgreich, ${errorCount} fehlgeschlagen`);
   };
 
   if (isLoading) {
@@ -199,12 +272,36 @@ const MovieGrid = ({
     );
   }
 
-  const ImportedMoviesInfo = () => (
-    <div className="flex items-center gap-2 mb-4 text-sm text-muted-foreground">
-      <Info className="h-4 w-4" />
-      <span>Importierte Filme: <strong>{totalImportedMovies}</strong></span>
-    </div>
-  );
+  const ImportedMoviesInfo = () => {
+    // Check if any movies need image import
+    const needsImageImport = Object.values(movieNeedsImageImport).some(val => val);
+    
+    return (
+      <div className="mb-4">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Info className="h-4 w-4" />
+          <span>Importierte Filme: <strong>{totalImportedMovies}</strong></span>
+        </div>
+        
+        {needsImageImport && (
+          <div className="mt-2 p-3 bg-amber-50 border border-amber-200 rounded-md flex justify-between items-center">
+            <div className="text-amber-800 text-sm">
+              Es gibt Filme mit TMDB-Bildern, die auf Ihren Server importiert werden sollten.
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={importAllImagesForMovies}
+              className="ml-4 bg-amber-100 hover:bg-amber-200 text-amber-800 border-amber-300"
+            >
+              <Download className="h-4 w-4 mr-1" />
+              Alle Bilder importieren
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   if (movies.length === 0) {
     return (
@@ -284,7 +381,7 @@ const MovieGrid = ({
                     )}
                     {importingIds.includes(movie.id) ? 'Wird importiert...' : 'Importieren'}
                   </Button>
-                ) : (
+                ) : movieNeedsImageImport[movie.id] ? (
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -299,7 +396,7 @@ const MovieGrid = ({
                     )}
                     {downloadingIds.includes(movie.id) ? 'Bilder werden importiert...' : 'Bilder importieren'}
                   </Button>
-                )}
+                ) : null}
               </div>
             </div>
             

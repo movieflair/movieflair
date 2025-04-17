@@ -1,4 +1,3 @@
-
 import { CustomList, MovieOrShow } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { mapSupabaseMovieToMovieObject } from './movieApi';
@@ -290,6 +289,117 @@ export const removeMovieFromList = async (listId: string, mediaId: number): Prom
     return mapSupabaseListToCustomList(data as SupabaseCustomList);
   } catch (error) {
     console.error('Error in removeMovieFromList:', error);
+    throw error;
+  }
+};
+
+export const importMoviesFromLists = async (): Promise<{success: number, error: number}> => {
+  try {
+    console.log('Starting import of movies from all custom lists');
+    
+    // Get all custom lists
+    const lists = await getCustomLists();
+    
+    // Collect all unique movie IDs from all lists
+    const movieMap = new Map<number, MovieOrShow>();
+    lists.forEach(list => {
+      list.movies.forEach(movie => {
+        if (!movieMap.has(movie.id)) {
+          movieMap.set(movie.id, movie);
+        }
+      });
+    });
+    
+    console.log(`Found ${movieMap.size} unique movies across all lists`);
+    
+    // Check which movies are already imported
+    const movieIds = Array.from(movieMap.keys());
+    
+    if (movieIds.length === 0) {
+      console.log('No movies to import from lists');
+      return { success: 0, error: 0 };
+    }
+    
+    const { data: existingMovies, error: checkError } = await supabase
+      .from('admin_movies')
+      .select('id')
+      .in('id', movieIds);
+    
+    if (checkError) {
+      console.error('Error checking existing movies:', checkError);
+      throw new Error('Error checking existing movies');
+    }
+    
+    // Filter out already imported movies
+    const existingIds = new Set(existingMovies?.map(m => m.id) || []);
+    const moviesToImport = Array.from(movieMap.values())
+      .filter(movie => !existingIds.has(movie.id));
+    
+    console.log(`Found ${moviesToImport.length} movies to import from lists`);
+    
+    // Import movies in batches to avoid overwhelming the server
+    const batchSize = 5;
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (let i = 0; i < moviesToImport.length; i += batchSize) {
+      const batch = moviesToImport.slice(i, i + batchSize);
+      
+      // Process each movie in the batch
+      const results = await Promise.allSettled(
+        batch.map(async (movie) => {
+          try {
+            // Prepare movie data for import
+            const movieData = {
+              id: movie.id,
+              title: movie.title || '',
+              poster_path: movie.poster_path || '',
+              backdrop_path: movie.backdrop_path || '',
+              overview: movie.overview || '',
+              release_date: movie.release_date || '',
+              vote_average: movie.vote_average || 0,
+              vote_count: movie.vote_count || 0,
+              popularity: movie.popularity || 0,
+              media_type: 'movie',
+              isfreemovie: false,
+              isnewtrailer: false,
+              hasstream: false,
+              streamurl: '',
+              hastrailer: false,
+              trailerurl: ''
+            };
+            
+            // Import movie
+            const { error } = await supabase
+              .from('admin_movies')
+              .upsert(movieData);
+            
+            if (error) {
+              throw error;
+            }
+            
+            return { success: true };
+          } catch (error) {
+            console.error(`Error importing movie ${movie.id}:`, error);
+            return { success: false, error };
+          }
+        })
+      );
+      
+      // Count successes and errors
+      results.forEach(result => {
+        if (result.status === 'fulfilled' && result.value.success) {
+          successCount++;
+        } else {
+          errorCount++;
+        }
+      });
+    }
+    
+    console.log(`Import complete: ${successCount} movies imported, ${errorCount} failed`);
+    return { success: successCount, error: errorCount };
+  } catch (error) {
+    console.error('Error importing movies from lists:', error);
     throw error;
   }
 };
