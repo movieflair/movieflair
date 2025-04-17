@@ -20,6 +20,7 @@ const TrailersHero = ({ trailerItems }: TrailersHeroProps) => {
           <ArrowLeft className="w-4 h-4 mr-1" />
           Zurück zu Entdecken
         </Link>
+        <span className="text-xs text-muted-foreground ml-auto">v2.0.1</span>
       </div>
 
       <div className="relative overflow-hidden rounded-2xl mb-10">
