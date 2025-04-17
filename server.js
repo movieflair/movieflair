@@ -12,6 +12,8 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
   const app = express();
+  
+  console.log(`[Server] Starting in ${isProduction ? 'production' : 'development'} mode`);
 
   let vite = null;
   if (!isProduction) {
@@ -27,6 +29,7 @@ async function startServer() {
   // Add vite to request object for use in routes
   app.use((req, res, next) => {
     req.vite = vite;
+    console.log(`[Server] Processing request for: ${req.originalUrl}`);
     next();
   });
 
@@ -35,13 +38,13 @@ async function startServer() {
 
   // Error handling middleware
   app.use((err, req, res, next) => {
-    console.error('Server error:', err);
+    console.error('[Server] Server error:', err);
     res.status(500).send('Internal Server Error');
   });
 
   app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-    console.log(`Mode: ${isProduction ? 'Production' : 'Development'}`);
+    console.log(`[Server] Server running on http://localhost:${PORT}`);
+    console.log(`[Server] Mode: ${isProduction ? 'Production' : 'Development'}`);
   });
 }
 

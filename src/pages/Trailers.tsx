@@ -42,6 +42,8 @@ const Trailers = () => {
     ? `https://image.tmdb.org/t/p/original${trailerItems[0].backdrop_path}` 
     : '/movieflair-logo.png';
 
+  console.log(`Trailers page rendering with ${trailerItems.length} items`);
+  
   return (
     <MainLayout>
       <Seo 
