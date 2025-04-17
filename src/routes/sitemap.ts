@@ -5,8 +5,13 @@ import { generateSitemapXml } from '../utils/generateSitemap';
 
 const router = Router();
 
-// Use explicit path parameter and handler function
-router.get('/sitemap.xml', async function(req: Request, res: Response) {
+// Using the correct handler pattern for Express 5
+router.get('/sitemap.xml', function(req: Request, res: Response, next) {
+  handleSitemap(req, res).catch(next);
+});
+
+// Separate the async logic into its own function
+async function handleSitemap(req: Request, res: Response) {
   try {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -31,6 +36,6 @@ router.get('/sitemap.xml', async function(req: Request, res: Response) {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.status(500).send('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
   }
-});
+}
 
 export default router;

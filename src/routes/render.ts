@@ -10,8 +10,13 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Use explicit path parameter and handler function
-router.get('*', async function(req: Request, res: Response, next: NextFunction) {
+// Using the correct handler pattern for Express 5
+router.get('*', function(req: Request, res: Response, next: NextFunction) {
+  handleRender(req, res, next).catch(next);
+});
+
+// Separate the async logic into its own function
+async function handleRender(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
 
   try {
@@ -49,7 +54,7 @@ router.get('*', async function(req: Request, res: Response, next: NextFunction) 
             req.vite.ssrFixStacktrace(error);
           }
           console.error('Render error:', error);
-          next(error);
+          throw error;
         }
       } else {
         throw new Error('Vite dev server not available');
@@ -65,7 +70,7 @@ router.get('*', async function(req: Request, res: Response, next: NextFunction) 
         renderApp(url, template, App, {}, res);
       } catch (error) {
         console.error('Render error:', error);
-        next(error);
+        throw error;
       }
     }
   } catch (error) {
@@ -73,8 +78,8 @@ router.get('*', async function(req: Request, res: Response, next: NextFunction) 
       req.vite.ssrFixStacktrace(error);
     }
     console.error('Render error:', error);
-    next(error);
+    throw error;
   }
-});
+}
 
 export default router;
