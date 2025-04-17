@@ -1,14 +1,18 @@
 
+import { Application } from 'express';
+import express from 'express';
 import { ViteDevServer } from 'vite';
-import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-export const setupViteMiddleware = async (app: any, vite: ViteDevServer, isProduction: boolean) => {
-  if (!isProduction) {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export const setupViteMiddleware = async (app: Application, vite: ViteDevServer | null, isProduction: boolean) => {
+  if (!isProduction && vite) {
     app.use(vite.middlewares);
   } else {
     app.use(
-      express.static(path.resolve(__dirname, '../dist/client'), {
+      express.static(path.resolve(__dirname, '../../dist/client'), {
         index: false,
       })
     );
