@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +9,7 @@ import MovieSearchDialog from './MovieSearchDialog';
 import MovieEditDialog from './MovieEditDialog';
 import MovieListItem from './MovieListItem';
 import DeleteMovieDialog from './DeleteMovieDialog';
+import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
 
 const MovieCmsModule: React.FC = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
@@ -68,7 +68,11 @@ const MovieCmsModule: React.FC = () => {
   };
 
   const handleViewMovie = (movie: MovieOrShow) => {
-    window.open(`/movie/${movie.id}`, '_blank');
+    const title = movie.title || 'Unbekannter Film';
+    const slug = createUrlSlug(title);
+    const mediaType = getMediaTypeInGerman(movie.media_type);
+    const url = `/${mediaType}/${movie.id}/${slug}`;
+    window.open(url, '_blank');
   };
 
   const confirmDeleteMovie = async () => {

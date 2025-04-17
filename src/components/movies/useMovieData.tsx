@@ -43,7 +43,7 @@ export function useMovieData(id: string | undefined, slug?: string) {
               backdrop_path: tmdbMovie.backdrop_path || adminMovie.backdrop_path,
               // Genres explizit von TMDB übernehmen
               genres: tmdbMovie.genres || [],
-              // Wichtige TMDB Daten übernehmen
+              // Wichtige TMDB Daten explizit übernehmen
               cast: tmdbMovie.cast || [],
               crew: tmdbMovie.crew || [],
               runtime: tmdbMovie.runtime || adminMovie.runtime,

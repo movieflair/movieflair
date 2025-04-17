@@ -59,15 +59,11 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
     if (!hasError && movie.poster_path) {
       setHasError(true);
       
-      if (movie.poster_path.startsWith('/storage/')) {
-        try {
-          // Try with a forced full URL
-          const fullUrl = window.location.origin + movie.poster_path;
-          console.log(`Trying alternative storage URL: ${fullUrl}`);
-          setImageSrc(fullUrl);
-        } catch (e) {
-          setImageSrc(null);
-        }
+      // Try a smaller image format for TMDB paths
+      if (movie.poster_path.startsWith('/')) {
+        const tmdbUrl = `https://image.tmdb.org/t/p/w342${movie.poster_path}`;
+        console.log(`Trying smaller TMDB image: ${tmdbUrl}`);
+        setImageSrc(tmdbUrl);
       } else {
         setImageSrc(null);
       }

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import WatchlistButton from '@/components/movies/WatchlistButton';
 import ShareButton from '@/components/movies/ShareButton';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MoviePosterProps {
   id: number;
@@ -19,34 +20,10 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
       return;
     }
     
-    // Check if the path is already a full URL
-    if (posterPath.startsWith('http')) {
-      setImageSrc(posterPath);
-      return;
-    }
-    
-    // Handle storage paths - behalte lokale Bilder, falls vorhanden
-    if (posterPath.startsWith('/storage/')) {
-      try {
-        const fullUrl = window.location.origin + posterPath;
-        console.log(`Using storage URL for poster: ${fullUrl}`);
-        setImageSrc(fullUrl);
-      } catch (e) {
-        setImageSrc(posterPath);
-      }
-      return;
-    }
-    
-    // Für TMDB Pfade, verwenden wir immer die TMDB URL
-    if (posterPath.startsWith('/')) {
-      const tmdbUrl = `https://image.tmdb.org/t/p/w500${posterPath}`;
-      console.log(`Using TMDB URL for poster: ${tmdbUrl}`);
-      setImageSrc(tmdbUrl);
-      setHasError(false);
-      return;
-    }
-    
-    setImageSrc(posterPath);
+    // Use our centralized image URL utility
+    const url = getPublicImageUrl(posterPath);
+    setImageSrc(url);
+    setHasError(false);
     
   }, [posterPath]);
   
@@ -56,7 +33,7 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
     if (!hasError && posterPath) {
       setHasError(true);
       
-      // Fallback für TMDB Pfade auf ein kleineres Format
+      // Fallback to a smaller image format for TMDB paths
       if (posterPath.startsWith('/')) {
         const tmdbUrl = `https://image.tmdb.org/t/p/w342${posterPath}`;
         console.log(`Trying smaller TMDB image: ${tmdbUrl}`);

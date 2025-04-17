@@ -1,5 +1,6 @@
 
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { getPublicImageUrl } from "@/utils/imageUtils";
 
 interface CastMember {
   id: number;
@@ -18,19 +19,15 @@ const CastAndCrewSection = ({ director, cast }: CastAndCrewSectionProps) => {
   // Funktion zum Abrufen des Profilbilds direkt von TMDB
   const getProfileImageUrl = (path: string | undefined) => {
     if (!path) return null;
-    
-    // Wenn es bereits ein vollständiger URL ist
-    if (path.startsWith('http')) {
-      return path;
-    }
-    
-    // Für TMDB Pfade
-    if (path.startsWith('/')) {
-      return `https://image.tmdb.org/t/p/w185${path}`;
-    }
-    
-    return null;
+    return getPublicImageUrl(path);
   };
+
+  // Check if we have either director or cast to display
+  const hasData = director || (cast && cast.length > 0);
+  
+  if (!hasData) {
+    return null;
+  }
 
   return (
     <div className="space-y-4">
