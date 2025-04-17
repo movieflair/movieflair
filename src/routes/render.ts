@@ -1,5 +1,5 @@
 
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { renderApp } from '../utils/renderUtils';
 import fs from 'fs';
 import path from 'path';
@@ -7,8 +7,9 @@ import { fileURLToPath } from 'url';
 
 const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const isProduction = process.env.NODE_ENV === 'production';
 
-router.use(async (req, res, next) => {
+router.get('*', async (req: Request, res: Response, next: NextFunction) => {
   const url = req.originalUrl;
 
   try {
@@ -21,8 +22,6 @@ router.use(async (req, res, next) => {
       url.match(/^\/serie\/\d+/) || 
       url.match(/^\/liste\//) ||
       ['/', '/neue-trailer', '/kostenlose-filme', '/entdecken', '/filmlisten'].includes(url);
-
-    const isProduction = process.env.NODE_ENV === 'production';
 
     if ((!isCrawler && !isImportantRoute) && !req.query.forceSSR) {
       const indexHtml = fs.readFileSync(
@@ -38,13 +37,23 @@ router.use(async (req, res, next) => {
     
     if (!isProduction) {
       template = fs.readFileSync(path.resolve(__dirname, '../../../index.html'), 'utf-8');
-      template = await req.vite.transformIndexHtml(url, template);
-      const { default: entryServer } = await req.vite.ssrLoadModule('/src/App.tsx');
-      App = entryServer;
+      if (req.vite) {
+        template = await req.vite.transformIndexHtml(url, template);
+        const { default: entryServer } = await req.vite.ssrLoadModule('/src/App.tsx');
+        App = entryServer;
+      } else {
+        throw new Error('Vite dev server not available');
+      }
     } else {
       template = fs.readFileSync(path.resolve(__dirname, '../../../dist/client/index.html'), 'utf-8');
-      const { default: entryServer } = await import('../../../dist/server/App.js');
-      App = entryServer;
+      // In production, we use the built app
+      try {
+        const { default: entryServer } = await import('../../../dist/server/App.js');
+        App = entryServer;
+      } catch (err) {
+        console.error('Failed to import server App:', err);
+        throw new Error(`Server App import failed: ${err.message}`);
+      }
     }
 
     const helmetContext = {};

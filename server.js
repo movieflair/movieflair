@@ -41,6 +41,7 @@ async function startServer() {
 
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Mode: ${isProduction ? 'Production' : 'Development'}`);
   });
 }
 
