@@ -7,13 +7,12 @@ import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { Button } from '@/components/ui/button';
 import { Seo } from '@/components/seo/Seo';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from "@/hooks/use-toast";
 
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     trackPageVisit('free-movies');
@@ -27,6 +26,11 @@ const FreeMovies = () => {
         setMovies(data);
       } catch (error) {
         console.error('Error fetching free movies:', error);
+        toast({
+          title: "Fehler",
+          description: "Filme konnten nicht geladen werden. Bitte versuche es später erneut.",
+          variant: "destructive"
+        });
       } finally {
         setIsLoading(false);
       }
