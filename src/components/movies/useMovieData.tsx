@@ -38,9 +38,15 @@ export function useMovieData(id: string | undefined, slug?: string) {
             movieData = {
               ...tmdbMovie,
               ...adminMovie,
-              // Stelle sicher, dass die lokalen Pfade für Bilder verwendet werden
-              poster_path: adminMovie.poster_path || tmdbMovie.poster_path,
-              backdrop_path: adminMovie.backdrop_path || tmdbMovie.backdrop_path,
+              // Wir wollen die TMDB Bilder verwenden, daher übernehmen wir nicht die lokalen Pfade
+              poster_path: tmdbMovie.poster_path || adminMovie.poster_path,
+              backdrop_path: tmdbMovie.backdrop_path || adminMovie.backdrop_path,
+              // Genres explizit von TMDB übernehmen
+              genres: tmdbMovie.genres || [],
+              // Wichtige TMDB Daten übernehmen
+              cast: tmdbMovie.cast || [],
+              crew: tmdbMovie.crew || [],
+              runtime: tmdbMovie.runtime || adminMovie.runtime,
               // Andere wichtige Felder
               hasTrailer: adminMovie.hasTrailer,
               hasStream: adminMovie.hasStream,
@@ -48,7 +54,6 @@ export function useMovieData(id: string | undefined, slug?: string) {
               trailerUrl: adminMovie.trailerUrl,
               isFreeMovie: adminMovie.isFreeMovie,
               isNewTrailer: adminMovie.isNewTrailer,
-              runtime: adminMovie.runtime || tmdbMovie.runtime
             };
             
             console.log('Kombinierte Filmdaten:', movieData);

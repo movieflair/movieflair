@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieBackdropProps {
   backdropPath?: string;
@@ -23,24 +22,28 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
       return;
     }
     
-    // Handle storage paths
+    // Handle storage paths - behalte lokale Bilder, falls vorhanden
     if (backdropPath.startsWith('/storage/')) {
       try {
-        // Try with a forced full URL for storage paths
         const fullUrl = window.location.origin + backdropPath;
         console.log(`Using storage URL for backdrop: ${fullUrl}`);
         setImageSrc(fullUrl);
       } catch (e) {
-        // Fallback to the original path
         setImageSrc(backdropPath);
       }
       return;
     }
     
-    // Use our centralized image URL utility for TMDB paths
-    const url = getPublicImageUrl(backdropPath);
-    setImageSrc(url);
-    setHasError(false);
+    // Für TMDB Pfade, verwenden wir immer die TMDB URL
+    if (backdropPath.startsWith('/')) {
+      const tmdbUrl = `https://image.tmdb.org/t/p/original${backdropPath}`;
+      console.log(`Using TMDB URL for backdrop: ${tmdbUrl}`);
+      setImageSrc(tmdbUrl);
+      setHasError(false);
+      return;
+    }
+    
+    setImageSrc(backdropPath);
     
   }, [backdropPath]);
   
@@ -50,19 +53,11 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
     if (!hasError && backdropPath) {
       setHasError(true);
       
-      // Attempt one more fallback for storage paths
-      if (backdropPath.startsWith('/storage/')) {
-        try {
-          // Try with a forced full URL
-          const fullUrl = window.location.origin + backdropPath;
-          console.log(`Trying alternative storage URL: ${fullUrl}`);
-          setImageSrc(fullUrl);
-        } catch (e) {
-          setImageSrc(null);
-        }
-      } else if (backdropPath.startsWith('/')) {
-        // Try TMDB path as fallback
-        setImageSrc(`https://image.tmdb.org/t/p/original${backdropPath}`);
+      // Fallback für TMDB Pfade
+      if (backdropPath.startsWith('/')) {
+        const tmdbUrl = `https://image.tmdb.org/t/p/w1280${backdropPath}`;
+        console.log(`Trying smaller TMDB image: ${tmdbUrl}`);
+        setImageSrc(tmdbUrl);
       } else {
         setImageSrc(null);
       }

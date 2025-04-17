@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { getPublicImageUrl } from '@/utils/imageUtils';
 import WatchlistButton from '@/components/movies/WatchlistButton';
 import ShareButton from '@/components/movies/ShareButton';
 
@@ -26,24 +25,28 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
       return;
     }
     
-    // Handle storage paths
+    // Handle storage paths - behalte lokale Bilder, falls vorhanden
     if (posterPath.startsWith('/storage/')) {
       try {
-        // Try with a forced full URL for storage paths
         const fullUrl = window.location.origin + posterPath;
         console.log(`Using storage URL for poster: ${fullUrl}`);
         setImageSrc(fullUrl);
       } catch (e) {
-        // Fallback to the original path
         setImageSrc(posterPath);
       }
       return;
     }
     
-    // Use our centralized image URL utility for TMDB paths
-    const url = getPublicImageUrl(posterPath);
-    setImageSrc(url);
-    setHasError(false);
+    // Für TMDB Pfade, verwenden wir immer die TMDB URL
+    if (posterPath.startsWith('/')) {
+      const tmdbUrl = `https://image.tmdb.org/t/p/w500${posterPath}`;
+      console.log(`Using TMDB URL for poster: ${tmdbUrl}`);
+      setImageSrc(tmdbUrl);
+      setHasError(false);
+      return;
+    }
+    
+    setImageSrc(posterPath);
     
   }, [posterPath]);
   
@@ -53,19 +56,11 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
     if (!hasError && posterPath) {
       setHasError(true);
       
-      // Attempt one more fallback for storage paths
-      if (posterPath.startsWith('/storage/')) {
-        try {
-          // Try with a forced full URL
-          const fullUrl = window.location.origin + posterPath;
-          console.log(`Trying alternative storage URL: ${fullUrl}`);
-          setImageSrc(fullUrl);
-        } catch (e) {
-          setImageSrc(null);
-        }
-      } else if (posterPath.startsWith('/')) {
-        // Try TMDB path as fallback
-        setImageSrc(`https://image.tmdb.org/t/p/w500${posterPath}`);
+      // Fallback für TMDB Pfade auf ein kleineres Format
+      if (posterPath.startsWith('/')) {
+        const tmdbUrl = `https://image.tmdb.org/t/p/w342${posterPath}`;
+        console.log(`Trying smaller TMDB image: ${tmdbUrl}`);
+        setImageSrc(tmdbUrl);
       } else {
         setImageSrc(null);
       }

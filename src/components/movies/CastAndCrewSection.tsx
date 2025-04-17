@@ -15,6 +15,23 @@ interface CastAndCrewSectionProps {
 }
 
 const CastAndCrewSection = ({ director, cast }: CastAndCrewSectionProps) => {
+  // Funktion zum Abrufen des Profilbilds direkt von TMDB
+  const getProfileImageUrl = (path: string | undefined) => {
+    if (!path) return null;
+    
+    // Wenn es bereits ein vollständiger URL ist
+    if (path.startsWith('http')) {
+      return path;
+    }
+    
+    // Für TMDB Pfade
+    if (path.startsWith('/')) {
+      return `https://image.tmdb.org/t/p/w185${path}`;
+    }
+    
+    return null;
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium mb-3">Regie & Besetzung</h3>
@@ -25,7 +42,7 @@ const CastAndCrewSection = ({ director, cast }: CastAndCrewSectionProps) => {
             <Avatar className="w-14 h-14 md:w-16 md:h-16 mx-auto mb-1">
               {director.profile_path ? (
                 <AvatarImage 
-                  src={`https://image.tmdb.org/t/p/w185${director.profile_path}`}
+                  src={getProfileImageUrl(director.profile_path)}
                   alt={director.name}
                 />
               ) : (
@@ -45,7 +62,7 @@ const CastAndCrewSection = ({ director, cast }: CastAndCrewSectionProps) => {
             <Avatar className="w-14 h-14 md:w-16 md:h-16 mx-auto mb-1">
               {actor.profile_path ? (
                 <AvatarImage 
-                  src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
+                  src={getProfileImageUrl(actor.profile_path)}
                   alt={actor.name}
                 />
               ) : (

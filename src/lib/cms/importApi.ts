@@ -57,13 +57,16 @@ export const importMovieFromTMDB = async (movieId: number): Promise<boolean> => 
       ? `https://www.youtube.com/embed/${trailer.key}` 
       : '';
     
+    // Extract genre IDs if available
+    const genreIds = movieDetails.genres?.map(genre => genre.id) || [];
+    
     // Insert the movie into our database
     const { error } = await supabase.from('admin_movies').insert({
       id: movieDetails.id,
       title: movieDetails.title || '',
       overview: movieDetails.overview || '',
-      poster_path: posterPath || movieDetails.poster_path || '',
-      backdrop_path: backdropPath || movieDetails.backdrop_path || '',
+      poster_path: movieDetails.poster_path, // Nur Pfad speichern, nicht die lokale Version
+      backdrop_path: movieDetails.backdrop_path, // Nur Pfad speichern, nicht die lokale Version
       release_date: movieDetails.release_date || '',
       vote_average: movieDetails.vote_average || 0,
       vote_count: movieDetails.vote_count || 0,

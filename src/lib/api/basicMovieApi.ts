@@ -22,7 +22,7 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
       console.log(`Found movie in database: ${movie.title}`);
       
       // Map database fields to MovieDetail object
-      return {
+      const localMovieData = {
         id: movie.id,
         title: movie.title,
         overview: movie.overview,
@@ -40,15 +40,72 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
         trailerUrl: movie.trailerurl,
         isFreeMovie: movie.isfreemovie,
         isNewTrailer: movie.isnewtrailer,
-        videos: { results: [] } // Initialize empty videos array
+        runtime: movie.runtime,
+        videos: { results: [] }
       };
+      
+      // Zusätzlich Daten von TMDB API holen
+      try {
+        console.log(`Fetching additional TMDB data for movie ${id}`);
+        
+        const { data: tmdbData, error: tmdbError } = await supabase.functions.invoke('tmdb', {
+          body: { 
+            path: `/movie/${id}`,
+            searchParams: {
+              append_to_response: 'videos,credits,images',
+              language: 'de-DE'
+            }
+          }
+        });
+        
+        if (tmdbError) {
+          console.error('Error fetching movie from TMDB API:', tmdbError);
+        } else if (tmdbData) {
+          console.log('Successfully fetched additional data from TMDB');
+          
+          // Extrahiere Cast und Crew
+          const cast = tmdbData.credits?.cast || [];
+          const crew = tmdbData.credits?.crew || [];
+          
+          // Kombiniere die Daten und gib lokalen Daten Priorität
+          return {
+            ...tmdbData,
+            ...localMovieData,
+            // Überschreibe mit den originalen TMDB Pfaden für Bilder
+            poster_path: tmdbData.poster_path || localMovieData.poster_path,
+            backdrop_path: tmdbData.backdrop_path || localMovieData.backdrop_path,
+            // Übernimm die zusätzlichen Daten von TMDB
+            genres: tmdbData.genres || [],
+            cast,
+            crew,
+            runtime: tmdbData.runtime || localMovieData.runtime,
+            // Behalte die lokalen Status-Informationen
+            hasStream: localMovieData.hasStream,
+            streamUrl: localMovieData.streamUrl,
+            hasTrailer: localMovieData.hasTrailer,
+            trailerUrl: localMovieData.trailerUrl,
+            isFreeMovie: localMovieData.isFreeMovie,
+            isNewTrailer: localMovieData.isNewTrailer
+          };
+        }
+      } catch (tmdbError) {
+        console.error('Error fetching TMDB data:', tmdbError);
+      }
+      
+      return localMovieData;
     }
     
     console.log(`Movie with ID ${id} not found in database, falling back to TMDB API`);
     
-    // If not found in database, try to fetch from TMDB API
+    // If not found in database, try to fetch from TMDB API directly
     const { data: apiData, error: apiError } = await supabase.functions.invoke('tmdb', {
-      body: { action: 'getById', movieId: id }
+      body: { 
+        path: `/movie/${id}`,
+        searchParams: {
+          append_to_response: 'videos,credits,images',
+          language: 'de-DE'
+        }
+      }
     });
     
     if (apiError) {
@@ -56,8 +113,39 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
       throw apiError;
     }
     
+    if (!apiData) {
+      throw new Error(`Movie with ID ${id} not found`);
+    }
+    
     console.log(`Retrieved movie from TMDB API: ${apiData.title}`);
-    return apiData;
+    
+    // Extrahiere Cast und Crew
+    const cast = apiData.credits?.cast || [];
+    const crew = apiData.credits?.crew || [];
+    
+    // Erstelle trailer URL
+    let trailerUrl = '';
+    if (apiData.videos && apiData.videos.results) {
+      const trailer = apiData.videos.results.find(
+        (video: any) => video.type === 'Trailer' && video.site === 'YouTube'
+      );
+      if (trailer) {
+        trailerUrl = `https://www.youtube.com/embed/${trailer.key}`;
+      }
+    }
+    
+    return {
+      ...apiData,
+      cast,
+      crew,
+      media_type: 'movie',
+      hasTrailer: !!trailerUrl,
+      trailerUrl,
+      hasStream: false,
+      streamUrl: '',
+      isFreeMovie: false,
+      isNewTrailer: false
+    };
   } catch (error) {
     console.error(`Error fetching movie with ID ${id}:`, error);
     throw error;
