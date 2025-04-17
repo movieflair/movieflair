@@ -98,7 +98,7 @@ const Trailers = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold">
-              {isLoading ? 'Lade Trailer...' : `${trailerItems.length} neue Trailer`}
+              {isLoading ? 'Lade Trailer...' : 'Die neusten Trailer'}
             </h2>
           </div>
           
