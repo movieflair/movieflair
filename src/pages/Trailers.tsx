@@ -1,19 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Youtube, Shuffle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, Youtube } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import TrailerCard from '@/components/movies/TrailerCard';
 import { Button } from '@/components/ui/button';
 import { Seo } from '@/components/seo/Seo';
-import { useToast } from '@/components/ui/use-toast';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     trackPageVisit('trailers');
@@ -34,25 +30,6 @@ const Trailers = () => {
 
     fetchTrailerItems();
   }, []);
-
-  const handleRandomTrailer = () => {
-    if (trailerItems.length > 0) {
-      const randomIndex = Math.floor(Math.random() * trailerItems.length);
-      const randomItem = trailerItems[randomIndex];
-      console.log('Navigating to random trailer:', randomItem);
-      
-      // Show a toast to make it more visible that something happened
-      toast({
-        title: "Zufallstrailer ausgewählt",
-        description: `${randomItem.title || randomItem.name} wird geladen...`,
-      });
-      
-      // Add a small delay to make the navigation more noticeable
-      setTimeout(() => {
-        navigate(`/${randomItem.media_type === 'tv' ? 'serie' : 'film'}/${randomItem.id}`);
-      }, 500);
-    }
-  };
 
   const seoTitle = "Neue Film & Serien Trailer Online anschauen | MovieFlair";
   const seoDescription = "Neue Film & Serien Trailer Online anschauen - Entdecke die aktuellsten Trailer für kommende Filme und Serien";
@@ -101,17 +78,6 @@ const Trailers = () => {
               </div>
               
               <div className="flex gap-3">
-                <Button 
-                  variant="secondary"
-                  size="sm"
-                  className="flex items-center gap-2 group"
-                  onClick={handleRandomTrailer}
-                  disabled={trailerItems.length === 0}
-                >
-                  <Shuffle className="w-4 h-4 group-hover:animate-spin" />
-                  Zufallstrailer starten
-                </Button>
-                
                 <Button 
                   asChild
                   variant="secondary"
