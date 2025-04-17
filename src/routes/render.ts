@@ -10,7 +10,7 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-// TypeScript fix: Use the correct method signature
+// Fix: Use the correct method signature for the router.get handler
 router.get('*', async function renderHandler(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
 
