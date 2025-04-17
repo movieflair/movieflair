@@ -13,6 +13,7 @@ import TvShowDetails from '@/pages/TvShowDetails';
 import AdminPage from '@/pages/AdminPage';
 import MoviesPage from '@/pages/MoviesPage';
 import MainLayout from '@/components/layout/MainLayout';
+import QuickTipp from '@/pages/QuickTipp';
 
 // Let's create temporary components for pages that don't exist
 const HomePage = () => <MainLayout><div className="container-custom py-12"><h1>Home Page</h1></div></MainLayout>;
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
   {
     path: "/movies",
     element: <MoviesPage />,
+  },
+  {
+    path: "/quick-tipp",
+    element: <QuickTipp />,
   },
   {
     path: "*",

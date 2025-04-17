@@ -1,10 +1,12 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Settings, User, LogOut, Clapperboard } from 'lucide-react';
+import { Settings, User, LogOut, Clapperboard, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
 
 interface NavItem {
   label: string;
@@ -52,6 +54,13 @@ const Navbar = () => {
               {item.label}
             </Link>
           ))}
+          
+          <Link to="/quick-tipp">
+            <Button className="bg-[#ff3131] hover:bg-[#ff3131]/90 text-white flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Quick Tipp
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -124,6 +133,13 @@ const Navbar = () => {
                 {item.label}
               </Link>
             ))}
+            
+            <Link to="/quick-tipp" onClick={closeMobileMenu}>
+              <Button className="bg-[#ff3131] hover:bg-[#ff3131]/90 text-white flex items-center gap-2 w-full justify-center">
+                <Sparkles className="h-4 w-4" />
+                Quick Tipp
+              </Button>
+            </Link>
           </div>
         </div>
       )}
