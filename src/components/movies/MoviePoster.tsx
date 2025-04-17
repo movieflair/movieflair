@@ -80,6 +80,7 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
               alt={title}
               className="w-full"
               onError={handleError}
+              loading="eager"
             />
           ) : (
             <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">

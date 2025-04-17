@@ -32,7 +32,7 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
         vote_average: movie.vote_average,
         vote_count: movie.vote_count,
         popularity: movie.popularity,
-        media_type: 'movie',
+        media_type: 'movie' as 'movie', // Explicitly type as 'movie'
         genre_ids: [],
         hasStream: movie.hasstream,
         hasTrailer: movie.hastrailer,
@@ -85,7 +85,9 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
             hasTrailer: localMovieData.hasTrailer,
             trailerUrl: localMovieData.trailerUrl,
             isFreeMovie: localMovieData.isFreeMovie,
-            isNewTrailer: localMovieData.isNewTrailer
+            isNewTrailer: localMovieData.isNewTrailer,
+            // Ensure media_type is properly typed
+            media_type: 'movie' as 'movie'
           };
         }
       } catch (tmdbError) {
@@ -138,7 +140,7 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
       ...apiData,
       cast,
       crew,
-      media_type: 'movie',
+      media_type: 'movie' as 'movie', // Explicitly type as 'movie'
       hasTrailer: !!trailerUrl,
       trailerUrl,
       hasStream: false,

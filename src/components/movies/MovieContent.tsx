@@ -33,7 +33,10 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
     if (!movie?.streamUrl) return;
     
     // Track the interaction
-    trackInteraction('free_movie_click', { mediaId: movie.id, mediaType: movie.media_type || 'movie' });
+    trackInteraction('free_movie_click', { 
+      mediaId: movie.id, 
+      mediaType: movie.media_type || 'movie' 
+    });
     
     if (movie?.streamUrl.includes('embed')) {
       setShowTrailer(true);
@@ -44,7 +47,10 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
   
   const handleTrailerClick = () => {
     // Track the interaction
-    trackInteraction('trailer_click', { mediaId: movie.id, mediaType: movie.media_type || 'movie' });
+    trackInteraction('trailer_click', { 
+      mediaId: movie.id, 
+      mediaType: movie.media_type || 'movie' 
+    });
     setShowTrailer(true);
   };
 
@@ -52,7 +58,7 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
     <div className="min-h-screen bg-gray-50">
       <MovieBackdrop backdropPath={movie.backdrop_path} title={movie.title || ''} />
 
-      <div className="container mx-auto -mt-20 md:-mt-40 relative z-20 px-4 md:px-6 max-w-7xl">
+      <div className="container mx-auto -mt-20 md:-mt-40 relative z-20 px-4 md:px-6 max-w-[800px]">
         <Card className="overflow-hidden shadow-lg border-0">
           <div className="grid md:grid-cols-[280px,1fr] gap-6 md:gap-8 p-6 md:p-8">
             <div className="flex justify-center md:block">
@@ -78,16 +84,6 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
                 mediaType="movie"
                 className="mt-2"
               />
-
-              {movie.genres && movie.genres.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {movie.genres.map(genre => (
-                    <Badge key={genre.id} variant="outline" className="bg-gray-100">
-                      {genre.name}
-                    </Badge>
-                  ))}
-                </div>
-              )}
 
               <Card className="bg-white shadow-sm border">
                 <CardContent className="p-6">
