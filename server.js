@@ -1,3 +1,4 @@
+
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -34,22 +35,27 @@ async function startServer() {
   // Sitemap.xml Route - Strikt konfiguriert für korrekte XML-Ausgabe
   app.get('/sitemap.xml', async (req, res) => {
     try {
-      // Entferne unnötige Header
+      // Stelle sicher, dass keine Buffer oder Schreiboperationen vor dem Senden durchgeführt werden
+      res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+      
+      // Entferne alle Headers, die Probleme verursachen könnten
       res.removeHeader('X-Powered-By');
       res.removeHeader('Connection');
       res.removeHeader('Keep-Alive');
-      
-      // Setze Content-Type und spezifische XML-Header
-      res.set({
-        'Content-Type': 'application/xml; charset=utf-8',
-        'X-Content-Type-Options': 'nosniff',
-        'Cache-Control': 'public, max-age=86400'
-      });
+      res.removeHeader('Transfer-Encoding');
       
       let sitemap;
       try {
         // Versuche, die dynamische Sitemap zu generieren
         sitemap = await generateSitemapXml();
+        
+        // Vergewissern, dass die XML-Deklaration am absoluten Anfang steht
+        if (!sitemap.startsWith('<?xml')) {
+          sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' + 
+                   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+        }
       } catch (sitemapError) {
         console.error('Error generating dynamic sitemap:', sitemapError);
         
@@ -59,6 +65,12 @@ async function startServer() {
             path.resolve(__dirname, isProduction ? 'dist/client/sitemap.xml' : 'public/sitemap.xml'),
             'utf-8'
           );
+          
+          // Auch hier prüfen, ob die XML-Deklaration am Anfang steht
+          if (!sitemap.startsWith('<?xml')) {
+            sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' + 
+                     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+          }
         } catch (fallbackError) {
           console.error('Error reading static sitemap:', fallbackError);
           // Minimales gültiges XML als letzter Ausweg
@@ -66,10 +78,11 @@ async function startServer() {
         }
       }
       
-      // Sende die Sitemap ohne weitere Manipulation
+      // Direktes Senden ohne weitere Manipulation
       return res.send(sitemap);
     } catch (error) {
       console.error('Error serving sitemap:', error);
+      res.setHeader('Content-Type', 'application/xml; charset=utf-8');
       return res.status(500).send('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
     }
   });
