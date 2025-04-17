@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Youtube } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
@@ -89,7 +88,7 @@ const Trailers = () => {
                   rel="noopener noreferrer"
                 >
                   <Youtube className="w-5 h-5" />
-                  YouTube Channel
+                  MovieFlair Trailer
                 </a>
               </Button>
             </div>
@@ -129,4 +128,3 @@ const Trailers = () => {
 };
 
 export default Trailers;
-
