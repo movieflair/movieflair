@@ -1,10 +1,8 @@
-
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
 import { callTMDB } from './apiUtils';
 
-// Export this function to make it available for other modules
 export const mapSupabaseMovieToMovieObject = (movie: any): MovieOrShow => {
   const genres = movie.genre_ids || [];
   
@@ -29,6 +27,94 @@ export const mapSupabaseMovieToMovieObject = (movie: any): MovieOrShow => {
     isNewTrailer: movie.isnewtrailer || false,
     popularity: movie.popularity || 0
   };
+};
+
+export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<boolean> => {
+  try {
+    console.log(`Downloading images for movie ${movie.id} to server...`);
+    
+    let posterUpdated = false;
+    let backdropUpdated = false;
+    
+    if (movie.poster_path && !movie.poster_path.startsWith('/storage') && (movie.poster_path.startsWith('http') || movie.poster_path.startsWith('/'))) {
+      const posterUrl = movie.poster_path.startsWith('http') 
+        ? movie.poster_path 
+        : `https://image.tmdb.org/t/p/original${movie.poster_path}`;
+      
+      const posterRes = await fetch(posterUrl);
+      const posterBlob = await posterRes.blob();
+      
+      const posterFile = new File([posterBlob], `movie_${movie.id}_poster.jpg`, { 
+        type: 'image/jpeg' 
+      });
+      
+      const { data: posterData, error: posterError } = await supabase.storage
+        .from('movie_images')
+        .upload(`posters/${movie.id}.jpg`, posterFile, {
+          cacheControl: '3600',
+          upsert: true
+        });
+      
+      if (posterError) {
+        console.error('Error uploading poster:', posterError);
+      } else {
+        posterUpdated = true;
+      }
+    }
+    
+    if (movie.backdrop_path && !movie.backdrop_path.startsWith('/storage') && (movie.backdrop_path.startsWith('http') || movie.backdrop_path.startsWith('/'))) {
+      const backdropUrl = movie.backdrop_path.startsWith('http') 
+        ? movie.backdrop_path 
+        : `https://image.tmdb.org/t/p/original${movie.backdrop_path}`;
+      
+      const backdropRes = await fetch(backdropUrl);
+      const backdropBlob = await backdropRes.blob();
+      
+      const backdropFile = new File([backdropBlob], `movie_${movie.id}_backdrop.jpg`, { 
+        type: 'image/jpeg' 
+      });
+      
+      const { data: backdropData, error: backdropError } = await supabase.storage
+        .from('movie_images')
+        .upload(`backdrops/${movie.id}.jpg`, backdropFile, {
+          cacheControl: '3600',
+          upsert: true
+        });
+      
+      if (backdropError) {
+        console.error('Error uploading backdrop:', backdropError);
+      } else {
+        backdropUpdated = true;
+      }
+    }
+    
+    if (posterUpdated || backdropUpdated) {
+      const updateData: any = {};
+      
+      if (posterUpdated) {
+        updateData.poster_path = `/storage/movie_images/posters/${movie.id}.jpg`;
+      }
+      
+      if (backdropUpdated) {
+        updateData.backdrop_path = `/storage/movie_images/backdrops/${movie.id}.jpg`;
+      }
+      
+      const { error: updateError } = await supabase
+        .from('admin_movies')
+        .update(updateData)
+        .eq('id', movie.id);
+      
+      if (updateError) {
+        console.error('Error updating movie with local paths:', updateError);
+        return false;
+      }
+    }
+    
+    return posterUpdated || backdropUpdated;
+  } catch (error) {
+    console.error('Error downloading images to server:', error);
+    return false;
+  }
 };
 
 export const getImportedMovies = async (): Promise<MovieOrShow[]> => {
@@ -194,6 +280,24 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
 
   if (adminMovie) {
     console.log('Found movie in admin_movies table:', adminMovie);
+    
+    if ((adminMovie.poster_path && adminMovie.poster_path.includes('tmdb.org')) || 
+        (adminMovie.backdrop_path && adminMovie.backdrop_path.includes('tmdb.org'))) {
+      
+      console.log('Movie has TMDB image paths, downloading to server...');
+      await downloadMovieImagesToServer(mapSupabaseMovieToMovieObject(adminMovie));
+      
+      const { data: updatedMovie } = await supabase
+        .from('admin_movies')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+        
+      if (updatedMovie) {
+        adminMovie = updatedMovie;
+      }
+    }
+    
     return {
       ...movieData,
       media_type: 'movie',
@@ -206,6 +310,8 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
       trailerUrl: adminMovie.trailerurl || '',
       isFreeMovie: adminMovie.isfreemovie || false,
       isNewTrailer: adminMovie.isnewtrailer || false,
+      poster_path: adminMovie.poster_path,
+      backdrop_path: adminMovie.backdrop_path,
     };
   }
 
@@ -352,5 +458,63 @@ export const getRandomMovie = async (): Promise<MovieDetail> => {
     const popularMovies = await getPopularMovies();
     const randomIndex = Math.floor(Math.random() * popularMovies.length);
     return getMovieById(popularMovies[randomIndex].id);
+  }
+};
+
+export const importMovieFromLists = async (movie: MovieOrShow): Promise<boolean> => {
+  try {
+    const { data: existingMovie, error: checkError } = await supabase
+      .from('admin_movies')
+      .select('id')
+      .eq('id', movie.id)
+      .maybeSingle();
+      
+    if (checkError) {
+      console.error('Error checking if movie exists:', checkError);
+      return false;
+    }
+    
+    if (existingMovie) {
+      console.log(`Movie ${movie.id} already exists, checking if images need to be updated`);
+      return await downloadMovieImagesToServer(movie);
+    }
+    
+    const fullMovieData = await getMovieById(movie.id);
+    
+    const movieToImport = {
+      id: movie.id,
+      title: movie.title || '',
+      poster_path: movie.poster_path || '',
+      backdrop_path: movie.backdrop_path || '',
+      overview: movie.overview || '',
+      release_date: movie.release_date || '',
+      vote_average: movie.vote_average || 0,
+      vote_count: movie.vote_count || 0,
+      popularity: movie.popularity || 0,
+      media_type: 'movie',
+      isfreemovie: false,
+      isnewtrailer: false,
+      hasstream: false,
+      streamurl: '',
+      hastrailer: !!fullMovieData.videos?.results?.some((v: any) => v.type === 'Trailer'),
+      trailerurl: fullMovieData.videos?.results?.find((v: any) => v.type === 'Trailer')?.key ? 
+        `https://www.youtube.com/embed/${fullMovieData.videos.results.find((v: any) => v.type === 'Trailer').key}` : ''
+    };
+    
+    const { error: importError } = await supabase
+      .from('admin_movies')
+      .upsert(movieToImport);
+      
+    if (importError) {
+      console.error('Error importing movie:', importError);
+      return false;
+    }
+    
+    await downloadMovieImagesToServer(movie);
+    
+    return true;
+  } catch (error) {
+    console.error('Error importing movie from list:', error);
+    return false;
   }
 };

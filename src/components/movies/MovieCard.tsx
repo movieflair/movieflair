@@ -34,6 +34,19 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
     scrollToTop();
   };
 
+  // Get image source with correct path
+  const getImageSrc = (path?: string) => {
+    if (!path) return null;
+    
+    if (path.startsWith('/storage')) {
+      return path;
+    } else if (path.startsWith('http')) {
+      return path;
+    }
+    
+    return `/storage/movie_images/posters/${path.replace(/^\//, '')}`;
+  };
+
   return (
     <Link 
       to={`/${mediaType}/${movie.id}/${slug}`} 
@@ -43,7 +56,7 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
       <div className={`relative ${imageSizes[size]} bg-muted overflow-hidden rounded-xl`}>
         {movie.poster_path ? (
           <img
-            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            src={getImageSrc(movie.poster_path)}
             alt={title}
             className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
           />

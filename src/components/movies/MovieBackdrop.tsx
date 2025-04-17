@@ -11,9 +11,11 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
         <>
           <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
           <img
-            src={backdropPath.startsWith('http') || backdropPath.startsWith('/storage') 
+            src={backdropPath.startsWith('/storage') 
               ? backdropPath 
-              : `https://image.tmdb.org/t/p/original${backdropPath}`}
+              : backdropPath.startsWith('http') 
+                ? backdropPath 
+                : `/storage/movie_images/backdrops/${backdropPath.replace(/^\//, '')}`}
             alt={title}
             className="w-full h-full object-cover"
           />

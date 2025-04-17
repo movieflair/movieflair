@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { MovieOrShow } from "@/lib/types";
 import AdminSearch from '../search/AdminSearch';
@@ -90,7 +89,6 @@ const ContentManager = ({
   const [isImportingFromLists, setIsImportingFromLists] = useState(false);
 
   useEffect(() => {
-    // Check which movies are already imported
     const checkImportedMovies = async () => {
       if (filteredMovies.length === 0) return;
       
@@ -109,7 +107,6 @@ const ContentManager = ({
         
         const importedIds = new Set(data?.map(item => item.id) || []);
         
-        // Update movies with isImported flag
         const processed: Record<number, boolean> = {};
         filteredMovies.forEach(movie => {
           processed[movie.id] = importedIds.has(movie.id);
@@ -125,7 +122,6 @@ const ContentManager = ({
     checkImportedMovies();
   }, [filteredMovies]);
 
-  // Function to import all movies from lists
   const handleImportFromLists = async () => {
     if (isImportingFromLists) return;
     
@@ -146,9 +142,7 @@ const ContentManager = ({
         toast.info('Keine neuen Filme zum Importieren gefunden');
       }
       
-      // Refresh movie list to show newly imported movies
       if (result.success > 0) {
-        // Assuming we have a function to refresh the movie list or it happens on component reload
         window.location.reload();
       }
     } catch (error) {
@@ -160,7 +154,6 @@ const ContentManager = ({
     }
   };
 
-  // Funktion zum Importieren eines Films
   const handleImportMovie = async (movie: MovieOrShow) => {
     if (importingMovie) return;
     
@@ -168,10 +161,8 @@ const ContentManager = ({
       setImportingMovie(true);
       toast.loading('Film wird importiert...');
       
-      // Vollständige Filmdaten abrufen
       const fullMovieData = await getMovieById(movie.id);
       
-      // Film in die Datenbank importieren
       const { error } = await supabase
         .from('admin_movies')
         .upsert({
@@ -201,7 +192,8 @@ const ContentManager = ({
         return;
       }
       
-      // Mark movie as imported
+      await downloadMovieImagesToServer(movie);
+      
       setProcessedMovies(prev => ({...prev, [movie.id]: true}));
       movie.isImported = true;
       

@@ -15,9 +15,11 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
         <div className="rounded-lg overflow-hidden shadow-xl">
           {posterPath ? (
             <img
-              src={posterPath.startsWith('http') || posterPath.startsWith('/storage') 
+              src={posterPath.startsWith('/storage') 
                 ? posterPath 
-                : `https://image.tmdb.org/t/p/w500${posterPath}`}
+                : posterPath.startsWith('http') 
+                  ? posterPath 
+                  : `/storage/movie_images/posters/${posterPath.replace(/^\//, '')}`}
               alt={title}
               className="w-full"
             />

@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import MainLayout from '@/components/layout/MainLayout';
-import { getMovieById, getSimilarMovies, trackPageVisit } from '@/lib/api';
+import { getMovieById, getSimilarMovies, trackPageVisit, downloadMovieImagesToServer } from '@/lib/api';
 import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/types';
 import { Seo } from '@/components/seo/Seo';
 import MovieHeader from '@/components/movies/MovieHeader';
@@ -53,7 +52,17 @@ const MovieDetails = () => {
           getSimilarMovies(parsedId)
         ]);
         
-        setMovie(movieData);
+        if ((movieData.poster_path && movieData.poster_path.includes('tmdb.org')) || 
+            (movieData.backdrop_path && movieData.backdrop_path.includes('tmdb.org'))) {
+          console.log('Movie images need to be migrated to server in frontend view');
+          await downloadMovieImagesToServer(movieData);
+          
+          const updatedMovie = await getMovieById(parsedId);
+          setMovie(updatedMovie);
+        } else {
+          setMovie(movieData);
+        }
+        
         setSimilarMovies(similars);
       } catch (error) {
         console.error('Error fetching movie details:', error);
@@ -84,7 +93,6 @@ const MovieDetails = () => {
   const director = movie.crew?.find(person => person.job === 'Director');
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
   
-  // Verbesserte SEO-Daten mit den Hilfsfunktionen
   const seoTitle = formatMediaTitle(movie.title, releaseYear);
   const seoDescription = formatMediaDescription(movie.title, releaseYear, movie.overview, 160);
   const seoOgImage = getAbsoluteImageUrl(
