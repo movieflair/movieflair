@@ -20,7 +20,27 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
       return;
     }
     
-    // Use our centralized image URL utility
+    // Check if the path is already a full URL
+    if (posterPath.startsWith('http')) {
+      setImageSrc(posterPath);
+      return;
+    }
+    
+    // Handle storage paths
+    if (posterPath.startsWith('/storage/')) {
+      try {
+        // Try with a forced full URL for storage paths
+        const fullUrl = window.location.origin + posterPath;
+        console.log(`Using storage URL for poster: ${fullUrl}`);
+        setImageSrc(fullUrl);
+      } catch (e) {
+        // Fallback to the original path
+        setImageSrc(posterPath);
+      }
+      return;
+    }
+    
+    // Use our centralized image URL utility for TMDB paths
     const url = getPublicImageUrl(posterPath);
     setImageSrc(url);
     setHasError(false);
@@ -43,6 +63,9 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
         } catch (e) {
           setImageSrc(null);
         }
+      } else if (posterPath.startsWith('/')) {
+        // Try TMDB path as fallback
+        setImageSrc(`https://image.tmdb.org/t/p/w500${posterPath}`);
       } else {
         setImageSrc(null);
       }

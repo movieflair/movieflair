@@ -17,7 +17,27 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
       return;
     }
     
-    // Use our centralized image URL utility
+    // Check if the path is already a full URL
+    if (backdropPath.startsWith('http')) {
+      setImageSrc(backdropPath);
+      return;
+    }
+    
+    // Handle storage paths
+    if (backdropPath.startsWith('/storage/')) {
+      try {
+        // Try with a forced full URL for storage paths
+        const fullUrl = window.location.origin + backdropPath;
+        console.log(`Using storage URL for backdrop: ${fullUrl}`);
+        setImageSrc(fullUrl);
+      } catch (e) {
+        // Fallback to the original path
+        setImageSrc(backdropPath);
+      }
+      return;
+    }
+    
+    // Use our centralized image URL utility for TMDB paths
     const url = getPublicImageUrl(backdropPath);
     setImageSrc(url);
     setHasError(false);
@@ -40,6 +60,9 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
         } catch (e) {
           setImageSrc(null);
         }
+      } else if (backdropPath.startsWith('/')) {
+        // Try TMDB path as fallback
+        setImageSrc(`https://image.tmdb.org/t/p/original${backdropPath}`);
       } else {
         setImageSrc(null);
       }

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { parseUrlSlug } from '@/lib/urlUtils';
-import { getAdminMovieById, getMovieById, getSimilarMovies, trackPageVisit } from '@/lib/api';
+import { getAdminMovieById, getMovieById, getSimilarMovies } from '@/lib/api';
 import { toast } from 'sonner';
 import type { MovieDetail, MovieOrShow } from '@/lib/types';
 
@@ -11,8 +11,6 @@ export function useMovieData(id: string | undefined, slug?: string) {
   const [similarMovies, setSimilarMovies] = useState<MovieOrShow[]>([]);
 
   useEffect(() => {
-    trackPageVisit('movie-details');
-    
     const fetchMovie = async () => {
       if (!id) return;
       
@@ -50,7 +48,10 @@ export function useMovieData(id: string | undefined, slug?: string) {
               trailerUrl: adminMovie.trailerUrl,
               isFreeMovie: adminMovie.isFreeMovie,
               isNewTrailer: adminMovie.isNewTrailer,
+              runtime: adminMovie.runtime || tmdbMovie.runtime
             };
+            
+            console.log('Kombinierte Filmdaten:', movieData);
           } catch (error) {
             console.error('Fehler beim Abrufen der TMDB-Details, verwende nur lokale Daten', error);
             movieData = adminMovie;
@@ -63,6 +64,8 @@ export function useMovieData(id: string | undefined, slug?: string) {
         if (!movieData) {
           throw new Error(`Film mit ID ${parsedId} konnte nicht gefunden werden`);
         }
+        
+        console.log('Finale Filmdaten für Anzeige:', movieData);
         
         const similars = await getSimilarMovies(parsedId);
         

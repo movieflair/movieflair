@@ -21,6 +21,9 @@ const MovieMeta = ({
   mediaType,
   className 
 }: MovieMetaProps) => {
+  // Format the rating to show max 1 decimal place and don't show .0
+  const formattedRating = rating ? (rating % 1 === 0 ? rating.toFixed(0) : rating.toFixed(1)) : undefined;
+  
   return (
     <div className={cn("flex items-center gap-6 text-gray-600 flex-wrap", className)}>
       {mediaType && (
@@ -55,11 +58,11 @@ const MovieMeta = ({
               />
             ))}
           </div>
-          <span>{rating.toFixed(1)}/10</span>
+          <span>{formattedRating}/10</span>
         </div>
       )}
       
-      {duration && (
+      {duration && duration > 0 && (
         <div className="flex items-center gap-1">
           <Clock className="w-4 h-4" />
           <span>{duration} Minuten</span>

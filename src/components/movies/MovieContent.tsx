@@ -9,8 +9,9 @@ import MovieBackdrop from '@/components/movies/MovieBackdrop';
 import MoviePoster from '@/components/movies/MoviePoster';
 import MovieTrailerDialog from '@/components/movies/MovieTrailerDialog';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
-import { getTrailerUrl, truncateOverview } from './MovieDetailsHelpers';
+import { getTrailerUrl } from './MovieDetailsHelpers';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface MovieContentProps {
   movie: MovieDetail;
@@ -19,13 +20,20 @@ interface MovieContentProps {
 
 export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) => {
   const [showTrailer, setShowTrailer] = useState(false);
-  // Fix: Check if crew exists and find director, otherwise use the director property if it exists
+  // Get director from crew if available
   const director = movie.crew?.find(person => person.job === 'Director');
+  
+  // Get release year from release_date
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
+  
+  // Get trailer URL
   const trailerUrl = getTrailerUrl(movie);
   
   const handleStreamClick = () => {
     if (!movie?.streamUrl) return;
+    
+    // Track the interaction
+    trackInteraction('stream_click', movie.id, movie.media_type || 'movie');
     
     if (movie?.streamUrl.includes('embed')) {
       setShowTrailer(true);
@@ -33,12 +41,16 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
       window.open(movie.streamUrl, '_blank');
     }
   };
-
-  const genres = movie.genres?.map(g => g.name).join(', ') || '';
+  
+  const handleTrailerClick = () => {
+    // Track the interaction
+    trackInteraction('trailer_click', movie.id, movie.media_type || 'movie');
+    setShowTrailer(true);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <MovieBackdrop backdropPath={movie.backdrop_path} title={movie.title} />
+      <MovieBackdrop backdropPath={movie.backdrop_path} title={movie.title || ''} />
 
       <div className="container mx-auto -mt-20 md:-mt-40 relative z-20 px-4 md:px-6 max-w-7xl">
         <Card className="overflow-hidden shadow-lg border-0">
@@ -46,14 +58,14 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
             <div className="flex justify-center md:block">
               <MoviePoster 
                 id={movie.id} 
-                title={movie.title} 
+                title={movie.title || ''} 
                 posterPath={movie.poster_path}
               />
             </div>
 
             <div className="space-y-6">
               <MovieHeader 
-                title={movie.title}
+                title={movie.title || ''}
                 tagline={movie.tagline}
                 releaseYear={releaseYear}
                 genres={movie.genres}
@@ -67,9 +79,13 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
                 className="mt-2"
               />
 
-              {genres && (
-                <div className="text-sm">
-                  <span className="font-semibold">Genres:</span> {genres}
+              {movie.genres && movie.genres.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {movie.genres.map(genre => (
+                    <Badge key={genre.id} variant="outline" className="bg-gray-100">
+                      {genre.name}
+                    </Badge>
+                  ))}
                 </div>
               )}
 
@@ -77,7 +93,7 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
                 <CardContent className="p-6">
                   <h3 className="text-lg font-medium mb-2">Handlung</h3>
                   <p className="text-gray-700 leading-relaxed">
-                    {movie.overview}
+                    {movie.overview || 'Keine Beschreibung verfügbar.'}
                   </p>
                 </CardContent>
               </Card>
@@ -86,11 +102,11 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
                 hasTrailer={movie.hasTrailer || !!trailerUrl}
                 trailerUrl={trailerUrl}
                 streamUrl={movie.streamUrl}
-                title={movie.title}
+                title={movie.title || ''}
                 amazonAffiliateId={amazonAffiliateId}
                 isFreeMovie={movie.isFreeMovie}
                 hasStream={movie.hasStream}
-                onTrailerClick={() => setShowTrailer(true)}
+                onTrailerClick={handleTrailerClick}
                 onStreamClick={handleStreamClick}
               />
 
@@ -111,7 +127,7 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
         isOpen={showTrailer}
         onClose={() => setShowTrailer(false)}
         trailerUrl={trailerUrl || ''}
-        movieTitle={movie.title}
+        movieTitle={movie.title || ''}
       />
     </div>
   );
