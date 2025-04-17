@@ -28,6 +28,7 @@ export const getAllMovies = async (): Promise<MovieOrShow[]> => {
       trailerUrl: movie.trailerurl,
       isFreeMovie: movie.isfreemovie,
       isNewTrailer: movie.isnewtrailer,
+      runtime: movie.runtime // Include runtime
     }));
   } catch (error) {
     console.error('Error fetching movies:', error);
@@ -63,6 +64,7 @@ export const getMovieById = async (id: number): Promise<MovieOrShow | null> => {
       trailerUrl: data.trailerurl,
       isFreeMovie: data.isfreemovie,
       isNewTrailer: data.isnewtrailer,
+      runtime: data.runtime // Include runtime
     };
   } catch (error) {
     console.error('Error fetching movie:', error);

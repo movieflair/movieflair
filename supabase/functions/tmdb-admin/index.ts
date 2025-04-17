@@ -1,3 +1,4 @@
+
 import { corsHeaders } from '../_shared/cors.ts'
 
 Deno.serve(async (req) => {
@@ -96,6 +97,9 @@ Deno.serve(async (req) => {
           data.hasTrailer = true;
         }
       }
+      
+      // Ensure runtime is included (it comes directly from TMDB API)
+      console.log(`Movie runtime: ${data.runtime} minutes`);
     }
     
     console.log(`TMDB API response received successfully for action: ${action}`);

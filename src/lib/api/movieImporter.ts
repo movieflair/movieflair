@@ -113,6 +113,12 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       console.error('Fehler beim Speichern der Bilder:', error);
     }
     
+    // Speichern der Laufzeit (Neu)
+    const runtime = fullMovieData.runtime || null;
+    if (runtime) {
+      console.log(`Film-Laufzeit: ${runtime} Minuten`);
+    }
+    
     if (existingMovie) {
       console.log(`Film ${movie.id} existiert bereits, Daten werden aktualisiert`);
       
@@ -129,7 +135,8 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
           vote_count: fullMovieData.vote_count || 0,
           popularity: fullMovieData.popularity || 0,
           hastrailer: hasTrailer,
-          trailerurl: trailerUrl
+          trailerurl: trailerUrl,
+          runtime: runtime // Laufzeit hinzugefügt
         })
         .eq('id', movie.id);
         
@@ -160,7 +167,8 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       hasstream: false,
       streamurl: '',
       hastrailer: hasTrailer,
-      trailerurl: trailerUrl
+      trailerurl: trailerUrl,
+      runtime: runtime // Laufzeit hinzugefügt
     };
     
     console.log('Füge Film in Datenbank ein:', movieToImport);
