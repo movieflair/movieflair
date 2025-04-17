@@ -9,6 +9,7 @@ import { getRandomCustomLists } from '@/lib/api';
 import { toast } from 'sonner';
 import { createUrlSlug } from '@/lib/urlUtils';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 const RandomLists = () => {
   const [customLists, setCustomLists] = useState<CustomList[]>([]);

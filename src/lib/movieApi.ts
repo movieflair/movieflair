@@ -1,9 +1,11 @@
+
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
 import { callTMDB } from './apiUtils';
 
-const mapSupabaseMovieToMovieObject = (movie: any): MovieOrShow => {
+// Export this function to make it available for other modules
+export const mapSupabaseMovieToMovieObject = (movie: any): MovieOrShow => {
   const genres = movie.genre_ids || [];
   
   return {

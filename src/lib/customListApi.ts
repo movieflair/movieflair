@@ -1,6 +1,8 @@
+
 import { CustomList, MovieOrShow } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { mapSupabaseMovieToMovieObject } from './movieApi';
+import { Json } from '@/integrations/supabase/types';
 
 interface SupabaseCustomList {
   id: string;
@@ -213,11 +215,11 @@ export const addMovieToList = async (listId: string, movie: MovieOrShow): Promis
   }
   
   // Check if movie already exists in the list
-  const movies = list.movies || [];
-  const movieExists = movies.some((m: MovieOrShow) => m.id === movie.id);
+  const movies = Array.isArray(list.movies) ? list.movies : [];
+  const movieExists = movies.some((m: any) => m.id === movie.id);
   
   if (movieExists) {
-    return list;
+    return mapSupabaseListToCustomList(list as SupabaseCustomList);
   }
   
   // Add the movie to the list
@@ -236,7 +238,7 @@ export const addMovieToList = async (listId: string, movie: MovieOrShow): Promis
     throw new Error('Error updating list');
   }
   
-  return updatedList;
+  return mapSupabaseListToCustomList(updatedList as SupabaseCustomList);
 };
 
 export const removeMovieFromList = async (listId: string, mediaId: number): Promise<CustomList> => {
@@ -260,6 +262,7 @@ export const removeMovieFromList = async (listId: string, mediaId: number): Prom
     
     console.log('Current movies in list:', currentList.movies);
     
+    // Ensure movies is an array before filtering
     const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
     
     const updatedMovies = currentMovies.filter((media: any) => media.id !== mediaId) as unknown as Json;
