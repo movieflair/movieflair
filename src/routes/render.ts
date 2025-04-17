@@ -10,7 +10,7 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-router.get('*', async (req: Request, res: Response, next: NextFunction) => {
+router.get('*', function renderHandler(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
 
   try {
@@ -38,9 +38,19 @@ router.get('*', async (req: Request, res: Response, next: NextFunction) => {
     if (!isProduction) {
       template = fs.readFileSync(path.resolve(__dirname, '../../../index.html'), 'utf-8');
       if (req.vite) {
-        template = await req.vite.transformIndexHtml(url, template);
-        const { default: entryServer } = await req.vite.ssrLoadModule('/src/App.tsx');
-        App = entryServer;
+        template = req.vite.transformIndexHtml(url, template);
+        req.vite.ssrLoadModule('/src/App.tsx')
+          .then(({ default: entryServer }) => {
+            App = entryServer;
+            renderApp(url, template, App, {}, res);
+          })
+          .catch(error => {
+            if (req.vite) {
+              req.vite.ssrFixStacktrace(error);
+            }
+            console.error('Render error:', error);
+            next(error);
+          });
       } else {
         throw new Error('Vite dev server not available');
       }
@@ -48,12 +58,17 @@ router.get('*', async (req: Request, res: Response, next: NextFunction) => {
       template = fs.readFileSync(path.resolve(__dirname, '../../../dist/client/index.html'), 'utf-8');
       const AppPath = '../../../dist/server/App.js';
       const dynamicImport = new Function('path', 'return import(path)');
-      const entryServer = await dynamicImport(AppPath);
-      App = entryServer.default;
+      
+      dynamicImport(AppPath)
+        .then(entryServer => {
+          App = entryServer.default;
+          renderApp(url, template, App, {}, res);
+        })
+        .catch(error => {
+          console.error('Render error:', error);
+          next(error);
+        });
     }
-
-    const helmetContext = {};
-    await renderApp(url, template, App, helmetContext, res);
   } catch (error) {
     if (!isProduction && req.vite) {
       req.vite.ssrFixStacktrace(error);

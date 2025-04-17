@@ -6,7 +6,7 @@ import React from 'react';
 import fs from 'fs';
 import path from 'path';
 
-export async function renderApp(url: string, template: string, App: any, helmetContext: any, res: any) {
+export function renderApp(url: string, template: string, App: any, helmetContext: any, res: any) {
   const { pipe } = renderToPipeableStream(
     React.createElement(
       HelmetProvider,
