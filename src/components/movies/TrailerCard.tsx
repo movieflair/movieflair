@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { MovieOrShow } from '@/lib/api';
 import { Link } from 'react-router-dom';
@@ -29,10 +28,10 @@ const TrailerCard = ({ movie }: TrailerCardProps) => {
           }}
         >
           <button 
-            className="w-16 h-16 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+            className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
             disabled={!movie.trailerUrl}
           >
-            <Play className="w-8 h-8 text-white fill-white" />
+            <Play className="w-6 h-6 text-white fill-white" />
           </button>
         </motion.div>
 
@@ -70,4 +69,3 @@ const TrailerCard = ({ movie }: TrailerCardProps) => {
 };
 
 export default TrailerCard;
-
