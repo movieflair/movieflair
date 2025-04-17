@@ -18,6 +18,7 @@ router.get('*', function(req: Request, res: Response, next: NextFunction) {
 // Separate the async logic into its own function
 async function handleRender(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
+  console.log(`Handling request for URL: ${url}`);
 
   try {
     const isCrawler = req.get('User-Agent')?.toLowerCase().includes('bot') ||
@@ -30,7 +31,13 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
       url.match(/^\/liste\//) ||
       ['/', '/neue-trailer', '/kostenlose-filme', '/entdecken', '/filmlisten'].includes(url);
 
-    if ((!isCrawler && !isImportantRoute) && !req.query.forceSSR) {
+    console.log(`Route ${url} - isCrawler: ${isCrawler}, isImportantRoute: ${isImportantRoute}`);
+
+    // Force SSR for specific routes to ensure they always go live
+    const forceSSR = ['/neue-trailer'].includes(url);
+    
+    if ((!isCrawler && !isImportantRoute && !forceSSR) && !req.query.forceSSR) {
+      console.log(`Serving client-side rendering for ${url}`);
       const indexHtml = fs.readFileSync(
         path.resolve(__dirname, isProduction ? '../../../dist/client/index.html' : '../../../index.html'),
         'utf-8'
@@ -38,6 +45,8 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
       return res.status(200).set({ 'Content-Type': 'text/html' }).end(indexHtml);
     }
 
+    console.log(`Performing server-side rendering for ${url}`);
+    
     // Wrap template and App loading in an async context
     let template, App;
     

@@ -27,6 +27,7 @@ async function startServer() {
   // Add vite to request object for use in routes
   app.use((req, res, next) => {
     req.vite = vite;
+    console.log(`Processing request for: ${req.url}`);
     next();
   });
 
@@ -42,6 +43,9 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Mode: ${isProduction ? 'Production' : 'Development'}`);
+    if (isProduction) {
+      console.log('Public deployment mode active');
+    }
   });
 }
 

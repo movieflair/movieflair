@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { MovieOrShow } from '@/lib/api';
 import { Link } from 'react-router-dom';
@@ -24,6 +25,7 @@ const TrailerCard = ({ movie }: TrailerCardProps) => {
             e.preventDefault();
             if (movie.trailerUrl) {
               setShowTrailer(true);
+              console.log('Opening trailer:', movie.trailerUrl);
             }
           }}
         >

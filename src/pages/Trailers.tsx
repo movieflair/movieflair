@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const appVersion = "v2.0.3"; // Updated version number to track changes
 
   useEffect(() => {
     trackPageVisit('trailers');
@@ -72,7 +73,7 @@ const Trailers = () => {
           <div className="relative z-10 p-8 md:p-12">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Neue Trailer</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Neue Trailer {appVersion}</h1>
                 <p className="text-white/80 max-w-2xl text-lg">
                   Entdecke die neuesten Trailer zu kommenden Filmen und Serien – Alle Trailer auf einen Blick. Immer aktuell.
                 </p>
