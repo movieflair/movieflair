@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Youtube } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import TrailerCard from '@/components/movies/TrailerCard';
 import { Seo } from '@/components/seo/Seo';
+import { Button } from '@/components/ui/button';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
@@ -76,6 +77,21 @@ const Trailers = () => {
                   Die neuesten Trailer zu kommenden Filmen und Serien.
                 </p>
               </div>
+              
+              <Button 
+                asChild
+                variant="secondary"
+                className="flex items-center gap-2"
+              >
+                <a 
+                  href="https://www.youtube.com/@movieflair_trailer" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  <Youtube className="w-5 h-5" />
+                  YouTube Channel
+                </a>
+              </Button>
             </div>
           </div>
         </div>
