@@ -8,6 +8,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import App from './App.tsx'
 import './index.css'
 import { ensureStorageBucketExists } from './lib/setupStorage'
+import { AdminSettingsProvider } from './hooks/useAdminSettings'
 
 // Initialisiere den Storage-Bucket
 ensureStorageBucketExists().catch(console.error);
@@ -26,8 +27,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <HelmetProvider>
       <BrowserRouter>
         <QueryClientProvider client={queryClient}>
-          <App />
-          <Toaster position="top-center" richColors />
+          <AdminSettingsProvider>
+            <App />
+            <Toaster position="top-center" richColors />
+          </AdminSettingsProvider>
         </QueryClientProvider>
       </BrowserRouter>
     </HelmetProvider>
