@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play } from 'lucide-react';
 import { trackInteraction } from '@/lib/analyticsApi';
@@ -9,6 +9,8 @@ interface PrimeVideoAdProps {
 }
 
 const PrimeVideoAd = ({ className = '' }: PrimeVideoAdProps) => {
+  const [logoError, setLogoError] = useState(false);
+  
   const handleClick = () => {
     trackInteraction('amazon_ad_click');
   };
@@ -26,17 +28,21 @@ const PrimeVideoAd = ({ className = '' }: PrimeVideoAdProps) => {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-6">
               <div className="h-5 md:h-8">
-                <img 
-                  src="https://m.media-amazon.com/images/G/01/digital/video/web/Logo-min.png" 
-                  alt="Prime Video" 
-                  className="h-full w-auto"
-                  onError={(e) => {
-                    console.error('Error loading Prime Video logo');
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null;
-                    target.src = '/movieflair-logo.png';
-                  }}
-                />
+                {!logoError ? (
+                  <img 
+                    src="https://m.media-amazon.com/images/G/01/digital/video/web/Logo-min.png" 
+                    alt="Prime Video" 
+                    className="h-full w-auto"
+                    onError={(e) => {
+                      console.error('Error loading Prime Video logo');
+                      setLogoError(true);
+                    }}
+                  />
+                ) : (
+                  <div className="bg-[#00A8E1] text-white px-2 py-1 rounded text-xs font-bold h-full flex items-center">
+                    prime video
+                  </div>
+                )}
               </div>
               <div className="text-left">
                 <p className="text-sm md:text-lg font-medium mb-1">Streame ähnliche Filme kostenlos auf Prime Video</p>
