@@ -19,9 +19,8 @@ export const getImagePath = (path?: string, type: 'poster' | 'backdrop' = 'poste
     return path;
   }
   
-  // For external URLs, use them but log a warning
+  // For external URLs (including TMDB URLs), return as is
   if (path.startsWith('http')) {
-    console.warn('External image URL found, should be imported to local storage:', path);
     return path;
   }
   

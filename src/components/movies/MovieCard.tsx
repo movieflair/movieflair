@@ -26,7 +26,7 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
   const imageSizes = {
     small: 'h-[250px] w-[170px]',
     medium: 'h-[250px] w-[170px]',
-    large: 'h-[270px] w-[190px]'  // Aktualisierte Größe für spezifische Seiten
+    large: 'h-[270px] w-[190px]'  // Updated size for specific pages
   };
   
   const textSizes = {
@@ -41,7 +41,7 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     if (!hasError && movie.poster_path && movie.poster_path.startsWith('/') && !movie.poster_path.startsWith('/storage')) {
-      console.log('Versuche TMDB-Fallback für Filmposter in der Karte:', movie.poster_path);
+      console.log('Trying TMDB fallback for movie poster in card:', movie.poster_path);
       setHasError(true);
       setImageSrc(`https://image.tmdb.org/t/p/w500${movie.poster_path}`);
     } else {

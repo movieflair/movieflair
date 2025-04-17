@@ -18,9 +18,9 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error(`Fehler beim Laden des Posters für ${title}:`, e);
     
-    // Versuche es mit dem TMDB-Fallback, wenn es ein TMDB-Pfad ist und wir noch nicht den Fallback verwenden
+    // Try using the TMDB fallback if it's a TMDB path and we're not already using the fallback
     if (!hasError && posterPath && posterPath.startsWith('/') && !posterPath.startsWith('/storage')) {
-      console.log('Versuche TMDB-Fallback für Poster');
+      console.log('Trying TMDB fallback for poster');
       setHasError(true);
       setCurrentSrc(`https://image.tmdb.org/t/p/w500${posterPath}`);
     }

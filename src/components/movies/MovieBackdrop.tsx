@@ -15,9 +15,9 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error(`Fehler beim Laden des Hintergrundbilds für ${title}:`, e);
     
-    // Versuche es mit dem TMDB-Fallback, wenn es ein TMDB-Pfad ist und wir noch nicht den Fallback verwenden
+    // Try using the TMDB fallback if it's a TMDB path and we're not already using the fallback
     if (!hasError && backdropPath && backdropPath.startsWith('/') && !backdropPath.startsWith('/storage')) {
-      console.log('Versuche TMDB-Fallback für Hintergrundbild');
+      console.log('Trying TMDB fallback for backdrop');
       setHasError(true);
       setCurrentSrc(`https://image.tmdb.org/t/p/original${backdropPath}`);
     }
