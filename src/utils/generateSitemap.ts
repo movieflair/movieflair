@@ -1,4 +1,9 @@
 
+/**
+ * This utility generates a sitemap.xml file based on the routes in your application
+ * and dynamic content like movies and TV shows from your database.
+ */
+
 import { supabase } from '@/integrations/supabase/client';
 
 // Base URL of your website
@@ -121,7 +126,7 @@ export async function generateSitemapXml() {
     xml += '  <url>\n';
     xml += `    <loc>${BASE_URL}/serie/${show.id}${slug ? `/${slug}` : ''}</loc>\n`;
     xml += '    <changefreq>monthly</changefreq>\n';
-    xml += '    <priority>0.7</priority>\n';
+    xml += '    <priority>0.7</priority>\n`;
     if (show.updated_at) {
       xml += `    <lastmod>${new Date(show.updated_at).toISOString()}</lastmod>\n`;
     }
@@ -135,7 +140,7 @@ export async function generateSitemapXml() {
     xml += '  <url>\n';
     xml += `    <loc>${BASE_URL}/liste/${slug}</loc>\n`;
     xml += '    <changefreq>weekly</changefreq>\n';
-    xml += '    <priority>0.6</priority>\n';
+    xml += '    <priority>0.6</priority>\n`;
     if (list.updated_at) {
       xml += `    <lastmod>${new Date(list.updated_at).toISOString()}</lastmod>\n`;
     }
@@ -182,4 +187,3 @@ export function writeSitemapToFile() {
 if (typeof require !== 'undefined' && require.main === module) {
   writeSitemapToFile();
 }
-
