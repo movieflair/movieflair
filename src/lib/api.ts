@@ -3,16 +3,11 @@
 export * from './types';
 export {
   getMovieById,
-  getImportedMovies,
   getFreeMovies,
   getTrailerMovies,
   getPopularMovies,
   searchMovies,
-  importMovieFromTMDB,
-  getRandomImportedMovie,
   getRandomMovie,
-  downloadMovieImagesToServer,
-  deleteAllMovies,
   getSimilarMovies
 } from './movieApi';
 
@@ -28,17 +23,11 @@ export * from './filterApi';
 // Re-export everything from analyticsApi except VisitorStat
 export { 
   trackInteraction, 
-  trackPageVisit, 
-  getVisitorStats 
+  trackPageVisit
 } from './analyticsApi';
 export { 
   getCustomLists,
   getCustomList,
-  getRandomCustomLists,
-  createCustomList,
-  updateCustomList,
-  deleteCustomList,
-  addMovieToList,
-  removeMovieFromList
+  getRandomCustomLists
 } from './customListApi';
 export * from './apiUtils';
