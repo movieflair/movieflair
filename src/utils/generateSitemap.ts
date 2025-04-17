@@ -89,8 +89,9 @@ async function fetchAllCustomLists() {
 // Funktion zum Erzeugen des Sitemap-XML-Inhalts
 export async function generateSitemapXml() {
   try {
-    // Ensure no whitespace before the XML declaration
-    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    let xml = '';
+    // Ensure no whitespace before the XML declaration - using string concatenation without spaces
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
     
     // Statische Routen hinzufügen
@@ -137,7 +138,7 @@ export async function generateSitemapXml() {
       xml += '  <url>\n';
       xml += `    <loc>${BASE_URL}/liste/${list.id}/${slug}</loc>\n`;
       xml += '    <changefreq>weekly</changefreq>\n';
-      xml += '    <priority>0.6</priority>\n';
+      xml += '    <priority>0.6</priority>\n`;
       if (list.updated_at) {
         xml += `    <lastmod>${new Date(list.updated_at).toISOString()}</lastmod>\n`;
       }
@@ -149,15 +150,16 @@ export async function generateSitemapXml() {
     return xml;
   } catch (error) {
     console.error('Error generating sitemap:', error);
-    // Return a minimal valid XML in case of error
+    // Return a minimal valid XML in case of error - ensuring no whitespace before XML declaration
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
   }
 }
 
 // Synchrone Version für den Einsatz in der Entwicklung
 export function generateSitemapXmlSync() {
-  // Ensure no whitespace before the XML declaration
-  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  let xml = '';
+  // Ensure no whitespace before the XML declaration - using string concatenation without spaces
+  xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
   
   // Statische Routen hinzufügen
@@ -165,7 +167,7 @@ export function generateSitemapXmlSync() {
     xml += '  <url>\n';
     xml += `    <loc>${BASE_URL}${route}</loc>\n`;
     xml += '    <changefreq>weekly</changefreq>\n';
-    xml += '    <priority>0.8</priority>\n';
+    xml += '    <priority>0.8</priority>\n`;
     xml += '  </url>\n';
   });
   
