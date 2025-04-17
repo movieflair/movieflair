@@ -30,7 +30,7 @@ const PrimeVideoAd = ({ className = '' }: PrimeVideoAdProps) => {
               <div className="h-5 md:h-8">
                 {!logoError ? (
                   <img 
-                    src="/amazon-prime-logo.svg"  // Lokale SVG-Version mit Fallback
+                    src="/lovable-uploads/dd4b81ce-ec50-4b55-81e2-f58e506c083d.png"  
                     alt="Prime Video" 
                     className="h-full w-auto"
                     onError={() => {
