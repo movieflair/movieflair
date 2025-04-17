@@ -16,41 +16,41 @@ const AdminPage = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isSettingUpStorage, setIsSettingUpStorage] = useState(false);
   
-  // Beim Laden der Admin-Seite Storage-Bucket initialisieren
+  // Initialize storage bucket when admin page loads
   useEffect(() => {
     if (user) {
       initializeStorage();
     }
   }, [user]);
   
-  // Storage-Bucket initialisieren
+  // Initialize storage bucket
   const initializeStorage = async () => {
     try {
       await setupStorage();
     } catch (error) {
-      console.error('Fehler beim Initialisieren des Speicher-Buckets:', error);
+      console.error('Error initializing storage bucket:', error);
     }
   };
   
-  // Manuell den Storage-Bucket einrichten
+  // Manually set up storage bucket
   const handleSetupStorage = async () => {
     setIsSettingUpStorage(true);
-    toast.loading('Richte Speicher-Bucket ein...');
+    toast.loading('Setting up storage bucket...');
     
     try {
       await setupStorage();
       toast.dismiss();
-      toast.success('Speicher-Bucket erfolgreich eingerichtet');
+      toast.success('Storage bucket successfully set up');
     } catch (error) {
-      console.error('Fehler beim Einrichten des Speicher-Buckets:', error);
+      console.error('Error setting up storage bucket:', error);
       toast.dismiss();
-      toast.error('Fehler beim Einrichten des Speicher-Buckets');
+      toast.error('Error setting up storage bucket');
     } finally {
       setIsSettingUpStorage(false);
     }
   };
   
-  // Wenn nicht eingeloggt, zur Login-Seite umleiten
+  // Redirect to login page if not logged in
   if (!user) {
     return <Navigate to="/auth" replace />;
   }

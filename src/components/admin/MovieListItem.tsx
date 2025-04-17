@@ -3,6 +3,7 @@ import React from 'react';
 import { MovieOrShow } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Film, Eye } from 'lucide-react';
+import { getPosterPath } from '@/utils/imageUtils';
 
 interface MovieListItemProps {
   movie: MovieOrShow;
@@ -12,21 +13,17 @@ interface MovieListItemProps {
 }
 
 const MovieListItem: React.FC<MovieListItemProps> = ({ movie, onEdit, onDelete, onView }) => {
-  const getPosterUrl = (path: string | undefined) => {
-    if (!path) return '/placeholder.svg';
-    if (path.startsWith('/storage')) return path;
-    if (path.startsWith('http')) return path;
-    return `https://image.tmdb.org/t/p/w92${path}`;
-  };
-
+  const posterUrl = getPosterPath(movie.poster_path);
+  
   return (
     <div className="flex items-center p-3 border rounded-md bg-white mb-2 gap-3 hover:bg-slate-50 transition-colors">
       <div className="h-16 w-12 flex-shrink-0 overflow-hidden rounded">
         <img 
-          src={getPosterUrl(movie.poster_path)} 
+          src={posterUrl || '/placeholder.svg'} 
           alt={movie.title || 'Movie poster'} 
           className="h-full w-full object-cover"
           onError={(e) => {
+            console.error(`Image error for ${movie.title || 'unknown movie'}:`, movie.poster_path);
             (e.target as HTMLImageElement).src = '/placeholder.svg';
           }}
         />

@@ -3,18 +3,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 /**
- * Initialisiert Storage-Buckets mit öffentlichem Zugriff
+ * Initializes storage buckets with public access
  */
 export const setupStorage = async (): Promise<void> => {
   console.log('Setting up storage buckets...');
   
   try {
-    // Prüfen, ob der Bucket bereits existiert
+    // Check if the bucket already exists
     const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets();
     
     if (bucketsError) {
       console.error('Error listing buckets:', bucketsError);
-      // Versuchen, den Bucket über eine Edge-Funktion zu erstellen
+      // Try to create the bucket through an Edge Function
       await createMovieBucketThroughEdgeFunction();
       return;
     }
@@ -25,7 +25,7 @@ export const setupStorage = async (): Promise<void> => {
       console.log('Creating movie_images bucket...');
       
       try {
-        // Bucket direkt erstellen versuchen
+        // Try to create bucket directly
         const { error: createError } = await supabase.storage.createBucket('movie_images', {
           public: true,
           fileSizeLimit: 10485760, // 10MB
@@ -34,12 +34,12 @@ export const setupStorage = async (): Promise<void> => {
         
         if (createError) {
           console.error('Error creating bucket directly:', createError);
-          // Wenn direktes Erstellen fehlschlägt, über die Edge-Funktion versuchen
+          // If direct creation fails, try through the Edge Function
           await createMovieBucketThroughEdgeFunction();
         } else {
           console.log('Successfully created movie_images bucket');
           
-          // Erstelle Unterordner
+          // Create subfolders
           try {
             await supabase.storage.from('movie_images').upload('posters/.gitkeep', new Blob(['']));
             await supabase.storage.from('movie_images').upload('backdrops/.gitkeep', new Blob(['']));
@@ -54,6 +54,25 @@ export const setupStorage = async (): Promise<void> => {
       }
     } else {
       console.log('movie_images bucket already exists');
+      
+      // Let's check if the bucket has the proper public access
+      try {
+        const { data: policyData, error: policyError } = await supabase.rpc('get_bucket_policy', { 
+          bucket_name: 'movie_images' 
+        });
+        
+        if (policyError) {
+          console.log('Could not check bucket policy, assuming it needs to be public:', policyError);
+          await createMovieBucketThroughEdgeFunction();
+        } else if (!policyData?.public) {
+          console.log('movie_images bucket exists but is not public, updating...');
+          await createMovieBucketThroughEdgeFunction();
+        } else {
+          console.log('movie_images bucket exists and is properly configured');
+        }
+      } catch (error) {
+        console.log('Error checking bucket policy:', error);
+      }
     }
   } catch (error) {
     console.error('Error setting up storage buckets:', error);
@@ -62,7 +81,7 @@ export const setupStorage = async (): Promise<void> => {
 };
 
 /**
- * Erstellt den movie_images Bucket über die Edge-Funktion
+ * Creates the movie_images bucket through the Edge Function
  */
 async function createMovieBucketThroughEdgeFunction() {
   console.log('Attempting to create movie_images bucket through edge function...');

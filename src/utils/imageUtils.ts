@@ -44,22 +44,22 @@ export const getBackdropPath = (path?: string): string | null => {
 };
 
 /**
- * Normalisiert einen Bildpfad, um für die UI-Anzeige zu funktionieren
+ * Normalizes an image path to work for UI display
  */
 export const normalizeImagePath = (path?: string): string | null => {
   if (!path) return null;
   
-  // Wenn es bereits eine URL ist, verwende sie
+  // If it's already a URL or storage path, use it as is
   if (path.startsWith('http') || path.startsWith('/storage')) {
     return path;
   }
   
-  // Füge die TMDB-Basis-URL hinzu
+  // Add the TMDB base URL
   return `https://image.tmdb.org/t/p/original${path}`;
 };
 
 /**
- * Prüft, ob eine URL vom TMDB-Server stammt
+ * Checks if a URL is from the TMDB server
  */
 export const isTMDBUrl = (url?: string): boolean => {
   if (!url) return false;
