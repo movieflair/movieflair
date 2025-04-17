@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import MainLayout from '@/components/layout/MainLayout';
-import { getMovieById, getSimilarMovies, trackPageVisit, downloadMovieImagesToServer } from '@/lib/api';
+import { getMovieById, getSimilarMovies, trackPageVisit } from '@/lib/api';
 import type { MovieDetail as MovieDetailType, MovieOrShow } from '@/lib/types';
 import { Seo } from '@/components/seo/Seo';
 import MovieHeader from '@/components/movies/MovieHeader';
@@ -55,32 +56,7 @@ const MovieDetails = () => {
           getSimilarMovies(parsedId)
         ]);
         
-        const needsImageDownload = 
-          (movieData.poster_path && movieData.poster_path.includes('tmdb.org')) || 
-          (movieData.backdrop_path && movieData.backdrop_path.includes('tmdb.org')) || 
-          (!movieData.poster_path && !movieData.backdrop_path);
-        
-        if (needsImageDownload) {
-          console.log('Filmbilder müssen auf den Server migriert werden');
-          
-          toast.loading('Bilder werden importiert...');
-          const imagesUpdated = await downloadMovieImagesToServer(movieData);
-          toast.dismiss();
-          
-          if (imagesUpdated) {
-            const updatedMovie = await getMovieById(parsedId);
-            console.log('Aktualisierter Film mit lokalen Bildern:', updatedMovie);
-            setMovie(updatedMovie);
-            toast.success('Bilder erfolgreich importiert');
-          } else {
-            console.log('Fehler beim Aktualisieren der Bilder, verwende ursprüngliche Filmdaten');
-            setMovie(movieData);
-            toast.error('Fehler beim Importieren der Bilder');
-          }
-        } else {
-          setMovie(movieData);
-        }
-        
+        setMovie(movieData);
         setSimilarMovies(similars);
       } catch (error) {
         console.error('Fehler beim Abrufen der Filmdetails:', error);

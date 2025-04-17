@@ -6,12 +6,9 @@ import MainLayout from '@/components/layout/MainLayout';
 import { 
   Genre, 
   getGenres, 
-  getImportedMovies,
-  getFreeMovies,
-  getTrailerMovies,
+  getPopularMovies,
   MovieOrShow,
 } from '@/lib/api';
-import { ensureStorageBucketExists } from '@/lib/setupStorage';
 
 import HeroSection from '@/components/discover/HeroSection';
 import TrendingMovies from '@/components/discover/TrendingMovies';
@@ -44,12 +41,12 @@ const Discover = () => {
   const [trailerMovies, setTrailerMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Trending Movies Query with automatic updates (now shows imported movies)
+  // Trending Movies Query with automatic updates (now shows popular movies instead)
   const { data: popularMovies = [] } = useQuery({
-    queryKey: ['importedMovies'],
+    queryKey: ['popularMovies'],
     queryFn: async () => {
-      console.log('Fetching imported movies...');
-      const movies = await getImportedMovies();
+      console.log('Fetching popular movies...');
+      const movies = await getPopularMovies();
       return movies.slice(0, 8);
     },
     refetchInterval: 5 * 60 * 1000, // Updates every 5 minutes
@@ -57,22 +54,16 @@ const Discover = () => {
   });
 
   useEffect(() => {
-    // Ensure storage bucket exists when app initializes
-    ensureStorageBucketExists();
-    
     const fetchInitialData = async () => {
       setIsLoading(true);
       try {
         console.log('Discover: Fetching initial data...');
-        const [genresList, freeMoviesList, trailersList] = await Promise.all([
-          getGenres(),
-          getFreeMovies(),
-          getTrailerMovies(),
-        ]);
-        
+        const genresList = await getGenres();
         setGenres(genresList);
-        setFreeMovies(freeMoviesList.slice(0, 4));
-        setTrailerMovies(trailersList.slice(0, 4));
+        
+        // Using empty arrays for now as these functions are disabled
+        setFreeMovies([]);
+        setTrailerMovies([]);
         
       } catch (error) {
         console.error('Error fetching initial data:', error);

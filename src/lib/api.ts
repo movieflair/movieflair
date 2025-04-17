@@ -11,7 +11,8 @@ export {
   getSimilarMovies,
   getImportedMovies,
   downloadMovieImagesToServer,
-  getRandomImportedMovie
+  getRandomImportedMovie,
+  deleteAllMovies
 } from './movieApi';
 
 export {

@@ -14,6 +14,11 @@ export const getPosterPath = (path?: string): string | null => {
     return path;
   }
   
+  // For storage URLs, return as is
+  if (path.startsWith('/storage')) {
+    return path;
+  }
+  
   // Default case for TMDB paths
   return `https://image.tmdb.org/t/p/w500${path}`;
 };
@@ -26,6 +31,11 @@ export const getBackdropPath = (path?: string): string | null => {
   
   // For external URLs (including TMDB URLs), return as is
   if (path.startsWith('http')) {
+    return path;
+  }
+  
+  // For storage URLs, return as is
+  if (path.startsWith('/storage')) {
     return path;
   }
   
