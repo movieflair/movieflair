@@ -1,5 +1,5 @@
 
-import { MovieDetail } from "@/lib/types";
+import { MovieDetail, CastMember } from "@/lib/types";
 import { Seo } from "@/components/seo/Seo";
 import MovieStructuredData from "@/components/movies/MovieStructuredData";
 import { 
@@ -11,7 +11,7 @@ import {
 
 interface MovieSeoDataProps {
   movie: MovieDetail;
-  director?: { id: number; name: string; job: string; };
+  director?: CastMember;
 }
 
 export const MovieSeoData = ({ movie, director }: MovieSeoDataProps) => {
