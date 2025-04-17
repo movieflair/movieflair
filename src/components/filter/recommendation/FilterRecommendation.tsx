@@ -25,6 +25,20 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
     return `${baseUrl}/${recommendation.id}`;
   };
 
+  const getImageSrc = (path?: string) => {
+    if (!path) return null;
+    
+    if (path.startsWith('/storage')) {
+      return path;
+    } else if (path.startsWith('http')) {
+      return path;
+    } else if (path.startsWith('/')) {
+      return `https://image.tmdb.org/t/p/w500${path}`;
+    }
+    
+    return `/storage/movie_images/posters/${path}`;
+  };
+
   return (
     <div className="mt-8 animate-fade-in">
       <div className="rounded-xl p-6 shadow-lg border border-gray-100 relative overflow-hidden">
@@ -52,7 +66,7 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
             >
               <div className="relative h-[300px] bg-muted overflow-hidden rounded-xl">
                 <img
-                  src={`https://image.tmdb.org/t/p/w500${recommendation.poster_path}`}
+                  src={getImageSrc(recommendation.poster_path)}
                   alt={recommendation.title || recommendation.name}
                   className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
                 />

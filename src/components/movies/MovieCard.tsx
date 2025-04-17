@@ -42,9 +42,11 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
       return path;
     } else if (path.startsWith('http')) {
       return path;
+    } else if (path.startsWith('/')) {
+      return `https://image.tmdb.org/t/p/w500${path}`;
     }
     
-    return `/storage/movie_images/posters/${path.replace(/^\//, '')}`;
+    return `/storage/movie_images/posters/${path}`;
   };
 
   return (

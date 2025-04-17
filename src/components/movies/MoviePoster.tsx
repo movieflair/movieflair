@@ -9,17 +9,27 @@ interface MoviePosterProps {
 }
 
 const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
+  const getImageSrc = (path?: string) => {
+    if (!path) return null;
+    
+    if (path.startsWith('/storage')) {
+      return path;
+    } else if (path.startsWith('http')) {
+      return path;
+    } else if (path.startsWith('/')) {
+      return `https://image.tmdb.org/t/p/w500${path}`;
+    }
+    
+    return `/storage/movie_images/posters/${path}`;
+  };
+  
   return (
     <div className="space-y-2">
       <div className="relative mb-2">
         <div className="rounded-lg overflow-hidden shadow-xl">
           {posterPath ? (
             <img
-              src={posterPath.startsWith('/storage') 
-                ? posterPath 
-                : posterPath.startsWith('http') 
-                  ? posterPath 
-                  : `/storage/movie_images/posters/${posterPath.replace(/^\//, '')}`}
+              src={getImageSrc(posterPath)}
               alt={title}
               className="w-full"
             />
