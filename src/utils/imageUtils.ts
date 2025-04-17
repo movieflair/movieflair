@@ -9,10 +9,9 @@
 export const getPosterPath = (path?: string): string | null => {
   if (!path) return null;
   
-  // For storage URLs, return as is with priority
+  // For storage URLs, return as is
   if (path.startsWith('/storage')) {
-    // Add timestamp to bust cache
-    return `${path}?t=${Date.now()}`;
+    return path;
   }
   
   // For external URLs (including TMDB URLs), return as is
@@ -30,10 +29,9 @@ export const getPosterPath = (path?: string): string | null => {
 export const getBackdropPath = (path?: string): string | null => {
   if (!path) return null;
   
-  // For storage URLs, return as is with priority
+  // For storage URLs, return as is
   if (path.startsWith('/storage')) {
-    // Add timestamp to bust cache
-    return `${path}?t=${Date.now()}`;
+    return path;
   }
   
   // For external URLs (including TMDB URLs), return as is

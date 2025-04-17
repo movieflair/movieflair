@@ -10,11 +10,12 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
   const imageSrc = getBackdropPath(backdropPath);
   
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error(`Fehler beim Laden des Hintergrundbilds für ${title}:`, e);
-    
-    // Wenn es ein lokales Bild ist, das fehlschlägt, setze direkt auf den TMDB-Pfad
-    if (backdropPath && backdropPath.startsWith('/') && !backdropPath.startsWith('/storage')) {
+    // If image fails to load, try the TMDB path directly
+    if (backdropPath && !backdropPath.startsWith('http')) {
+      console.log(`Falling back to direct TMDB path for ${title} backdrop`);
       (e.target as HTMLImageElement).src = `https://image.tmdb.org/t/p/original${backdropPath}`;
+    } else {
+      console.error(`Failed to load backdrop for ${title}`);
     }
   };
   

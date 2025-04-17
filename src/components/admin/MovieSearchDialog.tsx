@@ -1,10 +1,9 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { searchTMDBMovies, importMovieFromTMDB } from '@/lib/api';
-import { fetchMovieFromTMDB } from '@/lib/cms/tmdbApi';
 import { MovieOrShow } from '@/lib/types';
 import { toast } from 'sonner';
 import { Search, Import, Film } from 'lucide-react';
@@ -52,19 +51,22 @@ const MovieSearchDialog: React.FC<MovieSearchDialogProps> = ({
     
     setIsImporting(true);
     try {
-      toast.loading(`Filme mit ID ${movieId} wird importiert...`);
-      const movieDetails = await fetchMovieFromTMDB(movieId);
+      toast.loading(`Film mit ID ${movieId} wird importiert...`);
       
-      if (movieDetails) {
-        await importMovie(movieDetails);
+      const success = await importMovieFromTMDB({ id: movieId } as MovieOrShow);
+      
+      toast.dismiss();
+      if (success) {
+        toast.success('Film erfolgreich importiert');
+        onImportSuccess();
+        onOpenChange(false);
       } else {
-        toast.dismiss();
-        toast.error('Film konnte nicht gefunden werden');
+        toast.error('Fehler beim Importieren des Films');
       }
     } catch (error) {
-      console.error('Error fetching movie details:', error);
+      console.error('Error importing movie:', error);
       toast.dismiss();
-      toast.error('Fehler beim Abrufen der Filmdetails');
+      toast.error('Fehler beim Importieren des Films');
     } finally {
       setIsImporting(false);
     }
@@ -74,7 +76,6 @@ const MovieSearchDialog: React.FC<MovieSearchDialogProps> = ({
     setIsImporting(true);
     try {
       toast.loading(`Film "${movie.title}" wird importiert...`);
-      console.log("Importing movie:", movie);
       
       const success = await importMovieFromTMDB(movie);
       
