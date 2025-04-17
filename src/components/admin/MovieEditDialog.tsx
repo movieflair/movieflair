@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -147,7 +146,69 @@ const MovieEditDialog: React.FC<MovieEditDialogProps> = ({
     return `https://image.tmdb.org/t/p/w500${path}`;
   };
 
-  if (!movie) return null;
+  const renderForm = () => {
+    if (!movie) return null;
+
+    return (
+      <form onSubmit={handleSubmit} className="space-y-6 py-4">
+        <div>
+          <Label htmlFor="trailerUrl">Trailer URL</Label>
+          <Input
+            id="trailerUrl"
+            name="trailerUrl"
+            value={formData.trailerUrl || ''}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div>
+          <Label htmlFor="streamUrl">Stream URL</Label>
+          <Input
+            id="streamUrl"
+            name="streamUrl"
+            value={formData.streamUrl || ''}
+            onChange={handleInputChange}
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="hasTrailer"
+              checked={formData.hasTrailer || false}
+              onCheckedChange={(checked) => handleSwitchChange('hasTrailer', checked)}
+            />
+            <Label htmlFor="hasTrailer">Hat Trailer</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="hasStream"
+              checked={formData.hasStream || false}
+              onCheckedChange={(checked) => handleSwitchChange('hasStream', checked)}
+            />
+            <Label htmlFor="hasStream">Hat Stream</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="isFreeMovie"
+              checked={formData.isFreeMovie || false}
+              onCheckedChange={(checked) => handleSwitchChange('isFreeMovie', checked)}
+            />
+            <Label htmlFor="isFreeMovie">Kostenloser Film</Label>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="isNewTrailer"
+              checked={formData.isNewTrailer || false}
+              onCheckedChange={(checked) => handleSwitchChange('isNewTrailer', checked)}
+            />
+            <Label htmlFor="isNewTrailer">Neuer Trailer</Label>
+          </div>
+        </div>
+      </form>
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -155,224 +216,21 @@ const MovieEditDialog: React.FC<MovieEditDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Film bearbeiten</DialogTitle>
           <DialogDescription>
-            Bearbeite die Informationen für "{movie.title}"
+            Bearbeite die Informationen für "{movie?.title}"
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-6 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="title">Filmtitel</Label>
-                <Input
-                  id="title"
-                  name="title"
-                  value={formData.title || ''}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="release_date">Erscheinungsdatum</Label>
-                <Input
-                  id="release_date"
-                  name="release_date"
-                  value={formData.release_date || ''}
-                  onChange={handleInputChange}
-                  placeholder="YYYY-MM-DD"
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="overview">Beschreibung</Label>
-                <Textarea
-                  id="overview"
-                  name="overview"
-                  value={formData.overview || ''}
-                  onChange={handleInputChange}
-                  rows={5}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="vote_average">Bewertung</Label>
-                  <Input
-                    id="vote_average"
-                    name="vote_average"
-                    type="number"
-                    min="0"
-                    max="10"
-                    step="0.1"
-                    value={formData.vote_average || 0}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="vote_count">Anzahl der Bewertungen</Label>
-                  <Input
-                    id="vote_count"
-                    name="vote_count"
-                    type="number"
-                    min="0"
-                    value={formData.vote_count || 0}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="trailerurl">Trailer URL (YouTube Embed)</Label>
-                <Input
-                  id="trailerurl"
-                  name="trailerurl"
-                  value={formData.trailerurl || ''}
-                  onChange={handleInputChange}
-                  placeholder="https://www.youtube.com/embed/..."
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="streamurl">Stream URL</Label>
-                <Input
-                  id="streamurl"
-                  name="streamurl"
-                  value={formData.streamurl || ''}
-                  onChange={handleInputChange}
-                  placeholder="https://..."
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="hastrailer"
-                    checked={formData.hastrailer || false}
-                    onCheckedChange={(checked) => handleSwitchChange('hastrailer', checked)}
-                  />
-                  <Label htmlFor="hastrailer">Hat Trailer</Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="hasstream"
-                    checked={formData.hasstream || false}
-                    onCheckedChange={(checked) => handleSwitchChange('hasstream', checked)}
-                  />
-                  <Label htmlFor="hasstream">Hat Stream</Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="isfreemovie"
-                    checked={formData.isfreemovie || false}
-                    onCheckedChange={(checked) => handleSwitchChange('isfreemovie', checked)}
-                  />
-                  <Label htmlFor="isfreemovie">Kostenloser Film</Label>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="isnewtrailer"
-                    checked={formData.isnewtrailer || false}
-                    onCheckedChange={(checked) => handleSwitchChange('isnewtrailer', checked)}
-                  />
-                  <Label htmlFor="isnewtrailer">Neuer Trailer</Label>
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <Label className="block mb-2">Filmposter</Label>
-                <div className="mb-2 border rounded-md overflow-hidden aspect-[2/3] relative">
-                  <img 
-                    src={posterPreview || getImageUrl(movie.poster_path)} 
-                    alt="Movie Poster" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/placeholder.svg';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all flex items-center justify-center opacity-0 hover:opacity-100">
-                    <label className="cursor-pointer">
-                      <div className="bg-white text-black rounded-full p-2">
-                        <Upload size={24} />
-                      </div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handlePosterChange}
-                      />
-                    </label>
-                  </div>
-                </div>
-                <label className="block">
-                  <Button type="button" variant="outline" className="w-full gap-2">
-                    <Upload size={16} /> Poster hochladen
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handlePosterChange}
-                    />
-                  </Button>
-                </label>
-              </div>
-              
-              <div>
-                <Label className="block mb-2">Hintergrundbild</Label>
-                <div className="mb-2 border rounded-md overflow-hidden aspect-video relative">
-                  <img 
-                    src={backdropPreview || getImageUrl(movie.backdrop_path)} 
-                    alt="Movie Backdrop" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/placeholder.svg';
-                    }}
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-40 transition-all flex items-center justify-center opacity-0 hover:opacity-100">
-                    <label className="cursor-pointer">
-                      <div className="bg-white text-black rounded-full p-2">
-                        <Upload size={24} />
-                      </div>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleBackdropChange}
-                      />
-                    </label>
-                  </div>
-                </div>
-                <label className="block">
-                  <Button type="button" variant="outline" className="w-full gap-2">
-                    <Upload size={16} /> Hintergrundbild hochladen
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleBackdropChange}
-                    />
-                  </Button>
-                </label>
-              </div>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline">Abbrechen</Button>
-            </DialogClose>
-            <Button type="submit" disabled={isSaving} className="gap-2">
-              <Save size={16} />
-              {isSaving ? 'Wird gespeichert...' : 'Speichern'}
-            </Button>
-          </DialogFooter>
-        </form>
+        {renderForm()}
+        
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="outline">Abbrechen</Button>
+          </DialogClose>
+          <Button type="submit" disabled={isSaving} className="gap-2">
+            <Save size={16} />
+            {isSaving ? 'Wird gespeichert...' : 'Speichern'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
