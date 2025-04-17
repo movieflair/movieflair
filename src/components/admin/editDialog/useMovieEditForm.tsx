@@ -18,6 +18,7 @@ export const useMovieEditForm = (
     trailerUrl: movie?.trailerUrl || '',
     isFreeMovie: movie?.isFreeMovie || false,
     isNewTrailer: movie?.isNewTrailer || false,
+    runtime: movie?.runtime || null,
   });
 
   const [posterFile, setPosterFile] = useState<File | null>(null);
@@ -61,6 +62,7 @@ export const useMovieEditForm = (
         trailerUrl: formData.trailerUrl,
         isFreeMovie: formData.isFreeMovie,
         isNewTrailer: formData.isNewTrailer,
+        runtime: formData.runtime,
       };
 
       if (posterFile) {

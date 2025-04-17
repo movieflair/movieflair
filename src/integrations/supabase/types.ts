@@ -23,6 +23,7 @@ export type Database = {
           popularity: number | null
           poster_path: string | null
           release_date: string | null
+          runtime: number | null
           streamurl: string | null
           title: string
           trailerurl: string | null
@@ -43,6 +44,7 @@ export type Database = {
           popularity?: number | null
           poster_path?: string | null
           release_date?: string | null
+          runtime?: number | null
           streamurl?: string | null
           title: string
           trailerurl?: string | null
@@ -63,6 +65,7 @@ export type Database = {
           popularity?: number | null
           poster_path?: string | null
           release_date?: string | null
+          runtime?: number | null
           streamurl?: string | null
           title?: string
           trailerurl?: string | null

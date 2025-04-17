@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -143,6 +143,20 @@ const MovieEditForm: React.FC<MovieEditFormProps> = ({
             min="0"
             value={formData.vote_count || 0}
             onChange={handleNumberInputChange}
+          />
+        </div>
+        
+        {/* Runtime field */}
+        <div className="space-y-2">
+          <Label htmlFor="runtime">Laufzeit (Minuten)</Label>
+          <Input
+            id="runtime"
+            name="runtime"
+            type="number"
+            min="0"
+            value={formData.runtime || 0}
+            onChange={handleNumberInputChange}
+            placeholder="z.B. 120"
           />
         </div>
         
