@@ -3,7 +3,6 @@ import React from 'react';
 import { MovieOrShow } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Film, Eye } from 'lucide-react';
-import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieListItemProps {
   movie: MovieOrShow;
@@ -13,13 +12,28 @@ interface MovieListItemProps {
 }
 
 const MovieListItem: React.FC<MovieListItemProps> = ({ movie, onEdit, onDelete, onView }) => {
-  const posterUrl = getPublicImageUrl(movie.poster_path);
+  // Konstruiere die vollständige URL basierend auf dem Pfadtyp
+  const getPosterUrl = (path?: string): string => {
+    if (!path) return '/placeholder.svg';
+    
+    if (path.startsWith('/storage/')) {
+      return window.location.origin + path;
+    }
+    
+    if (path.startsWith('http')) {
+      return path;
+    }
+    
+    return `https://image.tmdb.org/t/p/w500${path}`;
+  };
+  
+  const posterUrl = getPosterUrl(movie.poster_path);
   
   return (
     <div className="flex items-center p-3 border rounded-md bg-white mb-2 gap-3 hover:bg-slate-50 transition-colors">
       <div className="h-16 w-12 flex-shrink-0 overflow-hidden rounded">
         <img 
-          src={posterUrl || '/placeholder.svg'} 
+          src={posterUrl} 
           alt={movie.title || 'Movie poster'} 
           className="h-full w-full object-cover"
           onError={(e) => {

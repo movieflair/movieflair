@@ -9,9 +9,9 @@
 export const getPosterPath = (path?: string): string | null => {
   if (!path) return null;
   
-  // For storage URLs, return as is
+  // For storage URLs, return with origin
   if (path.startsWith('/storage')) {
-    return path;
+    return window.location.origin + path;
   }
   
   // For external URLs (including TMDB URLs), return as is
@@ -29,9 +29,9 @@ export const getPosterPath = (path?: string): string | null => {
 export const getBackdropPath = (path?: string): string | null => {
   if (!path) return null;
   
-  // For storage URLs, return as is
+  // For storage URLs, return with origin
   if (path.startsWith('/storage')) {
-    return path;
+    return window.location.origin + path;
   }
   
   // For external URLs (including TMDB URLs), return as is
@@ -49,12 +49,17 @@ export const getBackdropPath = (path?: string): string | null => {
 export const normalizeImagePath = (path?: string): string | null => {
   if (!path) return null;
   
-  // If it's already a URL or storage path, use it as is
-  if (path.startsWith('http') || path.startsWith('/storage')) {
+  // If it's a storage path, add the origin
+  if (path.startsWith('/storage')) {
+    return window.location.origin + path;
+  }
+  
+  // If it's already a URL, use it as is
+  if (path.startsWith('http')) {
     return path;
   }
   
-  // Add the TMDB base URL
+  // Add the TMDB base URL for relative paths
   return `https://image.tmdb.org/t/p/original${path}`;
 };
 
@@ -74,11 +79,9 @@ export const getPublicImageUrl = (path?: string): string | null => {
   if (!path) return null;
   
   try {
-    // For storage URLs, return as is
+    // For storage URLs, add origin
     if (path.startsWith('/storage')) {
-      const publicUrl = new URL(window.location.origin + path).toString();
-      console.log(`Resolved storage path: ${path} to ${publicUrl}`);
-      return publicUrl;
+      return window.location.origin + path;
     }
     
     // For external URLs (including TMDB URLs), return as is

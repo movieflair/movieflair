@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieBackdropProps {
   backdropPath?: string;
@@ -8,44 +7,65 @@ interface MovieBackdropProps {
 }
 
 const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
-  const initialSrc = getPublicImageUrl(backdropPath);
-  const [currentSrc, setCurrentSrc] = useState<string | null>(initialSrc);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
   
-  // Bei Änderung des backdropPath den currentSrc aktualisieren
   useEffect(() => {
-    setCurrentSrc(getPublicImageUrl(backdropPath));
+    if (!backdropPath) {
+      setImageSrc(null);
+      return;
+    }
+    
+    // Direkte URL-Konstruktion basierend auf Pfadtyp
+    if (backdropPath.startsWith('/storage/')) {
+      // Vollständige URL für Storage-Pfade
+      const fullUrl = window.location.origin + backdropPath;
+      setImageSrc(fullUrl);
+    } else if (backdropPath.startsWith('http')) {
+      // Externe URLs direkt verwenden
+      setImageSrc(backdropPath);
+    } else if (backdropPath.startsWith('/')) {
+      // TMDB-Pfade
+      setImageSrc(`https://image.tmdb.org/t/p/original${backdropPath}`);
+    } else {
+      // Fallback für ungültige Pfade
+      setImageSrc(null);
+    }
+    
     setHasError(false);
   }, [backdropPath]);
   
-  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const handleError = () => {
+    console.error(`Fehler beim Laden des Hintergrundbilds für ${title}: ${backdropPath}`);
+    
     if (!hasError && backdropPath) {
-      console.log(`Fehler beim Laden des Hintergrundbilds für ${title}. Versuche Fallback...`);
       setHasError(true);
       
-      // Bei TMDB-Pfaden direkte URL verwenden
-      if (backdropPath.startsWith('/') && !backdropPath.startsWith('/storage')) {
-        const tmdbUrl = `https://image.tmdb.org/t/p/original${backdropPath}`;
-        console.log(`Verwende TMDB-Fallback: ${tmdbUrl}`);
-        setCurrentSrc(tmdbUrl);
-      } else if (backdropPath.startsWith('http')) {
-        // Bei externen URLs ist der Fehler wahrscheinlich permanent
-        setCurrentSrc(null);
+      // Fallback zu TMDB versuchen, wenn es ein Storage-Pfad war
+      if (backdropPath.startsWith('/storage/')) {
+        const movieId = backdropPath.split('/').pop()?.split('.')[0];
+        if (movieId) {
+          console.log(`Versuche TMDB-Fallback für ID: ${movieId}`);
+          setImageSrc(`https://image.tmdb.org/t/p/original/tmdb-fallback-${movieId}`);
+        } else {
+          setImageSrc(null);
+        }
+      } else {
+        setImageSrc(null);
       }
-    } else if (hasError) {
-      // Zweiter Fehler, wir geben auf
-      console.error(`Alle Fallbacks für ${title} Hintergrundbild fehlgeschlagen`);
-      setCurrentSrc(null);
+    } else {
+      // Zweiter Fehler, geben wir auf
+      setImageSrc(null);
     }
   };
   
   return (
     <div className="relative h-[400px] overflow-hidden">
-      {currentSrc ? (
+      {imageSrc ? (
         <>
           <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
           <img
-            src={currentSrc}
+            src={imageSrc}
             alt={title}
             className="w-full h-full object-cover"
             onError={handleError}

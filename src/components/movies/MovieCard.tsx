@@ -1,11 +1,10 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
 import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
 import { scrollToTop } from '@/utils/scrollUtils';
-import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieCardProps {
   movie: MovieOrShow;
@@ -20,13 +19,39 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
   const mediaType = getMediaTypeInGerman(movie.media_type);
   const slug = createUrlSlug(title);
   
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
-  const [imageSrc, setImageSrc] = useState(getPublicImageUrl(movie.poster_path));
+  
+  useEffect(() => {
+    const posterPath = movie.poster_path;
+    if (!posterPath) {
+      setImageSrc(null);
+      return;
+    }
+    
+    // Direkte URL-Konstruktion basierend auf Pfadtyp
+    if (posterPath.startsWith('/storage/')) {
+      // Vollständige URL für Storage-Pfade
+      const fullUrl = window.location.origin + posterPath;
+      setImageSrc(fullUrl);
+    } else if (posterPath.startsWith('http')) {
+      // Externe URLs direkt verwenden
+      setImageSrc(posterPath);
+    } else if (posterPath.startsWith('/')) {
+      // TMDB-Pfade
+      setImageSrc(`https://image.tmdb.org/t/p/w500${posterPath}`);
+    } else {
+      // Fallback für ungültige Pfade
+      setImageSrc(null);
+    }
+    
+    setHasError(false);
+  }, [movie.poster_path]);
   
   const imageSizes = {
     small: 'h-[250px] w-[170px]',
     medium: 'h-[250px] w-[170px]',
-    large: 'h-[270px] w-[190px]'  // Updated size for specific pages
+    large: 'h-[270px] w-[190px]'
   };
   
   const textSizes = {
@@ -39,11 +64,20 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
     scrollToTop();
   };
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    if (!hasError && movie.poster_path && movie.poster_path.startsWith('/') && !movie.poster_path.startsWith('/storage')) {
-      console.log('Trying TMDB fallback for movie poster in card:', movie.poster_path);
+  const handleImageError = () => {
+    if (!hasError && movie.poster_path) {
+      console.log('MovieCard: Bild konnte nicht geladen werden:', movie.poster_path);
       setHasError(true);
-      setImageSrc(`https://image.tmdb.org/t/p/w500${movie.poster_path}`);
+      
+      if (movie.poster_path.startsWith('/storage/')) {
+        // Versuche einen Fallback für Storage-Bilder
+        setImageSrc(null);
+      } else if (movie.poster_path.startsWith('/') && !movie.poster_path.startsWith('/storage/')) {
+        // Versuche einen TMDB-Fallback
+        setImageSrc(`https://image.tmdb.org/t/p/w500${movie.poster_path}`);
+      } else {
+        setImageSrc(null);
+      }
     } else {
       setImageSrc(null);
     }

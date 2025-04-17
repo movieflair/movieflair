@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react';
 import WatchlistButton from '@/components/movies/WatchlistButton';
 import ShareButton from '@/components/movies/ShareButton';
-import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MoviePosterProps {
   id: number;
@@ -11,44 +10,55 @@ interface MoviePosterProps {
 }
 
 const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
-  const imageSrc = getPublicImageUrl(posterPath);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState<string | null>(imageSrc);
   
-  // Bei Änderung des posterPath den currentSrc aktualisieren
   useEffect(() => {
-    setCurrentSrc(getPublicImageUrl(posterPath));
+    if (!posterPath) {
+      setImageSrc(null);
+      return;
+    }
+    
+    // Direkte URL-Konstruktion basierend auf Pfadtyp
+    if (posterPath.startsWith('/storage/')) {
+      // Vollständige URL für Storage-Pfade
+      const fullUrl = window.location.origin + posterPath;
+      setImageSrc(fullUrl);
+    } else if (posterPath.startsWith('http')) {
+      // Externe URLs direkt verwenden
+      setImageSrc(posterPath);
+    } else if (posterPath.startsWith('/')) {
+      // TMDB-Pfade
+      setImageSrc(`https://image.tmdb.org/t/p/w500${posterPath}`);
+    } else {
+      // Fallback für ungültige Pfade
+      setImageSrc(null);
+    }
+    
     setHasError(false);
   }, [posterPath]);
   
-  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    // Bei einem Fehler versuchen wir einen Fallback
+  const handleError = () => {
+    console.error(`Fehler beim Laden des Posters für ${title}: ${posterPath}`);
+    
     if (!hasError && posterPath) {
-      console.log(`Fehler beim Laden des Posters für ${title}. Versuche Fallback...`);
       setHasError(true);
       
-      // Wenn der Pfad mit / beginnt, aber nicht mit /storage,
-      // handelt es sich um einen TMDB-Pfad
-      if (posterPath.startsWith('/') && !posterPath.startsWith('/storage')) {
-        const tmdbUrl = `https://image.tmdb.org/t/p/w500${posterPath}`;
-        console.log(`Verwende TMDB-Fallback: ${tmdbUrl}`);
-        setCurrentSrc(tmdbUrl);
-      } 
-      // Wenn es eine Storage-URL ist, die fehlschlägt, versuchen wir es mit der TMDB-ID
-      else if (posterPath.includes('movie_images') && id) {
-        // Versuchen wir den Film über TMDB direkt zu holen
-        const tmdbFallback = `https://image.tmdb.org/t/p/w500/TMDB_FALLBACK_${id}`;
-        console.log(`Verwende TMDB-ID-Fallback: ${tmdbFallback}`);
-        setCurrentSrc(tmdbFallback);
-      } else if (posterPath.startsWith('http')) {
-        // Bei externen URLs nichts tun, da der Fehler wahrscheinlich permanent ist
-        console.error(`Externer URL-Fehler für ${posterPath}`);
-        setCurrentSrc(null);
+      // Fallback zu TMDB versuchen, wenn es ein Storage-Pfad war
+      if (posterPath.startsWith('/storage/')) {
+        const movieId = posterPath.split('/').pop()?.split('.')[0];
+        if (movieId) {
+          console.log(`Versuche TMDB-Fallback für ID: ${movieId}`);
+          setImageSrc(`https://image.tmdb.org/t/p/w500/tmdb-fallback-${movieId}`);
+        } else {
+          setImageSrc(null);
+        }
+      } else {
+        setImageSrc(null);
       }
-    } else if (hasError) {
-      // Zweiter Fehler, wir geben auf
-      console.error(`Alle Fallbacks für ${title} fehlgeschlagen`);
-      setCurrentSrc(null);
+    } else {
+      // Zweiter Fehler, geben wir auf
+      setImageSrc(null);
     }
   };
   
@@ -56,9 +66,9 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
     <div className="space-y-2">
       <div className="relative mb-2">
         <div className="rounded-lg overflow-hidden shadow-xl">
-          {currentSrc ? (
+          {imageSrc ? (
             <img
-              src={currentSrc}
+              src={imageSrc}
               alt={title}
               className="w-full"
               onError={handleError}
