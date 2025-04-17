@@ -1,5 +1,6 @@
 
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { renderApp } from '../utils/renderUtils';
 import fs from 'fs';
 import path from 'path';
@@ -9,8 +10,8 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-// TypeScript was incorrectly interpreting the route handler
-router.get('*', async function(req: Request, res: Response, next: NextFunction) {
+// TypeScript fix: Use the correct method signature
+router.get('*', async function renderHandler(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
 
   try {

@@ -1,11 +1,12 @@
 
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
+import type { Request, Response } from 'express';
 import { generateSitemapXml } from '../utils/generateSitemap';
 
 const router = Router();
 
-// TypeScript was incorrectly interpreting the route handler
-router.get('/sitemap.xml', async function(req: Request, res: Response) {
+// TypeScript fix: Use the correct method signature
+router.get('/sitemap.xml', async function sitemapHandler(req: Request, res: Response) {
   try {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.setHeader('X-Content-Type-Options', 'nosniff');
