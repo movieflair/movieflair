@@ -326,7 +326,7 @@ export const getRandomMovie = async (): Promise<MovieDetail> => {
   
   try {
     // Get admin settings
-    const adminSettings = apiUtils.getAdminSettings();
+    const adminSettings = await apiUtils.getAdminMovieSettings();
     
     // Call the random movie function
     const { data: apiData, error: apiError } = await supabase.functions.invoke('tmdb', {

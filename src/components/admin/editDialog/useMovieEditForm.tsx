@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { MovieOrShow } from '@/lib/types';
 import { toast } from 'sonner';
@@ -54,12 +55,12 @@ export const useMovieEditForm = (
         id: movie.id,
         title: formData.title,
         overview: formData.overview,
-        hasstream: formData.hasStream,
-        streamurl: formData.streamUrl,
-        hastrailer: formData.hasTrailer,
-        trailerurl: formData.trailerUrl,
-        isfreemovie: formData.isFreeMovie,
-        isnewtrailer: formData.isNewTrailer,
+        hasStream: formData.hasStream,
+        streamUrl: formData.streamUrl,
+        hasTrailer: formData.hasTrailer,
+        trailerUrl: formData.trailerUrl,
+        isFreeMovie: formData.isFreeMovie,
+        isNewTrailer: formData.isNewTrailer,
       };
 
       if (posterFile) {

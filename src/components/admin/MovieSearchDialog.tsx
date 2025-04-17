@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { searchTMDBMovies, importMovieFromTMDB } from '@/lib/api';
+import { searchTMDBMovies, importMovieFromTMDB, fetchMovieFromTMDB } from '@/lib/api';
 import { MovieOrShow } from '@/lib/types';
 import { toast } from 'sonner';
 import { Search, Import, Film } from 'lucide-react';
@@ -50,14 +50,21 @@ const MovieSearchDialog: React.FC<MovieSearchDialogProps> = ({
       return;
     }
     
-    await importMovie(movieId);
+    try {
+      // First, fetch the movie details to get a MovieOrShow object
+      const movieDetails = await fetchMovieFromTMDB(movieId);
+      await importMovie(movieDetails);
+    } catch (error) {
+      console.error('Error fetching movie details:', error);
+      toast.error('Fehler beim Abrufen der Filmdetails');
+    }
   };
 
-  const importMovie = async (movieId: number) => {
+  const importMovie = async (movie: MovieOrShow) => {
     setIsImporting(true);
     try {
-      toast.loading(`Film mit ID ${movieId} wird importiert...`);
-      const success = await importMovieFromTMDB(movieId);
+      toast.loading(`Film "${movie.title}" wird importiert...`);
+      const success = await importMovieFromTMDB(movie);
       
       toast.dismiss();
       if (success) {
@@ -140,7 +147,7 @@ const MovieSearchDialog: React.FC<MovieSearchDialogProps> = ({
                   <div 
                     key={movie.id} 
                     className="border rounded-md p-3 flex flex-col hover:bg-slate-50 cursor-pointer"
-                    onClick={() => importMovie(movie.id)}
+                    onClick={() => importMovie(movie)}
                   >
                     <div className="aspect-[2/3] w-full overflow-hidden rounded-md mb-2">
                       <img 

@@ -7,11 +7,11 @@ import { Toaster } from 'sonner'
 import { HelmetProvider } from 'react-helmet-async'
 import App from './App.tsx'
 import './index.css'
-import { ensureStorageBucketExists } from './lib/setupStorage'
+import { setupStorage } from './lib/setupStorage'
 import { AdminSettingsProvider } from './hooks/useAdminSettings'
 
 // Initialisiere den Storage-Bucket
-ensureStorageBucketExists().catch(console.error);
+setupStorage().catch(console.error);
 
 const queryClient = new QueryClient({
   defaultOptions: {
