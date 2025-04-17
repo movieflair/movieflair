@@ -124,7 +124,7 @@ export async function generateSitemapXml() {
       xml += '  <url>\n';
       xml += `    <loc>${BASE_URL}/serie/${show.id}${slug ? '/' + slug : ''}</loc>\n`;
       xml += '    <changefreq>monthly</changefreq>\n';
-      xml += '    <priority>0.7</priority>\n`;
+      xml += '    <priority>0.7</priority>\n';
       if (show.updated_at) {
         xml += `    <lastmod>${new Date(show.updated_at).toISOString()}</lastmod>\n`;
       }
@@ -138,7 +138,7 @@ export async function generateSitemapXml() {
       xml += '  <url>\n';
       xml += `    <loc>${BASE_URL}/liste/${list.id}/${slug}</loc>\n`;
       xml += '    <changefreq>weekly</changefreq>\n';
-      xml += '    <priority>0.6</priority>\n`;
+      xml += '    <priority>0.6</priority>\n';
       if (list.updated_at) {
         xml += `    <lastmod>${new Date(list.updated_at).toISOString()}</lastmod>\n`;
       }
