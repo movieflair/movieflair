@@ -17,13 +17,20 @@ const AdminSearch = ({
   isLoading, 
   activeTab 
 }: AdminSearchProps) => {
+  // Memoize the placeholder text to prevent unnecessary re-renders
+  const placeholderText = activeTab === 'movies' 
+    ? 'Suche Filme...' 
+    : activeTab === 'shows' 
+      ? 'Suche Serien...' 
+      : 'Suche Tags...';
+      
   return (
     <form onSubmit={onSearch} className="flex max-w-md mb-6">
       <div className="relative flex-grow">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           type="text"
-          placeholder={`Suche ${activeTab === 'movies' ? 'Filme' : activeTab === 'shows' ? 'Serien' : 'Tags'}...`}
+          placeholder={placeholderText}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full pl-9 pr-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"

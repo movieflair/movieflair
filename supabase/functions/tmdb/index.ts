@@ -2,6 +2,7 @@
 import { corsHeaders } from '../_shared/cors.ts'
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -11,6 +12,7 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get('TMDB_API_KEY')
     
     if (!apiKey) {
+      console.error('TMDB API key not found in environment variables');
       throw new Error('TMDB API key not found')
     }
 
@@ -25,7 +27,9 @@ Deno.serve(async (req) => {
       }
     })
 
-    console.log(`Fetching TMDB API: ${url.toString().replace(apiKey, 'API_KEY_HIDDEN')}`);
+    // Log the request (hiding the API key)
+    const sanitizedUrl = url.toString().replace(apiKey, 'API_KEY_HIDDEN');
+    console.log(`Fetching TMDB API: ${sanitizedUrl}`);
 
     const response = await fetch(url.toString(), {
       headers: {
@@ -41,7 +45,13 @@ Deno.serve(async (req) => {
     }
     
     const data = await response.json()
-    console.log(`TMDB API response: ${data.results ? data.results.length : 0} results`);
+    
+    // Log the response summary
+    if (data.results) {
+      console.log(`TMDB API response: ${data.results.length} results`);
+    } else {
+      console.log(`TMDB API response received (non-results format)`);
+    }
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
