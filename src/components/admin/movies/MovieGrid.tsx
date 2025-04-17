@@ -56,8 +56,14 @@ const MovieGrid = ({
       // Check each movie that's flagged as imported to see if it needs image migration
       movies.forEach(movie => {
         if (movie.isImported) {
-          const posterNeedsMigration = movie.poster_path && movie.poster_path.includes('tmdb.org');
-          const backdropNeedsMigration = movie.backdrop_path && movie.backdrop_path.includes('tmdb.org');
+          const posterNeedsMigration = movie.poster_path && (
+            movie.poster_path.includes('tmdb.org') || 
+            !movie.poster_path.startsWith('/storage')
+          );
+          const backdropNeedsMigration = movie.backdrop_path && (
+            movie.backdrop_path.includes('tmdb.org') || 
+            !movie.backdrop_path.startsWith('/storage')
+          );
           needs[movie.id] = posterNeedsMigration || backdropNeedsMigration;
         }
       });
@@ -69,7 +75,7 @@ const MovieGrid = ({
     checkMovieImagesSource();
   }, [movies]);
 
-  // Hilfsfunktion zum Prüfen, ob ein Film bereits importiert wurde
+  // Helper function to check if a movie is already imported
   const isMovieImported = async (movieId: number): Promise<boolean> => {
     try {
       const { data, error } = await supabase
@@ -90,11 +96,11 @@ const MovieGrid = ({
     }
   };
 
-  // Hilfsfunktion zum direkten Importieren eines Films
+  // Handle importing a movie
   const handleImportMovie = async (movie: MovieOrShow) => {
     try {
       if (importingIds.includes(movie.id)) {
-        return; // Bereits dabei zu importieren
+        return; // Already importing
       }
       
       setImportingIds(prev => [...prev, movie.id]);
@@ -131,76 +137,97 @@ const MovieGrid = ({
       
       toast.loading('Bilder werden auf den Server geladen...');
       
-      // Download poster image
-      if (movie.poster_path) {
+      // Download poster image if needed
+      if (movie.poster_path && (movie.poster_path.includes('tmdb.org') || !movie.poster_path.startsWith('/storage'))) {
         const posterUrl = movie.poster_path.startsWith('http') 
           ? movie.poster_path 
           : `https://image.tmdb.org/t/p/original${movie.poster_path}`;
         
         const posterRes = await fetch(posterUrl);
-        const posterBlob = await posterRes.blob();
         
-        const posterFile = new File([posterBlob], `movie_${movie.id}_poster.jpg`, { 
-          type: 'image/jpeg' 
-        });
-        
-        const { error: posterError } = await supabase.storage
-          .from('movie_images')
-          .upload(`posters/${movie.id}.jpg`, posterFile, {
-            cacheControl: '3600',
-            upsert: true
-          });
-        
-        if (posterError) {
-          console.error('Error uploading poster:', posterError);
-          toast.error('Fehler beim Hochladen des Posters');
+        if (!posterRes.ok) {
+          console.error(`Error fetching poster image: ${posterRes.statusText}`);
+          toast.error('Fehler beim Herunterladen des Posterbilds');
+        } else {
+          const posterBlob = await posterRes.blob();
+          
+          const { error: posterError } = await supabase.storage
+            .from('movie_images')
+            .upload(`posters/${movie.id}.jpg`, posterBlob, {
+              cacheControl: '3600',
+              upsert: true
+            });
+          
+          if (posterError) {
+            console.error('Error uploading poster:', posterError);
+            toast.error('Fehler beim Hochladen des Posters');
+          } else {
+            console.log(`Successfully uploaded poster for movie ${movie.id}`);
+          }
         }
       }
       
-      // Download backdrop image
-      if (movie.backdrop_path) {
+      // Download backdrop image if needed
+      if (movie.backdrop_path && (movie.backdrop_path.includes('tmdb.org') || !movie.backdrop_path.startsWith('/storage'))) {
         const backdropUrl = movie.backdrop_path.startsWith('http') 
           ? movie.backdrop_path 
           : `https://image.tmdb.org/t/p/original${movie.backdrop_path}`;
         
         const backdropRes = await fetch(backdropUrl);
-        const backdropBlob = await backdropRes.blob();
         
-        const backdropFile = new File([backdropBlob], `movie_${movie.id}_backdrop.jpg`, { 
-          type: 'image/jpeg' 
-        });
-        
-        const { error: backdropError } = await supabase.storage
-          .from('movie_images')
-          .upload(`backdrops/${movie.id}.jpg`, backdropFile, {
-            cacheControl: '3600',
-            upsert: true
-          });
-        
-        if (backdropError) {
-          console.error('Error uploading backdrop:', backdropError);
-          toast.error('Fehler beim Hochladen des Hintergrundbilds');
+        if (!backdropRes.ok) {
+          console.error(`Error fetching backdrop image: ${backdropRes.statusText}`);
+          toast.error('Fehler beim Herunterladen des Hintergrundbilds');
+        } else {
+          const backdropBlob = await backdropRes.blob();
+          
+          const { error: backdropError } = await supabase.storage
+            .from('movie_images')
+            .upload(`backdrops/${movie.id}.jpg`, backdropBlob, {
+              cacheControl: '3600',
+              upsert: true
+            });
+          
+          if (backdropError) {
+            console.error('Error uploading backdrop:', backdropError);
+            toast.error('Fehler beim Hochladen des Hintergrundbilds');
+          } else {
+            console.log(`Successfully uploaded backdrop for movie ${movie.id}`);
+          }
         }
       }
       
       // Update the movie in database with the new paths
-      const { error: updateError } = await supabase
-        .from('admin_movies')
-        .update({
-          poster_path: movie.poster_path ? `/storage/movie_images/posters/${movie.id}.jpg` : movie.poster_path,
-          backdrop_path: movie.backdrop_path ? `/storage/movie_images/backdrops/${movie.id}.jpg` : movie.backdrop_path
-        })
-        .eq('id', movie.id);
+      const updateData: Record<string, any> = {
+        id: movie.id
+      };
       
-      if (updateError) {
-        console.error('Error updating movie with local paths:', updateError);
-        toast.error('Fehler beim Aktualisieren der Bildpfade');
-      } else {
-        toast.dismiss();
-        toast.success('Bilder erfolgreich importiert');
-        // Update the movie needs import state
-        setMovieNeedsImageImport(prev => ({...prev, [movie.id]: false}));
+      if (movie.poster_path && (movie.poster_path.includes('tmdb.org') || !movie.poster_path.startsWith('/storage'))) {
+        updateData.poster_path = `/storage/movie_images/posters/${movie.id}.jpg`;
       }
+      
+      if (movie.backdrop_path && (movie.backdrop_path.includes('tmdb.org') || !movie.backdrop_path.startsWith('/storage'))) {
+        updateData.backdrop_path = `/storage/movie_images/backdrops/${movie.id}.jpg`;
+      }
+      
+      if (Object.keys(updateData).length > 1) {
+        const { error: updateError } = await supabase
+          .from('admin_movies')
+          .update(updateData)
+          .eq('id', movie.id);
+        
+        if (updateError) {
+          console.error('Error updating movie with local paths:', updateError);
+          toast.error('Fehler beim Aktualisieren der Bildpfade');
+        } else {
+          console.log(`Successfully updated image paths for movie ${movie.id}`);
+          // Update the movie needs import state
+          setMovieNeedsImageImport(prev => ({...prev, [movie.id]: false}));
+        }
+      }
+      
+      toast.dismiss();
+      toast.success('Bilder erfolgreich importiert');
       
     } catch (error) {
       console.error('Error downloading images:', error);
@@ -338,6 +365,10 @@ const MovieGrid = ({
                     : `https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
                   alt={movie.title || movie.name}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error(`Error loading image for movie ${movie.id}`);
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-200">

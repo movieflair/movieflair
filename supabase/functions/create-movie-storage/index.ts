@@ -1,120 +1,153 @@
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.4'
+import { corsHeaders } from '../_shared/cors.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.23.0';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+
+// Create a Supabase client with the service role key
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 Deno.serve(async (req) => {
-  // CORS-Präflug-Anfrage behandeln
+  // Handle CORS
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders });
   }
-  
+
   try {
-    // Supabase-Client mit Admin-Rolle erstellen
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') || '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '',
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
+    const bucketName = 'movie_images';
+    console.log(`Setting up movie images storage: ${bucketName}`);
+
+    // Check if the bucket already exists
+    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+    
+    if (listError) {
+      console.error('Error listing buckets:', listError);
+      throw new Error(`Error listing buckets: ${listError.message}`);
+    }
+    
+    const bucketExists = buckets.some(bucket => bucket.name === bucketName);
+    
+    if (!bucketExists) {
+      console.log(`Creating bucket '${bucketName}'...`);
+      
+      // Create the bucket
+      const { data, error } = await supabase.storage.createBucket(bucketName, {
+        public: true,  // Make bucket publicly accessible
+        fileSizeLimit: 26214400, // 25MB in bytes
+        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp']
+      });
+
+      if (error) {
+        console.error(`Error creating bucket '${bucketName}':`, error);
+        throw new Error(`Error creating bucket: ${error.message}`);
+      }
+      
+      // Create the folder structure
+      const foldersToCreate = ['posters', 'backdrops'];
+      
+      for (const folder of foldersToCreate) {
+        try {
+          // Create an empty file to represent the folder
+          const { error: folderError } = await supabase.storage
+            .from(bucketName)
+            .upload(`${folder}/.keep`, new Blob(['']));
+            
+          if (folderError) {
+            console.error(`Error creating folder '${folder}':`, folderError);
+          } else {
+            console.log(`Created folder '${folder}' in bucket '${bucketName}'`);
+          }
+        } catch (folderErr) {
+          console.error(`Error creating folder '${folder}':`, folderErr);
+        }
+      }
+      
+      // Set public access policies
+      console.log('Creating public access policies...');
+      try {
+        // Policy for public read access
+        const { error: readError } = await supabase.storage.from(bucketName).createSignedUrl('posters/.keep', 10);
+        if (readError) {
+          console.error('Error configuring bucket settings:', readError);
+        }
+      } catch (policyError) {
+        console.error('Error configuring bucket policies:', policyError);
+      }
+      
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: `Storage bucket '${bucketName}' created with folders 'posters' and 'backdrops'`,
+          isNew: true
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 
+        }
+      );
+    } else {
+      // Bucket already exists, check for the folders
+      console.log(`Bucket '${bucketName}' already exists, checking folders...`);
+      
+      const foldersToCheck = ['posters', 'backdrops'];
+      const foldersToCreate = [];
+      
+      for (const folder of foldersToCheck) {
+        const { data: folderContents, error: listError } = await supabase.storage
+          .from(bucketName)
+          .list(folder);
+          
+        if (listError || !folderContents) {
+          console.log(`Folder '${folder}' may not exist, will create it`);
+          foldersToCreate.push(folder);
+        } else {
+          console.log(`Folder '${folder}' exists with ${folderContents.length} items`);
+        }
+      }
+      
+      // Create any missing folders
+      for (const folder of foldersToCreate) {
+        try {
+          const { error: folderError } = await supabase.storage
+            .from(bucketName)
+            .upload(`${folder}/.keep`, new Blob(['']));
+            
+          if (folderError) {
+            console.error(`Error creating folder '${folder}':`, folderError);
+          } else {
+            console.log(`Created folder '${folder}' in bucket '${bucketName}'`);
+          }
+        } catch (folderErr) {
+          console.error(`Error creating folder '${folder}':`, folderErr);
+        }
+      }
+      
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: `Storage bucket '${bucketName}' already exists, checked folder structure`,
+          isNew: false,
+          foldersCreated: foldersToCreate
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200 
+        }
+      );
+    }
+  } catch (error) {
+    console.error('Error in create-movie-storage function:', error);
+    
+    return new Response(
+      JSON.stringify({ 
+        success: false, 
+        error: error.message 
+      }),
+      { 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500 
       }
     );
-    
-    console.log('Prüfe, ob movie_images Bucket existiert...');
-    
-    // Prüfen, ob der Bucket bereits existiert
-    const { data: existingBuckets, error: bucketsError } = await supabaseAdmin
-      .storage
-      .listBuckets();
-    
-    if (bucketsError) {
-      console.error('Fehler beim Auflisten von Buckets:', bucketsError);
-      return new Response(JSON.stringify({ 
-        error: 'Fehler beim Auflisten von Buckets', 
-        details: bucketsError 
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-    
-    const bucketExists = existingBuckets?.some(bucket => bucket.name === 'movie_images');
-    
-    if (bucketExists) {
-      console.log('movie_images Bucket existiert bereits');
-      return new Response(JSON.stringify({ 
-        message: 'Bucket existiert bereits',
-        bucketName: 'movie_images',
-        status: 'success' 
-      }), {
-        status: 200,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-    
-    // Bucket erstellen, wenn er nicht existiert
-    console.log('Erstelle movie_images Bucket...');
-    const { data: newBucket, error: createError } = await supabaseAdmin
-      .storage
-      .createBucket('movie_images', {
-        public: true,
-        fileSizeLimit: 20971520, // 20MB Limit in Bytes
-        allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'],
-      });
-    
-    if (createError) {
-      console.error('Fehler bei der Bucket-Erstellung:', createError);
-      return new Response(JSON.stringify({ 
-        error: 'Fehler bei der Bucket-Erstellung', 
-        details: createError 
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-    
-    console.log('Erstelle Ordner im Bucket...');
-    
-    // Funktion zum Erstellen eines leeren Markers für die Ordnerstruktur
-    const createFolderMarker = async (folderPath: string) => {
-      const { error } = await supabaseAdmin
-        .storage
-        .from('movie_images')
-        .upload(`${folderPath}/.folder`, new Blob([''], { type: 'text/plain' }));
-      
-      if (error) {
-        console.error(`Fehler beim Erstellen des Ordners ${folderPath}:`, error);
-      } else {
-        console.log(`Ordner erstellt: ${folderPath}`);
-      }
-    };
-    
-    // Ordner für Poster und Hintergrundbilder erstellen
-    await createFolderMarker('posters');
-    await createFolderMarker('backdrops');
-    
-    return new Response(JSON.stringify({ 
-      message: 'Bucket und Ordner erfolgreich erstellt',
-      bucketName: 'movie_images',
-      status: 'success' 
-    }), {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-    
-  } catch (error) {
-    console.error('Unerwarteter Fehler:', error);
-    return new Response(JSON.stringify({ 
-      error: 'Unerwarteter Fehler', 
-      details: error.message 
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
   }
 });

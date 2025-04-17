@@ -1,51 +1,51 @@
 
 /**
- * Hilfsfunktionen für die Behandlung von Bildpfaden in der gesamten Anwendung
+ * Helper functions for handling image paths throughout the application
  */
 
 /**
- * Konvertiert Bildpfade zu korrekt formatierten Serverpfaden
- * Behandelt:
- * - Pfade bereits im Speicherformat (/storage/...)
- * - Externe URLs (http://...)
- * - TMDB-Pfade (/abc123.jpg)
- * - Einfache Dateinamen (abc123.jpg)
+ * Converts image paths to correctly formatted server paths
+ * Handles:
+ * - Paths already in storage format (/storage/...)
+ * - External URLs (http://...)
+ * - TMDB paths (/abc123.jpg)
+ * - Simple filenames (abc123.jpg)
  */
 export const getImagePath = (path?: string, type: 'poster' | 'backdrop' = 'poster'): string | null => {
   if (!path) return null;
   
-  // Wenn bereits ein Storage-Pfad, direkt verwenden
+  // If already a storage path, use directly
   if (path.startsWith('/storage')) {
     return path;
   }
   
-  // Für externe URLs, diese verwenden, aber Warnung ausgeben
+  // For external URLs, use them but log a warning
   if (path.startsWith('http')) {
-    console.warn('Externe Bild-URL gefunden, sollte in lokalen Speicher importiert werden:', path);
+    console.warn('External image URL found, should be imported to local storage:', path);
     return path;
   }
   
-  // Für TMDB-Pfade (beginnend mit Schrägstrich)
+  // For TMDB paths (starting with slash)
   if (path.startsWith('/')) {
     const pathWithoutSlash = path.substring(1);
     const storagePath = `/storage/movie_images/${type === 'poster' ? 'posters' : 'backdrops'}/${pathWithoutSlash}`;
     return storagePath;
   }
   
-  // Standardfall: Annahme, es ist ein Dateiname in unserem Speicher
+  // Default case: assume it's a filename in our storage
   const storagePath = `/storage/movie_images/${type === 'poster' ? 'posters' : 'backdrops'}/${path}`;
   return storagePath;
 };
 
 /**
- * Holt den korrekten Pfad für ein Filmposter
+ * Gets the correct path for a movie poster
  */
 export const getPosterPath = (path?: string): string | null => {
   return getImagePath(path, 'poster');
 };
 
 /**
- * Holt den korrekten Pfad für ein Filmhintergrundbild
+ * Gets the correct path for a movie backdrop
  */
 export const getBackdropPath = (path?: string): string | null => {
   return getImagePath(path, 'backdrop');

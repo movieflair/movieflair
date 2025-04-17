@@ -1,6 +1,7 @@
 
 import { Search } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { useMemo } from 'react';
 
 interface AdminSearchProps {
   searchQuery: string;
@@ -18,11 +19,13 @@ const AdminSearch = ({
   activeTab 
 }: AdminSearchProps) => {
   // Memoize the placeholder text to prevent unnecessary re-renders
-  const placeholderText = activeTab === 'movies' 
-    ? 'Suche Filme...' 
-    : activeTab === 'shows' 
-      ? 'Suche Serien...' 
-      : 'Suche Tags...';
+  const placeholderText = useMemo(() => {
+    return activeTab === 'movies' 
+      ? 'Suche Filme...' 
+      : activeTab === 'shows' 
+        ? 'Suche Serien...' 
+        : 'Suche Tags...';
+  }, [activeTab]);
       
   return (
     <form onSubmit={onSearch} className="flex max-w-md mb-6">

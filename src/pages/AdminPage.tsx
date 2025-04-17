@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
+import { ensureStorageBucketExists } from '@/lib/setupStorage';
 
 const queryClient = new QueryClient();
 
@@ -16,6 +17,7 @@ const AdminPage = () => {
   const { user, loading: authLoading } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [storageInitialized, setStorageInitialized] = useState(false);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -24,21 +26,27 @@ const AdminPage = () => {
     checkAdminAccess();
 
     // Create the storage bucket for movie images if needed
-    const ensureStorageBucket = async () => {
+    const initStorage = async () => {
+      if (storageInitialized) return;
+      
       try {
-        await supabase.functions.invoke('create-storage-bucket');
+        await ensureStorageBucketExists();
+        setStorageInitialized(true);
       } catch (error) {
-        console.error('Error creating storage bucket:', error);
+        console.error('Error initializing storage:', error);
+        toast.error('Fehler bei der Initialisierung des Speicherbuckets');
       }
     };
 
-    ensureStorageBucket();
+    if (user && !storageInitialized) {
+      initStorage();
+    }
 
     // Clean up function to remove the flag when leaving the admin area
     return () => {
       localStorage.removeItem('isAdminLoggedIn');
     };
-  }, [user]);
+  }, [user, storageInitialized]);
 
   const checkAdminAccess = async () => {
     if (authLoading) return;
