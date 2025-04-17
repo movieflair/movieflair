@@ -1,4 +1,3 @@
-
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -53,8 +52,7 @@ async function startServer() {
         
         // Vergewissern, dass die XML-Deklaration am absoluten Anfang steht
         if (!sitemap.startsWith('<?xml')) {
-          sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' + 
-                   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+          sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
         }
       } catch (sitemapError) {
         console.error('Error generating dynamic sitemap:', sitemapError);
@@ -64,12 +62,11 @@ async function startServer() {
           sitemap = fs.readFileSync(
             path.resolve(__dirname, isProduction ? 'dist/client/sitemap.xml' : 'public/sitemap.xml'),
             'utf-8'
-          );
+          ).trim();
           
           // Auch hier prüfen, ob die XML-Deklaration am Anfang steht
           if (!sitemap.startsWith('<?xml')) {
-            sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n' + 
-                     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+            sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
           }
         } catch (fallbackError) {
           console.error('Error reading static sitemap:', fallbackError);
