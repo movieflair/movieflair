@@ -47,13 +47,10 @@ router.get('*', async (req: Request, res: Response, next: NextFunction) => {
     } else {
       template = fs.readFileSync(path.resolve(__dirname, '../../../dist/client/index.html'), 'utf-8');
       // In production, we use the built app
-      try {
-        const { default: entryServer } = await import('../../../dist/server/App.js');
-        App = entryServer;
-      } catch (err) {
-        console.error('Failed to import server App:', err);
-        throw new Error(`Server App import failed: ${err.message}`);
-      }
+      // Note: We're not checking for the actual file existence since this is a build-time check
+      // The actual file will be available at runtime after the server build
+      const { default: entryServer } = await import('../../../dist/server/App.js');
+      App = entryServer;
     }
 
     const helmetContext = {};
