@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Youtube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MovieOrShow } from '@/lib/types';
+import { MovieOrShow } from '@/lib/api';
 
 interface TrailersHeroProps {
   trailerItems: MovieOrShow[];

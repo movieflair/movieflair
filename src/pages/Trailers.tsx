@@ -5,6 +5,7 @@ import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import { Seo } from '@/components/seo/Seo';
 import TrailersHero from '@/components/trailers/TrailersHero';
 import TrailersGrid from '@/components/trailers/TrailersGrid';
+import { toast } from "@/hooks/use-toast";
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
@@ -22,6 +23,11 @@ const Trailers = () => {
         setTrailerItems(data);
       } catch (error) {
         console.error('Error fetching trailers:', error);
+        toast({
+          title: "Fehler",
+          description: "Trailer konnten nicht geladen werden. Bitte versuche es später erneut.",
+          variant: "destructive"
+        });
       } finally {
         setIsLoading(false);
       }

@@ -1,5 +1,5 @@
 
-import { MovieOrShow } from '@/lib/types';
+import { MovieOrShow } from '@/lib/api';
 import TrailerCard from '@/components/movies/TrailerCard';
 
 interface TrailersGridProps {
