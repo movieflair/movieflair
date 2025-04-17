@@ -187,9 +187,11 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
           console.error('Fehler beim Überprüfen, ob die Credits-Spalte existiert:', columnsError);
         } else {
           // If we got here, the column exists, update it
+          // Use type assertion to add the credits property
+          const updateData: any = { credits: creditsJson };
           const { error: creditsError } = await supabase
             .from('admin_movies')
-            .update({ credits: creditsJson })
+            .update(updateData)
             .eq('id', movie.id);
             
           if (creditsError) {
@@ -252,9 +254,11 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
         console.error('Fehler beim Überprüfen, ob die Credits-Spalte existiert:', columnsError);
       } else {
         // If we got here, the column exists, update it
+        // Use type assertion to add the credits property
+        const updateData: any = { credits: creditsJson };
         const { error: creditsError } = await supabase
           .from('admin_movies')
-          .update({ credits: creditsJson })
+          .update(updateData)
           .eq('id', movie.id);
           
         if (creditsError) {
