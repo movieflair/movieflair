@@ -22,7 +22,7 @@ const MovieMeta = ({
   className 
 }: MovieMetaProps) => {
   return (
-    <div className={cn("flex items-center gap-6 text-gray-600", className)}>
+    <div className={cn("flex items-center gap-6 text-gray-600 flex-wrap", className)}>
       {mediaType && (
         <div className="flex items-center gap-1">
           {mediaType === 'movie' ? (

@@ -10,6 +10,7 @@ import MoviePoster from '@/components/movies/MoviePoster';
 import MovieTrailerDialog from '@/components/movies/MovieTrailerDialog';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import { getTrailerUrl, truncateOverview } from './MovieDetailsHelpers';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface MovieContentProps {
   movie: MovieDetail;
@@ -36,12 +37,12 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
   const genres = movie.genres?.map(g => g.name).join(', ') || '';
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       <MovieBackdrop backdropPath={movie.backdrop_path} title={movie.title} />
 
-      <div className="container-custom -mt-20 md:-mt-40 relative z-20 px-3 md:px-8">
-        <div className="glass-card overflow-hidden rounded-xl">
-          <div className="grid md:grid-cols-[300px,1fr] gap-4 md:gap-8 p-4 md:p-8">
+      <div className="container mx-auto -mt-20 md:-mt-40 relative z-20 px-4 md:px-6 max-w-7xl">
+        <Card className="overflow-hidden shadow-lg border-0">
+          <div className="grid md:grid-cols-[280px,1fr] gap-6 md:gap-8 p-6 md:p-8">
             <div className="flex justify-center md:block">
               <MoviePoster 
                 id={movie.id} 
@@ -50,7 +51,7 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
               />
             </div>
 
-            <div className="text-gray-800">
+            <div className="space-y-6">
               <MovieHeader 
                 title={movie.title}
                 tagline={movie.tagline}
@@ -63,18 +64,23 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
                 rating={movie.vote_average}
                 duration={movie.runtime}
                 mediaType="movie"
-                className="mb-4"
+                className="mt-2"
               />
 
               {genres && (
-                <div className="mb-4 text-sm">
+                <div className="text-sm">
                   <span className="font-semibold">Genres:</span> {genres}
                 </div>
               )}
 
-              <p className="text-gray-600 mb-6 md:mb-8 leading-relaxed text-sm md:text-base">
-                {truncateOverview(movie.overview)}
-              </p>
+              <Card className="bg-white shadow-sm border">
+                <CardContent className="p-6">
+                  <h3 className="text-lg font-medium mb-2">Handlung</h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    {movie.overview}
+                  </p>
+                </CardContent>
+              </Card>
 
               <MovieStreamButtons
                 hasTrailer={movie.hasTrailer || !!trailerUrl}
@@ -88,15 +94,17 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
                 onStreamClick={handleStreamClick}
               />
 
-              <div className="mt-6 md:mt-8">
-                <CastAndCrewSection 
-                  director={director}
-                  cast={movie.cast?.filter(person => person.character)}
-                />
-              </div>
+              <Card className="bg-white shadow-sm border">
+                <CardContent className="p-6">
+                  <CastAndCrewSection 
+                    director={director}
+                    cast={movie.cast?.filter(person => person.character)}
+                  />
+                </CardContent>
+              </Card>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
 
       <MovieTrailerDialog

@@ -36,8 +36,14 @@ const MovieDetails = () => {
   return (
     <MainLayout>
       <MovieSeoData movie={movie} director={director} />
-      <MovieContent movie={movie} amazonAffiliateId={amazonAffiliateId} />
-      <SimilarMovies movies={similarMovies} />
+      <div className="pb-12">
+        <MovieContent movie={movie} amazonAffiliateId={amazonAffiliateId} />
+        
+        <div className="container mx-auto mt-12 px-4 md:px-6 max-w-7xl">
+          <h2 className="text-2xl font-semibold mb-6">Ähnliche Filme</h2>
+          <SimilarMovies movies={similarMovies} />
+        </div>
+      </div>
     </MainLayout>
   );
 };

@@ -34,7 +34,6 @@ export const getAllMovies = async (): Promise<MovieOrShow[]> => {
       hasTrailer: movie.hastrailer || false,
       streamUrl: movie.streamurl || '',
       trailerUrl: movie.trailerurl || '',
-      // Add a type assertion to inform TypeScript that runtime exists
       runtime: movie.runtime || null,
       genre_ids: [], // Required by MovieOrShow type
     }));
@@ -76,7 +75,6 @@ export const getMovieById = async (id: number): Promise<MovieOrShow | null> => {
       hasTrailer: data.hastrailer || false,
       streamUrl: data.streamurl || '',
       trailerUrl: data.trailerurl || '',
-      // Add runtime property
       runtime: data.runtime || null,
       genre_ids: [], // Required by MovieOrShow type
     };
@@ -108,7 +106,6 @@ export const updateMovie = async (movie: MovieOrShow): Promise<boolean> => {
         hastrailer: movie.hasTrailer,
         streamurl: movie.streamUrl || null, 
         trailerurl: movie.trailerUrl || null,
-        // Add runtime property
         runtime: movie.runtime || null
       })
       .eq('id', movie.id);

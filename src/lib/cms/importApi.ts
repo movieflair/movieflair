@@ -74,7 +74,8 @@ export const importMovieFromTMDB = async (movieId: number): Promise<boolean> => 
       hasstream: false,
       streamurl: '',
       isfreemovie: false,
-      isnewtrailer: false
+      isnewtrailer: false,
+      runtime: movieDetails.runtime || null
     });
     
     if (error) {
