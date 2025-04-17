@@ -14,12 +14,15 @@
 export const getImagePath = (path?: string, type: 'poster' | 'backdrop' = 'poster'): string | null => {
   if (!path) return null;
   
+  console.log('Processing image path:', path, 'type:', type);
+  
   // If already a storage path, use it directly
   if (path.startsWith('/storage')) {
+    console.log('Using existing storage path:', path);
     return path;
   }
   
-  // For external URLs, log warning but use them during transition
+  // For external URLs, use them but log warning
   if (path.startsWith('http')) {
     console.warn('External image URL found, should be imported to local storage:', path);
     return path;
@@ -28,11 +31,15 @@ export const getImagePath = (path?: string, type: 'poster' | 'backdrop' = 'poste
   // For TMDB paths (starting with slash)
   if (path.startsWith('/')) {
     const pathWithoutSlash = path.replace(/^\//, '');
-    return `/storage/movie_images/${type === 'poster' ? 'posters' : 'backdrops'}/${pathWithoutSlash}`;
+    const storagePath = `/storage/movie_images/${type === 'poster' ? 'posters' : 'backdrops'}/${pathWithoutSlash}`;
+    console.log('Converted TMDB path to storage path:', storagePath);
+    return storagePath;
   }
   
   // Default case: assume it's a filename in our storage
-  return `/storage/movie_images/${type === 'poster' ? 'posters' : 'backdrops'}/${path}`;
+  const storagePath = `/storage/movie_images/${type === 'poster' ? 'posters' : 'backdrops'}/${path}`;
+  console.log('Using filename as storage path:', storagePath);
+  return storagePath;
 };
 
 /**

@@ -1,3 +1,4 @@
+
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,7 +42,14 @@ export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<b
         ? movie.poster_path 
         : `https://image.tmdb.org/t/p/original${movie.poster_path}`;
       
+      console.log(`Downloading poster from ${posterUrl}`);
       const posterRes = await fetch(posterUrl);
+      
+      if (!posterRes.ok) {
+        console.error(`Error downloading poster: ${posterRes.statusText}`);
+        return false;
+      }
+      
       const posterBlob = await posterRes.blob();
       
       const posterFile = new File([posterBlob], `movie_${movie.id}_poster.jpg`, { 
@@ -58,6 +66,7 @@ export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<b
       if (posterError) {
         console.error('Error uploading poster:', posterError);
       } else {
+        console.log('Poster uploaded successfully');
         posterUpdated = true;
       }
     }
@@ -67,7 +76,14 @@ export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<b
         ? movie.backdrop_path 
         : `https://image.tmdb.org/t/p/original${movie.backdrop_path}`;
       
+      console.log(`Downloading backdrop from ${backdropUrl}`);
       const backdropRes = await fetch(backdropUrl);
+      
+      if (!backdropRes.ok) {
+        console.error(`Error downloading backdrop: ${backdropRes.statusText}`);
+        return false;
+      }
+      
       const backdropBlob = await backdropRes.blob();
       
       const backdropFile = new File([backdropBlob], `movie_${movie.id}_backdrop.jpg`, { 
@@ -84,6 +100,7 @@ export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<b
       if (backdropError) {
         console.error('Error uploading backdrop:', backdropError);
       } else {
+        console.log('Backdrop uploaded successfully');
         backdropUpdated = true;
       }
     }
@@ -99,6 +116,7 @@ export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<b
         updateData.backdrop_path = `/storage/movie_images/backdrops/${movie.id}.jpg`;
       }
       
+      console.log('Updating movie paths in database:', updateData);
       const { error: updateError } = await supabase
         .from('admin_movies')
         .update(updateData)
@@ -107,6 +125,8 @@ export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<b
       if (updateError) {
         console.error('Error updating movie with local paths:', updateError);
         return false;
+      } else {
+        console.log('Movie paths updated successfully in database');
       }
     }
     

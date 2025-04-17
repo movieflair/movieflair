@@ -7,15 +7,24 @@ interface MovieBackdropProps {
 }
 
 const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
+  const imageSrc = getBackdropPath(backdropPath);
+  
   return (
     <div className="relative h-[400px] overflow-hidden">
-      {backdropPath ? (
+      {imageSrc ? (
         <>
           <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
           <img
-            src={getBackdropPath(backdropPath)}
+            src={imageSrc}
             alt={title}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              console.error(`Error loading backdrop for ${title}:`, e);
+              // Fallback to TMDB if our storage fails
+              if (backdropPath && backdropPath.startsWith('/') && !backdropPath.startsWith('/storage')) {
+                (e.target as HTMLImageElement).src = `https://image.tmdb.org/t/p/original${backdropPath}`;
+              }
+            }}
           />
         </>
       ) : (

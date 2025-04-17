@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
@@ -52,13 +53,23 @@ const MovieDetails = () => {
           getSimilarMovies(parsedId)
         ]);
         
+        // Force download images if they're still from TMDB
         if ((movieData.poster_path && movieData.poster_path.includes('tmdb.org')) || 
             (movieData.backdrop_path && movieData.backdrop_path.includes('tmdb.org'))) {
           console.log('Movie images need to be migrated to server in frontend view');
-          await downloadMovieImagesToServer(movieData);
           
-          const updatedMovie = await getMovieById(parsedId);
-          setMovie(updatedMovie);
+          // Create toast to inform user
+          console.log('Importing images to server...');
+          const imagesUpdated = await downloadMovieImagesToServer(movieData);
+          
+          if (imagesUpdated) {
+            const updatedMovie = await getMovieById(parsedId);
+            console.log('Setting updated movie with local images');
+            setMovie(updatedMovie);
+          } else {
+            console.log('Failed to update images, using original movie data');
+            setMovie(movieData);
+          }
         } else {
           setMovie(movieData);
         }
