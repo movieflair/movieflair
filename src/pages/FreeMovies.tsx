@@ -7,11 +7,13 @@ import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { Button } from '@/components/ui/button';
 import { Seo } from '@/components/seo/Seo';
+import { useToast } from '@/components/ui/use-toast';
 
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     trackPageVisit('free-movies');
@@ -38,7 +40,17 @@ const FreeMovies = () => {
       const randomIndex = Math.floor(Math.random() * movies.length);
       const randomMovie = movies[randomIndex];
       console.log('Navigating to random movie:', randomMovie);
-      navigate(`/film/${randomMovie.id}`);
+      
+      // Show a toast to make it more visible that something happened
+      toast({
+        title: "Zufallsfilm ausgewählt",
+        description: `${randomMovie.title || randomMovie.name} wird geladen...`,
+      });
+      
+      // Add a small delay to make the navigation more noticeable
+      setTimeout(() => {
+        navigate(`/film/${randomMovie.id}`);
+      }, 500);
     }
   };
 

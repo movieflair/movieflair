@@ -7,11 +7,13 @@ import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import TrailerCard from '@/components/movies/TrailerCard';
 import { Button } from '@/components/ui/button';
 import { Seo } from '@/components/seo/Seo';
+import { useToast } from '@/components/ui/use-toast';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     trackPageVisit('trailers');
@@ -38,7 +40,17 @@ const Trailers = () => {
       const randomIndex = Math.floor(Math.random() * trailerItems.length);
       const randomItem = trailerItems[randomIndex];
       console.log('Navigating to random trailer:', randomItem);
-      navigate(`/${randomItem.media_type === 'tv' ? 'serie' : 'film'}/${randomItem.id}`);
+      
+      // Show a toast to make it more visible that something happened
+      toast({
+        title: "Zufallstrailer ausgewählt",
+        description: `${randomItem.title || randomItem.name} wird geladen...`,
+      });
+      
+      // Add a small delay to make the navigation more noticeable
+      setTimeout(() => {
+        navigate(`/${randomItem.media_type === 'tv' ? 'serie' : 'film'}/${randomItem.id}`);
+      }, 500);
     }
   };
 
