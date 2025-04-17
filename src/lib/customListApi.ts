@@ -403,3 +403,49 @@ export const importMoviesFromLists = async (): Promise<{success: number, error: 
     throw error;
   }
 };
+
+export const cleanAllCustomLists = async (): Promise<boolean> => {
+  try {
+    console.log('Cleaning all movies from custom lists...');
+    
+    // First, get all custom lists
+    const { data: lists, error: fetchError } = await supabase
+      .from('custom_lists')
+      .select('id, title');
+    
+    if (fetchError) {
+      console.error('Error fetching custom lists:', fetchError);
+      return false;
+    }
+    
+    if (!lists || lists.length === 0) {
+      console.log('No custom lists found to clean');
+      return true;
+    }
+    
+    console.log(`Found ${lists.length} custom lists to clean`);
+    
+    // Update each list to have an empty movies array
+    for (const list of lists) {
+      console.log(`Cleaning list: ${list.title} (${list.id})`);
+      
+      const { error: updateError } = await supabase
+        .from('custom_lists')
+        .update({ 
+          movies: [],
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', list.id);
+      
+      if (updateError) {
+        console.error(`Error cleaning list ${list.id}:`, updateError);
+      }
+    }
+    
+    console.log('All custom lists have been cleaned');
+    return true;
+  } catch (error) {
+    console.error('Error cleaning custom lists:', error);
+    return false;
+  }
+};

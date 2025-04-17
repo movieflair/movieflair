@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { deleteAllMovies, cleanAllCustomLists } from '@/lib/api';
 
 const AdminPage = () => {
   const { user } = useAuth();
@@ -16,41 +16,31 @@ const AdminPage = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  const handleDeleteAllMovies = async () => {
-    if (!confirm('Bist du sicher, dass du ALLE Filme aus der Datenbank löschen willst? Diese Aktion kann nicht rückgängig gemacht werden!')) {
+  const handleDeleteAllContent = async () => {
+    if (!confirm('Bist du sicher, dass du ALLE Inhalte löschen willst? Dies umfasst alle Filme, TV-Shows und Filme in Listen. Diese Aktion kann nicht rückgängig gemacht werden!')) {
       return;
     }
     
     setIsDeleting(true);
     try {
-      toast.loading('Lösche alle Filme aus der Datenbank...');
+      toast.loading('Lösche alle Inhalte aus der Datenbank...');
       
-      // Delete all movies from admin_movies table
-      const { error: moviesError } = await supabase
-        .from('admin_movies')
-        .delete()
-        .neq('id', 0); // Delete all entries
-      
-      if (moviesError) {
-        console.error('Fehler beim Löschen der Filme:', moviesError);
-        toast.error('Fehler beim Löschen der Filme');
+      // First clean all custom lists (remove movies from lists)
+      const listsCleanResult = await cleanAllCustomLists();
+      if (!listsCleanResult) {
+        toast.error('Fehler beim Leeren der Filmlisten');
         return;
       }
       
-      // Delete all TV shows from admin_shows table
-      const { error: showsError } = await supabase
-        .from('admin_shows')
-        .delete()
-        .neq('id', 0); // Delete all entries
-      
-      if (showsError) {
-        console.error('Fehler beim Löschen der TV-Shows:', showsError);
-        toast.error('Fehler beim Löschen der TV-Shows');
+      // Then delete all movies and TV shows
+      const deleteResult = await deleteAllMovies();
+      if (!deleteResult) {
+        toast.error('Fehler beim Löschen der Filme und TV-Shows');
         return;
       }
       
       toast.dismiss();
-      toast.success('Alle Filme und TV-Shows wurden erfolgreich gelöscht');
+      toast.success('Alle Inhalte wurden erfolgreich gelöscht');
     } catch (error) {
       console.error('Fehler beim Zurücksetzen der Datenbank:', error);
       toast.error('Ein unerwarteter Fehler ist aufgetreten');
@@ -68,17 +58,17 @@ const AdminPage = () => {
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-xl font-semibold mb-4">Datenbank-Verwaltung</h2>
             <p className="text-gray-600 mb-4">
-              Hier kannst du die Filmdatenbank zurücksetzen und alle Einträge löschen.
-              Diese Aktion kann nicht rückgängig gemacht werden.
+              Hier kannst du die gesamte Filmdatenbank zurücksetzen. Dies löscht alle Filme, TV-Shows 
+              und entfernt alle Filme aus den Filmlisten. Diese Aktion kann nicht rückgängig gemacht werden.
             </p>
             
             <Button 
               variant="destructive" 
-              onClick={handleDeleteAllMovies} 
+              onClick={handleDeleteAllContent} 
               disabled={isDeleting}
               className="mt-2"
             >
-              {isDeleting ? 'Wird gelöscht...' : 'Datenbank zurücksetzen'}
+              {isDeleting ? 'Wird gelöscht...' : 'Alle Inhalte löschen'}
             </Button>
           </div>
           

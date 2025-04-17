@@ -32,6 +32,7 @@ export {
 export { 
   getCustomLists,
   getCustomList,
-  getRandomCustomLists
+  getRandomCustomLists,
+  cleanAllCustomLists
 } from './customListApi';
 export * from './apiUtils';

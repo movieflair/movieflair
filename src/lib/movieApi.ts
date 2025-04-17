@@ -272,16 +272,31 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
 
 export const deleteAllMovies = async (): Promise<boolean> => {
   try {
-    const { error } = await supabase
+    console.log('Deleting all movies from the database...');
+    
+    // Delete all movies from admin_movies table
+    const { error: moviesError } = await supabase
       .from('admin_movies')
       .delete()
       .neq('id', 0); // Delete all entries
     
-    if (error) {
-      console.error('Error deleting all movies:', error);
+    if (moviesError) {
+      console.error('Error deleting all movies:', moviesError);
       return false;
     }
     
+    // Delete all TV shows from admin_shows table
+    const { error: showsError } = await supabase
+      .from('admin_shows')
+      .delete()
+      .neq('id', 0); // Delete all entries
+    
+    if (showsError) {
+      console.error('Error deleting all TV shows:', showsError);
+      return false;
+    }
+    
+    console.log('All movies and TV shows have been deleted');
     return true;
   } catch (error) {
     console.error('Error deleting all movies:', error);
