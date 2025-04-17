@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieBackdropProps {
   backdropPath?: string;
@@ -16,45 +17,34 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
       return;
     }
     
-    // Direkte URL-Konstruktion basierend auf Pfadtyp
-    if (backdropPath.startsWith('/storage/')) {
-      // Vollständige URL für Storage-Pfade
-      const fullUrl = window.location.origin + backdropPath;
-      setImageSrc(fullUrl);
-    } else if (backdropPath.startsWith('http')) {
-      // Externe URLs direkt verwenden
-      setImageSrc(backdropPath);
-    } else if (backdropPath.startsWith('/')) {
-      // TMDB-Pfade
-      setImageSrc(`https://image.tmdb.org/t/p/original${backdropPath}`);
-    } else {
-      // Fallback für ungültige Pfade
-      setImageSrc(null);
-    }
-    
+    // Use our centralized image URL utility
+    const url = getPublicImageUrl(backdropPath);
+    setImageSrc(url);
     setHasError(false);
+    
   }, [backdropPath]);
   
   const handleError = () => {
-    console.error(`Fehler beim Laden des Hintergrundbilds für ${title}: ${backdropPath}`);
+    console.error(`Error loading backdrop for ${title}: ${backdropPath}`);
     
     if (!hasError && backdropPath) {
       setHasError(true);
       
-      // Fallback zu TMDB versuchen, wenn es ein Storage-Pfad war
+      // Attempt one more fallback for storage paths
       if (backdropPath.startsWith('/storage/')) {
-        const movieId = backdropPath.split('/').pop()?.split('.')[0];
-        if (movieId) {
-          console.log(`Versuche TMDB-Fallback für ID: ${movieId}`);
-          setImageSrc(`https://image.tmdb.org/t/p/original/tmdb-fallback-${movieId}`);
-        } else {
+        try {
+          // Try with a forced full URL
+          const fullUrl = window.location.origin + backdropPath;
+          console.log(`Trying alternative storage URL: ${fullUrl}`);
+          setImageSrc(fullUrl);
+        } catch (e) {
           setImageSrc(null);
         }
       } else {
         setImageSrc(null);
       }
     } else {
-      // Zweiter Fehler, geben wir auf
+      // Second error, give up
       setImageSrc(null);
     }
   };

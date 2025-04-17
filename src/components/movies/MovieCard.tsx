@@ -5,6 +5,7 @@ import { Star } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
 import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
 import { scrollToTop } from '@/utils/scrollUtils';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieCardProps {
   movie: MovieOrShow;
@@ -29,23 +30,11 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
       return;
     }
     
-    // Direkte URL-Konstruktion basierend auf Pfadtyp
-    if (posterPath.startsWith('/storage/')) {
-      // Vollständige URL für Storage-Pfade
-      const fullUrl = window.location.origin + posterPath;
-      setImageSrc(fullUrl);
-    } else if (posterPath.startsWith('http')) {
-      // Externe URLs direkt verwenden
-      setImageSrc(posterPath);
-    } else if (posterPath.startsWith('/')) {
-      // TMDB-Pfade
-      setImageSrc(`https://image.tmdb.org/t/p/w500${posterPath}`);
-    } else {
-      // Fallback für ungültige Pfade
-      setImageSrc(null);
-    }
-    
+    // Use our centralized image URL utility
+    const url = getPublicImageUrl(posterPath);
+    setImageSrc(url);
     setHasError(false);
+    
   }, [movie.poster_path]);
   
   const imageSizes = {
@@ -65,16 +54,20 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
   };
 
   const handleImageError = () => {
+    console.error('MovieCard: Image could not be loaded:', movie.poster_path);
+    
     if (!hasError && movie.poster_path) {
-      console.log('MovieCard: Bild konnte nicht geladen werden:', movie.poster_path);
       setHasError(true);
       
       if (movie.poster_path.startsWith('/storage/')) {
-        // Versuche einen Fallback für Storage-Bilder
-        setImageSrc(null);
-      } else if (movie.poster_path.startsWith('/') && !movie.poster_path.startsWith('/storage/')) {
-        // Versuche einen TMDB-Fallback
-        setImageSrc(`https://image.tmdb.org/t/p/w500${movie.poster_path}`);
+        try {
+          // Try with a forced full URL
+          const fullUrl = window.location.origin + movie.poster_path;
+          console.log(`Trying alternative storage URL: ${fullUrl}`);
+          setImageSrc(fullUrl);
+        } catch (e) {
+          setImageSrc(null);
+        }
       } else {
         setImageSrc(null);
       }

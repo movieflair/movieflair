@@ -67,22 +67,35 @@ Deno.serve(async (req) => {
         // Continue anyway as the bucket was created
       }
       
-      // Create public access policy
-      try {
-        await supabase.rpc('create_movie_images_policy', { bucket_name: bucketName });
-        console.log('Storage policy created successfully');
-      } catch (policyError) {
-        console.error('Error creating policy (policy may already exist):', policyError);
-        // Continue anyway as the bucket was created
-      }
-      
       console.log(`${bucketName} bucket created successfully`);
       return new Response(
         JSON.stringify({ success: true, message: `${bucketName} bucket created successfully` }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     } else {
-      console.log(`${bucketName} bucket already exists`);
+      // Make sure the bucket is public
+      console.log(`${bucketName} bucket already exists, ensuring it's public...`);
+      
+      try {
+        // Get bucket details
+        const { data: bucketData, error: bucketError } = await supabase.storage.getBucket(bucketName);
+        
+        // If not public, update it
+        if (bucketData && !bucketData.public) {
+          const { error: updateError } = await supabase.storage.updateBucket(bucketName, {
+            public: true
+          });
+          
+          if (updateError) {
+            console.error('Error updating bucket visibility:', updateError);
+          } else {
+            console.log('Updated bucket to be public');
+          }
+        }
+      } catch (error) {
+        console.error('Error checking bucket visibility:', error);
+      }
+      
       return new Response(
         JSON.stringify({ success: true, message: `${bucketName} bucket already exists` }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }

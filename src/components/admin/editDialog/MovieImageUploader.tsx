@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { normalizeImagePath } from '@/utils/imageUtils';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieImageUploaderProps {
   posterFile: File | null;
@@ -33,13 +33,13 @@ const MovieImageUploader: React.FC<MovieImageUploaderProps> = ({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
-      // Größenlimit prüfen (10 MB)
+      // Check size limit (10 MB)
       if (file.size > 10 * 1024 * 1024) {
         setPosterError("Bild ist zu groß (max. 10 MB)");
         return;
       }
       
-      // Typ prüfen
+      // Check type
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
         setPosterError("Nur JPG, PNG oder WEBP erlaubt");
         return;
@@ -55,13 +55,13 @@ const MovieImageUploader: React.FC<MovieImageUploaderProps> = ({
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       
-      // Größenlimit prüfen (10 MB)
+      // Check size limit (10 MB)
       if (file.size > 10 * 1024 * 1024) {
         setBackdropError("Bild ist zu groß (max. 10 MB)");
         return;
       }
       
-      // Typ prüfen
+      // Check type
       if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
         setBackdropError("Nur JPG, PNG oder WEBP erlaubt");
         return;
@@ -74,7 +74,7 @@ const MovieImageUploader: React.FC<MovieImageUploaderProps> = ({
 
   const getDisplayImageUrl = (path: string | null): string => {
     if (!path) return '/placeholder.svg';
-    return normalizeImagePath(path) || '/placeholder.svg';
+    return getPublicImageUrl(path) || '/placeholder.svg';
   };
 
   return (
@@ -86,6 +86,7 @@ const MovieImageUploader: React.FC<MovieImageUploaderProps> = ({
             src={getDisplayImageUrl(posterPreview)} 
             alt="Poster Vorschau" 
             className="w-full h-full object-cover" 
+            onError={() => console.error('Error loading poster preview')}
           />
         </div>
         <div>
@@ -106,6 +107,7 @@ const MovieImageUploader: React.FC<MovieImageUploaderProps> = ({
             src={getDisplayImageUrl(backdropPreview)} 
             alt="Hintergrund Vorschau" 
             className="w-full h-full object-cover" 
+            onError={() => console.error('Error loading backdrop preview')}
           />
         </div>
         <div>

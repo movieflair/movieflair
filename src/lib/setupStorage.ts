@@ -55,15 +55,9 @@ export const setupStorage = async (): Promise<void> => {
     } else {
       console.log('movie_images bucket already exists');
       
-      // Let's check if the bucket is public
-      try {
-        // Check bucket policy - removing the RPC call that causes type errors
-        // Instead we'll use the Edge function to ensure the bucket is public
-        console.log('Ensuring bucket has public access...');
-        await createMovieBucketThroughEdgeFunction();
-      } catch (error) {
-        console.log('Error checking bucket policy:', error);
-      }
+      // Ensure the bucket has public access
+      console.log('Ensuring bucket has public access...');
+      await createMovieBucketThroughEdgeFunction();
     }
   } catch (error) {
     console.error('Error setting up storage buckets:', error);
@@ -75,7 +69,7 @@ export const setupStorage = async (): Promise<void> => {
  * Creates the movie_images bucket through the Edge Function
  */
 async function createMovieBucketThroughEdgeFunction() {
-  console.log('Attempting to create movie_images bucket through edge function...');
+  console.log('Attempting to create/update movie_images bucket through edge function...');
   
   try {
     const { data, error } = await supabase.functions.invoke('create-storage-bucket', {
@@ -89,7 +83,6 @@ async function createMovieBucketThroughEdgeFunction() {
     }
     
     console.log('Edge function response:', data);
-    toast.success('Storage-Bucket wurde erfolgreich eingerichtet');
   } catch (error) {
     console.error('Error invoking edge function:', error);
     toast.error('Fehler beim Zugriff auf die Edge-Funktion');

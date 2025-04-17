@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 import WatchlistButton from '@/components/movies/WatchlistButton';
 import ShareButton from '@/components/movies/ShareButton';
 
@@ -19,45 +20,34 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
       return;
     }
     
-    // Direkte URL-Konstruktion basierend auf Pfadtyp
-    if (posterPath.startsWith('/storage/')) {
-      // Vollständige URL für Storage-Pfade
-      const fullUrl = window.location.origin + posterPath;
-      setImageSrc(fullUrl);
-    } else if (posterPath.startsWith('http')) {
-      // Externe URLs direkt verwenden
-      setImageSrc(posterPath);
-    } else if (posterPath.startsWith('/')) {
-      // TMDB-Pfade
-      setImageSrc(`https://image.tmdb.org/t/p/w500${posterPath}`);
-    } else {
-      // Fallback für ungültige Pfade
-      setImageSrc(null);
-    }
-    
+    // Use our centralized image URL utility
+    const url = getPublicImageUrl(posterPath);
+    setImageSrc(url);
     setHasError(false);
+    
   }, [posterPath]);
   
   const handleError = () => {
-    console.error(`Fehler beim Laden des Posters für ${title}: ${posterPath}`);
+    console.error(`Error loading poster for ${title}: ${posterPath}`);
     
     if (!hasError && posterPath) {
       setHasError(true);
       
-      // Fallback zu TMDB versuchen, wenn es ein Storage-Pfad war
+      // Attempt one more fallback for storage paths
       if (posterPath.startsWith('/storage/')) {
-        const movieId = posterPath.split('/').pop()?.split('.')[0];
-        if (movieId) {
-          console.log(`Versuche TMDB-Fallback für ID: ${movieId}`);
-          setImageSrc(`https://image.tmdb.org/t/p/w500/tmdb-fallback-${movieId}`);
-        } else {
+        try {
+          // Try with a forced full URL
+          const fullUrl = window.location.origin + posterPath;
+          console.log(`Trying alternative storage URL: ${fullUrl}`);
+          setImageSrc(fullUrl);
+        } catch (e) {
           setImageSrc(null);
         }
       } else {
         setImageSrc(null);
       }
     } else {
-      // Zweiter Fehler, geben wir auf
+      // Second error, give up
       setImageSrc(null);
     }
   };

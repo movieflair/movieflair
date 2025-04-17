@@ -60,7 +60,8 @@ Deno.serve(async (req) => {
     
     const imageBlob = await imageResponse.blob();
     const folderPath = imageType === 'poster' ? 'posters' : 'backdrops';
-    const filePath = `${folderPath}/${movieId}.jpg`;
+    const timestamp = Date.now(); // Add timestamp to prevent caching issues
+    const filePath = `${folderPath}/${movieId}_${timestamp}.jpg`;
     
     console.log(`Uploading to movie_images/${filePath}`);
     

@@ -56,6 +56,10 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
                   src={getPublicImageUrl(recommendation.poster_path)}
                   alt={recommendation.title || recommendation.name}
                   className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
+                  onError={(e) => {
+                    console.error(`Image error for ${recommendation.title || 'unknown movie'}:`, recommendation.poster_path);
+                    (e.target as HTMLImageElement).src = '/placeholder.svg';
+                  }}
                 />
                 <div className="absolute top-2 right-2 flex items-center bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full">
                   <Star className="w-3 h-3 text-yellow-500 mr-1" />
