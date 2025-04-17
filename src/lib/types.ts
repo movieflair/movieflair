@@ -1,4 +1,3 @@
-
 export interface Genre {
   id: number;
   name: string;
@@ -31,7 +30,8 @@ export interface MovieOrShow {
   trailerUrl?: string;
   isFreeMovie?: boolean;
   isNewTrailer?: boolean;
-  popularity?: number; // Added this missing property
+  popularity?: number;
+  isImported?: boolean;
 }
 
 export interface MovieDetail extends MovieOrShow {
