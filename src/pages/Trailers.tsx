@@ -23,18 +23,27 @@ const Trailers = () => {
         console.log('Trailers page: Fetched trailer items:', data.length);
         if (data.length > 0) {
           console.log('Trailers page: Sample trailer item:', data[0]);
+          console.log('Trailers page: First item updated_at:', data[0].updated_at);
         }
-        
-        // Explizit nach updated_at sortieren, neueste zuerst
+
+        // Make sure we're sorting by updated_at timestamp, newest first
         const sortedData = [...data].sort((a, b) => {
-          // Stelle sicher, dass wir mit den aktuellsten Daten arbeiten
+          // Convert strings to Date objects and then to timestamps for reliable comparison
           const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
           const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
-          return dateB - dateA; // Neueste Einträge zuerst
+          return dateB - dateA; // Newest first
         });
         
         console.log('Trailers page: Sorted data, first item updated_at:', 
                      sortedData.length > 0 ? sortedData[0].updated_at : 'no data');
+        
+        // Log all items and their updated_at values for debugging
+        if (sortedData.length > 0) {
+          console.log('Trailers page: All sorted items updated_at values:');
+          sortedData.forEach((item, index) => {
+            console.log(`Item ${index}: title=${item.title || item.name}, updated_at=${item.updated_at}`);
+          });
+        }
         
         setTrailerItems(sortedData);
       } catch (error) {

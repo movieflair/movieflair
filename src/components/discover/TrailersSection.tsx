@@ -17,6 +17,7 @@ const TrailersSection = ({ movies }: TrailersSectionProps) => {
   // Sort movies by updated_at in descending order (newest first)
   // If updated_at is not available, fallback to release_date or first_air_date
   const sortedMovies = [...movies].sort((a, b) => {
+    // Convert to timestamp for reliable comparison
     const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 
                  a.release_date ? new Date(a.release_date).getTime() : 
                  a.first_air_date ? new Date(a.first_air_date).getTime() : 0;
@@ -25,8 +26,14 @@ const TrailersSection = ({ movies }: TrailersSectionProps) => {
                  b.release_date ? new Date(b.release_date).getTime() : 
                  b.first_air_date ? new Date(b.first_air_date).getTime() : 0;
     
-    return dateB - dateA; // Descending order
+    return dateB - dateA; // Descending order (newest first)
   });
+
+  // Log the sorted movies for debugging
+  console.log('TrailersSection: Sorted movies by updated_at');
+  if (sortedMovies.length > 0) {
+    console.log('First movie updated_at:', sortedMovies[0].updated_at);
+  }
 
   const newestTrailers = sortedMovies.slice(0, 2);
 
