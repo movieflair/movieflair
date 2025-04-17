@@ -281,6 +281,8 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
   if (adminMovie) {
     console.log('Found movie in admin_movies table:', adminMovie);
     
+    let finalMovieData = adminMovie;
+    
     if ((adminMovie.poster_path && adminMovie.poster_path.includes('tmdb.org')) || 
         (adminMovie.backdrop_path && adminMovie.backdrop_path.includes('tmdb.org'))) {
       
@@ -294,7 +296,7 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
         .maybeSingle();
         
       if (updatedMovie) {
-        adminMovie = updatedMovie;
+        finalMovieData = updatedMovie;
       }
     }
     
@@ -304,14 +306,14 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
       videos: { results: videos.results },
       cast: credits.cast?.slice(0, 10),
       crew: credits.crew,
-      hasTrailer: (updatedMovie || adminMovie).hastrailer || videos.results?.some((v: any) => v.type === 'Trailer'),
-      hasStream: (updatedMovie || adminMovie).hasstream || false,
-      streamUrl: (updatedMovie || adminMovie).streamurl || '',
-      trailerUrl: (updatedMovie || adminMovie).trailerurl || '',
-      isFreeMovie: (updatedMovie || adminMovie).isfreemovie || false,
-      isNewTrailer: (updatedMovie || adminMovie).isnewtrailer || false,
-      poster_path: updatedMovie?.poster_path || adminMovie.poster_path,
-      backdrop_path: updatedMovie?.backdrop_path || adminMovie.backdrop_path,
+      hasTrailer: finalMovieData.hastrailer || videos.results?.some((v: any) => v.type === 'Trailer'),
+      hasStream: finalMovieData.hasstream || false,
+      streamUrl: finalMovieData.streamurl || '',
+      trailerUrl: finalMovieData.trailerurl || '',
+      isFreeMovie: finalMovieData.isfreemovie || false,
+      isNewTrailer: finalMovieData.isnewtrailer || false,
+      poster_path: finalMovieData.poster_path,
+      backdrop_path: finalMovieData.backdrop_path,
     };
   }
 
