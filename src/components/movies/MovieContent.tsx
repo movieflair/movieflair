@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { MovieDetail } from '@/lib/types';
 import { trackInteraction } from '@/lib/api';
@@ -20,19 +19,13 @@ interface MovieContentProps {
 
 export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) => {
   const [showTrailer, setShowTrailer] = useState(false);
-  // Get director from crew if available
   const director = movie.crew?.find(person => person.job === 'Director');
-  
-  // Get release year from release_date
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
-  
-  // Get trailer URL
   const trailerUrl = getTrailerUrl(movie);
-  
+
   const handleStreamClick = () => {
     if (!movie?.streamUrl) return;
     
-    // Track the interaction
     trackInteraction('free_movie_click', { 
       mediaId: movie.id, 
       mediaType: movie.media_type || 'movie' 
@@ -44,9 +37,8 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
       window.open(movie.streamUrl, '_blank');
     }
   };
-  
+
   const handleTrailerClick = () => {
-    // Track the interaction
     trackInteraction('trailer_click', { 
       mediaId: movie.id, 
       mediaType: movie.media_type || 'movie' 
@@ -58,7 +50,7 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
     <div className="min-h-screen bg-gray-50">
       <MovieBackdrop backdropPath={movie.backdrop_path} title={movie.title || ''} />
 
-      <div className="container mx-auto -mt-20 md:-mt-40 relative z-20 px-4 md:px-6 max-w-[800px]">
+      <div className="container mx-auto -mt-20 md:-mt-40 relative z-20 px-4 md:px-6 max-w-[1000px]">
         <Card className="overflow-hidden shadow-lg border-0">
           <div className="grid md:grid-cols-[280px,1fr] gap-6 md:gap-8 p-6 md:p-8">
             <div className="flex justify-center md:block">
