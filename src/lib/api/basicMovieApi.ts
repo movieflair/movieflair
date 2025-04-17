@@ -1,7 +1,7 @@
 
 import { MovieOrShow, MovieDetail } from '../types';
 import { supabase } from '@/integrations/supabase/client';
-import { apiUtils } from '../apiUtils';
+import * as apiUtils from '../apiUtils';
 
 export const getMovieById = async (id: number): Promise<MovieDetail> => {
   console.log(`Fetching movie with ID: ${id} from database...`);

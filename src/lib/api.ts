@@ -10,8 +10,6 @@ export {
   getRandomMovie,
   getSimilarMovies,
   getImportedMovies,
-  downloadMovieImagesToServer,
-  getRandomImportedMovie,
   deleteAllMovies
 } from './movieApi';
 
@@ -37,12 +35,17 @@ export {
 } from './customListApi';
 export * from './apiUtils';
 
+// Export the download and import functions from the new files
+export { downloadMovieImagesToServer } from './api/imageUtils';
+export { importMovieFromTMDB } from './api/movieImporter';
+export { getRandomImportedMovie } from './api/randomMovieApi';
+
 // Export the new CMS API functions
 export {
   fetchMovieFromTMDB,
   searchTMDBMovies,
   getPopularTMDBMovies,
-  importMovieFromTMDB,
+  importMovieFromTMDB as importMovieFromTMDBAdmin,
   getAllMovies,
   getMovieById as getAdminMovieById,
   updateMovie,

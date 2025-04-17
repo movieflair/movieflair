@@ -16,10 +16,16 @@ export {
 } from './api/movieUtils';
 
 export {
-  downloadMovieImagesToServer,
-  importMovieFromTMDB,
+  downloadMovieImagesToServer
+} from './api/imageUtils';
+
+export {
+  importMovieFromTMDB
+} from './api/movieImporter';
+
+export {
   getRandomImportedMovie
-} from './api/movieImportApi';
+} from './api/randomMovieApi';
 
 export {
   getFreeMovies,
