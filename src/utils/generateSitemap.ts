@@ -2,7 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 // Base URL of your website
-const BASE_URL = 'https://movieflair.lovable.app'; // Ersetze dies mit deiner tatsächlichen Domain
+const BASE_URL = 'https://movieflair.co'; // Tatsächliche Domain der Website
 
 // Statische Routen
 const routes = [
@@ -135,7 +135,7 @@ export async function generateSitemapXml() {
     xml += '  <url>\n';
     xml += `    <loc>${BASE_URL}/liste/${slug}</loc>\n`;
     xml += '    <changefreq>weekly</changefreq>\n';
-    xml += '    <priority>0.6</priority>\n';
+    xml += '    <priority>0.6</priority>\n`;
     if (list.updated_at) {
       xml += `    <lastmod>${new Date(list.updated_at).toISOString()}</lastmod>\n`;
     }
@@ -157,7 +157,7 @@ export function generateSitemapXmlSync() {
     xml += '  <url>\n';
     xml += `    <loc>${BASE_URL}${route}</loc>\n`;
     xml += '    <changefreq>weekly</changefreq>\n';
-    xml += '    <priority>0.8</priority>\n';
+    xml += '    <priority>0.8</priority>\n`;
     xml += '  </url>\n';
   });
   
