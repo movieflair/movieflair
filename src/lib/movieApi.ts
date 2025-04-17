@@ -468,6 +468,9 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
       trailerUrl: savedMovie.trailerUrl || '',
       isFreeMovie: savedMovie.isFreeMovie || false,
       isNewTrailer: savedMovie.isNewTrailer || false,
+      vote_average: adminMovie?.vote_average || 0,
+      vote_count: adminMovie?.vote_count || 0,
+      genre_ids: [],
     };
   } catch (error) {
     console.error('Error fetching movie details:', error);
@@ -477,6 +480,9 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
       poster_path: adminMovie?.poster_path || '',
       backdrop_path: adminMovie?.backdrop_path || '',
       overview: adminMovie?.overview || '',
+      vote_average: adminMovie?.vote_average || 0,
+      vote_count: adminMovie?.vote_count || 0,
+      genre_ids: [],
       media_type: 'movie',
       videos: { results: [] },
       cast: [],
@@ -486,7 +492,9 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
       streamUrl: adminMovie?.streamurl || '',
       trailerUrl: adminMovie?.trailerurl || '',
       isFreeMovie: adminMovie?.isfreemovie || false,
-      isNewTrailer: adminMovie?.isnewtrailer || false
+      isNewTrailer: adminMovie?.isnewtrailer || false,
+      popularity: adminMovie?.popularity || 0,
+      release_date: adminMovie?.release_date || ''
     };
   }
 };
