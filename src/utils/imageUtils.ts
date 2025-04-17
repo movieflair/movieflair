@@ -26,14 +26,12 @@ export const getImagePath = (path?: string, type: 'poster' | 'backdrop' = 'poste
   
   // For TMDB paths (starting with slash)
   if (path.startsWith('/')) {
-    const pathWithoutSlash = path.substring(1);
-    const storagePath = `/storage/movie_images/${type === 'poster' ? 'posters' : 'backdrops'}/${pathWithoutSlash}`;
-    return storagePath;
+    // Use our server storage path instead
+    return `/storage/movie_images/${type === 'poster' ? 'posters' : 'backdrops'}/${path.substring(1)}`;
   }
   
   // Default case: assume it's a filename in our storage
-  const storagePath = `/storage/movie_images/${type === 'poster' ? 'posters' : 'backdrops'}/${path}`;
-  return storagePath;
+  return `/storage/movie_images/${type === 'poster' ? 'posters' : 'backdrops'}/${path}`;
 };
 
 /**

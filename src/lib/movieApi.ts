@@ -115,23 +115,24 @@ export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<b
       }
     }
     
-    let posterUrl = '';
-    let backdropUrl = '';
+    // Get public URLs for the uploaded images
+    let posterPath = '';
+    let backdropPath = '';
     
     if (posterUpdated) {
-      const { data: posterPublicUrlData } = await supabase.storage
+      const { data: posterPublicUrlData } = supabase.storage
         .from('movie_images')
         .getPublicUrl(`posters/${movie.id}.jpg`);
       
-      posterUrl = posterPublicUrlData.publicUrl;
+      posterPath = `/storage/movie_images/posters/${movie.id}.jpg`;
     }
     
     if (backdropUpdated) {
-      const { data: backdropPublicUrlData } = await supabase.storage
+      const { data: backdropPublicUrlData } = supabase.storage
         .from('movie_images')
         .getPublicUrl(`backdrops/${movie.id}.jpg`);
       
-      backdropUrl = backdropPublicUrlData.publicUrl;
+      backdropPath = `/storage/movie_images/backdrops/${movie.id}.jpg`;
     }
     
     if (posterUpdated || backdropUpdated) {
@@ -140,11 +141,11 @@ export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<b
       };
       
       if (posterUpdated) {
-        updateData.poster_path = posterUrl;
+        updateData.poster_path = posterPath;
       }
       
       if (backdropUpdated) {
-        updateData.backdrop_path = backdropUrl;
+        updateData.backdrop_path = backdropPath;
       }
       
       console.log('Updating movie data with local image paths:', updateData);
