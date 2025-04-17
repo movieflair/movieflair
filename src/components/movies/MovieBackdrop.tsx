@@ -8,14 +8,24 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
   const getImageSrc = (path?: string) => {
     if (!path) return null;
     
+    // Wenn der Pfad bereits ein lokaler Storage-Pfad ist
     if (path.startsWith('/storage')) {
       return path;
-    } else if (path.startsWith('http')) {
+    } 
+    // Für die Übergangszeit: falls noch externe URLs im System sind
+    else if (path.startsWith('http')) {
+      console.warn('Externe Bild-URL gefunden:', path);
+      // Hier könnten wir einen automatischen Download anstoßen
       return path;
-    } else if (path.startsWith('/')) {
-      return `https://image.tmdb.org/t/p/original${path}`;
+    } 
+    // TMDB-Pfade sollten nicht mehr vorkommen, aber zur Sicherheit:
+    else if (path.startsWith('/')) {
+      console.warn('TMDB-Pfad gefunden, sollte bereits importiert sein:', path);
+      // Wir versuchen trotzdem, die lokale Version zu verwenden
+      return `/storage/movie_images/backdrops/${path.replace(/^\//, '')}`;
     }
     
+    // Standard: Wir nehmen an, dass es ein Dateiname in unserem Storage ist
     return `/storage/movie_images/backdrops/${path}`;
   };
   

@@ -512,6 +512,7 @@ export const importMovieFromLists = async (movie: MovieOrShow): Promise<boolean>
       return false;
     }
     
+    console.log(`Downloading images for movie ${movie.id} to local storage...`);
     await downloadMovieImagesToServer(movie);
     
     return true;
