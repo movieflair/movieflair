@@ -12,7 +12,6 @@ import { Card, CardContent } from '@/components/ui/card';
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const appVersion = "v2.0.6 EMERGENCY UPDATE"; // CRITICAL VERSION CHANGE
 
   useEffect(() => {
     trackPageVisit('trailers');
@@ -49,11 +48,6 @@ const Trailers = () => {
         ogType="website"
         keywords="Filmtrailer, Serientrailer, neue Trailer, Kinotrailer, Online Stream, Trailer anschauen"
       />
-      
-      {/* EMERGENCY UPDATE INDICATOR - IMPOSSIBLE TO MISS */}
-      <div className="sticky top-0 z-50 bg-red-600 text-white text-center py-4 text-xl font-bold">
-        🚨 EMERGENCY UPDATE {appVersion} 🚨
-      </div>
 
       <div className="container-custom py-8">
         <div className="flex items-center gap-2 mb-6">
@@ -62,18 +56,6 @@ const Trailers = () => {
             Zurück zu Entdecken
           </Link>
         </div>
-
-        <Card className="border-red-500 bg-red-50 dark:bg-red-950/20 mb-6">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-bold text-center text-red-600 mb-2">
-              NOTFALL-UPDATE {appVersion}
-            </h2>
-            <p className="text-center text-red-600 font-semibold">
-              Diese neue Version enthält wichtige Updates und Verbesserungen.
-              Wenn Sie diese Nachricht sehen, wurde die Aktualisierung erfolgreich bereitgestellt.
-            </p>
-          </CardContent>
-        </Card>
 
         <div className="relative overflow-hidden rounded-2xl mb-10">
           <div className="absolute inset-0 bg-gradient-to-r from-theme-accent-red/90 to-primary/50 mix-blend-multiply"></div>
@@ -91,7 +73,7 @@ const Trailers = () => {
           <div className="relative z-10 p-8 md:p-12">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Neue Trailer {appVersion}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Neue Trailer</h1>
                 <p className="text-white/80 max-w-2xl text-lg">
                   Entdecke die neuesten Trailer zu kommenden Filmen und Serien – Alle Trailer auf einen Blick. Immer aktuell.
                 </p>
