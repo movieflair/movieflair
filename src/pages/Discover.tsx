@@ -6,7 +6,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { 
   Genre, 
   getGenres, 
-  getPopularMovies,
+  getImportedMovies,
   getFreeMovies,
   getTrailerMovies,
   MovieOrShow,
@@ -43,12 +43,12 @@ const Discover = () => {
   const [trailerMovies, setTrailerMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Trending Movies Query with automatic updates
+  // Trending Movies Query with automatic updates (now shows imported movies)
   const { data: popularMovies = [] } = useQuery({
-    queryKey: ['popularMovies'],
+    queryKey: ['importedMovies'],
     queryFn: async () => {
-      console.log('Fetching trending movies...');
-      const movies = await getPopularMovies();
+      console.log('Fetching imported movies...');
+      const movies = await getImportedMovies();
       return movies.slice(0, 8);
     },
     refetchInterval: 5 * 60 * 1000, // Updates every 5 minutes

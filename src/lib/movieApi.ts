@@ -1,3 +1,4 @@
+
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,6 +28,35 @@ const mapSupabaseMovieToMovieObject = (movie: any): MovieOrShow => {
     isNewTrailer: movie.isnewtrailer || false,
     popularity: movie.popularity || 0
   };
+};
+
+// Neue Funktion: Holt alle importierten Filme aus der Datenbank
+export const getImportedMovies = async (): Promise<MovieOrShow[]> => {
+  console.log('Fetching imported movies from database...');
+  
+  try {
+    const { data: importedMovies, error } = await supabase
+      .from('admin_movies')
+      .select('*')
+      .order('updated_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching imported movies from Supabase:', error);
+      return [];
+    }
+    
+    if (!importedMovies) {
+      console.log('No imported movies found in Supabase');
+      return [];
+    }
+    
+    const mappedMovies = importedMovies.map(mapSupabaseMovieToMovieObject);
+    console.log(`Found ${mappedMovies.length} imported movies from Supabase`);
+    return mappedMovies as MovieOrShow[];
+  } catch (e) {
+    console.error('Error processing imported movies:', e);
+    return [];
+  }
 };
 
 export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
@@ -104,6 +134,7 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
   }
 };
 
+// Behält die bestehende Funktion bei, aber wir werden sie in der App nicht mehr verwenden
 export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/movie/popular');
   const savedSettings = await getAdminMovieSettings();
@@ -212,6 +243,43 @@ export const getSimilarMovies = async (id: number): Promise<MovieOrShow[]> => {
     }));
 };
 
+// Neue Funktion: Holt einen zufälligen importierten Film
+export const getRandomImportedMovie = async (): Promise<MovieDetail> => {
+  console.log('Getting random imported movie...');
+  
+  try {
+    // Alle importierten Filme holen
+    const { data: importedMovies, error } = await supabase
+      .from('admin_movies')
+      .select('id')
+      .order('updated_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching imported movies:', error);
+      throw new Error('Fehler beim Laden importierter Filme');
+    }
+    
+    if (!importedMovies || importedMovies.length === 0) {
+      console.log('No imported movies found in database');
+      throw new Error('Keine importierten Filme gefunden');
+    }
+    
+    // Zufälligen Film auswählen
+    const randomIndex = Math.floor(Math.random() * importedMovies.length);
+    const randomMovieId = importedMovies[randomIndex].id;
+    
+    console.log(`Selected random movie ID: ${randomMovieId}`);
+    
+    // Vollständige Filmdaten holen
+    return getMovieById(randomMovieId);
+    
+  } catch (error) {
+    console.error('Error getting random imported movie:', error);
+    throw error;
+  }
+};
+
+// Die alte getRandomMovie-Funktion bleibt als Fallback bestehen
 export const getRandomMovie = async (): Promise<MovieDetail> => {
   console.log('Getting random movie with improved decade selection...');
   

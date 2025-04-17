@@ -1,6 +1,7 @@
 
 import { Genre, MovieOrShow, FilterOptions } from './types';
 import { callTMDB } from './apiUtils';
+import { supabase } from '@/integrations/supabase/client';
 
 // Mapping von Stimmungen zu Genres
 export const moodToGenres: Record<string, number[]> = {
@@ -44,15 +45,6 @@ const fetchMoviesByFilters = async (filters: FilterOptions): Promise<MovieOrShow
   console.log(`Fetching movies with filters - genres: ${genres}, decades: ${decades}, moods: ${moods}, rating: ${rating}`);
   
   try {
-    // Grundlegende Parameter für die API-Anfrage
-    let params: Record<string, any> = {
-      'sort_by': 'popularity.desc',
-      'vote_count.gte': '5', // Reduzierte Mindestanzahl an Stimmen
-      'include_adult': 'false',
-      'include_video': 'false',
-      'page': '1',
-    };
-    
     // Sammeln Sie alle Genres (aus direkt ausgewählten und Stimmungen)
     let allGenres: number[] = [...genres];
     
@@ -69,117 +61,168 @@ const fetchMoviesByFilters = async (filters: FilterOptions): Promise<MovieOrShow
     // Entferne Duplikate
     const uniqueGenres = [...new Set(allGenres)];
     
-    if (uniqueGenres.length > 0) {
-      params.with_genres = uniqueGenres.join(',');
-    }
+    // Holen wir uns alle importierten Filme aus der Datenbank
+    let query = supabase
+      .from('admin_movies')
+      .select('*');
     
-    // Mindestbewertung
+    // Mindestbewertung filtern
     if (rating > 0) {
-      params.vote_average_gte = rating.toString();
+      query = query.gte('vote_average', rating);
     }
     
-    // Jahrzehnt-Filter anwenden
+    // Filme nach Genres filtern (in voller Datenbank nicht möglich, werden wir später manuell filtern)
+    
+    // Filme nach Jahrzehnten filtern
     if (decades.length > 0) {
-      // Wir verarbeiten jeden Jahrzehnt einzeln und sammeln die Ergebnisse
-      let allResults: MovieOrShow[] = [];
-      
-      for (const decadeStr of decades) {
+      // Erstelle eine Liste von Jahrzehnt-Bedingungen
+      const decadeConditions = decades.map(decadeStr => {
         const decade = parseInt(decadeStr);
         if (!isNaN(decade)) {
           const startYear = decade;
           const endYear = decade + 9;
-          
-          console.log(`Searching decade ${startYear}-${endYear}`);
-          
-          const decadeParams = {
-            ...params,
-            'primary_release_date.gte': `${startYear}-01-01`,
-            'primary_release_date.lte': `${endYear}-12-31`
-          };
-          
-          // API-Aufruf für das aktuelle Jahrzehnt
-          const data = await callTMDB('/discover/movie', decadeParams);
-          
-          if (data.results && data.results.length > 0) {
-            console.log(`Found ${data.results.length} movies for decade ${startYear}-${endYear}`);
-            
-            // Filtern Sie Ergebnisse, um sicherzustellen, dass sie gültig sind
-            const validResults = data.results
-              .filter((item: any) => item.poster_path && item.overview && item.overview.trim() !== '')
-              .map((item: any) => ({
-                ...item,
-                media_type: 'movie'
-              }));
-            
-            allResults.push(...validResults);
-          } else {
-            console.log(`No results for decade ${startYear}-${endYear}, trying fallback`);
-            
-            // Fallback mit weniger Einschränkungen
-            const fallbackParams = {
-              ...decadeParams,
-              'vote_count.gte': '3'
-            };
-            
-            // Für ältere Filme sind weniger Einschränkungen nötig, aber wir müssen
-            // mit den Parametern arbeiten, die im Objekt tatsächlich existieren
-            // Daher kein Versuch, nicht existierende Eigenschaften zu löschen
-            
-            const fallbackData = await callTMDB('/discover/movie', fallbackParams);
-            
-            if (fallbackData.results && fallbackData.results.length > 0) {
-              console.log(`Fallback found ${fallbackData.results.length} movies for decade ${startYear}-${endYear}`);
+          return `(release_date >= '${startYear}' AND release_date <= '${endYear}')`;
+        }
+        return null;
+      }).filter(Boolean);
+      
+      // Wenn wir gültige Jahrzehnt-Bedingungen haben, fügen wir sie zur Abfrage hinzu
+      if (decadeConditions.length > 0) {
+        // In Supabase können wir nicht direkt mit OR filtern, 
+        // daher müssen wir die Jahrzehnte einzeln abfragen und die Ergebnisse zusammenführen
+        const decadeResults = await Promise.all(
+          decades.map(async (decadeStr) => {
+            const decade = parseInt(decadeStr);
+            if (!isNaN(decade)) {
+              const startYear = decade.toString();
+              const endYear = (decade + 9).toString();
               
-              const validFallbackResults = fallbackData.results
-                .filter((item: any) => item.poster_path)
-                .map((item: any) => ({
-                  ...item,
-                  media_type: 'movie'
-                }));
+              const { data, error } = await supabase
+                .from('admin_movies')
+                .select('*')
+                .gte('release_date', `${startYear}`)
+                .lte('release_date', `${endYear}`);
               
-              allResults.push(...validFallbackResults);
+              if (error) {
+                console.error(`Error fetching movies for decade ${startYear}-${endYear}:`, error);
+                return [];
+              }
+              
+              return data || [];
             }
-          }
+            return [];
+          })
+        );
+        
+        // Alle Ergebnisse zusammenführen
+        let allMovies: any[] = [];
+        decadeResults.forEach(movies => {
+          allMovies = [...allMovies, ...movies];
+        });
+        
+        // Doppelte Einträge entfernen
+        const uniqueMovies = Array.from(new Set(allMovies.map(m => m.id)))
+          .map(id => allMovies.find(m => m.id === id));
+        
+        // Jetzt filtern wir nach Genres wenn nötig
+        if (uniqueGenres.length > 0) {
+          // Da wir keine Genre-IDs in der Datenbank haben, müssen wir zusätzliche Informationen holen
+          const moviesWithGenres = await Promise.all(
+            uniqueMovies.map(async (movie) => {
+              const movieData = await callTMDB(`/movie/${movie.id}`);
+              return {
+                ...movie,
+                genre_ids: movieData.genres?.map((g: any) => g.id) || []
+              };
+            })
+          );
+          
+          // Jetzt filtern wir nach den Genres
+          const filteredByGenre = moviesWithGenres.filter(movie => {
+            const movieGenreIds = movie.genre_ids || [];
+            return uniqueGenres.some(genreId => movieGenreIds.includes(genreId));
+          });
+          
+          return filteredByGenre.map(movie => ({
+            ...movie,
+            media_type: 'movie',
+            isFreeMovie: movie.isfreemovie || false,
+            hasStream: movie.hasstream || false,
+            streamUrl: movie.streamurl || '',
+            hasTrailer: movie.hastrailer || false,
+            trailerUrl: movie.trailerurl || '',
+            isNewTrailer: movie.isnewtrailer || false
+          }));
         }
+        
+        // Wenn keine Genres angegeben sind, geben wir die einzigartigen Filme zurück
+        return uniqueMovies.map(movie => ({
+          ...movie,
+          media_type: 'movie',
+          isFreeMovie: movie.isfreemovie || false,
+          hasStream: movie.hasstream || false,
+          streamUrl: movie.streamurl || '',
+          hasTrailer: movie.hastrailer || false,
+          trailerUrl: movie.trailerurl || '',
+          isNewTrailer: movie.isnewtrailer || false
+        }));
       }
-      
-      // Mischen Sie die Ergebnisse, um Vielfalt zu bieten
-      const shuffledResults = allResults.sort(() => Math.random() - 0.5);
-      
-      // Reduzieren Sie auf maximal 20 Ergebnisse
-      return shuffledResults.slice(0, 20);
-    } else {
-      // Wenn kein Jahrzehnt ausgewählt wurde, normalen API-Aufruf durchführen
-      const data = await callTMDB('/discover/movie', params);
-      
-      if (!data.results || data.results.length === 0) {
-        console.log('No results from initial API call, trying with fewer restrictions');
-        
-        // Fallback mit weniger Einschränkungen
-        params.vote_count_gte = '3';
-        const fallbackData = await callTMDB('/discover/movie', params);
-        
-        if (!fallbackData.results || fallbackData.results.length === 0) {
-          return [];
-        }
-        
-        return fallbackData.results
-          .filter((item: any) => item.poster_path)
-          .map((item: any) => ({
-            ...item,
-            media_type: 'movie'
-          }))
-          .slice(0, 20);
-      }
-      
-      return data.results
-        .filter((item: any) => item.poster_path && item.overview && item.overview.trim() !== '')
-        .map((item: any) => ({
-          ...item,
-          media_type: 'movie'
-        }))
-        .slice(0, 20);
     }
+    
+    // Wenn keine Jahrzehnte angegeben sind, führen wir eine allgemeine Abfrage durch
+    const { data: allMovies, error } = await query;
+    
+    if (error) {
+      console.error('Error fetching movies from database:', error);
+      return [];
+    }
+    
+    if (!allMovies || allMovies.length === 0) {
+      console.log('No movies found in database');
+      return [];
+    }
+    
+    // Wenn keine Genres angegeben sind, geben wir alle Filme zurück
+    if (uniqueGenres.length === 0) {
+      return allMovies.map(movie => ({
+        ...movie,
+        media_type: 'movie',
+        isFreeMovie: movie.isfreemovie || false,
+        hasStream: movie.hasstream || false,
+        streamUrl: movie.streamurl || '',
+        hasTrailer: movie.hastrailer || false,
+        trailerUrl: movie.trailerurl || '',
+        isNewTrailer: movie.isnewtrailer || false
+      }));
+    }
+    
+    // Ansonsten holen wir die Genres für jeden Film und filtern danach
+    const moviesWithGenres = await Promise.all(
+      allMovies.map(async (movie) => {
+        const movieData = await callTMDB(`/movie/${movie.id}`);
+        return {
+          ...movie,
+          genre_ids: movieData.genres?.map((g: any) => g.id) || []
+        };
+      })
+    );
+    
+    // Jetzt filtern wir nach den Genres
+    const filteredByGenre = moviesWithGenres.filter(movie => {
+      const movieGenreIds = movie.genre_ids || [];
+      return uniqueGenres.some(genreId => movieGenreIds.includes(genreId));
+    });
+    
+    return filteredByGenre.map(movie => ({
+      ...movie,
+      media_type: 'movie',
+      isFreeMovie: movie.isfreemovie || false,
+      hasStream: movie.hasstream || false,
+      streamUrl: movie.streamurl || '',
+      hasTrailer: movie.hastrailer || false,
+      trailerUrl: movie.trailerurl || '',
+      isNewTrailer: movie.isnewtrailer || false
+    }));
   } catch (error) {
     console.error('Error fetching movies by filters:', error);
     return [];

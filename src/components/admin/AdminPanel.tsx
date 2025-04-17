@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -8,12 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { MovieOrShow } from "@/lib/types";
 import { 
-  getPopularMovies, 
+  getImportedMovies, 
   getFreeMovies, 
   getTrailerMovies,
   searchMovies, 
   searchTvShows,
-  getPopularTvShows 
+  getPopularTvShows,
+  getPopularMovies // Diese Funktion nutzen wir nur für die Suche
 } from '@/lib/api';
 
 import AdminHeader from './header/AdminHeader';
@@ -47,9 +49,10 @@ const AdminPanel = () => {
   
   const queryClient = useQueryClient();
 
+  // Hier ändern wir die Abfrage auf die importierten Filme
   const { data: movies = [], isLoading: isLoadingMovies } = useQuery({
     queryKey: ['admin-movies'],
-    queryFn: getPopularMovies
+    queryFn: getImportedMovies
   });
   
   const { data: freeMovies = [], isLoading: isLoadingFreeMovies } = useQuery({
@@ -67,6 +70,7 @@ const AdminPanel = () => {
     queryFn: getPopularTvShows
   });
   
+  // Für die Suche im Admin-Panel verwenden wir weiterhin die TMDB API
   const { data: searchResults = [], isLoading: isSearchLoading, refetch: refetchSearch } = useQuery({
     queryKey: ['search-movies', searchQuery],
     queryFn: () => searchMovies(searchQuery),

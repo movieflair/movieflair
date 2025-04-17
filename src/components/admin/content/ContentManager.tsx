@@ -7,6 +7,9 @@ import ShowGrid from '../shows/ShowGrid';
 import MovieEditForm from '../MovieEditForm';
 import TvShowEditForm from '../TvShowEditForm';
 import AdminContentTabs from '../AdminContentTabs';
+import { supabase } from '@/integrations/supabase/client';
+import { getMovieById } from '@/lib/api';
+import { toast } from 'sonner';
 
 interface ContentManagerProps {
   activeTab: string;
@@ -79,6 +82,56 @@ const ContentManager = ({
   setHasStream,
   setHasTrailer,
 }: ContentManagerProps) => {
+  const [importingMovie, setImportingMovie] = useState(false);
+
+  // Funktion zum Importieren eines Films
+  const handleImportMovie = async (movie: MovieOrShow) => {
+    if (importingMovie) return;
+    
+    try {
+      setImportingMovie(true);
+      
+      // Vollständige Filmdaten abrufen
+      const fullMovieData = await getMovieById(movie.id);
+      
+      // Film in die Datenbank importieren
+      const { error } = await supabase
+        .from('admin_movies')
+        .upsert({
+          id: movie.id,
+          title: movie.title || '',
+          poster_path: movie.poster_path || '',
+          backdrop_path: movie.backdrop_path || '',
+          overview: movie.overview || '',
+          release_date: movie.release_date || '',
+          vote_average: movie.vote_average || 0,
+          vote_count: movie.vote_count || 0,
+          popularity: movie.popularity || 0,
+          media_type: 'movie',
+          isfreemovie: false,
+          isnewtrailer: false,
+          hasstream: false,
+          streamurl: '',
+          hastrailer: !!fullMovieData.videos?.results?.some((v: any) => v.type === 'Trailer'),
+          trailerurl: fullMovieData.videos?.results?.find((v: any) => v.type === 'Trailer')?.key ? 
+            `https://www.youtube.com/embed/${fullMovieData.videos.results.find((v: any) => v.type === 'Trailer').key}` : ''
+        });
+      
+      if (error) {
+        console.error('Error importing movie:', error);
+        toast.error('Fehler beim Importieren des Films');
+        return;
+      }
+      
+      toast.success('Film erfolgreich importiert');
+    } catch (error) {
+      console.error('Error importing movie:', error);
+      toast.error('Fehler beim Importieren des Films');
+    } finally {
+      setImportingMovie(false);
+    }
+  };
+
   return (
     <div className="bg-card rounded-lg shadow-sm overflow-hidden">
       <AdminContentTabs 
@@ -152,6 +205,7 @@ const ContentManager = ({
               isLoading={isSearchLoading}
               searchQuery={searchQuery}
               currentView={currentView}
+              onImportMovie={handleImportMovie}
             />
           </div>
         )}
