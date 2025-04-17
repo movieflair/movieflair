@@ -33,6 +33,7 @@ export interface MovieOrShow {
   popularity?: number;
   isImported?: boolean;
   runtime?: number | null;
+  credits?: string; // Added the credits property as a string to store JSON data
 }
 
 export interface MovieDetail extends MovieOrShow {

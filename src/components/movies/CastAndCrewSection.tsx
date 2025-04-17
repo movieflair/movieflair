@@ -1,11 +1,5 @@
 
-interface CastMember {
-  id: number;
-  name: string;
-  character?: string;
-  profile_path?: string;
-  job?: string;
-}
+import { CastMember } from '@/lib/types';
 
 interface CastAndCrewSectionProps {
   director?: CastMember;

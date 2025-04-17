@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { parseUrlSlug } from '@/lib/urlUtils';
 import { getAdminMovieById, getMovieById, getSimilarMovies } from '@/lib/api';

@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { MovieOrShow } from '../types';
@@ -147,3 +146,24 @@ export const deleteMovie = async (id: number): Promise<boolean> => {
     return false;
   }
 };
+
+interface AdminMovie {
+  id: number;
+  title: string;
+  poster_path?: string;
+  backdrop_path?: string;
+  overview?: string;
+  release_date?: string;
+  vote_average?: number;
+  vote_count?: number;
+  popularity?: number;
+  media_type: string;
+  hasstream?: boolean;
+  streamurl?: string;
+  hastrailer?: boolean;
+  trailerurl?: string;
+  isfreemovie?: boolean;
+  isnewtrailer?: boolean;
+  runtime?: number | null;
+  credits?: string; // Added to match our database schema
+}
