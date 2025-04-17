@@ -18,9 +18,16 @@ router.get('*', function(req: Request, res: Response, next: NextFunction) {
 // Separate the async logic into its own function
 async function handleRender(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
-  console.log(`Handling request for URL: ${url} - Version 2.0.5`);
+  console.log(`Handling request for URL: ${url} - Version 2.0.6 EMERGENCY`);
 
   try {
+    // CRITICAL CHANGE: Always force server rendering for trailer page
+    if (url === '/neue-trailer') {
+      console.log('🚨 EMERGENCY RENDERING PATH ACTIVATED FOR TRAILER PAGE');
+      req.query.forceSSR = 'true';
+      req.query.forceUpdate = 'true';
+    }
+    
     const isCrawler = req.get('User-Agent')?.toLowerCase().includes('bot') ||
                      req.get('User-Agent')?.toLowerCase().includes('crawler') ||
                      req.query.forceSSR === 'true';
@@ -42,7 +49,7 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
     }
     
     // For testing purposes, force SSR for all pages if the specific query param is present
-    if (req.query.forceUpdate === 'true') {
+    if (req.query.forceUpdate === 'true' || url === '/neue-trailer') {
       console.log(`!!! EMERGENCY FORCE UPDATE REQUESTED FOR: ${url} !!!`);
       
       // Apply server-side rendering regardless of other conditions
@@ -75,7 +82,7 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
       }
     }
     
-    if ((!isCrawler && !isImportantRoute && !forceSSR) && !req.query.forceSSR) {
+    if ((!isCrawler && !isImportantRoute && !forceSSR) && !req.query.forceSSR && url !== '/neue-trailer') {
       console.log(`Serving client-side rendering for ${url}`);
       const indexHtml = fs.readFileSync(
         path.resolve(__dirname, isProduction ? '../../../dist/client/index.html' : '../../../index.html'),
