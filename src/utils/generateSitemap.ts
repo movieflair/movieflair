@@ -89,6 +89,7 @@ async function fetchAllCustomLists() {
 // Funktion zum Erzeugen des Sitemap-XML-Inhalts
 export async function generateSitemapXml() {
   try {
+    // Ensure no whitespace before the XML declaration
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
     
@@ -106,7 +107,7 @@ export async function generateSitemapXml() {
     movies.forEach(movie => {
       const slug = movie.title ? encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-')) : '';
       xml += '  <url>\n';
-      xml += `    <loc>${BASE_URL}/film/${movie.id}${slug ? `/${slug}` : ''}</loc>\n`;
+      xml += `    <loc>${BASE_URL}/film/${movie.id}${slug ? '/' + slug : ''}</loc>\n`;
       xml += '    <changefreq>monthly</changefreq>\n';
       xml += '    <priority>0.7</priority>\n';
       if (movie.updated_at) {
@@ -120,7 +121,7 @@ export async function generateSitemapXml() {
     tvShows.forEach(show => {
       const slug = show.name ? encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-')) : '';
       xml += '  <url>\n';
-      xml += `    <loc>${BASE_URL}/serie/${show.id}${slug ? `/${slug}` : ''}</loc>\n`;
+      xml += `    <loc>${BASE_URL}/serie/${show.id}${slug ? '/' + slug : ''}</loc>\n`;
       xml += '    <changefreq>monthly</changefreq>\n';
       xml += '    <priority>0.7</priority>\n';
       if (show.updated_at) {
@@ -134,7 +135,7 @@ export async function generateSitemapXml() {
     customLists.forEach(list => {
       const slug = list.title ? encodeURIComponent(list.title.toLowerCase().replace(/\s+/g, '-')) : '';
       xml += '  <url>\n';
-      xml += `    <loc>${BASE_URL}/liste/${slug}</loc>\n`;
+      xml += `    <loc>${BASE_URL}/liste/${list.id}/${slug}</loc>\n`;
       xml += '    <changefreq>weekly</changefreq>\n';
       xml += '    <priority>0.6</priority>\n';
       if (list.updated_at) {
@@ -148,12 +149,14 @@ export async function generateSitemapXml() {
     return xml;
   } catch (error) {
     console.error('Error generating sitemap:', error);
+    // Return a minimal valid XML in case of error
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
   }
 }
 
 // Synchrone Version für den Einsatz in der Entwicklung
 export function generateSitemapXmlSync() {
+  // Ensure no whitespace before the XML declaration
   let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
   
