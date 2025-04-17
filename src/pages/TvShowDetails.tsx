@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { MovieDetail } from '@/lib/types';
-import { getTvShowDetails, getCast } from '@/lib/tvShowApi';
+import { getTvShowDetails, getCast, getTvShowById } from '@/lib/tvShowApi';
 import { Seo } from '@/components/seo/Seo';
 import MovieMeta from '@/components/movies/MovieMeta';
 import MovieHeader from '@/components/movies/MovieHeader';
@@ -42,7 +42,34 @@ const TvShowDetails = () => {
 
       try {
         setIsLoading(true);
-        const showData = await getTvShowDetails(id);
+        
+        // Versuche zuerst, die Serie aus unserer Datenbank zu laden
+        const adminShow = await getTvShowById(parseInt(id));
+        
+        let showData;
+        if (adminShow) {
+          console.log('Serie aus lokaler Datenbank geladen:', adminShow);
+          // Für lokale Serien benötigen wir zusätzliche Details von TMDB
+          const tmdbShow = await getTvShowDetails(id);
+          
+          // Kombinieren der Daten, wobei lokale Daten Priorität haben
+          showData = {
+            ...tmdbShow,
+            ...adminShow,
+            // Stelle sicher, dass die lokalen Pfade für Bilder verwendet werden
+            poster_path: adminShow.poster_path || tmdbShow.poster_path,
+            backdrop_path: adminShow.backdrop_path || tmdbShow.backdrop_path,
+            // Andere wichtige Felder
+            hasTrailer: adminShow.hasTrailer,
+            hasStream: adminShow.hasStream,
+            streamUrl: adminShow.streamUrl,
+            trailerUrl: adminShow.trailerUrl
+          };
+        } else {
+          // Wenn nicht in unserer Datenbank, dann lade nur von TMDB
+          showData = await getTvShowDetails(id);
+        }
+        
         const castData = await getCast(id, 'tv');
 
         setShow(showData);
