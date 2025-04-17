@@ -22,7 +22,7 @@ export interface MovieOrShow {
   vote_count?: number;
   release_date?: string;
   first_air_date?: string;
-  genre_ids: number[];
+  genre_ids?: number[];
   media_type: 'movie' | 'tv';
   hasStream?: boolean;
   streamUrl?: string;
@@ -32,6 +32,7 @@ export interface MovieOrShow {
   isNewTrailer?: boolean;
   popularity?: number;
   isImported?: boolean;
+  runtime?: number | null;
 }
 
 export interface MovieDetail extends MovieOrShow {
