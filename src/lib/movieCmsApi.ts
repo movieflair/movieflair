@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { MovieOrShow, MovieDetail } from './types';
 import { uploadMovieImage } from './storage';
@@ -200,7 +199,17 @@ export const getAllMovies = async (): Promise<MovieOrShow[]> => {
       return [];
     }
     
-    return data || [];
+    return (data || []).map(movie => ({
+      ...movie,
+      genre_ids: [], // Add an empty array for genre_ids
+      media_type: 'movie' as const,
+      hasStream: movie.hasstream,
+      hasTrailer: movie.hastrailer,
+      streamUrl: movie.streamurl,
+      trailerUrl: movie.trailerurl,
+      isFreeMovie: movie.isfreemovie,
+      isNewTrailer: movie.isnewtrailer,
+    }));
   } catch (error) {
     console.error('Error fetching movies:', error);
     return [];
@@ -223,7 +232,19 @@ export const getMovieById = async (id: number): Promise<MovieOrShow | null> => {
       return null;
     }
     
-    return data || null;
+    if (!data) return null;
+    
+    return {
+      ...data,
+      genre_ids: [], // Add an empty array for genre_ids
+      media_type: 'movie' as const,
+      hasStream: data.hasstream,
+      hasTrailer: data.hastrailer,
+      streamUrl: data.streamurl,
+      trailerUrl: data.trailerurl,
+      isFreeMovie: data.isfreemovie,
+      isNewTrailer: data.isnewtrailer,
+    };
   } catch (error) {
     console.error('Error fetching movie:', error);
     return null;

@@ -42,12 +42,13 @@ const MovieEditDialog: React.FC<MovieEditDialogProps> = ({
         release_date: movie.release_date || '',
         vote_average: movie.vote_average || 0,
         vote_count: movie.vote_count || 0,
-        streamurl: movie.streamUrl || '',
-        trailerurl: movie.trailerUrl || '',
-        hasstream: movie.hasStream || false,
-        hastrailer: movie.hasTrailer || false,
-        isfreemovie: movie.isFreeMovie || false,
-        isnewtrailer: movie.isNewTrailer || false,
+        streamUrl: movie.streamUrl || '',
+        trailerUrl: movie.trailerUrl || '',
+        hasStream: movie.hasStream || false,
+        hasTrailer: movie.hasTrailer || false,
+        isFreeMovie: movie.isFreeMovie || false,
+        isNewTrailer: movie.isNewTrailer || false,
+        genre_ids: movie.genre_ids || [],
       });
       
       // Reset file inputs and previews
