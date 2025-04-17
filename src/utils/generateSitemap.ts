@@ -1,7 +1,6 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
-// Base URL of your website
+// Base URL deiner Website - mit der richtigen Domain
 const BASE_URL = 'https://movieflair.co'; 
 
 // Statische Routen
@@ -89,7 +88,7 @@ async function fetchAllCustomLists() {
 // Funktion zum Erzeugen des Sitemap-XML-Inhalts
 export async function generateSitemapXml() {
   try {
-    // Kein Leerzeichen vor der XML-Deklaration!
+    // WICHTIG: Kein Leerzeichen vor der XML-Deklaration!
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
     
@@ -99,6 +98,7 @@ export async function generateSitemapXml() {
       xml += `    <loc>${BASE_URL}${route}</loc>\n`;
       xml += '    <changefreq>weekly</changefreq>\n';
       xml += '    <priority>0.8</priority>\n';
+      xml += '    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>\n';
       xml += '  </url>\n';
     });
     
@@ -182,7 +182,8 @@ export function writeSitemapToFile() {
   const sitemap = generateSitemapXmlSync();
   const outputPath = path.resolve(process.cwd(), 'public', 'sitemap.xml');
   
-  fs.writeFileSync(outputPath, sitemap);
+  // Wichtig: UTF-8 ohne BOM verwenden
+  fs.writeFileSync(outputPath, sitemap, { encoding: 'utf8' });
   console.log(`Sitemap written to ${outputPath}`);
 }
 

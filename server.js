@@ -31,7 +31,7 @@ async function startServer() {
     app.use(express.static(path.resolve(__dirname, 'dist/client')));
   }
   
-  // Sitemap.xml Route - Strikt konfiguriert für korrekte XML-Ausgabe
+  // Sitemap.xml Route - Optimiert für korrekte XML-Ausgabe ohne BOM
   app.get('/sitemap.xml', async (req, res) => {
     try {
       // Stelle sicher, dass keine Buffer oder Schreiboperationen vor dem Senden durchgeführt werden
