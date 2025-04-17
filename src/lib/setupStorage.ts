@@ -55,21 +55,12 @@ export const setupStorage = async (): Promise<void> => {
     } else {
       console.log('movie_images bucket already exists');
       
-      // Let's check if the bucket has the proper public access
+      // Let's check if the bucket is public
       try {
-        const { data: policyData, error: policyError } = await supabase.rpc('get_bucket_policy', { 
-          bucket_name: 'movie_images' 
-        });
-        
-        if (policyError) {
-          console.log('Could not check bucket policy, assuming it needs to be public:', policyError);
-          await createMovieBucketThroughEdgeFunction();
-        } else if (!policyData?.public) {
-          console.log('movie_images bucket exists but is not public, updating...');
-          await createMovieBucketThroughEdgeFunction();
-        } else {
-          console.log('movie_images bucket exists and is properly configured');
-        }
+        // Check bucket policy - removing the RPC call that causes type errors
+        // Instead we'll use the Edge function to ensure the bucket is public
+        console.log('Ensuring bucket has public access...');
+        await createMovieBucketThroughEdgeFunction();
       } catch (error) {
         console.log('Error checking bucket policy:', error);
       }

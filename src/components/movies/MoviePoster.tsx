@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import WatchlistButton from '@/components/movies/WatchlistButton';
 import ShareButton from '@/components/movies/ShareButton';
-import { getPosterPath, normalizeImagePath } from '@/utils/imageUtils';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MoviePosterProps {
   id: number;
@@ -11,13 +11,13 @@ interface MoviePosterProps {
 }
 
 const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
-  const imageSrc = getPosterPath(posterPath);
+  const imageSrc = getPublicImageUrl(posterPath);
   const [hasError, setHasError] = useState(false);
   const [currentSrc, setCurrentSrc] = useState<string | null>(imageSrc);
   
   // Bei Änderung des posterPath den currentSrc aktualisieren
   useEffect(() => {
-    setCurrentSrc(getPosterPath(posterPath));
+    setCurrentSrc(getPublicImageUrl(posterPath));
     setHasError(false);
   }, [posterPath]);
   

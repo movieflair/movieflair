@@ -3,7 +3,7 @@ import React from 'react';
 import { MovieOrShow } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Film, Eye } from 'lucide-react';
-import { getPosterPath } from '@/utils/imageUtils';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieListItemProps {
   movie: MovieOrShow;
@@ -13,7 +13,7 @@ interface MovieListItemProps {
 }
 
 const MovieListItem: React.FC<MovieListItemProps> = ({ movie, onEdit, onDelete, onView }) => {
-  const posterUrl = getPosterPath(movie.poster_path);
+  const posterUrl = getPublicImageUrl(movie.poster_path);
   
   return (
     <div className="flex items-center p-3 border rounded-md bg-white mb-2 gap-3 hover:bg-slate-50 transition-colors">

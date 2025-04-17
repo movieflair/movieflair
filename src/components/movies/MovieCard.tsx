@@ -5,7 +5,7 @@ import { Star } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
 import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
 import { scrollToTop } from '@/utils/scrollUtils';
-import { getPosterPath } from '@/utils/imageUtils';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieCardProps {
   movie: MovieOrShow;
@@ -21,7 +21,7 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
   const slug = createUrlSlug(title);
   
   const [hasError, setHasError] = useState(false);
-  const [imageSrc, setImageSrc] = useState(getPosterPath(movie.poster_path));
+  const [imageSrc, setImageSrc] = useState(getPublicImageUrl(movie.poster_path));
   
   const imageSizes = {
     small: 'h-[250px] w-[170px]',

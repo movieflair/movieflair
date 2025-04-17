@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { getBackdropPath } from '@/utils/imageUtils';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieBackdropProps {
   backdropPath?: string;
@@ -8,13 +8,13 @@ interface MovieBackdropProps {
 }
 
 const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
-  const initialSrc = getBackdropPath(backdropPath);
+  const initialSrc = getPublicImageUrl(backdropPath);
   const [currentSrc, setCurrentSrc] = useState<string | null>(initialSrc);
   const [hasError, setHasError] = useState(false);
   
   // Bei Änderung des backdropPath den currentSrc aktualisieren
   useEffect(() => {
-    setCurrentSrc(getBackdropPath(backdropPath));
+    setCurrentSrc(getPublicImageUrl(backdropPath));
     setHasError(false);
   }, [backdropPath]);
   

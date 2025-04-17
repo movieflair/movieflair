@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
 import MovieRatingFeedback from '../../movies/MovieRatingFeedback';
-import { getPosterPath } from '@/utils/imageUtils';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface FilterRecommendationProps {
   recommendation: MovieOrShow;
@@ -53,7 +53,7 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
             >
               <div className="relative h-[300px] bg-muted overflow-hidden rounded-xl">
                 <img
-                  src={getPosterPath(recommendation.poster_path)}
+                  src={getPublicImageUrl(recommendation.poster_path)}
                   alt={recommendation.title || recommendation.name}
                   className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
                 />

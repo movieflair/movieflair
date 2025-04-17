@@ -65,3 +65,31 @@ export const isTMDBUrl = (url?: string): boolean => {
   if (!url) return false;
   return url.includes('image.tmdb.org');
 };
+
+/**
+ * Gets the proper public URL for a path with appropriate error handling
+ * This is a more robust function for handling image paths
+ */
+export const getPublicImageUrl = (path?: string): string | null => {
+  if (!path) return null;
+  
+  try {
+    // For storage URLs, return as is
+    if (path.startsWith('/storage')) {
+      const publicUrl = new URL(window.location.origin + path).toString();
+      console.log(`Resolved storage path: ${path} to ${publicUrl}`);
+      return publicUrl;
+    }
+    
+    // For external URLs (including TMDB URLs), return as is
+    if (path.startsWith('http')) {
+      return path;
+    }
+    
+    // Default case for TMDB paths
+    return `https://image.tmdb.org/t/p/original${path}`;
+  } catch (error) {
+    console.error('Error processing image path:', error, path);
+    return null;
+  }
+};
