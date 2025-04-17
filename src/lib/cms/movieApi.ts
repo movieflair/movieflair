@@ -34,7 +34,8 @@ export const getAllMovies = async (): Promise<MovieOrShow[]> => {
       hasTrailer: movie.hastrailer || false,
       streamUrl: movie.streamurl || '',
       trailerUrl: movie.trailerurl || '',
-      runtime: movie.runtime || null,
+      // Add a type assertion to inform TypeScript that runtime exists
+      runtime: (movie as any).runtime || null,
       genre_ids: [], // Required by MovieOrShow type
     }));
   } catch (error) {
