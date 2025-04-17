@@ -5,50 +5,60 @@
     <loc>https://movieflair.co/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <lastmod>2025-04-17</lastmod>
   </url>
   <url>
     <loc>https://movieflair.co/neue-trailer</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2025-04-17</lastmod>
   </url>
   <url>
     <loc>https://movieflair.co/kostenlose-filme</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2025-04-17</lastmod>
   </url>
   <url>
     <loc>https://movieflair.co/genres</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <lastmod>2025-04-17</lastmod>
   </url>
   <url>
     <loc>https://movieflair.co/quick-tipp</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2025-04-17</lastmod>
   </url>
   <url>
     <loc>https://movieflair.co/entdecken</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2025-04-17</lastmod>
   </url>
   <url>
     <loc>https://movieflair.co/filmlisten</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+    <lastmod>2025-04-17</lastmod>
   </url>
   <url>
     <loc>https://movieflair.co/ueber-uns</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+    <lastmod>2025-04-17</lastmod>
   </url>
   <url>
     <loc>https://movieflair.co/datenschutz</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+    <lastmod>2025-04-17</lastmod>
   </url>
   <url>
     <loc>https://movieflair.co/nutzungsbedingungen</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
+    <lastmod>2025-04-17</lastmod>
   </url>
 </urlset>
