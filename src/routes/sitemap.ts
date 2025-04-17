@@ -27,4 +27,3 @@ router.get('/sitemap.xml', async (req: Request, res: Response) => {
 });
 
 export default router;
-
