@@ -24,7 +24,13 @@ const Trailers = () => {
           console.log('Trailers page: Sample trailer item:', data[0]);
         }
         
-        setTrailerItems(data);
+        const sortedData = [...data].sort((a, b) => {
+          const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+          const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+          return dateB - dateA; // Absteigend sortieren (neueste zuerst)
+        });
+        
+        setTrailerItems(sortedData);
       } catch (error) {
         console.error('Error fetching trailers:', error);
       } finally {

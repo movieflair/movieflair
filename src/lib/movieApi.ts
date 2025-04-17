@@ -60,7 +60,8 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       console.log(`Found ${trailerShows.length} TV shows with trailers from Supabase`);
     }
     
-    // Sort all items by updated_at (newest first)
+    // Diese Sortierung ist vielleicht nicht mehr nötig, da wir bereits sortiert abfragen,
+    // aber zur Sicherheit behalten wir sie bei, falls die Daten aus unterschiedlichen Tabellen kommen
     trailerItems.sort((a, b) => {
       const dateA = new Date(a.updated_at || '');
       const dateB = new Date(b.updated_at || '');
