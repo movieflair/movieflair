@@ -46,6 +46,19 @@ export const uploadMovieImage = async (
   movieId: number
 ): Promise<string | null> => {
   try {
+    // Check if bucket exists first
+    const { data: buckets } = await supabase.storage.listBuckets();
+    const bucketExists = buckets?.some(bucket => bucket.name === 'movie_images');
+    
+    if (!bucketExists) {
+      console.log('Movie images bucket does not exist. Attempting to create it...');
+      const created = await ensureMovieImagesBucketExists();
+      if (!created) {
+        console.error('Failed to create movie_images bucket');
+        return null;
+      }
+    }
+    
     const filePath = `${type}s/${movieId}_${Date.now()}.jpg`;
     const { error } = await supabase.storage
       .from('movie_images')
@@ -76,27 +89,44 @@ export const uploadMovieImage = async (
 export const ensureMovieImagesBucketExists = async (): Promise<boolean> => {
   try {
     // Check if the bucket already exists
-    const { data: buckets } = await supabase.storage.listBuckets();
+    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+    
+    if (listError) {
+      console.error('Error listing buckets:', listError);
+      return false;
+    }
+    
     const bucketExists = buckets?.some(bucket => bucket.name === 'movie_images');
     
     if (!bucketExists) {
       console.log('Creating movie_images bucket...');
-      const { error } = await supabase.storage.createBucket('movie_images', {
-        public: true,
-        fileSizeLimit: 10485760, // 10MB
-        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp']
-      });
-      
-      if (error) {
-        console.error('Error creating bucket:', error);
+      try {
+        const { error } = await supabase.storage.createBucket('movie_images', {
+          public: true,
+          fileSizeLimit: 10485760, // 10MB
+          allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp']
+        });
+        
+        if (error) {
+          console.error('Error creating bucket:', error);
+          console.log('Note: You may need to create this bucket manually in the Supabase dashboard.');
+          return false;
+        }
+        
+        // Create folders within the bucket
+        try {
+          await supabase.storage.from('movie_images').upload('posters/.gitkeep', new Blob(['']));
+          await supabase.storage.from('movie_images').upload('backdrops/.gitkeep', new Blob(['']));
+        } catch (folderError) {
+          console.log('Could not create folders, but bucket exists:', folderError);
+          // Continue anyway as the bucket was created
+        }
+        
+        console.log('movie_images bucket created successfully');
+      } catch (createError) {
+        console.error('Failed to create bucket:', createError);
         return false;
       }
-      
-      // Create folders within the bucket
-      await supabase.storage.from('movie_images').upload('posters/.gitkeep', new Blob(['']));
-      await supabase.storage.from('movie_images').upload('backdrops/.gitkeep', new Blob(['']));
-      
-      console.log('movie_images bucket created successfully');
     } else {
       console.log('movie_images bucket already exists');
     }

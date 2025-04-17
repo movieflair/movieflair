@@ -58,13 +58,20 @@ Deno.serve(async (req) => {
     const response = await fetch(url.toString())
     
     if (!response.ok) {
+      console.error(`TMDB API error: ${response.status} ${response.statusText}`);
       return new Response(
-        JSON.stringify({ error: 'TMDB API error', status: response.status }), 
+        JSON.stringify({ 
+          error: 'TMDB API error', 
+          status: response.status,
+          message: response.statusText 
+        }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
       );
     }
     
     const data = await response.json()
+    
+    console.log(`TMDB API response received successfully for action: ${action}`);
     
     return new Response(
       JSON.stringify(data), 
@@ -73,7 +80,11 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Error in TMDB function:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error', message: error.message }), 
+      JSON.stringify({ 
+        error: 'Internal server error', 
+        message: error.message,
+        stack: error.stack 
+      }), 
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }

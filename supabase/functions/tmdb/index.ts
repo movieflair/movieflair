@@ -19,6 +19,15 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Validate that a path was provided
+    if (!path) {
+      console.error('No TMDB API path provided');
+      return new Response(
+        JSON.stringify({ error: 'Invalid request', message: 'No API path provided' }), 
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
     // Build the URL with search parameters
     const url = new URL(`https://api.themoviedb.org/3${path}`)
     url.searchParams.append('api_key', apiKey)

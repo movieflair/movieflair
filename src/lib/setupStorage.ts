@@ -1,26 +1,22 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { ensureMovieImagesBucketExists } from '@/lib/api';
+import { ensureMovieImagesBucketExists } from './cms/imageApi';
 
 /**
- * Setup all necessary storage buckets and permissions
+ * Initialize storage buckets
  */
-export const setupStorage = async (): Promise<boolean> => {
+export const setupStorage = async (): Promise<void> => {
+  console.log('Setting up storage buckets...');
+  
   try {
-    console.log('Setting up storage buckets...');
-    
     // Ensure the movie_images bucket exists
-    const movieImagesCreated = await ensureMovieImagesBucketExists();
+    const bucketCreated = await ensureMovieImagesBucketExists();
     
-    if (!movieImagesCreated) {
+    if (!bucketCreated) {
       console.error('Failed to create movie_images bucket');
-      return false;
+    } else {
+      console.log('Storage buckets set up successfully');
     }
-    
-    console.log('Storage setup completed successfully');
-    return true;
   } catch (error) {
-    console.error('Error setting up storage:', error);
-    return false;
+    console.error('Error setting up storage buckets:', error);
   }
 };

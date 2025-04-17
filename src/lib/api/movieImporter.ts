@@ -11,7 +11,6 @@ import { downloadMovieImagesToServer } from './imageUtils';
 export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> => {
   try {
     console.log(`Importing movie: ${movie.title} (ID: ${movie.id})`);
-    toast.loading(`Importiere "${movie.title}"...`);
     
     const { data: existingMovie, error: checkError } = await supabase
       .from('admin_movies')
@@ -21,8 +20,6 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       
     if (checkError) {
       console.error('Error checking if movie exists:', checkError);
-      toast.dismiss();
-      toast.error('Fehler beim Prüfen, ob der Film bereits existiert');
       return false;
     }
     
@@ -30,17 +27,45 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       console.log(`Movie ${movie.id} already exists, checking if images need to be updated`);
       const success = await downloadMovieImagesToServer(movie);
       
-      toast.dismiss();
       if (success) {
-        toast.success(`Bilder für "${movie.title}" erfolgreich aktualisiert`);
+        console.log(`Images for "${movie.title}" successfully updated`);
       } else {
-        toast.error(`Fehler beim Aktualisieren der Bilder für "${movie.title}"`);
+        console.log(`Error updating images for "${movie.title}"`);
       }
       
       return success;
     }
     
-    const fullMovieData = await getMovieById(movie.id);
+    // Check if we have all required information from the movie object
+    if (!movie.title || movie.id === undefined) {
+      console.error('Missing required movie information:', movie);
+      return false;
+    }
+    
+    let fullMovieData: any = movie;
+    
+    try {
+      // Try to get more detailed movie data if possible
+      const detailedMovie = await getMovieById(movie.id);
+      if (detailedMovie) {
+        fullMovieData = detailedMovie;
+      }
+    } catch (error) {
+      console.log('Could not fetch additional movie details, using provided data:', error);
+      // Continue with the basic movie data we already have
+    }
+    
+    // Prepare trailer URL if available
+    let hasTrailer = false;
+    let trailerUrl = '';
+    
+    if (fullMovieData.videos?.results?.length > 0) {
+      const trailer = fullMovieData.videos.results.find((v: any) => v.type === 'Trailer');
+      if (trailer && trailer.key) {
+        hasTrailer = true;
+        trailerUrl = `https://www.youtube.com/embed/${trailer.key}`;
+      }
+    }
     
     const movieToImport = {
       id: movie.id,
@@ -57,9 +82,8 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       isnewtrailer: false,
       hasstream: false,
       streamurl: '',
-      hastrailer: !!fullMovieData.videos?.results?.some((v: any) => v.type === 'Trailer'),
-      trailerurl: fullMovieData.videos?.results?.find((v: any) => v.type === 'Trailer')?.key ? 
-        `https://www.youtube.com/embed/${fullMovieData.videos.results.find((v: any) => v.type === 'Trailer').key}` : ''
+      hastrailer: hasTrailer,
+      trailerurl: trailerUrl
     };
     
     const { error: importError } = await supabase
@@ -68,24 +92,23 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       
     if (importError) {
       console.error('Error importing movie:', importError);
-      toast.dismiss();
-      toast.error(`Fehler beim Importieren von "${movie.title}"`);
       return false;
     }
     
     console.log(`Movie "${movie.title}" successfully imported to database`);
     
-    console.log(`Downloading images for movie ${movie.id} to local storage...`);
-    const imagesUpdated = await downloadMovieImagesToServer(movie);
-    
-    toast.dismiss();
-    toast.success(`Film "${movie.title}" erfolgreich importiert`);
+    // Try to download images, but don't fail if it doesn't work
+    try {
+      console.log(`Downloading images for movie ${movie.id} to local storage...`);
+      await downloadMovieImagesToServer(movie);
+    } catch (imageError) {
+      console.error('Error downloading images:', imageError);
+      // Continue anyway, the movie is imported
+    }
     
     return true;
   } catch (error) {
     console.error('Error importing movie from list:', error);
-    toast.dismiss();
-    toast.error(`Fehler beim Importieren des Films: ${error.message}`);
     return false;
   }
 };
