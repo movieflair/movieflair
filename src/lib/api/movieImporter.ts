@@ -1,3 +1,4 @@
+
 import { MovieOrShow, MovieDetail } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -174,81 +175,103 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
         return false;
       }
       
-    // Try to update credits separately to handle potential missing column
-    try {
-      const { error: creditsError } = await supabase
-        .from('admin_movies')
-        .update({ credits: creditsJson })
-        .eq('id', movie.id);
-        
-      if (creditsError) {
-        console.error('Fehler beim Aktualisieren der Credits-Daten (Spalte existiert möglicherweise nicht):', creditsError);
-        console.log('Credits-Daten konnten nicht gespeichert werden. Bitte fügen Sie die Spalte "credits" zur Tabelle "admin_movies" hinzu.');
-      } else {
-        console.log('Credits-Daten erfolgreich aktualisiert');
+      // Try to update credits separately to handle potential missing column
+      try {
+        // Check if credits column exists in admin_movies table
+        const { data: columnsData, error: columnsError } = await supabase
+          .from('admin_movies')
+          .select('credits')
+          .limit(1);
+          
+        if (columnsError) {
+          console.error('Fehler beim Überprüfen, ob die Credits-Spalte existiert:', columnsError);
+        } else {
+          // If we got here, the column exists, update it
+          const { error: creditsError } = await supabase
+            .from('admin_movies')
+            .update({ credits: creditsJson })
+            .eq('id', movie.id);
+            
+          if (creditsError) {
+            console.error('Fehler beim Aktualisieren der Credits-Daten:', creditsError);
+            console.log('Credits-Daten konnten nicht gespeichert werden.');
+          } else {
+            console.log('Credits-Daten erfolgreich aktualisiert');
+          }
+        }
+      } catch (creditsError) {
+        console.error('Fehler beim Aktualisieren der Credits-Daten:', creditsError);
       }
-    } catch (creditsError) {
-      console.error('Fehler beim Aktualisieren der Credits-Daten:', creditsError);
+      
+      console.log(`Filmdaten für "${fullMovieData.title}" erfolgreich aktualisiert`);
+      return true;
     }
     
-    console.log(`Filmdaten für "${fullMovieData.title}" erfolgreich aktualisiert`);
-    return true;
-  }
-  
-  // Wenn der Film nicht existiert, einen neuen Eintrag erstellen
-  const movieToImport = {
-    id: movie.id,
-    title: fullMovieData.title || '',
-    poster_path: posterPath,
-    backdrop_path: backdropPath,
-    overview: fullMovieData.overview || '',
-    release_date: fullMovieData.release_date || '',
-    vote_average: fullMovieData.vote_average || 0,
-    vote_count: fullMovieData.vote_count || 0,
-    popularity: fullMovieData.popularity || 0,
-    media_type: 'movie',
-    isfreemovie: false,
-    isnewtrailer: false,
-    hasstream: false,
-    streamurl: '',
-    hastrailer: hasTrailer,
-    trailerurl: trailerUrl,
-    runtime: runtime
-  };
-  
-  console.log('Füge Film in Datenbank ein:', movieToImport);
-  
-  const { error: importError } = await supabase
-    .from('admin_movies')
-    .insert(movieToImport);
+    // Wenn der Film nicht existiert, einen neuen Eintrag erstellen
+    const movieToImport = {
+      id: movie.id,
+      title: fullMovieData.title || '',
+      poster_path: posterPath,
+      backdrop_path: backdropPath,
+      overview: fullMovieData.overview || '',
+      release_date: fullMovieData.release_date || '',
+      vote_average: fullMovieData.vote_average || 0,
+      vote_count: fullMovieData.vote_count || 0,
+      popularity: fullMovieData.popularity || 0,
+      media_type: 'movie',
+      isfreemovie: false,
+      isnewtrailer: false,
+      hasstream: false,
+      streamurl: '',
+      hastrailer: hasTrailer,
+      trailerurl: trailerUrl,
+      runtime: runtime
+    };
     
-  if (importError) {
-    console.error('Fehler beim Importieren des Films:', importError);
-    toast.error(`Import fehlgeschlagen: ${importError.message}`);
-    return false;
-  }
-  
+    console.log('Füge Film in Datenbank ein:', movieToImport);
+    
+    const { error: importError } = await supabase
+      .from('admin_movies')
+      .insert(movieToImport);
+      
+    if (importError) {
+      console.error('Fehler beim Importieren des Films:', importError);
+      toast.error(`Import fehlgeschlagen: ${importError.message}`);
+      return false;
+    }
+    
     // Try to update credits separately to handle potential missing column
     try {
-      const { error: creditsError } = await supabase
+      // Check if credits column exists in admin_movies table
+      const { data: columnsData, error: columnsError } = await supabase
         .from('admin_movies')
-        .update({ credits: creditsJson })
-        .eq('id', movie.id);
+        .select('credits')
+        .limit(1);
         
-      if (creditsError) {
-        console.error('Fehler beim Hinzufügen der Credits-Daten (Spalte existiert möglicherweise nicht):', creditsError);
-        console.log('Credits-Daten konnten nicht gespeichert werden. Bitte fügen Sie die Spalte "credits" zur Tabelle "admin_movies" hinzu.');
+      if (columnsError) {
+        console.error('Fehler beim Überprüfen, ob die Credits-Spalte existiert:', columnsError);
       } else {
-        console.log('Credits-Daten erfolgreich hinzugefügt');
+        // If we got here, the column exists, update it
+        const { error: creditsError } = await supabase
+          .from('admin_movies')
+          .update({ credits: creditsJson })
+          .eq('id', movie.id);
+          
+        if (creditsError) {
+          console.error('Fehler beim Hinzufügen der Credits-Daten:', creditsError);
+          console.log('Credits-Daten konnten nicht gespeichert werden. Die Spalte "credits" muss zur Tabelle "admin_movies" hinzugefügt werden.');
+        } else {
+          console.log('Credits-Daten erfolgreich hinzugefügt');
+        }
       }
     } catch (creditsError) {
       console.error('Fehler beim Hinzufügen der Credits-Daten:', creditsError);
     }
-  
-  console.log(`Film "${fullMovieData.title}" erfolgreich in Datenbank importiert`);
-  toast.success(`Film "${fullMovieData.title}" erfolgreich importiert`);
-  return true;
-} catch (error: any) {
+    
+    console.log(`Film "${fullMovieData.title}" erfolgreich in Datenbank importiert`);
+    toast.success(`Film "${fullMovieData.title}" erfolgreich importiert`);
+    return true;
+  } catch (error: any) {
     console.error('Fehler beim Importieren des Films:', error);
     toast.error(`Allgemeiner Fehler: ${error.message}`);
     return false;

@@ -1,3 +1,4 @@
+
 export interface Genre {
   id: number;
   name: string;
@@ -34,6 +35,14 @@ export interface MovieOrShow {
   isImported?: boolean;
   runtime?: number | null;
   credits?: string; // Added the credits property as a string to store JSON data
+  
+  // Database field mappings for compatibility
+  hasstream?: boolean;
+  hastrailer?: boolean;
+  streamurl?: string;
+  trailerurl?: string;
+  isfreemovie?: boolean;
+  isnewtrailer?: boolean;
 }
 
 export interface MovieDetail extends MovieOrShow {

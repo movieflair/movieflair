@@ -78,13 +78,13 @@ export function useMovieData(id: string | undefined, slug?: string) {
               cast: cast.length > 0 ? cast : (tmdbMovie.cast || []),
               crew: director ? [director, ...(tmdbMovie.crew || [])] : (tmdbMovie.crew || []),
               runtime: tmdbMovie.runtime || adminMovie.runtime,
-              // Andere wichtige Felder
-              hasTrailer: adminMovie.hasstream,
-              hasStream: adminMovie.hasstream,
-              streamUrl: adminMovie.streamurl,
-              trailerUrl: adminMovie.trailerurl,
-              isFreeMovie: adminMovie.isfreemovie,
-              isNewTrailer: adminMovie.isnewtrailer,
+              // Andere wichtige Felder - using camelCase for consistent app model
+              hasTrailer: adminMovie.hasstream || adminMovie.hasStream,
+              hasStream: adminMovie.hasstream || adminMovie.hasStream,
+              streamUrl: adminMovie.streamurl || adminMovie.streamUrl,
+              trailerUrl: adminMovie.trailerurl || adminMovie.trailerUrl,
+              isFreeMovie: adminMovie.isfreemovie || adminMovie.isFreeMovie,
+              isNewTrailer: adminMovie.isnewtrailer || adminMovie.isNewTrailer,
             };
             
             console.log('Kombinierte Filmdaten:', movieData);
@@ -94,6 +94,13 @@ export function useMovieData(id: string | undefined, slug?: string) {
             // Wenn TMDB fehlschlägt, verwende nur lokale Daten
             movieData = {
               ...adminMovie,
+              // Map database field names to app model field names
+              hasTrailer: adminMovie.hasstream || adminMovie.hasTrailer, 
+              hasStream: adminMovie.hasstream || adminMovie.hasStream,
+              streamUrl: adminMovie.streamurl || adminMovie.streamUrl,
+              trailerUrl: adminMovie.trailerurl || adminMovie.trailerUrl,
+              isFreeMovie: adminMovie.isfreemovie || adminMovie.isFreeMovie,
+              isNewTrailer: adminMovie.isnewtrailer || adminMovie.isNewTrailer,
               cast: cast,
               crew: director ? [director] : [],
               genres: [] // Leere Genres, da wir keine haben
