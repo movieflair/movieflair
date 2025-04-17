@@ -32,6 +32,13 @@ Deno.serve(async (req) => {
     const url = new URL(`https://api.themoviedb.org/3${path}`)
     url.searchParams.append('api_key', apiKey)
     
+    // For movie details, always append videos and credits
+    if (path.startsWith('/movie/') && path.split('/').length === 3) {
+      if (!searchParams.append_to_response) {
+        searchParams.append_to_response = 'videos,credits,images,genres';
+      }
+    }
+    
     // Add additional search parameters
     Object.entries(searchParams).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
@@ -67,6 +74,27 @@ Deno.serve(async (req) => {
     }
     
     const data = await response.json()
+    
+    // Process and restructure data for easier consumption
+    if (path.startsWith('/movie/') && path.split('/').length === 3 && data) {
+      // Extract director from credits
+      if (data.credits) {
+        data.crew = data.credits.crew || [];
+        data.cast = data.credits.cast || [];
+        delete data.credits;
+      }
+      
+      // Ensure we have a proper trailer URL
+      if (data.videos && data.videos.results) {
+        const trailer = data.videos.results.find(
+          (video: any) => video.type === 'Trailer' && video.site === 'YouTube'
+        );
+        if (trailer) {
+          data.trailerUrl = `https://www.youtube.com/embed/${trailer.key}`;
+          data.hasTrailer = true;
+        }
+      }
+    }
     
     // Log the response summary
     if (data.results) {

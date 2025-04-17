@@ -32,6 +32,8 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
     }
   };
 
+  const genres = movie.genres?.map(g => g.name).join(', ') || '';
+
   return (
     <div className="min-h-screen bg-white">
       <MovieBackdrop backdropPath={movie.backdrop_path} title={movie.title} />
@@ -63,12 +65,18 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
                 className="mb-4"
               />
 
+              {genres && (
+                <div className="mb-4 text-sm">
+                  <span className="font-semibold">Genres:</span> {genres}
+                </div>
+              )}
+
               <p className="text-gray-600 mb-6 md:mb-8 leading-relaxed text-sm md:text-base">
                 {truncateOverview(movie.overview)}
               </p>
 
               <MovieStreamButtons
-                hasTrailer={movie.hasTrailer}
+                hasTrailer={movie.hasTrailer || !!trailerUrl}
                 trailerUrl={trailerUrl}
                 streamUrl={movie.streamUrl}
                 title={movie.title}

@@ -18,11 +18,20 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error(`Fehler beim Laden des Posters für ${title}:`, e);
     
-    // Try using the TMDB fallback if it's a TMDB path and we're not already using the fallback
-    if (!hasError && posterPath && posterPath.startsWith('/') && !posterPath.startsWith('/storage')) {
-      console.log('Trying TMDB fallback for poster');
+    // Versuche zuerst eine lokale URL
+    if (!hasError && posterPath) {
       setHasError(true);
-      setCurrentSrc(`https://image.tmdb.org/t/p/w500${posterPath}`);
+      
+      // Wenn es ein TMDB-Pfad ist, versuche die TMDB-URL
+      if (posterPath.startsWith('/') && !posterPath.startsWith('/storage')) {
+        console.log('Versuche TMDB-Fallback für Poster');
+        setCurrentSrc(`https://image.tmdb.org/t/p/w500${posterPath}`);
+      }
+      // Wenn es eine lokale URL ist, die fehlschlägt, versuche die TMDB-ID zu extrahieren
+      else if (posterPath.includes('movie_images') && id) {
+        console.log('Lokales Bild fehlgeschlagen, versuche TMDB');
+        setCurrentSrc(`https://image.tmdb.org/t/p/w500/TMDB_FALLBACK_${id}`);
+      }
     }
   };
   

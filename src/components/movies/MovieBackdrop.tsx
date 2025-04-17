@@ -9,6 +9,15 @@ interface MovieBackdropProps {
 const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
   const imageSrc = getBackdropPath(backdropPath);
   
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error(`Fehler beim Laden des Hintergrundbilds für ${title}:`, e);
+    
+    // Wenn es ein lokales Bild ist, das fehlschlägt, setze direkt auf den TMDB-Pfad
+    if (backdropPath && backdropPath.startsWith('/') && !backdropPath.startsWith('/storage')) {
+      (e.target as HTMLImageElement).src = `https://image.tmdb.org/t/p/original${backdropPath}`;
+    }
+  };
+  
   return (
     <div className="relative h-[400px] overflow-hidden">
       {imageSrc ? (
@@ -18,10 +27,7 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
             src={imageSrc}
             alt={title}
             className="w-full h-full object-cover"
-            onError={(e) => {
-              console.error(`Error loading backdrop image for ${title}`);
-              // Leave as is to show the broken image icon
-            }}
+            onError={handleError}
           />
         </>
       ) : (

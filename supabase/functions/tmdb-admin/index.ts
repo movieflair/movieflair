@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
         url = new URL(`https://api.themoviedb.org/3/movie/${movieId}`)
         url.searchParams.append('api_key', apiKey)
         url.searchParams.append('language', 'de-DE')
-        url.searchParams.append('append_to_response', 'videos,credits')
+        url.searchParams.append('append_to_response', 'videos,credits,images,genres')
         break
         
       case 'getPopular':
@@ -70,6 +70,21 @@ Deno.serve(async (req) => {
     }
     
     const data = await response.json()
+    
+    // For getById action, process and restructure the data
+    if (action === 'getById' && data) {
+      // Extract director and cast from credits
+      if (data.credits) {
+        data.crew = data.credits.crew || [];
+        data.cast = data.credits.cast || [];
+        delete data.credits;
+      }
+      
+      // Ensure we have genres properly set
+      if (data.genres) {
+        data.genre_ids = data.genres.map((genre: any) => genre.id);
+      }
+    }
     
     console.log(`TMDB API response received successfully for action: ${action}`);
     

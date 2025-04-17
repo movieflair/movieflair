@@ -1,153 +1,162 @@
 
-import { corsHeaders } from '../_shared/cors.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.23.0';
-
-const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
-
-// Create a Supabase client with the service role key
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+import { corsHeaders } from '../_shared/cors.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.5.0'
 
 Deno.serve(async (req) => {
-  // Handle CORS
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders })
   }
 
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')
+  const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return new Response(
+      JSON.stringify({ error: 'Missing Supabase credentials' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+    )
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+
   try {
-    const bucketName = 'movie_images';
-    console.log(`Setting up movie images storage: ${bucketName}`);
-
-    // Check if the bucket already exists
-    const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+    const { movie } = await req.json()
     
-    if (listError) {
-      console.error('Error listing buckets:', listError);
-      throw new Error(`Error listing buckets: ${listError.message}`);
+    if (!movie || !movie.id) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid movie data', success: false }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      )
     }
     
-    const bucketExists = buckets.some(bucket => bucket.name === bucketName);
+    // Check if the movie_images bucket exists
+    const { data: buckets, error: getBucketsError } = await supabase
+      .storage
+      .listBuckets()
     
-    if (!bucketExists) {
-      console.log(`Creating bucket '${bucketName}'...`);
-      
-      // Create the bucket
-      const { data, error } = await supabase.storage.createBucket(bucketName, {
-        public: true,  // Make bucket publicly accessible
-        fileSizeLimit: 26214400, // 25MB in bytes
-        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp']
-      });
-
-      if (error) {
-        console.error(`Error creating bucket '${bucketName}':`, error);
-        throw new Error(`Error creating bucket: ${error.message}`);
-      }
-      
-      // Create the folder structure
-      const foldersToCreate = ['posters', 'backdrops'];
-      
-      for (const folder of foldersToCreate) {
-        try {
-          // Create an empty file to represent the folder
-          const { error: folderError } = await supabase.storage
-            .from(bucketName)
-            .upload(`${folder}/.keep`, new Blob(['']));
-            
-          if (folderError) {
-            console.error(`Error creating folder '${folder}':`, folderError);
-          } else {
-            console.log(`Created folder '${folder}' in bucket '${bucketName}'`);
-          }
-        } catch (folderErr) {
-          console.error(`Error creating folder '${folder}':`, folderErr);
-        }
-      }
-      
-      // Set public access policies
-      console.log('Creating public access policies...');
-      try {
-        // Policy for public read access
-        const { error: readError } = await supabase.storage.from(bucketName).createSignedUrl('posters/.keep', 10);
-        if (readError) {
-          console.error('Error configuring bucket settings:', readError);
-        }
-      } catch (policyError) {
-        console.error('Error configuring bucket policies:', policyError);
-      }
-      
+    if (getBucketsError) {
+      console.error('Error listing buckets:', getBucketsError)
       return new Response(
-        JSON.stringify({
-          success: true,
-          message: `Storage bucket '${bucketName}' created with folders 'posters' and 'backdrops'`,
-          isNew: true
+        JSON.stringify({ 
+          error: 'Failed to list buckets',
+          details: getBucketsError.message,
+          success: false
         }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200 
-        }
-      );
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
+    }
+    
+    const movieImagesBucket = buckets.find(b => b.name === 'movie_images')
+    
+    if (!movieImagesBucket) {
+      console.log('Creating movie_images bucket...')
+      
+      const { data: bucketData, error: createBucketError } = await supabase
+        .storage
+        .createBucket('movie_images', {
+          public: true,
+          fileSizeLimit: 5 * 1024 * 1024 // 5MB
+        })
+      
+      if (createBucketError) {
+        console.error('Error creating bucket:', createBucketError)
+        return new Response(
+          JSON.stringify({ 
+            error: 'Failed to create bucket',
+            details: createBucketError.message,
+            success: false
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        )
+      }
+      
+      console.log('Bucket created:', bucketData)
     } else {
-      // Bucket already exists, check for the folders
-      console.log(`Bucket '${bucketName}' already exists, checking folders...`);
-      
-      const foldersToCheck = ['posters', 'backdrops'];
-      const foldersToCreate = [];
-      
-      for (const folder of foldersToCheck) {
-        const { data: folderContents, error: listError } = await supabase.storage
-          .from(bucketName)
-          .list(folder);
-          
-        if (listError || !folderContents) {
-          console.log(`Folder '${folder}' may not exist, will create it`);
-          foldersToCreate.push(folder);
-        } else {
-          console.log(`Folder '${folder}' exists with ${folderContents.length} items`);
-        }
-      }
-      
-      // Create any missing folders
-      for (const folder of foldersToCreate) {
-        try {
-          const { error: folderError } = await supabase.storage
-            .from(bucketName)
-            .upload(`${folder}/.keep`, new Blob(['']));
-            
-          if (folderError) {
-            console.error(`Error creating folder '${folder}':`, folderError);
-          } else {
-            console.log(`Created folder '${folder}' in bucket '${bucketName}'`);
-          }
-        } catch (folderErr) {
-          console.error(`Error creating folder '${folder}':`, folderErr);
-        }
-      }
-      
-      return new Response(
-        JSON.stringify({
-          success: true,
-          message: `Storage bucket '${bucketName}' already exists, checked folder structure`,
-          isNew: false,
-          foldersCreated: foldersToCreate
-        }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200 
-        }
-      );
+      console.log('movie_images bucket already exists')
     }
-  } catch (error) {
-    console.error('Error in create-movie-storage function:', error);
+    
+    // Try to download and store the movie images (poster and backdrop)
+    let posterSaved = false
+    let backdropSaved = false
+    
+    if (movie.poster_path && movie.poster_path.startsWith('/')) {
+      try {
+        console.log(`Downloading poster image for movie ${movie.id}`)
+        const imageUrl = `https://image.tmdb.org/t/p/original${movie.poster_path}`
+        const imageRes = await fetch(imageUrl)
+        
+        if (imageRes.ok) {
+          const imageBlob = await imageRes.blob()
+          const { data, error } = await supabase.storage
+            .from('movie_images')
+            .upload(`posters/${movie.id}.jpg`, imageBlob, {
+              cacheControl: '3600',
+              upsert: true
+            })
+            
+          if (error) {
+            console.error('Error uploading poster:', error)
+          } else {
+            console.log('Poster uploaded:', data)
+            posterSaved = true
+          }
+        } else {
+          console.error('Error downloading poster:', imageRes.statusText)
+        }
+      } catch (downloadError) {
+        console.error('Error processing poster image:', downloadError)
+      }
+    }
+    
+    if (movie.backdrop_path && movie.backdrop_path.startsWith('/')) {
+      try {
+        console.log(`Downloading backdrop image for movie ${movie.id}`)
+        const imageUrl = `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
+        const imageRes = await fetch(imageUrl)
+        
+        if (imageRes.ok) {
+          const imageBlob = await imageRes.blob()
+          const { data, error } = await supabase.storage
+            .from('movie_images')
+            .upload(`backdrops/${movie.id}.jpg`, imageBlob, {
+              cacheControl: '3600',
+              upsert: true
+            })
+            
+          if (error) {
+            console.error('Error uploading backdrop:', error)
+          } else {
+            console.log('Backdrop uploaded:', data)
+            backdropSaved = true
+          }
+        } else {
+          console.error('Error downloading backdrop:', imageRes.statusText)
+        }
+      } catch (downloadError) {
+        console.error('Error processing backdrop image:', downloadError)
+      }
+    }
     
     return new Response(
       JSON.stringify({ 
-        success: false, 
-        error: error.message 
+        success: true, 
+        message: 'Movie storage prepared',
+        details: {
+          posterSaved,
+          backdropSaved
+        }
       }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
-      }
-    );
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+    )
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message,
+        success: false
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+    )
   }
-});
+})

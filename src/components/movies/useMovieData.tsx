@@ -33,26 +33,35 @@ export function useMovieData(id: string | undefined, slug?: string) {
         if (adminMovie) {
           console.log('Film aus lokaler Datenbank geladen:', adminMovie);
           // Für lokale Filme benötigen wir zusätzliche Details von TMDB
-          const tmdbMovie = await getMovieById(parsedId);
-          
-          // Kombinieren der Daten, wobei lokale Daten Priorität haben
-          movieData = {
-            ...tmdbMovie,
-            ...adminMovie,
-            // Stelle sicher, dass die lokalen Pfade für Bilder verwendet werden
-            poster_path: adminMovie.poster_path || tmdbMovie.poster_path,
-            backdrop_path: adminMovie.backdrop_path || tmdbMovie.backdrop_path,
-            // Andere wichtige Felder
-            hasTrailer: adminMovie.hasTrailer,
-            hasStream: adminMovie.hasStream,
-            streamUrl: adminMovie.streamUrl,
-            trailerUrl: adminMovie.trailerUrl,
-            isFreeMovie: adminMovie.isFreeMovie,
-            isNewTrailer: adminMovie.isNewTrailer,
-          };
+          try {
+            const tmdbMovie = await getMovieById(parsedId);
+            
+            // Kombinieren der Daten, wobei lokale Daten Priorität haben
+            movieData = {
+              ...tmdbMovie,
+              ...adminMovie,
+              // Stelle sicher, dass die lokalen Pfade für Bilder verwendet werden
+              poster_path: adminMovie.poster_path || tmdbMovie.poster_path,
+              backdrop_path: adminMovie.backdrop_path || tmdbMovie.backdrop_path,
+              // Andere wichtige Felder
+              hasTrailer: adminMovie.hasTrailer,
+              hasStream: adminMovie.hasStream,
+              streamUrl: adminMovie.streamUrl,
+              trailerUrl: adminMovie.trailerUrl,
+              isFreeMovie: adminMovie.isFreeMovie,
+              isNewTrailer: adminMovie.isNewTrailer,
+            };
+          } catch (error) {
+            console.error('Fehler beim Abrufen der TMDB-Details, verwende nur lokale Daten', error);
+            movieData = adminMovie;
+          }
         } else {
           // Wenn nicht in unserer Datenbank, dann lade nur von TMDB
           movieData = await getMovieById(parsedId);
+        }
+        
+        if (!movieData) {
+          throw new Error(`Film mit ID ${parsedId} konnte nicht gefunden werden`);
         }
         
         const similars = await getSimilarMovies(parsedId);

@@ -42,13 +42,27 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       return false;
     }
     
-    let fullMovieData: any = movie;
+    let fullMovieData: any = { ...movie };
     
     try {
-      // Try to get more detailed movie data if possible
-      const detailedMovie = await getMovieById(movie.id);
-      if (detailedMovie) {
-        fullMovieData = detailedMovie;
+      // Try to get more detailed movie data from TMDB
+      const { data: movieDetails, error } = await supabase.functions.invoke('tmdb', {
+        body: { 
+          path: `/movie/${movie.id}`,
+          searchParams: {
+            append_to_response: 'videos,credits,images,genres'
+          }
+        }
+      });
+      
+      if (error) {
+        console.error('Error fetching detailed movie data:', error);
+      } else if (movieDetails) {
+        console.log('Retrieved detailed movie data from TMDB');
+        fullMovieData = {
+          ...fullMovieData,
+          ...movieDetails
+        };
       }
     } catch (error) {
       console.log('Could not fetch additional movie details, using provided data:', error);
@@ -60,11 +74,14 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
     let trailerUrl = '';
     
     if (fullMovieData.videos?.results?.length > 0) {
-      const trailer = fullMovieData.videos.results.find((v: any) => v.type === 'Trailer');
+      const trailer = fullMovieData.videos.results.find((v: any) => v.type === 'Trailer' && v.site === 'YouTube');
       if (trailer && trailer.key) {
         hasTrailer = true;
         trailerUrl = `https://www.youtube.com/embed/${trailer.key}`;
       }
+    } else if (fullMovieData.trailerUrl) {
+      hasTrailer = true;
+      trailerUrl = fullMovieData.trailerUrl;
     }
     
     const movieToImport = {
