@@ -10,7 +10,7 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-router.get('*', async function renderHandler(req: Request, res: Response, next: NextFunction) {
+router.get('*', async (req: Request, res: Response, next: NextFunction) => {
   const url = req.originalUrl;
 
   try {
@@ -64,4 +64,3 @@ router.get('*', async function renderHandler(req: Request, res: Response, next: 
 });
 
 export default router;
-
