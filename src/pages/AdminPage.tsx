@@ -23,7 +23,10 @@ const AdminPage = () => {
   useEffect(() => {
     // Set admin flag in localStorage to prevent tracking
     localStorage.setItem('isAdminLoggedIn', 'true');
-    checkAdminAccess();
+    
+    if (!authLoading) {
+      checkAdminAccess();
+    }
 
     // Create the storage bucket for movie images if needed
     const initStorage = async () => {
@@ -46,11 +49,9 @@ const AdminPage = () => {
     return () => {
       localStorage.removeItem('isAdminLoggedIn');
     };
-  }, [user, storageInitialized]);
+  }, [user, storageInitialized, authLoading]);
 
   const checkAdminAccess = async () => {
-    if (authLoading) return;
-
     if (!user) {
       setIsLoading(false);
       setIsLoggedIn(false);

@@ -20,11 +20,16 @@ const AdminSearch = ({
 }: AdminSearchProps) => {
   // Memoize the placeholder text to prevent unnecessary re-renders
   const placeholderText = useMemo(() => {
-    return activeTab === 'movies' 
-      ? 'Suche Filme...' 
-      : activeTab === 'shows' 
-        ? 'Suche Serien...' 
-        : 'Suche Tags...';
+    switch (activeTab) {
+      case 'movies':
+        return 'Suche Filme...';
+      case 'shows':
+        return 'Suche Serien...';
+      case 'tags':
+        return 'Suche Tags...';
+      default:
+        return 'Suche...';
+    }
   }, [activeTab]);
       
   return (
