@@ -37,6 +37,7 @@ const Trailers = () => {
     if (trailerItems.length > 0) {
       const randomIndex = Math.floor(Math.random() * trailerItems.length);
       const randomItem = trailerItems[randomIndex];
+      console.log('Navigating to random trailer:', randomItem);
       navigate(`/${randomItem.media_type === 'tv' ? 'serie' : 'film'}/${randomItem.id}`);
     }
   };

@@ -37,6 +37,7 @@ const FreeMovies = () => {
     if (movies.length > 0) {
       const randomIndex = Math.floor(Math.random() * movies.length);
       const randomMovie = movies[randomIndex];
+      console.log('Navigating to random movie:', randomMovie);
       navigate(`/film/${randomMovie.id}`);
     }
   };
