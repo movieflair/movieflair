@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import { renderApp } from '../utils/renderUtils';
@@ -10,8 +9,7 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Fix: Use the correct method signature for the router.get handler
-router.get('*', async function renderHandler(req: Request, res: Response, next: NextFunction) {
+router.get('*', function renderHandler(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
 
   try {

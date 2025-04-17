@@ -1,22 +1,31 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 const BASE_URL = 'https://movieflair.co';
 
 const staticRoutes = [
   { path: '/', priority: '1.0', changefreq: 'daily' },
-  { path: '/neue-trailer', priority: '0.8', changefreq: 'weekly' },
-  { path: '/kostenlose-filme', priority: '0.8', changefreq: 'weekly' },
-  { path: '/genres', priority: '0.7', changefreq: 'monthly' },
-  { path: '/entdecken', priority: '0.8', changefreq: 'weekly' },
-  { path: '/filmlisten', priority: '0.7', changefreq: 'weekly' },
-  { path: '/quick-tipp', priority: '0.8', changefreq: 'weekly' },
-  { path: '/ueber-uns', priority: '0.5', changefreq: 'monthly' },
-  { path: '/datenschutz', priority: '0.3', changefreq: 'yearly' },
-  { path: '/nutzungsbedingungen', priority: '0.3', changefreq: 'yearly' },
+  { path: '/entdecken', priority: '1.0', changefreq: 'daily' },
+  { path: '/neue-trailer', priority: '1.0', changefreq: 'daily' },
+  { path: '/kostenlose-filme', priority: '1.0', changefreq: 'daily' },
+  { path: '/quick-tipp', priority: '1.0', changefreq: 'daily' },
+  { path: '/ueber-uns', priority: '1.0', changefreq: 'monthly' },
+  { path: '/datenschutz', priority: '0.5', changefreq: 'monthly' },
+  { path: '/nutzungsbedingungen', priority: '0.5', changefreq: 'monthly' },
+  { path: '/filmlisten', priority: '1.0', changefreq: 'daily' },
+  { path: '/suche', priority: '1.0', changefreq: 'daily' },
+  { path: '/genres', priority: '1.0', changefreq: 'daily' },
 ];
 
-const excludedRoutes = ['/admin', '/auth', '/profil', '/merkliste'];
+const excludedRoutes = [
+  '/admin',
+  '/auth',
+  '/profil',
+  '/merkliste',
+  '/search',
+  '/listen',
+  '/discover',
+  '/about',
+];
 
 async function fetchAllMovies() {
   try {
@@ -152,4 +161,3 @@ export function writeSitemapToFile() {
     console.error('Error writing sitemap to file:', error);
   });
 }
-
