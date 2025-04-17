@@ -1,4 +1,3 @@
-
 import { corsHeaders } from '../_shared/cors.ts'
 
 Deno.serve(async (req) => {
@@ -77,12 +76,25 @@ Deno.serve(async (req) => {
       if (data.credits) {
         data.crew = data.credits.crew || [];
         data.cast = data.credits.cast || [];
-        delete data.credits;
+        
+        // Keep a reference to the director for easier access
+        data.director = data.credits.crew?.find((person: any) => person.job === 'Director');
       }
       
       // Ensure we have genres properly set
       if (data.genres) {
         data.genre_ids = data.genres.map((genre: any) => genre.id);
+      }
+      
+      // Process trailer information
+      if (data.videos && data.videos.results) {
+        const trailer = data.videos.results.find(
+          (video: any) => video.type === 'Trailer' && video.site === 'YouTube'
+        );
+        if (trailer) {
+          data.trailerUrl = `https://www.youtube.com/embed/${trailer.key}`;
+          data.hasTrailer = true;
+        }
       }
     }
     

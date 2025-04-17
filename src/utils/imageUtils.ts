@@ -9,13 +9,14 @@
 export const getPosterPath = (path?: string): string | null => {
   if (!path) return null;
   
-  // For external URLs (including TMDB URLs), return as is
-  if (path.startsWith('http')) {
-    return path;
+  // For storage URLs, return as is with priority
+  if (path.startsWith('/storage')) {
+    // Add timestamp to bust cache
+    return `${path}?t=${Date.now()}`;
   }
   
-  // For storage URLs, return as is
-  if (path.startsWith('/storage')) {
+  // For external URLs (including TMDB URLs), return as is
+  if (path.startsWith('http')) {
     return path;
   }
   
@@ -29,13 +30,14 @@ export const getPosterPath = (path?: string): string | null => {
 export const getBackdropPath = (path?: string): string | null => {
   if (!path) return null;
   
-  // For external URLs (including TMDB URLs), return as is
-  if (path.startsWith('http')) {
-    return path;
+  // For storage URLs, return as is with priority
+  if (path.startsWith('/storage')) {
+    // Add timestamp to bust cache
+    return `${path}?t=${Date.now()}`;
   }
   
-  // For storage URLs, return as is
-  if (path.startsWith('/storage')) {
+  // For external URLs (including TMDB URLs), return as is
+  if (path.startsWith('http')) {
     return path;
   }
   

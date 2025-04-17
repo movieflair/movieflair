@@ -18,7 +18,7 @@ interface MovieContentProps {
 
 export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) => {
   const [showTrailer, setShowTrailer] = useState(false);
-  const director = movie.crew?.find(person => person.job === 'Director');
+  const director = movie.crew?.find(person => person.job === 'Director') || movie.director;
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
   const trailerUrl = getTrailerUrl(movie);
   

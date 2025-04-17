@@ -24,16 +24,70 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
     }
     
     if (existingMovie) {
-      console.log(`Movie ${movie.id} already exists, checking if images need to be updated`);
+      console.log(`Movie ${movie.id} already exists, updating data and checking if images need to be updated`);
+      
+      // Try to get more detailed movie data from TMDB for the update
+      try {
+        const { data: movieDetails, error } = await supabase.functions.invoke('tmdb-admin', {
+          body: { 
+            action: 'getById',
+            movieId: movie.id
+          }
+        });
+        
+        if (error) {
+          console.error('Error fetching detailed movie data:', error);
+        } else if (movieDetails) {
+          console.log('Retrieved detailed movie data from TMDB for update');
+          
+          // Prepare trailer URL if available
+          let hasTrailer = movieDetails.hasTrailer || false;
+          let trailerUrl = movieDetails.trailerUrl || '';
+          
+          if (movieDetails.videos?.results?.length > 0 && !trailerUrl) {
+            const trailer = movieDetails.videos.results.find((v: any) => v.type === 'Trailer' && v.site === 'YouTube');
+            if (trailer && trailer.key) {
+              hasTrailer = true;
+              trailerUrl = `https://www.youtube.com/embed/${trailer.key}`;
+            }
+          }
+          
+          // Update the movie data in our database
+          const { error: updateError } = await supabase
+            .from('admin_movies')
+            .update({
+              title: movieDetails.title,
+              overview: movieDetails.overview,
+              release_date: movieDetails.release_date,
+              vote_average: movieDetails.vote_average,
+              vote_count: movieDetails.vote_count,
+              popularity: movieDetails.popularity,
+              runtime: movieDetails.runtime,
+              hastrailer: hasTrailer,
+              trailerurl: trailerUrl
+            })
+            .eq('id', movie.id);
+            
+          if (updateError) {
+            console.error('Error updating movie data:', updateError);
+          } else {
+            console.log(`Movie "${movie.title}" data successfully updated`);
+          }
+        }
+      } catch (updateError) {
+        console.error('Error updating movie:', updateError);
+      }
+      
+      // Try to download and update images
       const success = await downloadMovieImagesToServer(movie);
       
       if (success) {
         console.log(`Images for "${movie.title}" successfully updated`);
       } else {
-        console.log(`Error updating images for "${movie.title}"`);
+        console.log(`Failed to update images for "${movie.title}"`);
       }
       
-      return success;
+      return true;
     }
     
     // Check if we have all required information from the movie object
@@ -46,12 +100,10 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
     
     try {
       // Try to get more detailed movie data from TMDB
-      const { data: movieDetails, error } = await supabase.functions.invoke('tmdb', {
+      const { data: movieDetails, error } = await supabase.functions.invoke('tmdb-admin', {
         body: { 
-          path: `/movie/${movie.id}`,
-          searchParams: {
-            append_to_response: 'videos,credits,images,genres'
-          }
+          action: 'getById',
+          movieId: movie.id
         }
       });
       
@@ -70,18 +122,15 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
     }
     
     // Prepare trailer URL if available
-    let hasTrailer = false;
-    let trailerUrl = '';
+    let hasTrailer = fullMovieData.hasTrailer || false;
+    let trailerUrl = fullMovieData.trailerUrl || '';
     
-    if (fullMovieData.videos?.results?.length > 0) {
+    if (fullMovieData.videos?.results?.length > 0 && !trailerUrl) {
       const trailer = fullMovieData.videos.results.find((v: any) => v.type === 'Trailer' && v.site === 'YouTube');
       if (trailer && trailer.key) {
         hasTrailer = true;
         trailerUrl = `https://www.youtube.com/embed/${trailer.key}`;
       }
-    } else if (fullMovieData.trailerUrl) {
-      hasTrailer = true;
-      trailerUrl = fullMovieData.trailerUrl;
     }
     
     const movieToImport = {
@@ -95,6 +144,7 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       vote_count: movie.vote_count || 0,
       popularity: movie.popularity || 0,
       media_type: 'movie',
+      runtime: fullMovieData.runtime || 0,
       isfreemovie: false,
       isnewtrailer: false,
       hasstream: false,

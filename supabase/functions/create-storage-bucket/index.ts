@@ -1,94 +1,95 @@
 
-import { corsHeaders } from '../_shared/cors.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { corsHeaders } from '../_shared/cors.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4'
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
+  // Handle CORS
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    const { name } = await req.json();
+    const { bucketName = 'movie_images' } = await req.json()
     
-    if (!name) {
+    // Get environment variables for Supabase connection
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error('Missing required environment variables');
       return new Response(
-        JSON.stringify({ error: 'Missing bucket name' }), 
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        JSON.stringify({ error: 'Configuration error', message: 'Missing required environment variables' }), 
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       );
     }
     
-    console.log(`Attempting to create bucket: ${name}`);
-    
-    // Create Supabase client with service role key
-    const supabaseAdmin = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-    
-    // Check if the bucket already exists
-    const { data: buckets, error: listError } = await supabaseAdmin.storage.listBuckets();
+    // Create Supabase client with service role (admin) permissions
+    const supabase = createClient(supabaseUrl, serviceRoleKey)
+
+    // Check if bucket already exists
+    const { data: buckets, error: listError } = await supabase.storage.listBuckets()
     
     if (listError) {
       console.error('Error listing buckets:', listError);
       return new Response(
-        JSON.stringify({ error: 'Failed to list buckets', details: listError }), 
+        JSON.stringify({ error: 'Error listing buckets', message: listError.message }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       );
     }
     
-    const bucketExists = buckets?.some(bucket => bucket.name === name);
+    const bucketExists = buckets?.some(bucket => bucket.name === bucketName)
     
-    if (bucketExists) {
-      console.log(`Bucket '${name}' already exists.`);
+    if (!bucketExists) {
+      console.log(`Creating ${bucketName} bucket...`);
+      
+      // Create the bucket
+      const { error: createError } = await supabase.storage.createBucket(bucketName, {
+        public: true,
+        fileSizeLimit: 10485760, // 10MB
+        allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp']
+      })
+      
+      if (createError) {
+        console.error('Error creating bucket:', createError);
+        return new Response(
+          JSON.stringify({ error: 'Error creating bucket', message: createError.message }), 
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        );
+      }
+      
+      // Create folder structure with placeholder files
+      try {
+        await supabase.storage.from(bucketName).upload('posters/.gitkeep', new Blob(['']));
+        await supabase.storage.from(bucketName).upload('backdrops/.gitkeep', new Blob(['']));
+        console.log('Created folders within the bucket');
+      } catch (folderError) {
+        console.log('Could not create folders, but bucket exists:', folderError);
+        // Continue anyway as the bucket was created
+      }
+      
+      // Create public access policy
+      try {
+        await supabase.rpc('create_movie_images_policy', { bucket_name: bucketName });
+        console.log('Storage policy created successfully');
+      } catch (policyError) {
+        console.error('Error creating policy (policy may already exist):', policyError);
+        // Continue anyway as the bucket was created
+      }
+      
+      console.log(`${bucketName} bucket created successfully`);
       return new Response(
-        JSON.stringify({ message: `Bucket '${name}' already exists.` }), 
+        JSON.stringify({ success: true, message: `${bucketName} bucket created successfully` }), 
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+      );
+    } else {
+      console.log(`${bucketName} bucket already exists`);
+      return new Response(
+        JSON.stringify({ success: true, message: `${bucketName} bucket already exists` }), 
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
-    
-    // Create the bucket
-    const { data, error } = await supabaseAdmin.storage.createBucket(name, {
-      public: true,
-      fileSizeLimit: 100 * 1024 * 1024, // 100MB
-    });
-    
-    if (error) {
-      console.error(`Error creating bucket '${name}':`, error);
-      return new Response(
-        JSON.stringify({ error: 'Failed to create bucket', details: error }), 
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      );
-    }
-    
-    // Create a policy to allow authenticated users to upload files
-    const uploadPolicyResponse = await supabaseAdmin.rpc('create_storage_policy', {
-      bucket_name: name,
-      policy_name: `${name}_authenticated_uploads`,
-      definition: 'auth.role() = \'authenticated\'',
-      operation: 'INSERT'
-    });
-    
-    // Create a policy to allow everyone to read files
-    const readPolicyResponse = await supabaseAdmin.rpc('create_storage_policy', {
-      bucket_name: name,
-      policy_name: `${name}_public_reads`,
-      definition: 'true',
-      operation: 'SELECT'
-    });
-    
-    console.log(`Bucket '${name}' created successfully.`);
-    
-    return new Response(
-      JSON.stringify({ 
-        message: `Bucket '${name}' created successfully`, 
-        data 
-      }), 
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
-    );
   } catch (error) {
     console.error('Error in create-storage-bucket function:', error);
-    
     return new Response(
       JSON.stringify({ 
         error: 'Internal server error', 
@@ -98,4 +99,4 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
-});
+})

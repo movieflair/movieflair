@@ -12,50 +12,47 @@ export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<b
     let posterUpdated = false;
     let backdropUpdated = false;
     
+    // Use the dedicated Edge Function for poster
     if (movie.poster_path && !movie.poster_path.startsWith('/storage')) {
-      posterUpdated = await downloadAndUploadImage(movie.poster_path, 'posters', movie.id);
+      try {
+        const { data, error } = await supabase.functions.invoke('create-movie-storage', {
+          body: {
+            movieId: movie.id,
+            imageUrl: movie.poster_path,
+            imageType: 'poster'
+          }
+        });
+        
+        if (error) {
+          console.error('Error uploading poster through Edge Function:', error);
+        } else {
+          console.log('Poster uploaded successfully:', data?.publicUrl);
+          posterUpdated = true;
+        }
+      } catch (posterError) {
+        console.error('Error calling poster upload function:', posterError);
+      }
     }
     
+    // Use the dedicated Edge Function for backdrop
     if (movie.backdrop_path && !movie.backdrop_path.startsWith('/storage')) {
-      backdropUpdated = await downloadAndUploadImage(movie.backdrop_path, 'backdrops', movie.id);
-    }
-    
-    // Get public URLs for the uploaded images
-    let posterPath = '';
-    let backdropPath = '';
-    
-    if (posterUpdated) {
-      posterPath = `/storage/movie_images/posters/${movie.id}.jpg`;
-    }
-    
-    if (backdropUpdated) {
-      backdropPath = `/storage/movie_images/backdrops/${movie.id}.jpg`;
-    }
-    
-    if (posterUpdated || backdropUpdated) {
-      const updateData: any = {
-        id: movie.id,
-      };
-      
-      if (posterUpdated) {
-        updateData.poster_path = posterPath;
-      }
-      
-      if (backdropUpdated) {
-        updateData.backdrop_path = backdropPath;
-      }
-      
-      console.log('Updating movie data with local image paths:', updateData);
-      
-      const { error: updateError } = await supabase
-        .from('admin_movies')
-        .upsert(updateData);
-      
-      if (updateError) {
-        console.error('Error updating movie with local paths:', updateError);
-        return false;
-      } else {
-        console.log('Movie paths successfully updated in database');
+      try {
+        const { data, error } = await supabase.functions.invoke('create-movie-storage', {
+          body: {
+            movieId: movie.id,
+            imageUrl: movie.backdrop_path,
+            imageType: 'backdrop'
+          }
+        });
+        
+        if (error) {
+          console.error('Error uploading backdrop through Edge Function:', error);
+        } else {
+          console.log('Backdrop uploaded successfully:', data?.publicUrl);
+          backdropUpdated = true;
+        }
+      } catch (backdropError) {
+        console.error('Error calling backdrop upload function:', backdropError);
       }
     }
     
@@ -68,6 +65,7 @@ export const downloadMovieImagesToServer = async (movie: MovieOrShow): Promise<b
 
 /**
  * Helper function to download and upload an image
+ * This function is kept for legacy compatibility, but we prefer to use the Edge Function
  */
 async function downloadAndUploadImage(
   imagePath: string, 
@@ -104,13 +102,55 @@ async function downloadAndUploadImage(
     
     if (error) {
       console.error(`Error uploading ${folderType}:`, error);
-      return false;
+      
+      // Try to use the edge function instead
+      try {
+        const { data: edgeData, error: edgeError } = await supabase.functions.invoke('create-movie-storage', {
+          body: {
+            movieId,
+            imageUrl: imagePath,
+            imageType: folderType === 'posters' ? 'poster' : 'backdrop'
+          }
+        });
+        
+        if (edgeError) {
+          console.error(`Error uploading ${folderType} through Edge Function:`, edgeError);
+          return false;
+        }
+        
+        console.log(`${folderType} uploaded successfully through Edge Function:`, edgeData?.publicUrl);
+        return true;
+      } catch (edgeCallError) {
+        console.error(`Error calling upload function for ${folderType}:`, edgeCallError);
+        return false;
+      }
     } else {
       console.log(`${folderType} uploaded successfully:`, data?.path);
       return true;
     }
   } catch (error) {
     console.error(`Error processing ${folderType} image:`, error);
-    return false;
+    
+    // Try using the edge function as a fallback
+    try {
+      const { data, error: edgeError } = await supabase.functions.invoke('create-movie-storage', {
+        body: {
+          movieId,
+          imageUrl: imagePath,
+          imageType: folderType === 'posters' ? 'poster' : 'backdrop'
+        }
+      });
+      
+      if (edgeError) {
+        console.error(`Fallback: Error uploading ${folderType} through Edge Function:`, edgeError);
+        return false;
+      }
+      
+      console.log(`Fallback: ${folderType} uploaded successfully through Edge Function:`, data?.publicUrl);
+      return true;
+    } catch (edgeCallError) {
+      console.error(`Fallback: Error calling upload function for ${folderType}:`, edgeCallError);
+      return false;
+    }
   }
 }
