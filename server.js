@@ -1,4 +1,3 @@
-
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
@@ -32,11 +31,26 @@ async function startServer() {
     app.use(express.static(path.resolve(__dirname, 'dist/client')));
   }
   
-  // Sitemap.xml Route
-  app.get('/sitemap.xml', (req, res) => {
-    const sitemap = generateSitemapXml();
-    res.header('Content-Type', 'application/xml');
-    res.send(sitemap);
+  // Sitemap.xml Route - Aktualisiert für korrekte XML-Ausgabe
+  app.get('/sitemap.xml', async (req, res) => {
+    try {
+      res.removeHeader('X-Powered-By'); // Entferne unnötige Header
+      res.removeHeader('Connection');
+      res.removeHeader('Keep-Alive');
+      
+      // Setze Content-Type und keine Transformation
+      res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      
+      // Wichtig: Keine Leerzeichen vor der XML-Deklaration
+      const sitemap = await generateSitemapXml();
+      
+      // Direkt senden ohne weitere Modifikationen
+      return res.send(sitemap);
+    } catch (error) {
+      console.error('Error generating sitemap:', error);
+      res.status(500).send('Error generating sitemap');
+    }
   });
 
   app.use('*', async (req, res, next) => {

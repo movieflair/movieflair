@@ -88,9 +88,8 @@ async function fetchAllCustomLists() {
 // Funktion zum Erzeugen des Sitemap-XML-Inhalts
 export async function generateSitemapXml() {
   try {
-    let xml = '';
-    // Ensure no whitespace before the XML declaration - using string concatenation without spaces
-    xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    // WICHTIG: Keine Leerzeichen vor der XML-Deklaration
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
     
     // Statische Routen hinzufügen
@@ -156,9 +155,8 @@ export async function generateSitemapXml() {
 
 // Synchrone Version für den Einsatz in der Entwicklung
 export function generateSitemapXmlSync() {
-  let xml = '';
-  // Ensure no whitespace before the XML declaration - using string concatenation without spaces
-  xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+  // WICHTIG: Keine Leerzeichen vor der XML-Deklaration
+  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
   xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
   
   // Statische Routen hinzufügen
