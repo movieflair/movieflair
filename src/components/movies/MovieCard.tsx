@@ -4,6 +4,7 @@ import { Star } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
 import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
 import { scrollToTop } from '@/utils/scrollUtils';
+import { getPosterPath } from '@/utils/imageUtils';
 
 interface MovieCardProps {
   movie: MovieOrShow;
@@ -14,7 +15,7 @@ interface MovieCardProps {
 const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardProps) => {
   const title = movie.title || movie.name || 'Unbekannter Titel';
   const releaseDate = movie.release_date || movie.first_air_date;
-  const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
+  const year = releaseDate ? new Date(releaseDate).getFullYear().toString() : '';
   const mediaType = getMediaTypeInGerman(movie.media_type);
   const slug = createUrlSlug(title);
   
@@ -34,31 +35,6 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
     scrollToTop();
   };
 
-  // Get image source with correct path
-  const getImageSrc = (path?: string) => {
-    if (!path) return null;
-    
-    // Wenn der Pfad bereits ein lokaler Storage-Pfad ist
-    if (path.startsWith('/storage')) {
-      return path;
-    } 
-    // Für die Übergangszeit: falls noch externe URLs im System sind
-    else if (path.startsWith('http')) {
-      console.warn('Externe Bild-URL gefunden:', path);
-      // Hier könnten wir einen automatischen Download anstoßen
-      return path;
-    } 
-    // TMDB-Pfade sollten nicht mehr vorkommen, aber zur Sicherheit:
-    else if (path.startsWith('/')) {
-      console.warn('TMDB-Pfad gefunden, sollte bereits importiert sein:', path);
-      // Wir versuchen trotzdem, die lokale Version zu verwenden
-      return `/storage/movie_images/posters/${path.replace(/^\//, '')}`;
-    }
-    
-    // Standard: Wir nehmen an, dass es ein Dateiname in unserem Storage ist
-    return `/storage/movie_images/posters/${path}`;
-  };
-
   return (
     <Link 
       to={`/${mediaType}/${movie.id}/${slug}`} 
@@ -68,7 +44,7 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
       <div className={`relative ${imageSizes[size]} bg-muted overflow-hidden rounded-xl`}>
         {movie.poster_path ? (
           <img
-            src={getImageSrc(movie.poster_path)}
+            src={getPosterPath(movie.poster_path)}
             alt={title}
             className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
           />

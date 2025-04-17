@@ -11,6 +11,7 @@ import {
   getTrailerMovies,
   MovieOrShow,
 } from '@/lib/api';
+import { ensureStorageBucketExists } from '@/lib/setupStorage';
 
 import HeroSection from '@/components/discover/HeroSection';
 import TrendingMovies from '@/components/discover/TrendingMovies';
@@ -56,6 +57,9 @@ const Discover = () => {
   });
 
   useEffect(() => {
+    // Ensure storage bucket exists when app initializes
+    ensureStorageBucketExists();
+    
     const fetchInitialData = async () => {
       setIsLoading(true);
       try {

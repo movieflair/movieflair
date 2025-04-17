@@ -73,6 +73,17 @@ serve(async (req) => {
         }
       )
     } else {
+      // Make bucket public if it exists but isn't public
+      const { error: updateError } = await supabase
+        .storage
+        .updateBucket('movie_images', {
+          public: true
+        })
+
+      if (updateError) {
+        console.error('Error updating bucket to public:', updateError)
+      }
+
       return new Response(
         JSON.stringify({ 
           success: true, 

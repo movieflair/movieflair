@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { MovieOrShow } from '@/lib/api';
 import MovieRatingFeedback from '../../movies/MovieRatingFeedback';
+import { getPosterPath } from '@/utils/imageUtils';
 
 interface FilterRecommendationProps {
   recommendation: MovieOrShow;
@@ -23,30 +24,6 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
   const getDetailPath = () => {
     const baseUrl = recommendation.media_type === 'movie' ? '/film' : '/serie';
     return `${baseUrl}/${recommendation.id}`;
-  };
-
-  const getImageSrc = (path?: string) => {
-    if (!path) return null;
-    
-    // Wenn der Pfad bereits ein lokaler Storage-Pfad ist
-    if (path.startsWith('/storage')) {
-      return path;
-    } 
-    // Für die Übergangszeit: falls noch externe URLs im System sind
-    else if (path.startsWith('http')) {
-      console.warn('Externe Bild-URL gefunden:', path);
-      // Hier könnten wir einen automatischen Download anstoßen
-      return path;
-    } 
-    // TMDB-Pfade sollten nicht mehr vorkommen, aber zur Sicherheit:
-    else if (path.startsWith('/')) {
-      console.warn('TMDB-Pfad gefunden, sollte bereits importiert sein:', path);
-      // Wir versuchen trotzdem, die lokale Version zu verwenden
-      return `/storage/movie_images/posters/${path.replace(/^\//, '')}`;
-    }
-    
-    // Standard: Wir nehmen an, dass es ein Dateiname in unserem Storage ist
-    return `/storage/movie_images/posters/${path}`;
   };
 
   return (
@@ -76,7 +53,7 @@ const FilterRecommendation = ({ recommendation, onRefresh, isLoading }: FilterRe
             >
               <div className="relative h-[300px] bg-muted overflow-hidden rounded-xl">
                 <img
-                  src={getImageSrc(recommendation.poster_path)}
+                  src={getPosterPath(recommendation.poster_path)}
                   alt={recommendation.title || recommendation.name}
                   className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
                 />
