@@ -3,7 +3,6 @@ import React from 'react';
 import { MovieOrShow } from '@/lib/types';
 import { Eye, Calendar, Star, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getPublicImageUrl } from '@/utils/imageUtils';
 import { Link } from 'react-router-dom';
 import { createUrlSlug } from '@/lib/urlUtils';
 
@@ -22,11 +21,23 @@ const MovieList = ({ movies }: MovieListProps) => {
   return (
     <div className="space-y-4">
       {movies.map(movie => {
-        const posterUrl = getPublicImageUrl(movie.poster_path) || '/placeholder.svg';
         const title = movie.title || 'Unbekannter Film';
         const year = movie.release_date ? new Date(movie.release_date).getFullYear() : null;
         const slug = createUrlSlug(title);
         const movieUrl = `/film/${movie.id}/${slug}`;
+        
+        // Handle image URL construction
+        let posterUrl = '/placeholder.svg';
+        
+        if (movie.poster_path) {
+          if (movie.poster_path.startsWith('/storage')) {
+            posterUrl = window.location.origin + movie.poster_path;
+          } else if (movie.poster_path.startsWith('http')) {
+            posterUrl = movie.poster_path;
+          } else {
+            posterUrl = `https://image.tmdb.org/t/p/original${movie.poster_path}`;
+          }
+        }
         
         return (
           <div 

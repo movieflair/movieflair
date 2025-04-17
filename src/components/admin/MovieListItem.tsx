@@ -3,7 +3,6 @@ import React from 'react';
 import { MovieOrShow } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Edit, Trash2, Eye } from 'lucide-react';
-import { getPublicImageUrl } from '@/utils/imageUtils';
 import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
 
 interface MovieListItemProps {
@@ -14,16 +13,28 @@ interface MovieListItemProps {
 }
 
 const MovieListItem: React.FC<MovieListItemProps> = ({ movie, onEdit, onDelete, onView }) => {
-  const posterUrl = getPublicImageUrl(movie.poster_path);
   const title = movie.title || 'Unbekannter Film';
   const slug = createUrlSlug(title);
   const mediaType = getMediaTypeInGerman(movie.media_type);
+  
+  // Handle image URL construction
+  let posterUrl = '/placeholder.svg';
+  
+  if (movie.poster_path) {
+    if (movie.poster_path.startsWith('/storage')) {
+      posterUrl = window.location.origin + movie.poster_path;
+    } else if (movie.poster_path.startsWith('http')) {
+      posterUrl = movie.poster_path;
+    } else {
+      posterUrl = `https://image.tmdb.org/t/p/original${movie.poster_path}`;
+    }
+  }
   
   return (
     <div className="flex items-center p-3 border rounded-md bg-white mb-2 gap-3 hover:bg-slate-50 transition-colors">
       <div className="h-16 w-12 flex-shrink-0 overflow-hidden rounded">
         <img 
-          src={posterUrl || '/placeholder.svg'} 
+          src={posterUrl} 
           alt={title}
           className="h-full w-full object-cover"
           onError={(e) => {

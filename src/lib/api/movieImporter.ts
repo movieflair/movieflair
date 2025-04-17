@@ -29,6 +29,8 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
     
     // Detaillierte Filminformationen von TMDB abrufen
     let fullMovieData: any = { ...movie };
+    let directorName = '';
+    let castList: any[] = [];
     
     try {
       console.log('Hole detaillierte Filmdaten von TMDB...');
@@ -48,6 +50,24 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
           ...fullMovieData,
           ...movieDetails
         };
+        
+        // Extrahiere Regie und Besetzung
+        if (movieDetails.credits && movieDetails.credits.crew) {
+          const director = movieDetails.credits.crew.find((person: any) => person.job === 'Director');
+          if (director) {
+            directorName = director.name;
+            console.log(`Regisseur gefunden: ${directorName}`);
+          }
+        }
+        
+        if (movieDetails.credits && movieDetails.credits.cast) {
+          castList = movieDetails.credits.cast.slice(0, 4).map((person: any) => ({
+            id: person.id,
+            name: person.name,
+            character: person.character
+          }));
+          console.log(`Besetzung gefunden: ${castList.length} Personen`);
+        }
       }
     } catch (error: any) {
       console.log('Konnte keine zusätzlichen Filmdetails abrufen:', error);
@@ -113,11 +133,20 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       console.error('Fehler beim Speichern der Bilder:', error);
     }
     
-    // Speichern der Laufzeit (Neu)
+    // Speichern der Laufzeit
     const runtime = fullMovieData.runtime || null;
     if (runtime) {
       console.log(`Film-Laufzeit: ${runtime} Minuten`);
     }
+    
+    // Regie und Besetzung als JSON speichern
+    const creditsData = {
+      director: directorName ? { name: directorName } : null,
+      cast: castList
+    };
+    
+    const creditsJson = JSON.stringify(creditsData);
+    console.log('Credits-Daten zum Speichern:', creditsJson);
     
     if (existingMovie) {
       console.log(`Film ${movie.id} existiert bereits, Daten werden aktualisiert`);
@@ -136,7 +165,8 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
           popularity: fullMovieData.popularity || 0,
           hastrailer: hasTrailer,
           trailerurl: trailerUrl,
-          runtime: runtime // Laufzeit hinzugefügt
+          runtime: runtime,
+          credits: creditsJson
         })
         .eq('id', movie.id);
         
@@ -168,7 +198,8 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       streamurl: '',
       hastrailer: hasTrailer,
       trailerurl: trailerUrl,
-      runtime: runtime // Laufzeit hinzugefügt
+      runtime: runtime,
+      credits: creditsJson
     };
     
     console.log('Füge Film in Datenbank ein:', movieToImport);

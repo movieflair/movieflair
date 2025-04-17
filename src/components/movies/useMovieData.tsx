@@ -30,6 +30,37 @@ export function useMovieData(id: string | undefined, slug?: string) {
         let movieData;
         if (adminMovie) {
           console.log('Film aus lokaler Datenbank geladen:', adminMovie);
+          
+          // Extrahiere Regie und Besetzung, falls vorhanden
+          let director = undefined;
+          let cast = [];
+          
+          if (adminMovie.credits) {
+            try {
+              const creditsData = typeof adminMovie.credits === 'string' 
+                ? JSON.parse(adminMovie.credits) 
+                : adminMovie.credits;
+              
+              if (creditsData.director) {
+                director = {
+                  id: 0,
+                  name: creditsData.director.name,
+                  job: 'Director'
+                };
+              }
+              
+              if (Array.isArray(creditsData.cast)) {
+                cast = creditsData.cast.map((actor: any) => ({
+                  id: actor.id || 0,
+                  name: actor.name,
+                  character: actor.character
+                }));
+              }
+            } catch (e) {
+              console.error('Fehler beim Parsen der Credits-Daten:', e);
+            }
+          }
+          
           // Für lokale Filme benötigen wir zusätzliche Details von TMDB
           try {
             const tmdbMovie = await getMovieById(parsedId);
@@ -43,9 +74,9 @@ export function useMovieData(id: string | undefined, slug?: string) {
               backdrop_path: tmdbMovie.backdrop_path || adminMovie.backdrop_path,
               // Genres explizit von TMDB übernehmen
               genres: tmdbMovie.genres || [],
-              // Wichtige TMDB Daten explizit übernehmen
-              cast: tmdbMovie.cast || [],
-              crew: tmdbMovie.crew || [],
+              // Lokale Cast/Crew Daten haben Priorität
+              cast: cast.length > 0 ? cast : (tmdbMovie.cast || []),
+              crew: director ? [director, ...(tmdbMovie.crew || [])] : (tmdbMovie.crew || []),
               runtime: tmdbMovie.runtime || adminMovie.runtime,
               // Andere wichtige Felder
               hasTrailer: adminMovie.hasTrailer,
@@ -59,7 +90,14 @@ export function useMovieData(id: string | undefined, slug?: string) {
             console.log('Kombinierte Filmdaten:', movieData);
           } catch (error) {
             console.error('Fehler beim Abrufen der TMDB-Details, verwende nur lokale Daten', error);
-            movieData = adminMovie;
+            
+            // Wenn TMDB fehlschlägt, verwende nur lokale Daten
+            movieData = {
+              ...adminMovie,
+              cast: cast,
+              crew: director ? [director] : [],
+              genres: [] // Leere Genres, da wir keine haben
+            };
           }
         } else {
           // Wenn nicht in unserer Datenbank, dann lade nur von TMDB

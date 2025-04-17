@@ -20,11 +20,19 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
       return;
     }
     
-    // Use our centralized image URL utility
-    const url = getPublicImageUrl(posterPath);
-    setImageSrc(url);
-    setHasError(false);
+    // For locally stored images or complete URLs, use them directly
+    if (posterPath.startsWith('/storage') || posterPath.startsWith('http')) {
+      const url = posterPath.startsWith('/storage') 
+        ? window.location.origin + posterPath 
+        : posterPath;
+      setImageSrc(url);
+    } else {
+      // For TMDB paths, use the full URL
+      const url = `https://image.tmdb.org/t/p/original${posterPath}`;
+      setImageSrc(url);
+    }
     
+    setHasError(false);
   }, [posterPath]);
   
   const handleError = () => {
