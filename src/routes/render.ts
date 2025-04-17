@@ -18,7 +18,7 @@ router.get('*', function(req: Request, res: Response, next: NextFunction) {
 // Separate the async logic into its own function
 async function handleRender(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
-  console.log(`Handling request for URL: ${url}`);
+  console.log(`Handling request for URL: ${url} - Version 2.0.4`);
 
   try {
     const isCrawler = req.get('User-Agent')?.toLowerCase().includes('bot') ||
@@ -33,8 +33,13 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
 
     console.log(`Route ${url} - isCrawler: ${isCrawler}, isImportantRoute: ${isImportantRoute}`);
 
-    // Force SSR for specific routes to ensure they always go live
-    const forceSSR = ['/neue-trailer'].includes(url);
+    // ALWAYS force SSR for the trailers page to ensure changes are deployed
+    const forcedSSRPaths = ['/neue-trailer'];
+    const forceSSR = forcedSSRPaths.includes(url);
+    
+    if (forceSSR) {
+      console.log(`FORCING server-side rendering for critical path: ${url}`);
+    }
     
     if ((!isCrawler && !isImportantRoute && !forceSSR) && !req.query.forceSSR) {
       console.log(`Serving client-side rendering for ${url}`);

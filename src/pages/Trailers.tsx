@@ -7,11 +7,12 @@ import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import TrailerCard from '@/components/movies/TrailerCard';
 import { Seo } from '@/components/seo/Seo';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const appVersion = "v2.0.3"; // Updated version number to track changes
+  const appVersion = "v2.0.4"; // Updated version number to track changes
 
   useEffect(() => {
     trackPageVisit('trailers');
@@ -56,6 +57,14 @@ const Trailers = () => {
             Zurück zu Entdecken
           </Link>
         </div>
+
+        <Card className="border-primary/20 mb-4">
+          <CardContent className="p-4">
+            <p className="text-center text-primary font-semibold">
+              Version {appVersion} - Neue Features und Verbesserungen
+            </p>
+          </CardContent>
+        </Card>
 
         <div className="relative overflow-hidden rounded-2xl mb-10">
           <div className="absolute inset-0 bg-gradient-to-r from-theme-accent-red/90 to-primary/50 mix-blend-multiply"></div>

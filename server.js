@@ -45,6 +45,7 @@ async function startServer() {
     console.log(`Mode: ${isProduction ? 'Production' : 'Development'}`);
     if (isProduction) {
       console.log('Public deployment mode active');
+      console.log('Version: 2.0.4 - Full deployment active');
     }
   });
 }
