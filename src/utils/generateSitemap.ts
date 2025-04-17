@@ -2,7 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 
 // Base URL of your website
-const BASE_URL = 'https://movieflair.co'; // Tatsächliche Domain der Website
+const BASE_URL = 'https://movieflair.co'; 
 
 // Statische Routen
 const routes = [
@@ -88,63 +88,68 @@ async function fetchAllCustomLists() {
 
 // Funktion zum Erzeugen des Sitemap-XML-Inhalts
 export async function generateSitemapXml() {
-  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-  
-  // Statische Routen hinzufügen
-  routes.forEach(route => {
-    xml += '  <url>\n';
-    xml += `    <loc>${BASE_URL}${route}</loc>\n`;
-    xml += '    <changefreq>weekly</changefreq>\n';
-    xml += '    <priority>0.8</priority>\n';
-    xml += '  </url>\n';
-  });
-  
-  // Filme aus der Datenbank hinzufügen
-  const movies = await fetchAllMovies();
-  movies.forEach(movie => {
-    const slug = movie.title ? encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-')) : '';
-    xml += '  <url>\n';
-    xml += `    <loc>${BASE_URL}/film/${movie.id}${slug ? `/${slug}` : ''}</loc>\n`;
-    xml += '    <changefreq>monthly</changefreq>\n';
-    xml += '    <priority>0.7</priority>\n';
-    if (movie.updated_at) {
-      xml += `    <lastmod>${new Date(movie.updated_at).toISOString()}</lastmod>\n`;
-    }
-    xml += '  </url>\n';
-  });
-  
-  // TV-Shows aus der Datenbank hinzufügen
-  const tvShows = await fetchAllTvShows();
-  tvShows.forEach(show => {
-    const slug = show.name ? encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-')) : '';
-    xml += '  <url>\n';
-    xml += `    <loc>${BASE_URL}/serie/${show.id}${slug ? `/${slug}` : ''}</loc>\n`;
-    xml += '    <changefreq>monthly</changefreq>\n';
-    xml += '    <priority>0.7</priority>\n';
-    if (show.updated_at) {
-      xml += `    <lastmod>${new Date(show.updated_at).toISOString()}</lastmod>\n`;
-    }
-    xml += '  </url>\n';
-  });
-  
-  // Benutzerdefinierte Listen aus der Datenbank hinzufügen
-  const customLists = await fetchAllCustomLists();
-  customLists.forEach(list => {
-    const slug = list.title ? encodeURIComponent(list.title.toLowerCase().replace(/\s+/g, '-')) : '';
-    xml += '  <url>\n';
-    xml += `    <loc>${BASE_URL}/liste/${slug}</loc>\n`;
-    xml += '    <changefreq>weekly</changefreq>\n';
-    xml += '    <priority>0.6</priority>\n';
-    if (list.updated_at) {
-      xml += `    <lastmod>${new Date(list.updated_at).toISOString()}</lastmod>\n`;
-    }
-    xml += '  </url>\n';
-  });
-  
-  xml += '</urlset>';
-  
-  return xml;
+  try {
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+    
+    // Statische Routen hinzufügen
+    routes.forEach(route => {
+      xml += '  <url>\n';
+      xml += `    <loc>${BASE_URL}${route}</loc>\n`;
+      xml += '    <changefreq>weekly</changefreq>\n';
+      xml += '    <priority>0.8</priority>\n';
+      xml += '  </url>\n';
+    });
+    
+    // Filme aus der Datenbank hinzufügen
+    const movies = await fetchAllMovies();
+    movies.forEach(movie => {
+      const slug = movie.title ? encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-')) : '';
+      xml += '  <url>\n';
+      xml += `    <loc>${BASE_URL}/film/${movie.id}${slug ? `/${slug}` : ''}</loc>\n`;
+      xml += '    <changefreq>monthly</changefreq>\n';
+      xml += '    <priority>0.7</priority>\n';
+      if (movie.updated_at) {
+        xml += `    <lastmod>${new Date(movie.updated_at).toISOString()}</lastmod>\n`;
+      }
+      xml += '  </url>\n';
+    });
+    
+    // TV-Shows aus der Datenbank hinzufügen
+    const tvShows = await fetchAllTvShows();
+    tvShows.forEach(show => {
+      const slug = show.name ? encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-')) : '';
+      xml += '  <url>\n';
+      xml += `    <loc>${BASE_URL}/serie/${show.id}${slug ? `/${slug}` : ''}</loc>\n`;
+      xml += '    <changefreq>monthly</changefreq>\n';
+      xml += '    <priority>0.7</priority>\n';
+      if (show.updated_at) {
+        xml += `    <lastmod>${new Date(show.updated_at).toISOString()}</lastmod>\n`;
+      }
+      xml += '  </url>\n';
+    });
+    
+    // Benutzerdefinierte Listen aus der Datenbank hinzufügen
+    const customLists = await fetchAllCustomLists();
+    customLists.forEach(list => {
+      const slug = list.title ? encodeURIComponent(list.title.toLowerCase().replace(/\s+/g, '-')) : '';
+      xml += '  <url>\n';
+      xml += `    <loc>${BASE_URL}/liste/${slug}</loc>\n`;
+      xml += '    <changefreq>weekly</changefreq>\n';
+      xml += '    <priority>0.6</priority>\n';
+      if (list.updated_at) {
+        xml += `    <lastmod>${new Date(list.updated_at).toISOString()}</lastmod>\n`;
+      }
+      xml += '  </url>\n';
+    });
+    
+    xml += '</urlset>';
+    
+    return xml;
+  } catch (error) {
+    console.error('Error generating sitemap:', error);
+    return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+  }
 }
 
 // Synchrone Version für den Einsatz in der Entwicklung
