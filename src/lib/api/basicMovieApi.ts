@@ -1,141 +1,120 @@
 
 import { MovieOrShow, MovieDetail } from '../types';
-import { getAdminMovieSettings, callTMDB } from '../apiUtils';
 import { supabase } from '@/integrations/supabase/client';
-import { downloadMovieImagesToServer } from './movieImportApi';
-import { mapSupabaseMovieToMovieObject } from './movieUtils';
+import { apiUtils } from '../apiUtils';
 
 export const getMovieById = async (id: number): Promise<MovieDetail> => {
-  const { data: adminMovie, error: adminError } = await supabase
-    .from('admin_movies')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
-    
-  if (adminError) {
-    console.error('Error fetching movie from Supabase:', adminError);
-  }
-
+  console.log(`Fetching movie with ID: ${id} from database...`);
+  
   try {
-    const [movieData, videos, credits] = await Promise.all([
-      callTMDB(`/movie/${id}`),
-      callTMDB(`/movie/${id}/videos`),
-      callTMDB(`/movie/${id}/credits`),
-    ]);
-
-    if (adminMovie) {
-      console.log('Movie found in admin_movies table:', adminMovie);
+    const { data: movie, error } = await supabase
+      .from('admin_movies')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+    
+    if (error) {
+      console.error('Error fetching movie from database:', error);
+      throw error;
+    }
+    
+    if (movie) {
+      console.log(`Found movie in database: ${movie.title}`);
       
-      let finalMovieData = adminMovie;
-      
-      if ((adminMovie.poster_path && adminMovie.poster_path.includes('tmdb.org')) || 
-          (adminMovie.backdrop_path && adminMovie.backdrop_path.includes('tmdb.org')) ||
-          !adminMovie.poster_path || !adminMovie.backdrop_path) {
-        
-        console.log('Movie has TMDB image paths, downloading to server...');
-        
-        const success = await downloadMovieImagesToServer(mapSupabaseMovieToMovieObject(adminMovie));
-        
-        if (success) {
-          const { data: updatedMovie } = await supabase
-            .from('admin_movies')
-            .select('*')
-            .eq('id', id)
-            .maybeSingle();
-            
-          if (updatedMovie) {
-            finalMovieData = updatedMovie;
-            console.log('Updated movie data:', finalMovieData);
-          }
-        }
-      }
-      
+      // Map database fields to MovieDetail object
       return {
-        ...movieData,
+        id: movie.id,
+        title: movie.title,
+        overview: movie.overview,
+        poster_path: movie.poster_path,
+        backdrop_path: movie.backdrop_path,
+        release_date: movie.release_date,
+        vote_average: movie.vote_average,
+        vote_count: movie.vote_count,
+        popularity: movie.popularity,
         media_type: 'movie',
-        videos: { results: videos?.results || [] },
-        cast: credits?.cast?.slice(0, 10) || [],
-        crew: credits?.crew || [],
-        hasTrailer: finalMovieData.hastrailer || videos?.results?.some((v: any) => v.type === 'Trailer'),
-        hasStream: finalMovieData.hasstream || false,
-        streamUrl: finalMovieData.streamurl || '',
-        trailerUrl: finalMovieData.trailerurl || '',
-        isFreeMovie: finalMovieData.isfreemovie || false,
-        isNewTrailer: finalMovieData.isnewtrailer || false,
-        poster_path: finalMovieData.poster_path,
-        backdrop_path: finalMovieData.backdrop_path,
-        vote_average: finalMovieData.vote_average || 0,
-        vote_count: finalMovieData.vote_count || 0,
         genre_ids: [],
+        hasStream: movie.hasstream,
+        hasTrailer: movie.hastrailer,
+        streamUrl: movie.streamurl,
+        trailerUrl: movie.trailerurl,
+        isFreeMovie: movie.isfreemovie,
+        isNewTrailer: movie.isnewtrailer,
+        videos: { results: [] } // Initialize empty videos array
       };
     }
-
-    const savedSettings = await getAdminMovieSettings();
-    const savedMovie = savedSettings[id] || {};
-
-    return {
-      ...movieData,
-      media_type: 'movie',
-      videos: { results: videos?.results || [] },
-      cast: credits?.cast?.slice(0, 10) || [],
-      crew: credits?.crew || [],
-      hasTrailer: savedMovie.hasTrailer ?? videos?.results?.some((v: any) => v.type === 'Trailer'),
-      hasStream: savedMovie.hasStream || false,
-      streamUrl: savedMovie.streamUrl || '',
-      trailerUrl: savedMovie.trailerUrl || '',
-      isFreeMovie: savedMovie.isFreeMovie || false,
-      isNewTrailer: savedMovie.isNewTrailer || false,
-      vote_average: adminMovie?.vote_average || 0,
-      vote_count: adminMovie?.vote_count || 0,
-      genre_ids: [],
-    };
+    
+    console.log(`Movie with ID ${id} not found in database, falling back to TMDB API`);
+    
+    // If not found in database, try to fetch from TMDB API
+    const { data: apiData, error: apiError } = await supabase.functions.invoke('tmdb', {
+      body: { action: 'getById', movieId: id }
+    });
+    
+    if (apiError) {
+      console.error('Error fetching movie from TMDB:', apiError);
+      throw apiError;
+    }
+    
+    console.log(`Retrieved movie from TMDB API: ${apiData.title}`);
+    return apiData;
   } catch (error) {
-    console.error('Error fetching movie details:', error);
-    return {
-      id,
-      title: adminMovie?.title || 'Unknown Movie',
-      poster_path: adminMovie?.poster_path || '',
-      backdrop_path: adminMovie?.backdrop_path || '',
-      overview: adminMovie?.overview || '',
-      vote_average: adminMovie?.vote_average || 0,
-      vote_count: adminMovie?.vote_count || 0,
-      genre_ids: [],
-      media_type: 'movie',
-      videos: { results: [] },
-      cast: [],
-      crew: [],
-      hasTrailer: adminMovie?.hastrailer || false,
-      hasStream: adminMovie?.hasstream || false,
-      streamUrl: adminMovie?.streamurl || '',
-      trailerUrl: adminMovie?.trailerurl || '',
-      isFreeMovie: adminMovie?.isfreemovie || false,
-      isNewTrailer: adminMovie?.isnewtrailer || false,
-      popularity: adminMovie?.popularity || 0,
-      release_date: adminMovie?.release_date || ''
-    };
+    console.error(`Error fetching movie with ID ${id}:`, error);
+    throw error;
   }
 };
 
 export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
+  console.log('Fetching popular movies...');
+  
   try {
-    const data = await callTMDB('/movie/popular');
-    const savedSettings = await getAdminMovieSettings();
+    // First, check if we have popular movies in our database
+    const { data: dbMovies, error: dbError } = await supabase
+      .from('admin_movies')
+      .select('*')
+      .order('popularity', { ascending: false })
+      .limit(20);
     
-    return data.results
-      ?.filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '')
-      ?.map((movie: any) => {
-        const savedMovie = savedSettings[movie.id] || {};
-        return {
-          ...movie,
-          media_type: 'movie',
-          isFreeMovie: savedMovie.isfreemovie || false,
-          streamUrl: savedMovie.streamurl || '',
-          isNewTrailer: savedMovie.isnewtrailer || false,
-          hasTrailer: savedMovie.hastrailer || false,
-          trailerUrl: savedMovie.trailerurl || '',
-          isImported: !!savedMovie.id
-        };
-      }) || [];
+    if (dbError) {
+      console.error('Error fetching popular movies from database:', dbError);
+    } else if (dbMovies && dbMovies.length >= 10) {
+      console.log(`Found ${dbMovies.length} popular movies in database`);
+      
+      return dbMovies.map(movie => ({
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        backdrop_path: movie.backdrop_path,
+        overview: movie.overview,
+        release_date: movie.release_date,
+        vote_average: movie.vote_average,
+        vote_count: movie.vote_count,
+        genre_ids: [],
+        media_type: 'movie',
+        popularity: movie.popularity,
+        hasStream: movie.hasstream,
+        hasTrailer: movie.hastrailer,
+        streamUrl: movie.streamurl,
+        trailerUrl: movie.trailerurl,
+        isFreeMovie: movie.isfreemovie,
+        isNewTrailer: movie.isnewtrailer
+      }));
+    }
+    
+    // If not enough movies in our database, fetch from TMDB API
+    console.log('Not enough movies in database, falling back to TMDB API');
+    
+    const { data: apiData, error: apiError } = await supabase.functions.invoke('tmdb', {
+      body: { action: 'getPopular' }
+    });
+    
+    if (apiError) {
+      console.error('Error fetching popular movies from TMDB:', apiError);
+      return [];
+    }
+    
+    console.log(`Retrieved ${apiData.results.length} popular movies from TMDB API`);
+    return apiData.results;
   } catch (error) {
     console.error('Error fetching popular movies:', error);
     return [];
@@ -143,51 +122,117 @@ export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
 };
 
 export const searchMovies = async (query: string): Promise<MovieOrShow[]> => {
-  if (!query) return [];
+  console.log(`Searching for movies with query: ${query}`);
+  
+  if (!query || query.trim() === '') {
+    console.log('Empty search query, returning empty results');
+    return [];
+  }
   
   try {
-    const data = await callTMDB('/search/movie', { query });
-    const savedSettings = await getAdminMovieSettings();
+    // First, search our database
+    const { data: dbMovies, error: dbError } = await supabase
+      .from('admin_movies')
+      .select('*')
+      .ilike('title', `%${query}%`)
+      .order('popularity', { ascending: false })
+      .limit(20);
     
-    return data.results
-      ?.filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '')
-      ?.map((movie: any) => {
-        const savedMovie = savedSettings[movie.id] || {};
-        return {
-          ...movie,
-          media_type: 'movie',
-          isFreeMovie: savedMovie.isfreemovie || false,
-          streamUrl: savedMovie.streamurl || '',
-          isNewTrailer: savedMovie.isnewtrailer || false,
-          hasTrailer: savedMovie.hastrailer || false,
-          trailerUrl: savedMovie.trailerurl || '',
-          isImported: !!savedMovie.id
-        };
-      }) || [];
+    if (dbError) {
+      console.error('Error searching movies in database:', dbError);
+    } else if (dbMovies && dbMovies.length > 0) {
+      console.log(`Found ${dbMovies.length} movies in database matching query: ${query}`);
+      
+      return dbMovies.map(movie => ({
+        id: movie.id,
+        title: movie.title,
+        poster_path: movie.poster_path,
+        backdrop_path: movie.backdrop_path,
+        overview: movie.overview,
+        release_date: movie.release_date,
+        vote_average: movie.vote_average,
+        vote_count: movie.vote_count,
+        genre_ids: [],
+        media_type: 'movie',
+        popularity: movie.popularity,
+        hasStream: movie.hasstream,
+        hasTrailer: movie.hastrailer,
+        streamUrl: movie.streamurl,
+        trailerUrl: movie.trailerurl,
+        isFreeMovie: movie.isfreemovie,
+        isNewTrailer: movie.isnewtrailer
+      }));
+    }
+    
+    // If no results in our database, search TMDB API
+    console.log(`No results in database for query: ${query}, searching TMDB API`);
+    
+    const { data: apiData, error: apiError } = await supabase.functions.invoke('tmdb', {
+      body: { action: 'search', searchQuery: query }
+    });
+    
+    if (apiError) {
+      console.error('Error searching movies in TMDB:', apiError);
+      return [];
+    }
+    
+    console.log(`Retrieved ${apiData.results.length} movies from TMDB API matching query: ${query}`);
+    return apiData.results;
   } catch (error) {
-    console.error('Error searching movies:', error);
+    console.error(`Error searching for movies with query: ${query}:`, error);
     return [];
   }
 };
 
 export const getPopularTvShows = async (): Promise<MovieOrShow[]> => {
+  console.log('Fetching popular TV shows...');
+  
   try {
-    const data = await callTMDB('/tv/popular');
-    const savedSettings = await getAdminTvShowSettings();
+    // First check if we have TV shows in our database
+    const { data: dbShows, error: dbError } = await supabase
+      .from('admin_shows')
+      .select('*')
+      .order('popularity', { ascending: false })
+      .limit(20);
     
-    return data.results
-      ?.filter((show: any) => show.poster_path && show.overview && show.overview.trim() !== '')
-      ?.map((show: any) => {
-        const savedShow = savedSettings[show.id] || {};
-        return {
-          ...show,
-          media_type: 'tv',
-          hasStream: savedShow.hasstream || false,
-          streamUrl: savedShow.streamurl || '',
-          hasTrailer: savedShow.hastrailer || false,
-          trailerUrl: savedShow.trailerurl || '',
-        };
-      }) || [];
+    if (dbError) {
+      console.error('Error fetching popular TV shows from database:', dbError);
+    } else if (dbShows && dbShows.length >= 10) {
+      console.log(`Found ${dbShows.length} popular TV shows in database`);
+      
+      return dbShows.map(show => ({
+        id: show.id,
+        name: show.name,
+        poster_path: show.poster_path,
+        backdrop_path: show.backdrop_path,
+        overview: show.overview,
+        first_air_date: show.first_air_date,
+        vote_average: show.vote_average,
+        vote_count: show.vote_count,
+        genre_ids: [],
+        media_type: 'tv',
+        popularity: show.popularity,
+        hasStream: show.hasstream,
+        hasTrailer: show.hastrailer,
+        streamUrl: show.streamurl,
+        trailerUrl: show.trailerurl
+      }));
+    }
+    
+    // If not enough shows in our database, fetch from TMDB API
+    console.log('Not enough TV shows in database, falling back to TMDB API');
+    
+    const { data: apiData, error: apiError } = await supabase.functions.invoke('tmdb', {
+      body: { action: 'getPopularTvShows' }
+    });
+    
+    if (apiError) {
+      console.error('Error fetching popular TV shows from TMDB:', apiError);
+      return [];
+    }
+    
+    console.log(`Retrieved ${apiData.results.length} popular TV shows from TMDB API`);
+    return apiData.results;
   } catch (error) {
     console.error('Error fetching popular TV shows:', error);
     return [];
@@ -195,124 +240,108 @@ export const getPopularTvShows = async (): Promise<MovieOrShow[]> => {
 };
 
 export const searchTvShows = async (query: string): Promise<MovieOrShow[]> => {
-  if (!query) return [];
+  console.log(`Searching for TV shows with query: ${query}`);
+  
+  if (!query || query.trim() === '') {
+    console.log('Empty search query, returning empty results');
+    return [];
+  }
   
   try {
-    const data = await callTMDB('/search/tv', { query });
-    const savedSettings = await getAdminTvShowSettings();
+    // First, search our database
+    const { data: dbShows, error: dbError } = await supabase
+      .from('admin_shows')
+      .select('*')
+      .ilike('name', `%${query}%`)
+      .order('popularity', { ascending: false })
+      .limit(20);
     
-    return data.results
-      ?.filter((show: any) => show.poster_path && show.overview && show.overview.trim() !== '')
-      ?.map((show: any) => {
-        const savedShow = savedSettings[show.id] || {};
-        return {
-          ...show,
-          media_type: 'tv',
-          hasStream: savedShow.hasstream || false,
-          streamUrl: savedShow.streamurl || '',
-          hasTrailer: savedShow.hastrailer || false,
-          trailerUrl: savedShow.trailerurl || '',
-        };
-      }) || [];
+    if (dbError) {
+      console.error('Error searching TV shows in database:', dbError);
+    } else if (dbShows && dbShows.length > 0) {
+      console.log(`Found ${dbShows.length} TV shows in database matching query: ${query}`);
+      
+      return dbShows.map(show => ({
+        id: show.id,
+        name: show.name,
+        poster_path: show.poster_path,
+        backdrop_path: show.backdrop_path,
+        overview: show.overview,
+        first_air_date: show.first_air_date,
+        vote_average: show.vote_average,
+        vote_count: show.vote_count,
+        genre_ids: [],
+        media_type: 'tv',
+        popularity: show.popularity,
+        hasStream: show.hasstream,
+        hasTrailer: show.hastrailer,
+        streamUrl: show.streamurl,
+        trailerUrl: show.trailerurl
+      }));
+    }
+    
+    // If no results in our database, search TMDB API
+    console.log(`No results in database for query: ${query}, searching TMDB API`);
+    
+    const { data: apiData, error: apiError } = await supabase.functions.invoke('tmdb', {
+      body: { action: 'searchTvShows', searchQuery: query }
+    });
+    
+    if (apiError) {
+      console.error('Error searching TV shows in TMDB:', apiError);
+      return [];
+    }
+    
+    console.log(`Retrieved ${apiData.results.length} TV shows from TMDB API matching query: ${query}`);
+    return apiData.results;
   } catch (error) {
-    console.error('Error searching TV shows:', error);
+    console.error(`Error searching for TV shows with query: ${query}:`, error);
     return [];
   }
 };
 
 export const getSimilarMovies = async (movieId: number): Promise<MovieOrShow[]> => {
+  console.log(`Fetching similar movies for ID: ${movieId}`);
+  
   try {
-    const data = await callTMDB(`/movie/${movieId}/similar`);
-    const savedSettings = await getAdminMovieSettings();
+    const { data: apiData, error: apiError } = await supabase.functions.invoke('tmdb', {
+      body: { action: 'getSimilar', movieId }
+    });
     
-    return data.results
-      ?.filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '')
-      ?.map((movie: any) => {
-        const savedMovie = savedSettings[movie.id] || {};
-        return {
-          ...movie,
-          media_type: 'movie',
-          isFreeMovie: savedMovie.isfreemovie || false,
-          streamUrl: savedMovie.streamurl || '',
-          isNewTrailer: savedMovie.isnewtrailer || false,
-          hasTrailer: savedMovie.hastrailer || false,
-          trailerUrl: savedMovie.trailerurl || '',
-        };
-      }) || [];
+    if (apiError) {
+      console.error('Error fetching similar movies from TMDB:', apiError);
+      return [];
+    }
+    
+    console.log(`Retrieved ${apiData.results.length} similar movies from TMDB API`);
+    return apiData.results;
   } catch (error) {
-    console.error('Error fetching similar movies:', error);
+    console.error(`Error fetching similar movies for ID ${movieId}:`, error);
     return [];
   }
 };
 
 export const getRandomMovie = async (): Promise<MovieDetail> => {
-  console.log('Hole zufälligen Film mit verbesserter Jahrzehntauswahl...');
-  
-  const allDecades = ['1970', '1980', '1990', '2000', '2010', '2020'];
-  
-  const randomDecade = allDecades[Math.floor(Math.random() * allDecades.length)];
-  console.log(`Zufälliges Jahrzehnt ausgewählt: ${randomDecade}`);
+  console.log('Fetching random movie...');
   
   try {
-    let params: Record<string, any> = {
-      'sort_by': 'popularity.desc',
-      'vote_count.gte': '5',
-      'include_adult': 'false',
-      'include_video': 'false',
-      'page': '1',
-    };
+    // Get admin settings
+    const adminSettings = apiUtils.getAdminSettings();
     
-    const decade = parseInt(randomDecade);
-    if (!isNaN(decade)) {
-      const startYear = decade;
-      const endYear = decade + 9;
-      
-      params = {
-        ...params,
-        'primary_release_date.gte': `${startYear}-01-01`,
-        'primary_release_date.lte': `${endYear}-12-31`
-      };
-      
-      console.log(`Suche nach Filmen zwischen ${startYear}-${endYear}`);
+    // Call the random movie function
+    const { data: apiData, error: apiError } = await supabase.functions.invoke('tmdb', {
+      body: { action: 'getRandom' }
+    });
+    
+    if (apiError) {
+      console.error('Error fetching random movie from TMDB:', apiError);
+      throw apiError;
     }
     
-    const data = await callTMDB('/discover/movie', params);
-    
-    if (!data.results || data.results.length === 0) {
-      console.log('Keine Ergebnisse gefunden, versuche mit weniger Einschränkungen');
-      
-      params.vote_count_gte = '3';
-      const fallbackData = await callTMDB('/discover/movie', params);
-      
-      if (!fallbackData.results || fallbackData.results.length === 0) {
-        throw new Error('Keine Filme für das ausgewählte Jahrzehnt gefunden');
-      }
-      
-      const validResults = fallbackData.results
-        .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '');
-      
-      if (validResults.length === 0) {
-        throw new Error('Keine gültigen Filme für das ausgewählte Jahrzehnt gefunden');
-      }
-      
-      const randomMovie = validResults[Math.floor(Math.random() * validResults.length)];
-      return getMovieById(randomMovie.id);
-    }
-    
-    const validResults = data.results
-      .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '');
-    
-    if (validResults.length === 0) {
-      throw new Error('Keine gültigen Filme für das ausgewählte Jahrzehnt gefunden');
-    }
-    
-    const randomMovie = validResults[Math.floor(Math.random() * validResults.length)];
-    return getMovieById(randomMovie.id);
-    
+    console.log(`Retrieved random movie from TMDB API: ${apiData.title}`);
+    return apiData;
   } catch (error) {
-    console.error('Fehler beim Abrufen eines zufälligen Films:', error);
-    const popularMovies = await getPopularMovies();
-    const randomIndex = Math.floor(Math.random() * popularMovies.length);
-    return getMovieById(popularMovies[randomIndex].id);
+    console.error('Error fetching random movie:', error);
+    throw error;
   }
 };

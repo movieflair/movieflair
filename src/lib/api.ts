@@ -37,7 +37,7 @@ export {
 } from './customListApi';
 export * from './apiUtils';
 
-// Export the new movieCMS API functions
+// Export the new CMS API functions
 export {
   fetchMovieFromTMDB,
   searchTMDBMovies,
@@ -47,5 +47,7 @@ export {
   getMovieById as getAdminMovieById,
   updateMovie,
   deleteMovie,
-  downloadImageToStorage
-} from './movieCmsApi';
+  downloadImageToStorage,
+  uploadMovieImage,
+  ensureMovieImagesBucketExists
+} from './cms';
