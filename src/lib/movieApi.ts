@@ -1,4 +1,3 @@
-
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,7 +29,6 @@ const mapSupabaseMovieToMovieObject = (movie: any): MovieOrShow => {
   };
 };
 
-// Neue Funktion: Holt alle importierten Filme aus der Datenbank
 export const getImportedMovies = async (): Promise<MovieOrShow[]> => {
   console.log('Fetching imported movies from database...');
   
@@ -90,7 +88,6 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       console.log(`Found ${trailerShows.length} TV shows with trailers from Supabase`);
     }
     
-    // Sort all items by updated_at
     trailerItems.sort((a, b) => {
       const dateA = new Date(b.updated_at || '');
       const dateB = new Date(a.updated_at || '');
@@ -134,7 +131,6 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
   }
 };
 
-// Behält die bestehende Funktion bei, aber wir werden sie in der App nicht mehr verwenden
 export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
   const data = await callTMDB('/movie/popular');
   const savedSettings = await getAdminMovieSettings();
@@ -178,7 +174,6 @@ export const searchMovies = async (query: string): Promise<MovieOrShow[]> => {
 };
 
 export const getMovieById = async (id: number): Promise<MovieDetail> => {
-  // First check if movie exists in our database with custom settings
   const { data: adminMovie, error: adminError } = await supabase
     .from('admin_movies')
     .select('*')
@@ -189,14 +184,12 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
     console.error('Error fetching movie from Supabase:', adminError);
   }
 
-  // Then fetch the movie data from TMDB API
   const [movieData, videos, credits] = await Promise.all([
     callTMDB(`/movie/${id}`),
     callTMDB(`/movie/${id}/videos`),
     callTMDB(`/movie/${id}/credits`),
   ]);
 
-  // If we have admin settings, use those values
   if (adminMovie) {
     console.log('Found movie in admin_movies table:', adminMovie);
     return {
@@ -214,7 +207,6 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
     };
   }
 
-  // Fallback to the general admin settings
   const savedSettings = await getAdminMovieSettings();
   const savedMovie = savedSettings[id] || {};
 
@@ -234,21 +226,33 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
 };
 
 export const getSimilarMovies = async (id: number): Promise<MovieOrShow[]> => {
-  const data = await callTMDB(`/movie/${id}/similar`);
-  return data.results
-    .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '')
-    .map((movie: any) => ({
-      ...movie,
-      media_type: 'movie'
-    }));
+  try {
+    const data = await callTMDB(`/movie/${id}/similar`);
+    const similarMoviesIds = data.results
+      .filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '')
+      .map((movie: any) => movie.id);
+    
+    const { data: importedMovies, error } = await supabase
+      .from('admin_movies')
+      .select('*')
+      .in('id', similarMoviesIds);
+    
+    if (error) {
+      console.error('Error fetching imported similar movies:', error);
+      return [];
+    }
+    
+    return importedMovies.map(movie => mapSupabaseMovieToMovieObject(movie));
+  } catch (error) {
+    console.error('Error getting similar movies:', error);
+    return [];
+  }
 };
 
-// Neue Funktion: Holt einen zufälligen importierten Film
 export const getRandomImportedMovie = async (): Promise<MovieDetail> => {
   console.log('Getting random imported movie...');
   
   try {
-    // Alle importierten Filme holen
     const { data: importedMovies, error } = await supabase
       .from('admin_movies')
       .select('id')
@@ -264,13 +268,11 @@ export const getRandomImportedMovie = async (): Promise<MovieDetail> => {
       throw new Error('Keine importierten Filme gefunden');
     }
     
-    // Zufälligen Film auswählen
     const randomIndex = Math.floor(Math.random() * importedMovies.length);
     const randomMovieId = importedMovies[randomIndex].id;
     
     console.log(`Selected random movie ID: ${randomMovieId}`);
     
-    // Vollständige Filmdaten holen
     return getMovieById(randomMovieId);
     
   } catch (error) {
@@ -279,7 +281,6 @@ export const getRandomImportedMovie = async (): Promise<MovieDetail> => {
   }
 };
 
-// Die alte getRandomMovie-Funktion bleibt als Fallback bestehen
 export const getRandomMovie = async (): Promise<MovieDetail> => {
   console.log('Getting random movie with improved decade selection...');
   

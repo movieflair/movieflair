@@ -22,7 +22,33 @@ const RandomLists = () => {
         // Always get the newest list for the Discover page
         const lists = await getRandomCustomLists(1);
         console.log(`RandomLists: Fetched ${lists.length} custom lists`);
-        setCustomLists(lists);
+        
+        // Make sure lists only contain imported movies
+        const listsWithImportedMovies = await Promise.all(
+          lists.map(async (list) => {
+            if (!list.movies || list.movies.length === 0) {
+              return { ...list, movies: [] };
+            }
+            
+            // Check which movies in the list are imported
+            const movieIds = list.movies.map(movie => movie.id);
+            const { data: importedMovies } = await supabase
+              .from('admin_movies')
+              .select('*')
+              .in('id', movieIds);
+            
+            const importedMovieIds = importedMovies?.map(movie => movie.id) || [];
+            
+            // Filter the list to only include imported movies
+            const filteredMovies = list.movies.filter(movie => 
+              importedMovieIds.includes(movie.id)
+            );
+            
+            return { ...list, movies: filteredMovies };
+          })
+        );
+        
+        setCustomLists(listsWithImportedMovies);
       } catch (error) {
         console.error('Error fetching random custom lists:', error);
         toast.error('Fehler beim Laden der Listen');

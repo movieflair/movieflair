@@ -1,7 +1,6 @@
-
 import { CustomList, MovieOrShow } from './types';
 import { supabase } from '@/integrations/supabase/client';
-import { Json } from '@/integrations/supabase/types';
+import { mapSupabaseMovieToMovieObject } from './movieApi';
 
 interface SupabaseCustomList {
   id: string;
@@ -184,65 +183,60 @@ export const deleteCustomList = async (listId: string): Promise<boolean> => {
   return true;
 };
 
-export const addMovieToList = async (listId: string, media: MovieOrShow): Promise<CustomList> => {
-  try {
-    console.log('Adding movie to list:', listId, media);
-    
-    const { data: currentList, error: fetchError } = await supabase
-      .from('custom_lists')
-      .select('*')
-      .eq('id', listId)
-      .single();
-    
-    if (fetchError) {
-      console.error('Error fetching list to add movie:', fetchError);
-      throw fetchError;
-    }
-    
-    if (!currentList) {
-      throw new Error(`List with ID ${listId} not found`);
-    }
-    
-    const mediaToAdd = {
-      ...media,
-      media_type: media.media_type || 'movie'
-    };
-    
-    console.log('Current movies in list:', currentList.movies);
-    
-    const currentMovies = Array.isArray(currentList.movies) ? currentList.movies : [];
-    
-    const movieExists = currentMovies.some((m: any) => m.id === mediaToAdd.id);
-    
-    if (movieExists) {
-      console.log('Movie already exists in list:', mediaToAdd.id);
-      return mapSupabaseListToCustomList(currentList as SupabaseCustomList);
-    }
-    
-    console.log('Adding movie to list:', mediaToAdd);
-    const updatedMovies = [...currentMovies, mediaToAdd] as unknown as Json;
-    
-    const { data, error } = await supabase
-      .from('custom_lists')
-      .update({ 
-        movies: updatedMovies,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', listId)
-      .select()
-      .single();
-    
-    if (error) {
-      console.error('Error adding movie to list in Supabase:', error);
-      throw error;
-    }
-    
-    console.log('Movie added successfully:', mediaToAdd.id);
-    return mapSupabaseListToCustomList(data as SupabaseCustomList);
-  } catch (error) {
-    console.error('Error in addMovieToList:', error);
-    throw error;
+export const addMovieToList = async (listId: string, movie: MovieOrShow): Promise<CustomList> => {
+  // First check if the movie is imported
+  const { data: importedMovie, error: importCheckError } = await supabase
+    .from('admin_movies')
+    .select('*')
+    .eq('id', movie.id)
+    .maybeSingle();
+  
+  if (importCheckError) {
+    console.error('Error checking if movie is imported:', importCheckError);
+    throw new Error('Error checking if movie is imported');
   }
+  
+  if (!importedMovie) {
+    throw new Error('Movie must be imported before adding to a list');
+  }
+  
+  // Get the current list
+  const { data: list, error: getListError } = await supabase
+    .from('custom_lists')
+    .select('*')
+    .eq('id', listId)
+    .single();
+  
+  if (getListError) {
+    console.error('Error getting list:', getListError);
+    throw new Error('Error getting list');
+  }
+  
+  // Check if movie already exists in the list
+  const movies = list.movies || [];
+  const movieExists = movies.some((m: MovieOrShow) => m.id === movie.id);
+  
+  if (movieExists) {
+    return list;
+  }
+  
+  // Add the movie to the list
+  const updatedMovies = [...movies, movie];
+  
+  // Update the list
+  const { data: updatedList, error: updateError } = await supabase
+    .from('custom_lists')
+    .update({ movies: updatedMovies, updated_at: new Date().toISOString() })
+    .eq('id', listId)
+    .select('*')
+    .single();
+  
+  if (updateError) {
+    console.error('Error updating list:', updateError);
+    throw new Error('Error updating list');
+  }
+  
+  return updatedList;
 };
 
 export const removeMovieFromList = async (listId: string, mediaId: number): Promise<CustomList> => {
