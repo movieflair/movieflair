@@ -8,7 +8,10 @@ export {
   getPopularMovies,
   searchMovies,
   getRandomMovie,
-  getSimilarMovies
+  getSimilarMovies,
+  getImportedMovies,
+  downloadMovieImagesToServer,
+  getRandomImportedMovie
 } from './movieApi';
 
 export {

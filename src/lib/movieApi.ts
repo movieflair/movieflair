@@ -1,4 +1,3 @@
-
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings, callTMDB } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
