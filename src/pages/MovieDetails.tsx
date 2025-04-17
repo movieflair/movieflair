@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
@@ -32,7 +31,8 @@ const MovieDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
   const [similarMovies, setSimilarMovies] = useState<MovieOrShow[]>([]);
-  const { amazonAffiliateId } = useAdminSettings();
+  
+  const { amazonAffiliateId = '' } = useAdminSettings?.() || {};
 
   useEffect(() => {
     trackPageVisit('movie-details');
@@ -50,13 +50,11 @@ const MovieDetails = () => {
       try {
         setIsLoading(true);
         
-        // Film und ähnliche Filme gleichzeitig abrufen
         const [movieData, similars] = await Promise.all([
           getMovieById(parsedId),
           getSimilarMovies(parsedId)
         ]);
         
-        // Überprüfen, ob Bilder von TMDB stammen und heruntergeladen werden müssen
         const needsImageDownload = 
           (movieData.poster_path && movieData.poster_path.includes('tmdb.org')) || 
           (movieData.backdrop_path && movieData.backdrop_path.includes('tmdb.org')) || 
@@ -70,7 +68,6 @@ const MovieDetails = () => {
           toast.dismiss();
           
           if (imagesUpdated) {
-            // Aktualisierte Filmdaten abrufen
             const updatedMovie = await getMovieById(parsedId);
             console.log('Aktualisierter Film mit lokalen Bildern:', updatedMovie);
             setMovie(updatedMovie);
@@ -118,7 +115,6 @@ const MovieDetails = () => {
   const seoTitle = formatMediaTitle(movie.title, releaseYear);
   const seoDescription = formatMediaDescription(movie.title, releaseYear, movie.overview, 160);
   
-  // Verwende lokale Bilder für SEO, wenn verfügbar
   const seoOgImage = movie.backdrop_path && movie.backdrop_path.startsWith('/storage') 
     ? getAbsoluteImageUrl(movie.backdrop_path)
     : getAbsoluteImageUrl(
