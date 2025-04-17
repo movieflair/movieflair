@@ -1,8 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import WatchlistButton from '@/components/movies/WatchlistButton';
 import ShareButton from '@/components/movies/ShareButton';
-import { getPosterPath } from '@/utils/imageUtils';
+import { getPosterPath, normalizeImagePath } from '@/utils/imageUtils';
 
 interface MoviePosterProps {
   id: number;
@@ -13,25 +13,42 @@ interface MoviePosterProps {
 const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
   const imageSrc = getPosterPath(posterPath);
   const [hasError, setHasError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState(imageSrc);
+  const [currentSrc, setCurrentSrc] = useState<string | null>(imageSrc);
+  
+  // Bei Änderung des posterPath den currentSrc aktualisieren
+  useEffect(() => {
+    setCurrentSrc(getPosterPath(posterPath));
+    setHasError(false);
+  }, [posterPath]);
   
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error(`Fehler beim Laden des Posters für ${title}:`, e);
-    
-    // Versuche zuerst eine lokale URL
+    // Bei einem Fehler versuchen wir einen Fallback
     if (!hasError && posterPath) {
+      console.log(`Fehler beim Laden des Posters für ${title}. Versuche Fallback...`);
       setHasError(true);
       
-      // Wenn es ein TMDB-Pfad ist, versuche die TMDB-URL
+      // Wenn der Pfad mit / beginnt, aber nicht mit /storage,
+      // handelt es sich um einen TMDB-Pfad
       if (posterPath.startsWith('/') && !posterPath.startsWith('/storage')) {
-        console.log('Versuche TMDB-Fallback für Poster');
-        setCurrentSrc(`https://image.tmdb.org/t/p/w500${posterPath}`);
-      }
-      // Wenn es eine lokale URL ist, die fehlschlägt, versuche die TMDB-ID zu extrahieren
+        const tmdbUrl = `https://image.tmdb.org/t/p/w500${posterPath}`;
+        console.log(`Verwende TMDB-Fallback: ${tmdbUrl}`);
+        setCurrentSrc(tmdbUrl);
+      } 
+      // Wenn es eine Storage-URL ist, die fehlschlägt, versuchen wir es mit der TMDB-ID
       else if (posterPath.includes('movie_images') && id) {
-        console.log('Lokales Bild fehlgeschlagen, versuche TMDB');
-        setCurrentSrc(`https://image.tmdb.org/t/p/w500/TMDB_FALLBACK_${id}`);
+        // Versuchen wir den Film über TMDB direkt zu holen
+        const tmdbFallback = `https://image.tmdb.org/t/p/w500/TMDB_FALLBACK_${id}`;
+        console.log(`Verwende TMDB-ID-Fallback: ${tmdbFallback}`);
+        setCurrentSrc(tmdbFallback);
+      } else if (posterPath.startsWith('http')) {
+        // Bei externen URLs nichts tun, da der Fehler wahrscheinlich permanent ist
+        console.error(`Externer URL-Fehler für ${posterPath}`);
+        setCurrentSrc(null);
       }
+    } else if (hasError) {
+      // Zweiter Fehler, wir geben auf
+      console.error(`Alle Fallbacks für ${title} fehlgeschlagen`);
+      setCurrentSrc(null);
     }
   };
   

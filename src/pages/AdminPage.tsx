@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/context/AuthContext';
@@ -8,13 +8,49 @@ import { toast } from 'sonner';
 import { deleteAllMovies, cleanAllCustomLists } from '@/lib/api';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MovieCmsModule from '@/components/admin/MovieCmsModule';
-import { DatabaseZap, FilmIcon, Settings } from 'lucide-react';
+import { DatabaseZap, FilmIcon, Settings, ServerIcon } from 'lucide-react';
+import { setupStorage } from '@/lib/setupStorage';
 
 const AdminPage = () => {
   const { user } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSettingUpStorage, setIsSettingUpStorage] = useState(false);
   
-  // If not logged in, redirect to login page
+  // Beim Laden der Admin-Seite Storage-Bucket initialisieren
+  useEffect(() => {
+    if (user) {
+      initializeStorage();
+    }
+  }, [user]);
+  
+  // Storage-Bucket initialisieren
+  const initializeStorage = async () => {
+    try {
+      await setupStorage();
+    } catch (error) {
+      console.error('Fehler beim Initialisieren des Speicher-Buckets:', error);
+    }
+  };
+  
+  // Manuell den Storage-Bucket einrichten
+  const handleSetupStorage = async () => {
+    setIsSettingUpStorage(true);
+    toast.loading('Richte Speicher-Bucket ein...');
+    
+    try {
+      await setupStorage();
+      toast.dismiss();
+      toast.success('Speicher-Bucket erfolgreich eingerichtet');
+    } catch (error) {
+      console.error('Fehler beim Einrichten des Speicher-Buckets:', error);
+      toast.dismiss();
+      toast.error('Fehler beim Einrichten des Speicher-Buckets');
+    } finally {
+      setIsSettingUpStorage(false);
+    }
+  };
+  
+  // Wenn nicht eingeloggt, zur Login-Seite umleiten
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
@@ -28,14 +64,14 @@ const AdminPage = () => {
     try {
       toast.loading('Lösche alle Inhalte aus der Datenbank...');
       
-      // First clean all custom lists (remove movies from lists)
+      // Zuerst alle benutzerdefinierten Listen leeren (Filme aus Listen entfernen)
       const listsCleanResult = await cleanAllCustomLists();
       if (!listsCleanResult) {
         toast.error('Fehler beim Leeren der Filmlisten');
         return;
       }
       
-      // Then delete all movies and TV shows
+      // Dann alle Filme und TV-Shows löschen
       const deleteResult = await deleteAllMovies();
       if (!deleteResult) {
         toast.error('Fehler beim Löschen der Filme und TV-Shows');
@@ -73,6 +109,28 @@ const AdminPage = () => {
             </TabsContent>
             
             <TabsContent value="system">
+              {/* Storage Management */}
+              <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <ServerIcon size={20} /> Speicher-Verwaltung
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  Hier kannst du den Speicher-Bucket für Filmbilder einrichten oder reparieren.
+                  Diese Funktion wird automatisch aufgerufen, wenn du die Admin-Seite öffnest,
+                  kann aber bei Problemen auch manuell gestartet werden.
+                </p>
+                
+                <Button 
+                  variant="outline" 
+                  onClick={handleSetupStorage} 
+                  disabled={isSettingUpStorage}
+                  className="mt-2"
+                >
+                  {isSettingUpStorage ? 'Wird eingerichtet...' : 'Speicher-Bucket einrichten/reparieren'}
+                </Button>
+              </div>
+              
+              {/* Database Management */}
               <div className="bg-white rounded-lg shadow-md p-6 mb-8">
                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                   <DatabaseZap size={20} /> Datenbank-Verwaltung

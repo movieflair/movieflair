@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react';
 import { getBackdropPath } from '@/utils/imageUtils';
 
 interface MovieBackdropProps {
@@ -7,25 +8,44 @@ interface MovieBackdropProps {
 }
 
 const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
-  const imageSrc = getBackdropPath(backdropPath);
+  const initialSrc = getBackdropPath(backdropPath);
+  const [currentSrc, setCurrentSrc] = useState<string | null>(initialSrc);
+  const [hasError, setHasError] = useState(false);
+  
+  // Bei Änderung des backdropPath den currentSrc aktualisieren
+  useEffect(() => {
+    setCurrentSrc(getBackdropPath(backdropPath));
+    setHasError(false);
+  }, [backdropPath]);
   
   const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    // If image fails to load, try the TMDB path directly
-    if (backdropPath && !backdropPath.startsWith('http')) {
-      console.log(`Falling back to direct TMDB path for ${title} backdrop`);
-      (e.target as HTMLImageElement).src = `https://image.tmdb.org/t/p/original${backdropPath}`;
-    } else {
-      console.error(`Failed to load backdrop for ${title}`);
+    if (!hasError && backdropPath) {
+      console.log(`Fehler beim Laden des Hintergrundbilds für ${title}. Versuche Fallback...`);
+      setHasError(true);
+      
+      // Bei TMDB-Pfaden direkte URL verwenden
+      if (backdropPath.startsWith('/') && !backdropPath.startsWith('/storage')) {
+        const tmdbUrl = `https://image.tmdb.org/t/p/original${backdropPath}`;
+        console.log(`Verwende TMDB-Fallback: ${tmdbUrl}`);
+        setCurrentSrc(tmdbUrl);
+      } else if (backdropPath.startsWith('http')) {
+        // Bei externen URLs ist der Fehler wahrscheinlich permanent
+        setCurrentSrc(null);
+      }
+    } else if (hasError) {
+      // Zweiter Fehler, wir geben auf
+      console.error(`Alle Fallbacks für ${title} Hintergrundbild fehlgeschlagen`);
+      setCurrentSrc(null);
     }
   };
   
   return (
     <div className="relative h-[400px] overflow-hidden">
-      {imageSrc ? (
+      {currentSrc ? (
         <>
           <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
           <img
-            src={imageSrc}
+            src={currentSrc}
             alt={title}
             className="w-full h-full object-cover"
             onError={handleError}

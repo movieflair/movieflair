@@ -2,15 +2,19 @@
 import { MovieOrShow, MovieDetail } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { setupStorage } from '@/lib/setupStorage';
 
 /**
- * Imports a movie from TMDB into our local database
+ * Importiert einen Film von TMDB in unsere lokale Datenbank
  */
 export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> => {
   try {
-    console.log(`Importing movie: ${movie.title || 'Unknown'} (ID: ${movie.id})`);
+    console.log(`Importiere Film: ${movie.title || 'Unbekannt'} (ID: ${movie.id})`);
     
-    // First check if movie already exists
+    // Sicherstellen, dass der Storage-Bucket existiert
+    await setupStorage();
+    
+    // Zunächst prüfen, ob der Film bereits existiert
     const { data: existingMovie, error: checkError } = await supabase
       .from('admin_movies')
       .select('id')
@@ -18,14 +22,16 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       .maybeSingle();
       
     if (checkError) {
-      console.error('Error checking if movie exists:', checkError);
+      console.error('Fehler beim Prüfen, ob der Film existiert:', checkError);
+      toast.error(`Fehler bei der Datenbankabfrage: ${checkError.message}`);
       return false;
     }
     
-    // Get detailed movie information from TMDB
+    // Detaillierte Filminformationen von TMDB abrufen
     let fullMovieData: any = { ...movie };
     
     try {
+      console.log('Hole detaillierte Filmdaten von TMDB...');
       const { data: movieDetails, error } = await supabase.functions.invoke('tmdb-admin', {
         body: { 
           action: 'getById',
@@ -34,19 +40,21 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       });
       
       if (error) {
-        console.error('Error fetching detailed movie data:', error);
+        console.error('Fehler beim Abrufen detaillierter Filmdaten:', error);
+        toast.error(`TMDB-API Fehler: ${error.message}`);
       } else if (movieDetails) {
-        console.log('Retrieved detailed movie data from TMDB');
+        console.log('Detaillierte Filmdaten von TMDB erhalten:', movieDetails);
         fullMovieData = {
           ...fullMovieData,
           ...movieDetails
         };
       }
-    } catch (error) {
-      console.log('Could not fetch additional movie details, using provided data:', error);
+    } catch (error: any) {
+      console.log('Konnte keine zusätzlichen Filmdetails abrufen:', error);
+      toast.error(`Fehler: ${error.message}`);
     }
     
-    // Prepare trailer URL if available
+    // Trailer-URL vorbereiten, falls verfügbar
     let hasTrailer = fullMovieData.hasTrailer || false;
     let trailerUrl = fullMovieData.trailerUrl || '';
     
@@ -55,20 +63,67 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       if (trailer && trailer.key) {
         hasTrailer = true;
         trailerUrl = `https://www.youtube.com/embed/${trailer.key}`;
+        console.log(`Trailer gefunden: ${trailerUrl}`);
       }
     }
     
-    if (existingMovie) {
-      console.log(`Movie ${movie.id} already exists, updating data`);
+    // Bilder verarbeiten
+    let posterPath = fullMovieData.poster_path || '';
+    let backdropPath = fullMovieData.backdrop_path || '';
+    
+    // Versuchen, Bilder auf lokalen Speicher hochzuladen
+    try {
+      console.log('Lade Bilder zum lokalen Speicher hoch...');
+      if (posterPath && !posterPath.startsWith('/storage')) {
+        console.log(`Versuche Poster-Bild zu speichern: ${posterPath}`);
+        const { data, error } = await supabase.functions.invoke('create-movie-storage', {
+          body: {
+            movieId: movie.id,
+            imageUrl: posterPath,
+            imageType: 'poster'
+          }
+        });
+        
+        if (error) {
+          console.error('Fehler beim Hochladen des Posters:', error);
+        } else if (data?.publicUrl) {
+          console.log(`Poster erfolgreich gespeichert: ${data.publicUrl}`);
+          posterPath = data.publicUrl;
+        }
+      }
       
-      // Update the movie data in our database
+      if (backdropPath && !backdropPath.startsWith('/storage')) {
+        console.log(`Versuche Hintergrundbild zu speichern: ${backdropPath}`);
+        const { data, error } = await supabase.functions.invoke('create-movie-storage', {
+          body: {
+            movieId: movie.id,
+            imageUrl: backdropPath,
+            imageType: 'backdrop'
+          }
+        });
+        
+        if (error) {
+          console.error('Fehler beim Hochladen des Hintergrundbilds:', error);
+        } else if (data?.publicUrl) {
+          console.log(`Hintergrundbild erfolgreich gespeichert: ${data.publicUrl}`);
+          backdropPath = data.publicUrl;
+        }
+      }
+    } catch (error: any) {
+      console.error('Fehler beim Speichern der Bilder:', error);
+    }
+    
+    if (existingMovie) {
+      console.log(`Film ${movie.id} existiert bereits, Daten werden aktualisiert`);
+      
+      // Filmdaten in unserer Datenbank aktualisieren
       const { error: updateError } = await supabase
         .from('admin_movies')
         .update({
           title: fullMovieData.title || '',
           overview: fullMovieData.overview || '',
-          poster_path: fullMovieData.poster_path || '',
-          backdrop_path: fullMovieData.backdrop_path || '',
+          poster_path: posterPath,
+          backdrop_path: backdropPath,
           release_date: fullMovieData.release_date || '',
           vote_average: fullMovieData.vote_average || 0,
           vote_count: fullMovieData.vote_count || 0,
@@ -79,20 +134,21 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
         .eq('id', movie.id);
         
       if (updateError) {
-        console.error('Error updating movie data:', updateError);
+        console.error('Fehler beim Aktualisieren der Filmdaten:', updateError);
+        toast.error(`Datenbankfehler: ${updateError.message}`);
         return false;
       }
       
-      console.log(`Movie "${fullMovieData.title}" data successfully updated`);
+      console.log(`Filmdaten für "${fullMovieData.title}" erfolgreich aktualisiert`);
       return true;
     }
     
-    // If movie doesn't exist, create a new entry
+    // Wenn der Film nicht existiert, einen neuen Eintrag erstellen
     const movieToImport = {
       id: movie.id,
       title: fullMovieData.title || '',
-      poster_path: fullMovieData.poster_path || '',
-      backdrop_path: fullMovieData.backdrop_path || '',
+      poster_path: posterPath,
+      backdrop_path: backdropPath,
       overview: fullMovieData.overview || '',
       release_date: fullMovieData.release_date || '',
       vote_average: fullMovieData.vote_average || 0,
@@ -107,21 +163,24 @@ export const importMovieFromTMDB = async (movie: MovieOrShow): Promise<boolean> 
       trailerurl: trailerUrl
     };
     
-    console.log('Inserting movie into database:', movieToImport);
+    console.log('Füge Film in Datenbank ein:', movieToImport);
     
     const { error: importError } = await supabase
       .from('admin_movies')
       .insert(movieToImport);
       
     if (importError) {
-      console.error('Error importing movie:', importError);
+      console.error('Fehler beim Importieren des Films:', importError);
+      toast.error(`Import fehlgeschlagen: ${importError.message}`);
       return false;
     }
     
-    console.log(`Movie "${fullMovieData.title}" successfully imported to database`);
+    console.log(`Film "${fullMovieData.title}" erfolgreich in Datenbank importiert`);
+    toast.success(`Film "${fullMovieData.title}" erfolgreich importiert`);
     return true;
-  } catch (error) {
-    console.error('Error importing movie:', error);
+  } catch (error: any) {
+    console.error('Fehler beim Importieren des Films:', error);
+    toast.error(`Allgemeiner Fehler: ${error.message}`);
     return false;
   }
 };
