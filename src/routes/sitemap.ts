@@ -5,7 +5,8 @@ import { generateSitemapXml } from '../utils/generateSitemap';
 
 const router = Router();
 
-router.get('/sitemap.xml', function sitemapHandler(req: Request, res: Response) {
+// Fix the route handler signature
+router.get('/sitemap.xml', (req: Request, res: Response) => {
   try {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.setHeader('X-Content-Type-Options', 'nosniff');

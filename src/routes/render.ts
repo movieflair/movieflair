@@ -10,7 +10,8 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-router.get('*', function renderHandler(req: Request, res: Response, next: NextFunction) {
+// Fix the route handler signature
+router.get('*', (req: Request, res: Response, next: NextFunction) => {
   const url = req.originalUrl;
 
   try {
