@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
@@ -19,10 +20,13 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
   const mediaType = getMediaTypeInGerman(movie.media_type);
   const slug = createUrlSlug(title);
   
+  const [hasError, setHasError] = useState(false);
+  const [imageSrc, setImageSrc] = useState(getPosterPath(movie.poster_path));
+  
   const imageSizes = {
     small: 'h-[250px] w-[170px]',
     medium: 'h-[250px] w-[170px]',
-    large: 'h-[270px] w-[190px]'  // Updated size for specific pages
+    large: 'h-[270px] w-[190px]'  // Aktualisierte Größe für spezifische Seiten
   };
   
   const textSizes = {
@@ -35,6 +39,16 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
     scrollToTop();
   };
 
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    if (!hasError && movie.poster_path && movie.poster_path.startsWith('/') && !movie.poster_path.startsWith('/storage')) {
+      console.log('Versuche TMDB-Fallback für Filmposter in der Karte:', movie.poster_path);
+      setHasError(true);
+      setImageSrc(`https://image.tmdb.org/t/p/w500${movie.poster_path}`);
+    } else {
+      setImageSrc(null);
+    }
+  };
+
   return (
     <Link 
       to={`/${mediaType}/${movie.id}/${slug}`} 
@@ -42,21 +56,22 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
       onClick={handleClick}
     >
       <div className={`relative ${imageSizes[size]} bg-muted overflow-hidden rounded-xl`}>
-        {movie.poster_path ? (
+        {imageSrc ? (
           <img
-            src={getPosterPath(movie.poster_path)}
+            src={imageSrc}
             alt={title}
             className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
+            onError={handleImageError}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted rounded-xl">
-            <span className="text-muted-foreground">No Image</span>
+            <span className="text-muted-foreground">Kein Bild</span>
           </div>
         )}
         
         <div className="absolute top-2 right-2 flex items-center bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full">
           <Star className="w-3 h-3 text-yellow-500 mr-1" />
-          <span className="text-xs font-medium">{movie.vote_average.toFixed(1)}</span>
+          <span className="text-xs font-medium">{movie.vote_average?.toFixed(1) || '0.0'}</span>
         </div>
       </div>
       

@@ -18,6 +18,7 @@ import MovieLoadingState from '@/components/movies/MovieLoadingState';
 import MovieErrorState from '@/components/movies/MovieErrorState';
 import CastAndCrewSection from '@/components/movies/CastAndCrewSection';
 import SimilarMovies from '@/components/movies/SimilarMovies';
+import { toast } from 'sonner';
 import { 
   formatMediaTitle, 
   formatMediaDescription, 
@@ -42,33 +43,42 @@ const MovieDetails = () => {
       const parsedId = slug ? parseUrlSlug(id).id : parseInt(id);
       
       if (!parsedId) {
-        console.error('Invalid movie ID');
+        console.error('Ungültige Film-ID');
         return;
       }
 
       try {
         setIsLoading(true);
+        
+        // Film und ähnliche Filme gleichzeitig abrufen
         const [movieData, similars] = await Promise.all([
           getMovieById(parsedId),
           getSimilarMovies(parsedId)
         ]);
         
-        // Force download images if they're still from TMDB
-        if ((movieData.poster_path && movieData.poster_path.includes('tmdb.org')) || 
-            (movieData.backdrop_path && movieData.backdrop_path.includes('tmdb.org'))) {
-          console.log('Movie images need to be migrated to server in frontend view');
+        // Überprüfen, ob Bilder von TMDB stammen und heruntergeladen werden müssen
+        const needsImageDownload = 
+          (movieData.poster_path && movieData.poster_path.includes('tmdb.org')) || 
+          (movieData.backdrop_path && movieData.backdrop_path.includes('tmdb.org')) || 
+          (!movieData.poster_path && !movieData.backdrop_path);
+        
+        if (needsImageDownload) {
+          console.log('Filmbilder müssen auf den Server migriert werden');
           
-          // Create toast to inform user
-          console.log('Importing images to server...');
+          toast.loading('Bilder werden importiert...');
           const imagesUpdated = await downloadMovieImagesToServer(movieData);
+          toast.dismiss();
           
           if (imagesUpdated) {
+            // Aktualisierte Filmdaten abrufen
             const updatedMovie = await getMovieById(parsedId);
-            console.log('Setting updated movie with local images');
+            console.log('Aktualisierter Film mit lokalen Bildern:', updatedMovie);
             setMovie(updatedMovie);
+            toast.success('Bilder erfolgreich importiert');
           } else {
-            console.log('Failed to update images, using original movie data');
+            console.log('Fehler beim Aktualisieren der Bilder, verwende ursprüngliche Filmdaten');
             setMovie(movieData);
+            toast.error('Fehler beim Importieren der Bilder');
           }
         } else {
           setMovie(movieData);
@@ -76,7 +86,8 @@ const MovieDetails = () => {
         
         setSimilarMovies(similars);
       } catch (error) {
-        console.error('Error fetching movie details:', error);
+        console.error('Fehler beim Abrufen der Filmdetails:', error);
+        toast.error('Fehler beim Laden des Films');
       } finally {
         setIsLoading(false);
       }
@@ -106,13 +117,20 @@ const MovieDetails = () => {
   
   const seoTitle = formatMediaTitle(movie.title, releaseYear);
   const seoDescription = formatMediaDescription(movie.title, releaseYear, movie.overview, 160);
-  const seoOgImage = getAbsoluteImageUrl(
-    movie.backdrop_path ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` : '/movieflair-logo.png'
-  );
+  
+  // Verwende lokale Bilder für SEO, wenn verfügbar
+  const seoOgImage = movie.backdrop_path && movie.backdrop_path.startsWith('/storage') 
+    ? getAbsoluteImageUrl(movie.backdrop_path)
+    : getAbsoluteImageUrl(
+        movie.backdrop_path 
+          ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}` 
+          : '/movieflair-logo.png'
+      );
+  
   const seoPath = `/film/${movie.id}${movie.title ? `/${encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
   const canonical = createCanonicalUrl(seoPath);
 
-  console.log('Movie SEO data:', { 
+  console.log('Film SEO-Daten:', { 
     title: seoTitle,
     description: seoDescription,
     image: seoOgImage,

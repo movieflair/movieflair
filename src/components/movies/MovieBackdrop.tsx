@@ -1,5 +1,6 @@
 
 import { getBackdropPath } from '@/utils/imageUtils';
+import { useState } from 'react';
 
 interface MovieBackdropProps {
   backdropPath?: string;
@@ -8,23 +9,30 @@ interface MovieBackdropProps {
 
 const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
   const imageSrc = getBackdropPath(backdropPath);
+  const [hasError, setHasError] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState(imageSrc);
+  
+  const handleError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error(`Fehler beim Laden des Hintergrundbilds für ${title}:`, e);
+    
+    // Versuche es mit dem TMDB-Fallback, wenn es ein TMDB-Pfad ist und wir noch nicht den Fallback verwenden
+    if (!hasError && backdropPath && backdropPath.startsWith('/') && !backdropPath.startsWith('/storage')) {
+      console.log('Versuche TMDB-Fallback für Hintergrundbild');
+      setHasError(true);
+      setCurrentSrc(`https://image.tmdb.org/t/p/original${backdropPath}`);
+    }
+  };
   
   return (
     <div className="relative h-[400px] overflow-hidden">
-      {imageSrc ? (
+      {currentSrc ? (
         <>
           <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
           <img
-            src={imageSrc}
+            src={currentSrc}
             alt={title}
             className="w-full h-full object-cover"
-            onError={(e) => {
-              console.error(`Error loading backdrop for ${title}:`, e);
-              // Fallback to TMDB if our storage fails
-              if (backdropPath && backdropPath.startsWith('/') && !backdropPath.startsWith('/storage')) {
-                (e.target as HTMLImageElement).src = `https://image.tmdb.org/t/p/original${backdropPath}`;
-              }
-            }}
+            onError={handleError}
           />
         </>
       ) : (

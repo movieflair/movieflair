@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,7 +16,8 @@ import {
   searchMovies, 
   searchTvShows,
   getPopularTvShows,
-  getPopularMovies
+  getPopularMovies,
+  deleteAllMovies
 } from '@/lib/api';
 
 import AdminHeader from './header/AdminHeader';
@@ -46,21 +48,22 @@ const AdminPanel = () => {
   const [isNewTrailer, setIsNewTrailer] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [currentView, setCurrentView] = useState<'all' | 'free' | 'trailers'>('all');
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const queryClient = useQueryClient();
 
   // Hier ändern wir die Abfrage auf die importierten Filme
-  const { data: movies = [], isLoading: isLoadingMovies } = useQuery({
+  const { data: movies = [], isLoading: isLoadingMovies, refetch: refetchMovies } = useQuery({
     queryKey: ['admin-movies'],
     queryFn: getImportedMovies
   });
   
-  const { data: freeMovies = [], isLoading: isLoadingFreeMovies } = useQuery({
+  const { data: freeMovies = [], isLoading: isLoadingFreeMovies, refetch: refetchFreeMovies } = useQuery({
     queryKey: ['admin-free-movies'],
     queryFn: getFreeMovies
   });
   
-  const { data: trailerMovies = [], isLoading: isLoadingTrailerMovies } = useQuery({
+  const { data: trailerMovies = [], isLoading: isLoadingTrailerMovies, refetch: refetchTrailerMovies } = useQuery({
     queryKey: ['admin-trailer-movies'],
     queryFn: getTrailerMovies
   });
@@ -201,7 +204,7 @@ const AdminPanel = () => {
         trailerurl: isNewTrailer ? trailerUrl : ''
       };
 
-      console.log("Saving movie with data:", updatedMovie);
+      console.log("Speichere Film mit Daten:", updatedMovie);
 
       const { error: checkError } = await supabase
         .from('admin_movies')
@@ -210,7 +213,7 @@ const AdminPanel = () => {
         .maybeSingle();
         
       if (checkError) {
-        console.error('Error checking if movie exists:', checkError);
+        console.error('Fehler beim Überprüfen, ob der Film existiert:', checkError);
         toast.dismiss();
         toast.error("Fehler beim Überprüfen des Films");
         return;
@@ -221,7 +224,7 @@ const AdminPanel = () => {
         .upsert(updatedMovie);
       
       if (saveError) {
-        console.error('Error saving movie to Supabase:', saveError);
+        console.error('Fehler beim Speichern des Films in Supabase:', saveError);
         toast.dismiss();
         toast.error("Fehler beim Speichern des Films");
         return;
@@ -236,7 +239,7 @@ const AdminPanel = () => {
       toast.success("Änderungen gespeichert");
       setSelectedMovie(null);
     } catch (error) {
-      console.error('Error saving movie:', error);
+      console.error('Fehler beim Speichern des Films:', error);
       toast.dismiss();
       toast.error("Fehler beim Speichern des Films");
     }
@@ -268,7 +271,7 @@ const AdminPanel = () => {
         .upsert(updatedShow);
       
       if (saveError) {
-        console.error('Error saving show to Supabase:', saveError);
+        console.error('Fehler beim Speichern der Show in Supabase:', saveError);
         toast.error("Fehler beim Speichern der Serie");
         return;
       }
@@ -279,7 +282,7 @@ const AdminPanel = () => {
       toast.success("Änderungen gespeichert");
       setSelectedTvShow(null);
     } catch (error) {
-      console.error('Error saving TV show:', error);
+      console.error('Fehler beim Speichern der TV-Show:', error);
       toast.error("Fehler beim Speichern der Serie");
     }
   };
@@ -296,10 +299,51 @@ const AdminPanel = () => {
       setFilteredMovies(movies);
     }
   };
+  
+  const handleDeleteAllMovies = async () => {
+    if (window.confirm('Sind Sie sicher, dass Sie ALLE Filme löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden!')) {
+      setIsDeleting(true);
+      
+      try {
+        const success = await deleteAllMovies();
+        
+        if (success) {
+          // Aktualisiere die Listen nach dem Löschen
+          await Promise.all([
+            refetchMovies(),
+            refetchFreeMovies(),
+            refetchTrailerMovies()
+          ]);
+          
+          setFilteredMovies([]);
+          toast.success('Alle Filme wurden erfolgreich gelöscht');
+        } else {
+          toast.error('Fehler beim Löschen aller Filme');
+        }
+      } catch (error) {
+        console.error('Fehler beim Löschen aller Filme:', error);
+        toast.error('Fehler beim Löschen aller Filme');
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
 
   return (
     <div className="container-custom py-8">
       <AdminHeader onLogout={handleLogout} />
+      
+      <div className="mb-6 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+        <h2 className="text-lg font-semibold mb-2">Datenbank-Management</h2>
+        <p className="text-gray-600 mb-4">Wenn Sie Probleme mit der Bildanzeige haben oder neu starten möchten, können Sie alle Filme löschen.</p>
+        <Button 
+          variant="destructive" 
+          onClick={handleDeleteAllMovies} 
+          disabled={isDeleting}
+        >
+          {isDeleting ? 'Lösche...' : 'Alle Filme löschen'}
+        </Button>
+      </div>
 
       <Tabs defaultValue="content" className="w-full">
         <TabsList className="mb-6">
