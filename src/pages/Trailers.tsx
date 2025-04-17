@@ -12,7 +12,7 @@ import { Card, CardContent } from '@/components/ui/card';
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const appVersion = "v2.0.4"; // Updated version number to track changes
+  const appVersion = "v2.0.5"; // Updated version number to track changes
 
   useEffect(() => {
     trackPageVisit('trailers');
@@ -58,10 +58,14 @@ const Trailers = () => {
           </Link>
         </div>
 
-        <Card className="border-primary/20 mb-4">
-          <CardContent className="p-4">
-            <p className="text-center text-primary font-semibold">
-              Version {appVersion} - Neue Features und Verbesserungen
+        <Card className="border-red-500 bg-red-50 dark:bg-red-950/20 mb-6">
+          <CardContent className="p-6">
+            <h2 className="text-2xl font-bold text-center text-red-600 mb-2">
+              VERSION UPDATE {appVersion}
+            </h2>
+            <p className="text-center text-red-600 font-semibold">
+              Diese neue Version enthält wichtige Updates und Verbesserungen.
+              Wenn Sie diese Nachricht sehen, wurde die Aktualisierung erfolgreich bereitgestellt.
             </p>
           </CardContent>
         </Card>

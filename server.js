@@ -44,8 +44,10 @@ async function startServer() {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Mode: ${isProduction ? 'Production' : 'Development'}`);
     if (isProduction) {
-      console.log('Public deployment mode active');
-      console.log('Version: 2.0.4 - Full deployment active');
+      console.log('=======================================');
+      console.log('PUBLIC DEPLOYMENT MODE ACTIVE');
+      console.log('Version: 2.0.5 - PRODUCTION DEPLOYMENT');
+      console.log('=======================================');
     }
   });
 }

@@ -18,7 +18,7 @@ router.get('*', function(req: Request, res: Response, next: NextFunction) {
 // Separate the async logic into its own function
 async function handleRender(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
-  console.log(`Handling request for URL: ${url} - Version 2.0.4`);
+  console.log(`Handling request for URL: ${url} - Version 2.0.5`);
 
   try {
     const isCrawler = req.get('User-Agent')?.toLowerCase().includes('bot') ||
@@ -34,11 +34,45 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
     console.log(`Route ${url} - isCrawler: ${isCrawler}, isImportantRoute: ${isImportantRoute}`);
 
     // ALWAYS force SSR for the trailers page to ensure changes are deployed
-    const forcedSSRPaths = ['/neue-trailer'];
+    const forcedSSRPaths = ['/neue-trailer', '/kostenlose-filme'];
     const forceSSR = forcedSSRPaths.includes(url);
     
     if (forceSSR) {
-      console.log(`FORCING server-side rendering for critical path: ${url}`);
+      console.log(`!!! FORCING SERVER-SIDE RENDERING FOR CRITICAL PATH: ${url} !!!`);
+    }
+    
+    // For testing purposes, force SSR for all pages if the specific query param is present
+    if (req.query.forceUpdate === 'true') {
+      console.log(`!!! EMERGENCY FORCE UPDATE REQUESTED FOR: ${url} !!!`);
+      
+      // Apply server-side rendering regardless of other conditions
+      let template, App;
+      
+      if (!isProduction) {
+        template = fs.readFileSync(path.resolve(__dirname, '../../../index.html'), 'utf-8');
+        template = req.vite ? await req.vite.transformIndexHtml(url, template) : template;
+        
+        try {
+          const { default: entryServer } = await req.vite.ssrLoadModule('/src/App.tsx');
+          App = entryServer;
+          return renderApp(url, template, App, {}, res);
+        } catch (error) {
+          if (req.vite) req.vite.ssrFixStacktrace(error);
+          throw error;
+        }
+      } else {
+        template = fs.readFileSync(path.resolve(__dirname, '../../../dist/client/index.html'), 'utf-8');
+        
+        try {
+          const AppPath = '../../../dist/server/App.js';
+          const dynamicImport = new Function('path', 'return import(path)');
+          const entryServer = await dynamicImport(AppPath);
+          App = entryServer.default;
+          return renderApp(url, template, App, {}, res);
+        } catch (error) {
+          throw error;
+        }
+      }
     }
     
     if ((!isCrawler && !isImportantRoute && !forceSSR) && !req.query.forceSSR) {
