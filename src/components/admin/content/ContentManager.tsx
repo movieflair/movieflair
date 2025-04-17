@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { MovieOrShow } from "@/lib/types";
 import AdminSearch from '../search/AdminSearch';
@@ -7,7 +8,7 @@ import MovieEditForm from '../MovieEditForm';
 import TvShowEditForm from '../TvShowEditForm';
 import AdminContentTabs from '../AdminContentTabs';
 import { supabase } from '@/integrations/supabase/client';
-import { getMovieById, downloadMovieImagesToServer } from '@/lib/api';
+import { getMovieById, downloadMovieImagesToServer, importMovieFromTMDB } from '@/lib/api';
 import { importMoviesFromLists } from '@/lib/customListApi';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -159,46 +160,14 @@ const ContentManager = ({
     
     try {
       setImportingMovie(true);
-      toast.loading('Film wird importiert...');
       
-      const fullMovieData = await getMovieById(movie.id);
+      // Use the improved importMovieFromTMDB function
+      const success = await importMovieFromTMDB(movie);
       
-      const { error } = await supabase
-        .from('admin_movies')
-        .upsert({
-          id: movie.id,
-          title: movie.title || '',
-          poster_path: movie.poster_path || '',
-          backdrop_path: movie.backdrop_path || '',
-          overview: movie.overview || '',
-          release_date: movie.release_date || '',
-          vote_average: movie.vote_average || 0,
-          vote_count: movie.vote_count || 0,
-          popularity: movie.popularity || 0,
-          media_type: 'movie',
-          isfreemovie: false,
-          isnewtrailer: false,
-          hasstream: false,
-          streamurl: '',
-          hastrailer: !!fullMovieData.videos?.results?.some((v: any) => v.type === 'Trailer'),
-          trailerurl: fullMovieData.videos?.results?.find((v: any) => v.type === 'Trailer')?.key ? 
-            `https://www.youtube.com/embed/${fullMovieData.videos.results.find((v: any) => v.type === 'Trailer').key}` : ''
-        });
-      
-      if (error) {
-        console.error('Error importing movie:', error);
-        toast.dismiss();
-        toast.error('Fehler beim Importieren des Films');
-        return;
+      if (success) {
+        setProcessedMovies(prev => ({...prev, [movie.id]: true}));
+        movie.isImported = true;
       }
-      
-      await downloadMovieImagesToServer(movie);
-      
-      setProcessedMovies(prev => ({...prev, [movie.id]: true}));
-      movie.isImported = true;
-      
-      toast.dismiss();
-      toast.success('Film erfolgreich importiert');
     } catch (error) {
       console.error('Error importing movie:', error);
       toast.dismiss();
