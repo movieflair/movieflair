@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Settings, User, LogOut } from 'lucide-react';
+import { Settings, User, LogOut, Clapperboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -33,9 +32,10 @@ const Navbar = () => {
   return (
     <nav className="bg-background border-b">
       <div className="container-custom py-4 flex items-center justify-between">
-        {/* Brand only without logo */}
+        {/* Brand with Logo */}
         <Link to="/" className="flex items-center font-bold text-xl md:text-2xl" onClick={closeMobileMenu}>
-          MovieFlix
+          <Clapperboard className="h-8 w-8 mr-2 text-primary" />
+          MovieFlair
         </Link>
 
         {/* Desktop Navigation */}
