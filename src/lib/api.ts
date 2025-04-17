@@ -19,8 +19,8 @@ export {
   getTvShowDetails,
   getTvShowById,
   getCast,
-  getPopularTvShows as getPopularTvShows,
-  searchTvShows as searchTvShows
+  getPopularTvShows,
+  searchTvShows
 } from './tvShowApi';
 
 export * from './filterApi';

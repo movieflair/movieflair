@@ -8,6 +8,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
+import { ensureStorageBucketExists } from '@/lib/setupStorage';
 
 const queryClient = new QueryClient();
 
@@ -28,32 +29,7 @@ const AdminPage = () => {
     // Ensure the storage bucket exists
     const initStorage = async () => {
       try {
-        // Check if bucket exists and create it if it doesn't
-        const { data: buckets, error: listError } = await supabase.storage.listBuckets();
-        
-        if (listError) {
-          console.error('Error listing storage buckets:', listError);
-          return;
-        }
-        
-        const movieImagesBucket = buckets?.find(bucket => bucket.name === 'movie_images');
-        
-        if (!movieImagesBucket) {
-          console.log('Creating movie_images bucket...');
-          // Call our bucket creation edge function
-          const { error: createError } = await supabase.functions.invoke('create-storage-bucket', {
-            body: { name: 'movie_images' }
-          });
-          
-          if (createError) {
-            console.error('Error creating movie_images bucket:', createError);
-            toast.error('Fehler beim Erstellen des Speicher-Buckets');
-          } else {
-            console.log('movie_images bucket created successfully');
-          }
-        } else {
-          console.log('movie_images bucket already exists');
-        }
+        await ensureStorageBucketExists();
       } catch (error) {
         console.error('Error initializing storage:', error);
       }

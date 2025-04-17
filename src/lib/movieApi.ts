@@ -1,3 +1,4 @@
+
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings, callTMDB } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
@@ -305,6 +306,7 @@ export const getPopularMovies = async (): Promise<MovieOrShow[]> => {
           isNewTrailer: savedMovie.isnewtrailer || false,
           hasTrailer: savedMovie.hastrailer || false,
           trailerUrl: savedMovie.trailerurl || '',
+          isImported: !!savedMovie.id
         };
       }) || [];
   } catch (error) {
@@ -450,6 +452,9 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
         isNewTrailer: finalMovieData.isnewtrailer || false,
         poster_path: finalMovieData.poster_path,
         backdrop_path: finalMovieData.backdrop_path,
+        vote_average: finalMovieData.vote_average || 0,
+        vote_count: finalMovieData.vote_count || 0,
+        genre_ids: [],
       };
     }
 
@@ -682,5 +687,30 @@ export const getRandomMovie = async (): Promise<MovieDetail> => {
     const popularMovies = await getPopularMovies();
     const randomIndex = Math.floor(Math.random() * popularMovies.length);
     return getMovieById(popularMovies[randomIndex].id);
+  }
+};
+
+export const getSimilarMovies = async (movieId: number): Promise<MovieOrShow[]> => {
+  try {
+    const data = await callTMDB(`/movie/${movieId}/similar`);
+    const savedSettings = await getAdminMovieSettings();
+    
+    return data.results
+      ?.filter((movie: any) => movie.poster_path && movie.overview && movie.overview.trim() !== '')
+      ?.map((movie: any) => {
+        const savedMovie = savedSettings[movie.id] || {};
+        return {
+          ...movie,
+          media_type: 'movie',
+          isFreeMovie: savedMovie.isfreemovie || false,
+          streamUrl: savedMovie.streamurl || '',
+          isNewTrailer: savedMovie.isnewtrailer || false,
+          hasTrailer: savedMovie.hastrailer || false,
+          trailerUrl: savedMovie.trailerurl || '',
+        };
+      }) || [];
+  } catch (error) {
+    console.error('Error fetching similar movies:', error);
+    return [];
   }
 };
