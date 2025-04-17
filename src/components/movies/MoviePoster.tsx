@@ -1,8 +1,5 @@
-
-import { useState, useEffect } from 'react';
 import WatchlistButton from '@/components/movies/WatchlistButton';
 import ShareButton from '@/components/movies/ShareButton';
-import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MoviePosterProps {
   id: number;
@@ -11,51 +8,15 @@ interface MoviePosterProps {
 }
 
 const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [hasError, setHasError] = useState(false);
-  
-  useEffect(() => {
-    if (!posterPath) {
-      setImageSrc(null);
-      return;
-    }
-    
-    const url = getPublicImageUrl(posterPath);
-    setImageSrc(url);
-    setHasError(false);
-  }, [posterPath]);
-  
-  const handleError = () => {
-    console.error(`Error loading poster for ${title}: ${posterPath}`);
-    
-    if (!hasError && posterPath) {
-      setHasError(true);
-      
-      // Fallback to a smaller image format for TMDB paths
-      if (posterPath.startsWith('/') && !posterPath.startsWith('/storage')) {
-        const tmdbUrl = `https://image.tmdb.org/t/p/w342${posterPath}`;
-        console.log(`Trying smaller TMDB image: ${tmdbUrl}`);
-        setImageSrc(tmdbUrl);
-      } else {
-        setImageSrc(null);
-      }
-    } else {
-      // Second error, give up
-      setImageSrc(null);
-    }
-  };
-  
   return (
     <div className="space-y-2">
       <div className="relative mb-2">
         <div className="rounded-lg overflow-hidden shadow-xl">
-          {imageSrc ? (
+          {posterPath ? (
             <img
-              src={imageSrc}
+              src={`https://image.tmdb.org/t/p/w500${posterPath}`}
               alt={title}
               className="w-full"
-              onError={handleError}
-              loading="eager"
             />
           ) : (
             <div className="aspect-[2/3] bg-gray-200 flex items-center justify-center">

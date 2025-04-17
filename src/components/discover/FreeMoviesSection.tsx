@@ -12,7 +12,6 @@ interface FreeMoviesSectionProps {
 }
 
 const FreeMoviesSection = ({ movies }: FreeMoviesSectionProps) => {
-  // The getFreeMovies function is already updated to only return imported movies
   if (!movies || movies.length === 0) return null;
 
   const newestMovies = movies.slice(0, 2);

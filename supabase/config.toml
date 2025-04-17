@@ -1,29 +1,5 @@
 
 project_id = "bjuzoovrgsozkcdgrxnj"
 
-[api]
-enabled = true
-port = 54321
-schemas = ["public", "storage", "graphql_public"]
-
-[db]
-port = 54322
-
-[studio]
-enabled = true
-port = 54323
-
-[[db.migrations]]
-migrations_dir = "migrations"
-
-[functions.create-storage-bucket]
-verify_jwt = true
-
-[functions.create-movie-storage]
-verify_jwt = true
-
 [functions.tmdb]
-verify_jwt = true
-
-[realtime]
-enabled = false
+verify_jwt = false

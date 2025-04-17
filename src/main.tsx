@@ -1,35 +1,24 @@
 
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Toaster } from 'sonner'
-import { HelmetProvider } from 'react-helmet-async'
+import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { setupStorage } from './lib/setupStorage'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { HelmetProvider } from 'react-helmet-async'
+import { BrowserRouter } from 'react-router-dom'
 import { AdminSettingsProvider } from './hooks/useAdminSettings'
 
-// Initialisiere den Storage-Bucket
-setupStorage().catch(console.error);
+// Create a client
+const queryClient = new QueryClient()
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 Minuten
-      refetchOnWindowFocus: false
-    }
-  }
-})
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <AdminSettingsProvider>
+// Client-Side Rendering - wird nicht für SSR verwendet, sondern nur beim Hydration
+createRoot(document.getElementById("root")!).render(
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <AdminSettingsProvider>
+        <BrowserRouter>
           <App />
-          <Toaster position="top-center" richColors />
-        </AdminSettingsProvider>
-      </QueryClientProvider>
-    </HelmetProvider>
-  </React.StrictMode>,
-)
+        </BrowserRouter>
+      </AdminSettingsProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
+);

@@ -12,8 +12,6 @@ interface TrendingMoviesProps {
 const TrendingMovies = ({ movies }: TrendingMoviesProps) => {
   if (movies.length === 0) return null;
   
-  // Since we're now guaranteed that the movies we receive are imported
-  // (coming from getImportedMovies() in Discover.tsx), we don't need to filter
   const trendingMovies = movies.slice(0, 4);
   
   return (

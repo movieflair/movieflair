@@ -1,4 +1,3 @@
-
 import { Star, Clock, Tv, Film } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,11 +20,8 @@ const MovieMeta = ({
   mediaType,
   className 
 }: MovieMetaProps) => {
-  // Format the rating to show max 1 decimal place and don't show .0
-  const formattedRating = rating ? (rating % 1 === 0 ? rating.toFixed(0) : rating.toFixed(1)) : undefined;
-  
   return (
-    <div className={cn("flex items-center gap-6 text-gray-600 flex-wrap", className)}>
+    <div className={cn("flex items-center gap-6 text-gray-600", className)}>
       {mediaType && (
         <div className="flex items-center gap-1">
           {mediaType === 'movie' ? (
@@ -58,11 +54,11 @@ const MovieMeta = ({
               />
             ))}
           </div>
-          <span>{formattedRating}/10</span>
+          <span>{rating.toFixed(1)}/10</span>
         </div>
       )}
       
-      {duration && duration > 0 && (
+      {duration && (
         <div className="flex items-center gap-1">
           <Clock className="w-4 h-4" />
           <span>{duration} Minuten</span>

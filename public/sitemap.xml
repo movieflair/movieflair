@@ -2,52 +2,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://movieflair.lovable.app/</loc>
+    <loc>https://screenspick.com/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://movieflair.lovable.app/neue-trailer</loc>
+    <loc>https://screenspick.com/trailers</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://movieflair.lovable.app/kostenlose-filme</loc>
+    <loc>https://screenspick.com/free-movies</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://movieflair.lovable.app/genres</loc>
+    <loc>https://screenspick.com/genres</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://movieflair.lovable.app/quick-tipp</loc>
+    <loc>https://screenspick.com/quick-tipp</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://movieflair.lovable.app/entdecken</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://movieflair.lovable.app/ueber-uns</loc>
+    <loc>https://screenspick.com/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://movieflair.lovable.app/filmlisten</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://movieflair.lovable.app/datenschutz</loc>
+    <loc>https://screenspick.com/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>https://movieflair.lovable.app/nutzungsbedingungen</loc>
+    <loc>https://screenspick.com/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

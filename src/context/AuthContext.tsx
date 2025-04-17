@@ -1,14 +1,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User as SupabaseUser, Session } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-
-// Extended User interface with additional properties
-interface User extends SupabaseUser {
-  name?: string;
-  avatarUrl?: string;
-  isAdmin?: boolean;
-}
 
 interface AuthContextType {
   user: User | null;
@@ -39,38 +32,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     // Set up the auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
-        if (currentSession?.user) {
-          // Add the additional properties to the user object
-          const enhancedUser: User = {
-            ...currentSession.user,
-            name: currentSession.user.email?.split('@')[0] || 'User',
-            avatarUrl: null,
-            isAdmin: currentSession.user.email === 'admin@example.com', // Example admin check
-          };
-          setUser(enhancedUser);
-        } else {
-          setUser(null);
-        }
         setSession(currentSession);
+        setUser(currentSession?.user ?? null);
         setLoading(false);
       }
     );
 
     // Then check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
-      if (currentSession?.user) {
-        // Add the additional properties to the user object
-        const enhancedUser: User = {
-          ...currentSession.user,
-          name: currentSession.user.email?.split('@')[0] || 'User',
-          avatarUrl: null,
-          isAdmin: currentSession.user.email === 'admin@example.com', // Example admin check
-        };
-        setUser(enhancedUser);
-      } else {
-        setUser(null);
-      }
       setSession(currentSession);
+      setUser(currentSession?.user ?? null);
       setLoading(false);
     });
 

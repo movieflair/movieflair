@@ -22,7 +22,6 @@ const SimilarMovies = ({ movies }: SimilarMoviesProps) => {
   const [filteredMovies, setFilteredMovies] = useState<MovieOrShow[]>([]);
   
   useEffect(() => {
-    // Filter to only show movies with posters and descriptions
     const filtered = movies.filter(movie => 
       movie.poster_path && 
       movie.overview && 

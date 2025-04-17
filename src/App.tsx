@@ -1,91 +1,91 @@
 
 import React from 'react';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import { HelmetProvider } from 'react-helmet-async';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from '@/context/AuthContext';
-import { Toaster } from 'sonner';
-import MovieDetails from '@/pages/MovieDetails';
-import TvShowDetails from '@/pages/TvShowDetails';
-import AdminPage from '@/pages/AdminPage';
-import MoviesPage from '@/pages/MoviesPage';
-import MainLayout from '@/components/layout/MainLayout';
-import QuickTipp from '@/pages/QuickTipp';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import Index from './pages/Index';
+import MovieDetails from './pages/MovieDetails';
+import TvShowDetails from './pages/TvShowDetails';
+import Trailers from './pages/Trailers';
+import FreeMovies from './pages/FreeMovies';
+import Search from './pages/Search';
+import Genres from './pages/Genres';
+import QuickTipp from './pages/QuickTipp';
+import Watchlist from './pages/Watchlist';
+import Auth from './pages/Auth';
+import Profile from './pages/Profile';
+import About from './pages/About';
+import AdminPage from './pages/AdminPage';
+import { AuthProvider } from './context/AuthContext';
+import { Toaster } from '@/components/ui/toaster';
+import MainLayout from './components/layout/MainLayout';
+import Discover from './pages/Discover';
+import ListDetailPage from './pages/ListDetailPage';
+import AllLists from './pages/AllLists';
+import NotFound from './pages/NotFound';
 
-// Let's create temporary components for pages that don't exist
-const HomePage = () => <MainLayout><div className="container-custom py-12"><h1>Home Page</h1></div></MainLayout>;
-const SearchPage = () => <MainLayout><div className="container-custom py-12"><h1>Search Page</h1></div></MainLayout>;
-const WatchlistPage = () => <MainLayout><div className="container-custom py-12"><h1>Watchlist Page</h1></div></MainLayout>;
-const AuthPage = () => <MainLayout><div className="container-custom py-12"><h1>Auth Page</h1></div></MainLayout>;
-const NotFoundPage = () => <MainLayout><div className="container-custom py-12"><h1>404 - Page Not Found</h1></div></MainLayout>;
+const PrivacyPolicy = () => (
+  <MainLayout>
+    <div className="container-custom py-12">
+      <h1 className="text-3xl font-bold mb-6">Datenschutzerklärung</h1>
+      <p className="prose max-w-none">
+        Hier finden Sie detaillierte Informationen zum Schutz und zur Verarbeitung Ihrer persönlichen Daten bei MovieFlair. 
+        Wir legen großen Wert auf Transparenz und den verantwortungsvollen Umgang mit Ihren Daten.
+      </p>
+      {/* Placeholder for more detailed privacy policy content */}
+    </div>
+  </MainLayout>
+);
 
-// Create context providers wrapper
-const ContextProviders = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <AuthProvider>{children}</AuthProvider>
-  );
+const TermsOfService = () => (
+  <MainLayout>
+    <div className="container-custom py-12">
+      <h1 className="text-3xl font-bold mb-6">Nutzungsbedingungen</h1>
+      <p className="prose max-w-none">
+        Die folgenden Nutzungsbedingungen regeln Ihre Nutzung des MovieFlair-Services. 
+        Durch die Nutzung unserer Plattform erkennen Sie diese Bedingungen an.
+      </p>
+      {/* Placeholder for more detailed terms of service content */}
+    </div>
+  </MainLayout>
+);
+
+const MovieRedirect = () => {
+  const location = useLocation();
+  const id = location.pathname.split('/').pop();
+  return <Navigate to={`/film/${id}`} replace />;
 };
-
-// Create the router
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <HomePage />,
-  },
-  {
-    path: "/film/:id",
-    element: <MovieDetails />,
-  },
-  {
-    path: "/film/:id/:slug",
-    element: <MovieDetails />,
-  },
-  {
-    path: "/serie/:id",
-    element: <TvShowDetails />,
-  },
-  {
-    path: "/serie/:id/:slug",
-    element: <TvShowDetails />,
-  },
-  {
-    path: "/suche",
-    element: <SearchPage />,
-  },
-  {
-    path: "/watchlist",
-    element: <WatchlistPage />,
-  },
-  {
-    path: "/auth",
-    element: <AuthPage />,
-  },
-  {
-    path: "/admin",
-    element: <AdminPage />,
-  },
-  {
-    path: "/movies",
-    element: <MoviesPage />,
-  },
-  {
-    path: "/quick-tipp",
-    element: <QuickTipp />,
-  },
-  {
-    path: "*",
-    element: <NotFoundPage />,
-  },
-]);
 
 const App = () => {
   return (
-    <ContextProviders>
-      <RouterProvider router={router} />
-    </ContextProviders>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/film/:id/:slug?" element={<MovieDetails />} />
+        <Route path="/movie/:id" element={<MovieRedirect />} />
+        <Route path="/serie/:id/:slug?" element={<TvShowDetails />} />
+        <Route path="/neue-trailer" element={<Trailers />} />
+        <Route path="/kostenlose-filme" element={<FreeMovies />} />
+        <Route path="/suche" element={<Search />} />
+        <Route path="/search" element={<Navigate to="/suche" replace />} />
+        <Route path="/entdecken" element={<Discover />} />
+        <Route path="/discover" element={<Discover />} />
+        <Route path="/liste/:slug" element={<ListDetailPage />} />
+        <Route path="/liste/:id/:slug" element={<Navigate to={`/liste/${window.location.pathname.split('/').pop()}`} replace />} />
+        <Route path="/filmlisten" element={<AllLists />} />
+        <Route path="/listen" element={<Navigate to="/filmlisten" replace />} />
+        <Route path="/genres" element={<Genres />} />
+        <Route path="/quick-tipp" element={<QuickTipp />} />
+        <Route path="/merkliste" element={<Watchlist />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/profil" element={<Profile />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/datenschutz" element={<PrivacyPolicy />} />
+        <Route path="/nutzungsbedingungen" element={<TermsOfService />} />
+        <Route path="/ueber-uns" element={<About />} />
+        <Route path="/about" element={<About />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      <Toaster />
+    </AuthProvider>
   );
 };
 

@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { Button } from '@/components/ui/button';
-import { getRandomImportedMovie, MovieDetail } from '@/lib/api';
+import { getRandomMovie, MovieDetail } from '@/lib/api';
 import { Sparkles, ArrowRight, Wand2, Target, Rocket } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import MovieRatingFeedback from '@/components/movies/MovieRatingFeedback';
@@ -16,7 +17,7 @@ const QuickTipp = () => {
   const handleGetRandomMovie = async () => {
     setLoading(true);
     try {
-      const randomMovie = await getRandomImportedMovie();
+      const randomMovie = await getRandomMovie();
       if (!randomMovie.poster_path || !randomMovie.overview || randomMovie.overview.trim() === '') {
         toast.error('Film ohne Beschreibung oder Cover gefunden. Bitte erneut versuchen.');
         setLoading(false);

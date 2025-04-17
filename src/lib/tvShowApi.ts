@@ -1,122 +1,89 @@
+import { MovieOrShow, MovieDetail } from './types';
+import { callTMDB, getAdminTvShowSettings } from './apiUtils';
 
-import { supabase } from '@/integrations/supabase/client';
-import { MovieDetail, MovieOrShow } from './types';
-
-// Exportieren der neuen Funktion zum Abrufen von TV-Shows aus der Datenbank
-export const getTvShowById = async (id: number): Promise<MovieOrShow | null> => {
-  try {
-    const { data, error } = await supabase
-      .from('admin_shows')
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
-      
-    if (error) {
-      console.error('Error fetching TV show from database:', error);
-      return null;
-    }
-    
-    if (!data) return null;
-    
-    return {
-      ...data,
-      genre_ids: [], 
-      media_type: 'tv' as const,
-      hasStream: data.hasstream,
-      hasTrailer: data.hastrailer,
-      streamUrl: data.streamurl,
-      trailerUrl: data.trailerurl,
-    };
-  } catch (error) {
-    console.error('Error fetching TV show from database:', error);
-    return null;
-  }
-};
-
-// TMDB API-Funktion zum Abrufen der TV-Show-Details
-export const getTvShowDetails = async (id: string | number): Promise<MovieDetail> => {
-  const url = `https://api.themoviedb.org/3/tv/${id}?api_key=${import.meta.env.VITE_TMDB_API_KEY}&language=de-DE&append_to_response=videos,credits`;
+export const getPopularTvShows = async (): Promise<MovieOrShow[]> => {
+  const data = await callTMDB('/tv/popular');
+  const savedSettings = await getAdminTvShowSettings();
   
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-
-    // Extrahiere Cast und Crew aus den Credits
-    const cast = data.credits?.cast || [];
-    const crew = data.credits?.crew || [];
-
+  return data.results.map((show: any) => {
+    const savedShow = savedSettings[show.id] || {};
     return {
-      ...data,
+      ...show,
       media_type: 'tv',
-      cast,
-      crew,
-      genre_ids: data.genres?.map((g: any) => g.id) || [],
+      hasStream: savedShow.hasStream || false,
+      streamUrl: savedShow.streamUrl || '',
+      hasTrailer: savedShow.hasTrailer || false,
+      trailerUrl: savedShow.trailerUrl || '',
     };
-  } catch (error) {
-    console.error('Error fetching TV show details:', error);
-    throw new Error('Failed to fetch TV show details');
-  }
+  });
 };
 
-// Funktion zum Abrufen des Casts für einen Film oder eine TV-Show
-export const getCast = async (id: string | number, type: 'movie' | 'tv'): Promise<any[]> => {
-  try {
-    const url = `https://api.themoviedb.org/3/${type}/${id}/credits?api_key=${import.meta.env.VITE_TMDB_API_KEY}&language=de-DE`;
-    const response = await fetch(url);
-    const data = await response.json();
-    return data.cast || [];
-  } catch (error) {
-    console.error(`Error fetching ${type} cast:`, error);
-    return [];
-  }
+export const getTvShowDetails = async (id: string): Promise<MovieDetail> => {
+  const [showData, videos, credits] = await Promise.all([
+    callTMDB(`/tv/${id}`),
+    callTMDB(`/tv/${id}/videos`),
+    callTMDB(`/tv/${id}/credits`),
+  ]);
+
+  const savedSettings = await getAdminTvShowSettings();
+  const savedShow = savedSettings[id] || {};
+
+  return {
+    ...showData,
+    media_type: 'tv',
+    videos: { results: videos.results },
+    cast: credits.cast?.slice(0, 10),
+    crew: credits.crew,
+    hasTrailer: savedShow.hasTrailer ?? videos.results?.some((v: any) => v.type === 'Trailer'),
+    hasStream: savedShow.hasStream || false,
+    streamUrl: savedShow.streamUrl || '',
+    trailerUrl: savedShow.trailerUrl || '',
+  };
 };
 
-// Funktion zum Abrufen beliebter TV-Shows
-export const getPopularTvShows = async (page = 1): Promise<MovieOrShow[]> => {
-  try {
-    const url = `https://api.themoviedb.org/3/tv/popular?api_key=${import.meta.env.VITE_TMDB_API_KEY}&language=de-DE&page=${page}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    return data.results.map((show: any) => ({
-      id: show.id,
-      name: show.name,
-      poster_path: show.poster_path,
-      backdrop_path: show.backdrop_path,
-      overview: show.overview,
-      vote_average: show.vote_average,
-      first_air_date: show.first_air_date,
-      genre_ids: show.genre_ids || [],
-      media_type: 'tv',
-    }));
-  } catch (error) {
-    console.error('Error fetching popular TV shows:', error);
-    return [];
-  }
+export const getCast = async (id: string, mediaType: 'movie' | 'tv'): Promise<any[]> => {
+  const credits = await callTMDB(`/${mediaType}/${id}/credits`);
+  return credits.cast?.slice(0, 10) || [];
 };
 
-// Funktion zum Suchen von TV-Shows
-export const searchTvShows = async (query: string, page = 1): Promise<MovieOrShow[]> => {
+export const searchTvShows = async (query: string): Promise<MovieOrShow[]> => {
   if (!query) return [];
   
-  try {
-    const url = `https://api.themoviedb.org/3/search/tv?api_key=${import.meta.env.VITE_TMDB_API_KEY}&language=de-DE&query=${encodeURIComponent(query)}&page=${page}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    return data.results.map((show: any) => ({
-      id: show.id,
-      name: show.name,
-      poster_path: show.poster_path,
-      backdrop_path: show.backdrop_path,
-      overview: show.overview,
-      vote_average: show.vote_average,
-      first_air_date: show.first_air_date,
-      genre_ids: show.genre_ids || [],
+  const data = await callTMDB('/search/tv', { query });
+  const savedSettings = await getAdminTvShowSettings();
+  
+  return data.results.map((show: any) => {
+    const savedShow = savedSettings[show.id] || {};
+    return {
+      ...show,
       media_type: 'tv',
-    }));
-  } catch (error) {
-    console.error('Error searching TV shows:', error);
-    return [];
-  }
+      hasStream: savedShow.hasStream || false,
+      streamUrl: savedShow.streamUrl || '',
+      hasTrailer: savedShow.hasTrailer || false,
+      trailerUrl: savedShow.trailerUrl || '',
+    };
+  });
+};
+
+export const getTvShowById = async (id: number): Promise<MovieDetail> => {
+  const [showData, videos, credits] = await Promise.all([
+    callTMDB(`/tv/${id}`),
+    callTMDB(`/tv/${id}/videos`),
+    callTMDB(`/tv/${id}/credits`),
+  ]);
+
+  const savedSettings = await getAdminTvShowSettings();
+  const savedShow = savedSettings[id] || {};
+
+  return {
+    ...showData,
+    media_type: 'tv',
+    videos: { results: videos.results },
+    cast: credits.cast?.slice(0, 10),
+    crew: credits.crew,
+    hasTrailer: savedShow.hasTrailer ?? videos.results?.some((v: any) => v.type === 'Trailer'),
+    hasStream: savedShow.hasStream || false,
+    streamUrl: savedShow.streamUrl || '',
+    trailerUrl: savedShow.trailerUrl || '',
+  };
 };

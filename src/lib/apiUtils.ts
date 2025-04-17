@@ -1,34 +1,33 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export async function callTMDB(path: string, searchParams: Record<string, any> = {}) {
-  // Set default parameters if not specified
+  // Füge Standardparameter hinzu, wenn nicht angegeben
   const finalParams = {
     language: 'de-DE',
     ...searchParams
   };
   
+  console.log(`Calling TMDB API: ${path} with params:`, finalParams);
+  
   try {
-    console.log(`Calling TMDB API: ${path} with params:`, finalParams);
-    
     const { data, error } = await supabase.functions.invoke('tmdb', {
       body: { path, searchParams: finalParams },
     });
 
     if (error) {
       console.error('Error from Supabase TMDB function:', error);
-      throw new Error(`Supabase function error: ${error.message}`);
+      throw error;
     }
     
     if (!data) {
-      console.warn('No data returned from TMDB API');
+      console.error('No data returned from TMDB API');
       return { results: [] };
     }
     
     return data;
   } catch (err) {
     console.error('Error calling TMDB API:', err);
-    // Return empty results on error for graceful degradation
+    // Fallback zu leeren Ergebnissen im Fehlerfall
     return { results: [] };
   }
 }

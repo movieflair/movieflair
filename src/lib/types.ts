@@ -23,7 +23,7 @@ export interface MovieOrShow {
   vote_count?: number;
   release_date?: string;
   first_air_date?: string;
-  genre_ids?: number[];
+  genre_ids: number[];
   media_type: 'movie' | 'tv';
   hasStream?: boolean;
   streamUrl?: string;
@@ -31,18 +31,7 @@ export interface MovieOrShow {
   trailerUrl?: string;
   isFreeMovie?: boolean;
   isNewTrailer?: boolean;
-  popularity?: number;
-  isImported?: boolean;
-  runtime?: number | null;
-  credits?: string; // Added the credits property as a string to store JSON data
-  
-  // Database field mappings for compatibility
-  hasstream?: boolean;
-  hastrailer?: boolean;
-  streamurl?: string;
-  trailerurl?: string;
-  isfreemovie?: boolean;
-  isnewtrailer?: boolean;
+  popularity?: number; // Added this missing property
 }
 
 export interface MovieDetail extends MovieOrShow {

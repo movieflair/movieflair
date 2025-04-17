@@ -12,7 +12,6 @@ interface TrailersSectionProps {
 }
 
 const TrailersSection = ({ movies }: TrailersSectionProps) => {
-  // The getTrailerMovies function is already updated to only return imported movies
   if (!movies || movies.length === 0) return null;
 
   const newestTrailers = movies.slice(0, 2);

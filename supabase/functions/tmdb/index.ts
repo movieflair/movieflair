@@ -2,7 +2,6 @@
 import { corsHeaders } from '../_shared/cors.ts'
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -12,32 +11,12 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get('TMDB_API_KEY')
     
     if (!apiKey) {
-      console.error('TMDB API key not found in environment variables');
-      return new Response(
-        JSON.stringify({ error: 'API configuration error', message: 'TMDB API key not found' }), 
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      );
-    }
-
-    // Validate that a path was provided
-    if (!path) {
-      console.error('No TMDB API path provided');
-      return new Response(
-        JSON.stringify({ error: 'Invalid request', message: 'No API path provided' }), 
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-      );
+      throw new Error('TMDB API key not found')
     }
 
     // Build the URL with search parameters
     const url = new URL(`https://api.themoviedb.org/3${path}`)
     url.searchParams.append('api_key', apiKey)
-    
-    // For movie details, always append videos and credits
-    if (path.startsWith('/movie/') && path.split('/').length === 3) {
-      if (!searchParams.append_to_response) {
-        searchParams.append_to_response = 'videos,credits,images,genres';
-      }
-    }
     
     // Add additional search parameters
     Object.entries(searchParams).forEach(([key, value]) => {
@@ -46,9 +25,7 @@ Deno.serve(async (req) => {
       }
     })
 
-    // Log the request (hiding the API key)
-    const sanitizedUrl = url.toString().replace(apiKey, 'API_KEY_HIDDEN');
-    console.log(`Fetching TMDB API: ${sanitizedUrl}`);
+    console.log(`Fetching TMDB API: ${url.toString().replace(apiKey, 'API_KEY_HIDDEN')}`);
 
     const response = await fetch(url.toString(), {
       headers: {
@@ -60,65 +37,21 @@ Deno.serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`TMDB API responded with status ${response.status}: ${errorText}`);
-      return new Response(
-        JSON.stringify({ 
-          error: 'TMDB API error', 
-          status: response.status, 
-          message: errorText 
-        }), 
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
-          status: response.status 
-        }
-      );
+      throw new Error(`TMDB API error: ${response.status}`);
     }
     
     const data = await response.json()
-    
-    // Process and restructure data for easier consumption
-    if (path.startsWith('/movie/') && path.split('/').length === 3 && data) {
-      // Extract director from credits
-      if (data.credits) {
-        data.crew = data.credits.crew || [];
-        data.cast = data.credits.cast || [];
-        delete data.credits;
-      }
-      
-      // Ensure we have a proper trailer URL
-      if (data.videos && data.videos.results) {
-        const trailer = data.videos.results.find(
-          (video: any) => video.type === 'Trailer' && video.site === 'YouTube'
-        );
-        if (trailer) {
-          data.trailerUrl = `https://www.youtube.com/embed/${trailer.key}`;
-          data.hasTrailer = true;
-        }
-      }
-    }
-    
-    // Log the response summary
-    if (data.results) {
-      console.log(`TMDB API response: ${data.results.length} results`);
-    } else {
-      console.log(`TMDB API response received (non-results format)`);
-    }
+    console.log(`TMDB API response: ${data.results ? data.results.length : 0} results`);
 
     return new Response(JSON.stringify(data), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })
   } catch (error) {
-    console.error('Error in TMDB function:', error.message, error.stack);
-    return new Response(
-      JSON.stringify({ 
-        error: 'Internal server error', 
-        message: error.message,
-        stack: error.stack 
-      }), 
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
-      }
-    )
+    console.error('Error in TMDB function:', error.message);
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500,
+    })
   }
 })
