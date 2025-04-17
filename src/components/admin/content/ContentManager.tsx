@@ -90,6 +90,7 @@ const ContentManager = ({
     
     try {
       setImportingMovie(true);
+      toast.loading('Film wird importiert...');
       
       // Vollständige Filmdaten abrufen
       const fullMovieData = await getMovieById(movie.id);
@@ -119,13 +120,16 @@ const ContentManager = ({
       
       if (error) {
         console.error('Error importing movie:', error);
+        toast.dismiss();
         toast.error('Fehler beim Importieren des Films');
         return;
       }
       
+      toast.dismiss();
       toast.success('Film erfolgreich importiert');
     } catch (error) {
       console.error('Error importing movie:', error);
+      toast.dismiss();
       toast.error('Fehler beim Importieren des Films');
     } finally {
       setImportingMovie(false);

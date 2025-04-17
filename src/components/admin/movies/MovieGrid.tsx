@@ -1,7 +1,7 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { MovieOrShow } from '@/lib/types';
-import { ImportIcon, Edit, Ban } from 'lucide-react';
+import { ImportIcon, Edit, Ban, Loader } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +23,7 @@ const MovieGrid = ({
   currentView,
   onImportMovie 
 }: MovieGridProps) => {
+  const [importingIds, setImportingIds] = useState<number[]>([]);
 
   // Hilfsfunktion zum Prüfen, ob ein Film bereits importiert wurde
   const isMovieImported = async (movieId: number): Promise<boolean> => {
@@ -48,20 +49,28 @@ const MovieGrid = ({
   // Hilfsfunktion zum direkten Importieren eines Films
   const handleImportMovie = async (movie: MovieOrShow) => {
     try {
+      if (importingIds.includes(movie.id)) {
+        return; // Bereits dabei zu importieren
+      }
+      
+      setImportingIds(prev => [...prev, movie.id]);
+      
       const alreadyImported = await isMovieImported(movie.id);
       
       if (alreadyImported) {
         toast.info('Film bereits importiert');
+        setImportingIds(prev => prev.filter(id => id !== movie.id));
         return;
       }
       
       if (onImportMovie) {
         await onImportMovie(movie);
-        toast.success('Film erfolgreich importiert');
       }
     } catch (error) {
       console.error('Error importing movie:', error);
       toast.error('Fehler beim Importieren des Films');
+    } finally {
+      setImportingIds(prev => prev.filter(id => id !== movie.id));
     }
   };
 
@@ -104,7 +113,9 @@ const MovieGrid = ({
           <div className="aspect-[2/3] bg-gray-100 rounded-md overflow-hidden">
             {movie.poster_path ? (
               <img 
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
+                src={movie.poster_path.startsWith('http') 
+                  ? movie.poster_path 
+                  : `https://image.tmdb.org/t/p/w500${movie.poster_path}`} 
                 alt={movie.title || movie.name}
                 className="w-full h-full object-cover"
               />
@@ -139,9 +150,14 @@ const MovieGrid = ({
                 size="sm" 
                 className="flex-1 h-8 bg-white/20 hover:bg-white/30 border-none text-white"
                 onClick={() => handleImportMovie(movie)}
+                disabled={importingIds.includes(movie.id)}
               >
-                <ImportIcon className="h-4 w-4 mr-1" />
-                Importieren
+                {importingIds.includes(movie.id) ? (
+                  <Loader className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <ImportIcon className="h-4 w-4 mr-1" />
+                )}
+                {importingIds.includes(movie.id) ? 'Wird importiert...' : 'Importieren'}
               </Button>
             </div>
           </div>

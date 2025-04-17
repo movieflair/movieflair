@@ -15,7 +15,7 @@ import {
   searchMovies, 
   searchTvShows,
   getPopularTvShows,
-  getPopularMovies // Diese Funktion nutzen wir nur für die Suche
+  getPopularMovies
 } from '@/lib/api';
 
 import AdminHeader from './header/AdminHeader';
@@ -180,6 +180,8 @@ const AdminPanel = () => {
     if (!selectedMovie) return;
 
     try {
+      toast.loading("Film wird gespeichert...");
+      
       const updatedMovie = {
         id: selectedMovie.id,
         title: selectedMovie.title,
@@ -199,6 +201,8 @@ const AdminPanel = () => {
         trailerurl: isNewTrailer ? trailerUrl : ''
       };
 
+      console.log("Saving movie with data:", updatedMovie);
+
       const { error: checkError } = await supabase
         .from('admin_movies')
         .select('*')
@@ -207,6 +211,7 @@ const AdminPanel = () => {
         
       if (checkError) {
         console.error('Error checking if movie exists:', checkError);
+        toast.dismiss();
         toast.error("Fehler beim Überprüfen des Films");
         return;
       }
@@ -217,6 +222,7 @@ const AdminPanel = () => {
       
       if (saveError) {
         console.error('Error saving movie to Supabase:', saveError);
+        toast.dismiss();
         toast.error("Fehler beim Speichern des Films");
         return;
       }
@@ -226,10 +232,12 @@ const AdminPanel = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-trailer-movies'] });
       queryClient.invalidateQueries({ queryKey: ['search-movies'] });
       
+      toast.dismiss();
       toast.success("Änderungen gespeichert");
       setSelectedMovie(null);
     } catch (error) {
       console.error('Error saving movie:', error);
+      toast.dismiss();
       toast.error("Fehler beim Speichern des Films");
     }
   };

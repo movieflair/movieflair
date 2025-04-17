@@ -1,10 +1,11 @@
 
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { MovieOrShow } from "@/lib/types";
-import { LinkIcon, PlayCircle } from "lucide-react";
+import { LinkIcon, PlayCircle, Image } from "lucide-react";
 import MovieCategories from "./MovieCategories";
 
 interface MovieEditFormProps {
@@ -38,6 +39,12 @@ const MovieEditForm = ({
   onSave,
   onCancel,
 }: MovieEditFormProps) => {
+  const [title, setTitle] = useState(selectedMovie.title || '');
+  const [overview, setOverview] = useState(selectedMovie.overview || '');
+  const [posterPath, setPosterPath] = useState(selectedMovie.poster_path || '');
+  const [backdropPath, setBackdropPath] = useState(selectedMovie.backdrop_path || '');
+  const [releaseDate, setReleaseDate] = useState(selectedMovie.release_date || '');
+
   return (
     <div className="border border-border rounded-md p-6 mb-6">
       <div className="flex justify-between items-center mb-4">
@@ -54,8 +61,8 @@ const MovieEditForm = ({
             id="title"
             placeholder="Fight Club"
             className="mt-1"
-            value={selectedMovie.title || ''}
-            readOnly
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
@@ -65,8 +72,8 @@ const MovieEditForm = ({
             id="year"
             placeholder="1999"
             className="mt-1"
-            value={selectedMovie.release_date?.substring(0, 4) || ''}
-            readOnly
+            value={releaseDate}
+            onChange={(e) => setReleaseDate(e.target.value)}
           />
         </div>
 
@@ -77,9 +84,55 @@ const MovieEditForm = ({
             rows={3}
             className="w-full mt-1 p-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary/30"
             placeholder="Film Beschreibung..."
-            value={selectedMovie.overview || ''}
-            readOnly
+            value={overview}
+            onChange={(e) => setOverview(e.target.value)}
           />
+        </div>
+
+        <div>
+          <Label htmlFor="posterPath" className="flex items-center gap-2">
+            <Image className="w-4 h-4" />
+            Poster URL
+          </Label>
+          <Input
+            id="posterPath"
+            placeholder="/path/to/poster.jpg"
+            className="mt-1"
+            value={posterPath}
+            onChange={(e) => setPosterPath(e.target.value)}
+          />
+          {posterPath && (
+            <div className="mt-2">
+              <img 
+                src={posterPath.startsWith('http') ? posterPath : `https://image.tmdb.org/t/p/w500${posterPath}`} 
+                alt="Poster Vorschau" 
+                className="w-32 h-auto rounded-md border border-border"
+              />
+            </div>
+          )}
+        </div>
+
+        <div>
+          <Label htmlFor="backdropPath" className="flex items-center gap-2">
+            <Image className="w-4 h-4" />
+            Hintergrundbild URL
+          </Label>
+          <Input
+            id="backdropPath"
+            placeholder="/path/to/backdrop.jpg"
+            className="mt-1"
+            value={backdropPath}
+            onChange={(e) => setBackdropPath(e.target.value)}
+          />
+          {backdropPath && (
+            <div className="mt-2">
+              <img 
+                src={backdropPath.startsWith('http') ? backdropPath : `https://image.tmdb.org/t/p/w500${backdropPath}`} 
+                alt="Hintergrundbild Vorschau" 
+                className="w-full h-auto rounded-md border border-border"
+              />
+            </div>
+          )}
         </div>
 
         <div className="md:col-span-2">
@@ -145,12 +198,33 @@ const MovieEditForm = ({
               value={trailerUrl}
               onChange={(e) => setTrailerUrl(e.target.value)}
             />
+            {trailerUrl && (
+              <div className="mt-2 aspect-video">
+                <iframe 
+                  src={trailerUrl} 
+                  title="Trailer Vorschau"
+                  className="w-full h-full rounded-md border border-border"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            )}
           </div>
         )}
       </div>
 
       <div className="flex justify-end mt-6">
-        <Button onClick={onSave}>Speichern</Button>
+        <Button onClick={() => {
+          // Update selectedMovie with new values
+          selectedMovie.title = title;
+          selectedMovie.overview = overview;
+          selectedMovie.poster_path = posterPath;
+          selectedMovie.backdrop_path = backdropPath;
+          selectedMovie.release_date = releaseDate;
+          
+          onSave();
+        }}>
+          Speichern
+        </Button>
       </div>
     </div>
   );
