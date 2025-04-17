@@ -33,7 +33,7 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
     if (!movie?.streamUrl) return;
     
     // Track the interaction
-    trackInteraction('stream_click', movie.id, movie.media_type || 'movie');
+    trackInteraction('stream_click', { movieId: movie.id, mediaType: movie.media_type || 'movie' });
     
     if (movie?.streamUrl.includes('embed')) {
       setShowTrailer(true);
@@ -44,7 +44,7 @@ export const MovieContent = ({ movie, amazonAffiliateId }: MovieContentProps) =>
   
   const handleTrailerClick = () => {
     // Track the interaction
-    trackInteraction('trailer_click', movie.id, movie.media_type || 'movie');
+    trackInteraction('trailer_click', { movieId: movie.id, mediaType: movie.media_type || 'movie' });
     setShowTrailer(true);
   };
 
