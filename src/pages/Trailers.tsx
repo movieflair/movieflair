@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
@@ -24,6 +23,7 @@ const Trailers = () => {
         if (data.length > 0) {
           console.log('Trailers page: Sample trailer item:', data[0]);
         }
+        
         setTrailerItems(data);
       } catch (error) {
         console.error('Error fetching trailers:', error);

@@ -14,7 +14,21 @@ interface TrailersSectionProps {
 const TrailersSection = ({ movies }: TrailersSectionProps) => {
   if (!movies || movies.length === 0) return null;
 
-  const newestTrailers = movies.slice(0, 2);
+  // Sort movies by updated_at in descending order (newest first)
+  // If updated_at is not available, fallback to release_date or first_air_date
+  const sortedMovies = [...movies].sort((a, b) => {
+    const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 
+                 a.release_date ? new Date(a.release_date).getTime() : 
+                 a.first_air_date ? new Date(a.first_air_date).getTime() : 0;
+    
+    const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 
+                 b.release_date ? new Date(b.release_date).getTime() : 
+                 b.first_air_date ? new Date(b.first_air_date).getTime() : 0;
+    
+    return dateB - dateA; // Descending order
+  });
+
+  const newestTrailers = sortedMovies.slice(0, 2);
 
   return (
     <section className="rounded-2xl bg-card p-6 border shadow-sm h-full">
