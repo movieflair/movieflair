@@ -1,18 +1,16 @@
 
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shuffle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, Gift } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { Button } from '@/components/ui/button';
 import { Seo } from '@/components/seo/Seo';
-import { toast } from "@/hooks/use-toast";
 
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
   useEffect(() => {
     trackPageVisit('free-movies');
@@ -26,11 +24,6 @@ const FreeMovies = () => {
         setMovies(data);
       } catch (error) {
         console.error('Error fetching free movies:', error);
-        toast({
-          title: "Fehler",
-          description: "Filme konnten nicht geladen werden. Bitte versuche es später erneut.",
-          variant: "destructive"
-        });
       } finally {
         setIsLoading(false);
       }
@@ -38,25 +31,6 @@ const FreeMovies = () => {
 
     fetchMovies();
   }, []);
-
-  const handleRandomMovie = () => {
-    if (movies.length > 0) {
-      const randomIndex = Math.floor(Math.random() * movies.length);
-      const randomMovie = movies[randomIndex];
-      console.log('Navigating to random movie:', randomMovie);
-      
-      // Show a toast to make it more visible that something happened
-      toast({
-        title: "Zufallsfilm ausgewählt",
-        description: `${randomMovie.title || randomMovie.name} wird geladen...`,
-      });
-      
-      // Add a small delay to make the navigation more noticeable
-      setTimeout(() => {
-        navigate(`/film/${randomMovie.id}`);
-      }, 500);
-    }
-  };
 
   const seoTitle = "Kostenlose Filme Online anschauen | MovieFlair";
   const seoDescription = "Kostenlose Filme Online anschauen - Entdecke eine kuratierte Auswahl an Filmen, die du komplett kostenlos und legal streamen kannst.";
@@ -80,7 +54,6 @@ const FreeMovies = () => {
             <ArrowLeft className="w-4 h-4 mr-1" />
             Zurück zu Entdecken
           </Link>
-          <span className="text-xs text-muted-foreground ml-auto">v2.0.2</span>
         </div>
 
         <div className="relative overflow-hidden rounded-2xl mb-10">
@@ -106,14 +79,15 @@ const FreeMovies = () => {
               </div>
               
               <Button 
+                asChild
                 variant="secondary"
                 size="sm"
-                className="flex items-center gap-2 group"
-                onClick={handleRandomMovie}
-                disabled={movies.length === 0}
+                className="flex items-center gap-1"
               >
-                <Shuffle className="w-4 h-4 group-hover:animate-spin" />
-                Zufallsfilm starten
+                <Link to="/entdecken">
+                  <Gift className="w-4 h-4" />
+                  Zurück zur Übersicht
+                </Link>
               </Button>
             </div>
           </div>

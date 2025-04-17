@@ -18,7 +18,6 @@ router.get('*', function(req: Request, res: Response, next: NextFunction) {
 // Separate the async logic into its own function
 async function handleRender(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
-  console.log(`[Server] Handling render for URL: ${url}`);
 
   try {
     const isCrawler = req.get('User-Agent')?.toLowerCase().includes('bot') ||
@@ -31,10 +30,7 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
       url.match(/^\/liste\//) ||
       ['/', '/neue-trailer', '/kostenlose-filme', '/entdecken', '/filmlisten'].includes(url);
 
-    console.log(`[Server] URL: ${url}, isCrawler: ${isCrawler}, isImportantRoute: ${isImportantRoute}`);
-
     if ((!isCrawler && !isImportantRoute) && !req.query.forceSSR) {
-      console.log(`[Server] Serving static HTML for: ${url}`);
       const indexHtml = fs.readFileSync(
         path.resolve(__dirname, isProduction ? '../../../dist/client/index.html' : '../../../index.html'),
         'utf-8'
@@ -52,20 +48,18 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
         try {
           const { default: entryServer } = await req.vite.ssrLoadModule('/src/App.tsx');
           App = entryServer;
-          console.log(`[Server] Rendering app for development: ${url}`);
           renderApp(url, template, App, {}, res);
         } catch (error) {
           if (req.vite) {
             req.vite.ssrFixStacktrace(error);
           }
-          console.error('[Server] Render error in development:', error);
+          console.error('Render error:', error);
           throw error;
         }
       } else {
         throw new Error('Vite dev server not available');
       }
     } else {
-      console.log(`[Server] Production rendering for: ${url}`);
       template = fs.readFileSync(path.resolve(__dirname, '../../../dist/client/index.html'), 'utf-8');
       const AppPath = '../../../dist/server/App.js';
       const dynamicImport = new Function('path', 'return import(path)');
@@ -73,10 +67,9 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
       try {
         const entryServer = await dynamicImport(AppPath);
         App = entryServer.default;
-        console.log(`[Server] Rendering app for production: ${url}`);
         renderApp(url, template, App, {}, res);
       } catch (error) {
-        console.error('[Server] Render error in production:', error);
+        console.error('Render error:', error);
         throw error;
       }
     }
@@ -84,7 +77,7 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
     if (!isProduction && req.vite) {
       req.vite.ssrFixStacktrace(error);
     }
-    console.error('[Server] Render error:', error);
+    console.error('Render error:', error);
     throw error;
   }
 }

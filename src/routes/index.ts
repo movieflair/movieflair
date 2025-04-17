@@ -9,9 +9,6 @@ const router = Router();
 router.use(sitemapRouter);
 
 // Mount render router for all paths (catch-all)
-router.use((req, res, next) => {
-  console.log(`[Routes] Request received for path: ${req.path}`);
-  next();
-}, renderRouter);
+router.use(renderRouter);
 
 export default router;

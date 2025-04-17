@@ -7,8 +7,6 @@ import fs from 'fs';
 import path from 'path';
 
 export function renderApp(url: string, template: string, App: any, helmetContext: any, res: any) {
-  console.log(`[RenderUtils] Starting SSR for URL: ${url}`);
-  
   const { pipe } = renderToPipeableStream(
     React.createElement(
       HelmetProvider,
@@ -30,13 +28,12 @@ export function renderApp(url: string, template: string, App: any, helmetContext
           ${helmet?.script?.toString() || ''}
         `);
         
-        console.log(`[RenderUtils] Shell ready for URL: ${url}, sending response`);
         res.status(200).set({ 'Content-Type': 'text/html' });
         res.write(htmlWithHelmet.split('<!--app-html-->')[0]);
         pipe(res);
       },
       onError(error: Error) {
-        console.error('[RenderUtils] Rendering error:', error);
+        console.error('Rendering error:', error);
         res.status(500).send('Internal Server Error');
       }
     }
