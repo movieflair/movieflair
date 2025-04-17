@@ -129,16 +129,6 @@ const Navbar = () => {
               <User className="h-5 w-5" />
             </Button>
           )}
-
-          {isAdmin && (
-            <Link 
-              to="/admin" 
-              className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
-            >
-              <LayoutDashboard className="w-5 h-5" />
-              <span>Admin Panel</span>
-            </Link>
-          )}
         </div>
 
         <div className="flex md:hidden items-center gap-2">
@@ -241,19 +231,6 @@ const Navbar = () => {
                       <span>Quick Tipp</span>
                     </Button>
                   </div>
-                  
-                  {isAdmin && (
-                    <div className="py-2">
-                      <Button 
-                        variant="ghost" 
-                        className="w-full justify-start text-white hover:text-white hover:bg-gray-800"
-                        onClick={() => navigateTo('/admin')}
-                      >
-                        <LayoutDashboard className="mr-2 h-5 w-5" />
-                        <span>Admin Panel</span>
-                      </Button>
-                    </div>
-                  )}
                 </div>
               </div>
             </SheetContent>
