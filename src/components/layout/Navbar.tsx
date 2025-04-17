@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { List, Play, Gift, User, Bookmark, LogOut, Sparkles, Compass, X } from 'lucide-react';
+import { List, Play, Gift, User, Bookmark, LogOut, Sparkles, Compass, X, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -15,12 +14,36 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { supabase } from '@/integrations/supabase/client';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (user) {
+        const { data, error } = await supabase.rpc(
+          'has_role',
+          { 
+            _user_id: user.id,
+            _role: 'admin'
+          }
+        );
+
+        if (error) {
+          console.error('Error checking admin role:', error);
+        }
+
+        setIsAdmin(data);
+      }
+    };
+
+    checkAdminStatus();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -51,7 +74,6 @@ const Navbar = () => {
           />
         </Link>
 
-        {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
           <Link to="/entdecken" className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors">
             <Compass className="w-5 h-5" />
@@ -107,9 +129,18 @@ const Navbar = () => {
               <User className="h-5 w-5" />
             </Button>
           )}
+
+          {isAdmin && (
+            <Link 
+              to="/admin" 
+              className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
+            >
+              <LayoutDashboard className="w-5 h-5" />
+              <span>Admin Panel</span>
+            </Link>
+          )}
         </div>
 
-        {/* Mobile Navigation */}
         <div className="flex md:hidden items-center gap-2">
           {user ? (
             <DropdownMenu>
@@ -210,6 +241,19 @@ const Navbar = () => {
                       <span>Quick Tipp</span>
                     </Button>
                   </div>
+                  
+                  {isAdmin && (
+                    <div className="py-2">
+                      <Button 
+                        variant="ghost" 
+                        className="w-full justify-start text-white hover:text-white hover:bg-gray-800"
+                        onClick={() => navigateTo('/admin')}
+                      >
+                        <LayoutDashboard className="mr-2 h-5 w-5" />
+                        <span>Admin Panel</span>
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </div>
             </SheetContent>
