@@ -17,9 +17,12 @@ interface MovieSeoDataProps {
 export const MovieSeoData = ({ movie, director }: MovieSeoDataProps) => {
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
   
+  // Individueller SEO-Titel mit Filmname und Jahr
   const seoTitle = formatMediaTitle(movie.title, releaseYear);
+  // Individuelle SEO-Beschreibung mit Übersicht des Films, beschränkt auf 160 Zeichen
   const seoDescription = formatMediaDescription(movie.title, releaseYear, movie.overview, 160);
   
+  // Verwende TMDB-Bilder für OG-Image, aber bevorzuge lokale Bilder falls vorhanden
   const seoOgImage = movie.backdrop_path && movie.backdrop_path.startsWith('/storage') 
     ? getAbsoluteImageUrl(movie.backdrop_path)
     : getAbsoluteImageUrl(
@@ -28,6 +31,7 @@ export const MovieSeoData = ({ movie, director }: MovieSeoDataProps) => {
           : '/movieflair-logo.png'
       );
   
+  // Kanonische URL für diesen Film
   const seoPath = `/film/${movie.id}${movie.title ? `/${encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-'))}` : ''}`;
   const canonical = createCanonicalUrl(seoPath);
 
