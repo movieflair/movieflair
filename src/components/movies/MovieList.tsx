@@ -5,6 +5,7 @@ import { Eye, Calendar, Star, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { createUrlSlug } from '@/lib/urlUtils';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 // Update the MovieOrShow type for runtime
 declare module '@/lib/types' {
@@ -27,17 +28,7 @@ const MovieList = ({ movies }: MovieListProps) => {
         const movieUrl = `/film/${movie.id}/${slug}`;
         
         // Handle image URL construction
-        let posterUrl = '/placeholder.svg';
-        
-        if (movie.poster_path) {
-          if (movie.poster_path.startsWith('/storage')) {
-            posterUrl = window.location.origin + movie.poster_path;
-          } else if (movie.poster_path.startsWith('http')) {
-            posterUrl = movie.poster_path;
-          } else {
-            posterUrl = `https://image.tmdb.org/t/p/original${movie.poster_path}`;
-          }
-        }
+        const posterUrl = movie.poster_path ? getPublicImageUrl(movie.poster_path) : '/placeholder.svg';
         
         return (
           <div 

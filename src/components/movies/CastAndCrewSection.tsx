@@ -33,7 +33,7 @@ const CastAndCrewSection = ({ director, cast }: CastAndCrewSectionProps) => {
             <h4 className="font-medium text-sm text-gray-700 mb-1">Besetzung:</h4>
             <ul className="space-y-1">
               {cast.slice(0, 4).map((actor) => (
-                <li key={actor.id} className="text-sm">
+                <li key={actor.id || actor.name} className="text-sm">
                   <span className="font-medium">{actor.name}</span>
                   {actor.character && (
                     <span className="text-gray-500"> als {actor.character}</span>

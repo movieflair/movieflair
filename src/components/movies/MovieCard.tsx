@@ -5,6 +5,7 @@ import { Star } from 'lucide-react';
 import { MovieOrShow } from '@/lib/api';
 import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
 import { scrollToTop } from '@/utils/scrollUtils';
+import { getPublicImageUrl } from '@/utils/imageUtils';
 
 interface MovieCardProps {
   movie: MovieOrShow;
@@ -29,18 +30,8 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
       return;
     }
     
-    // For locally stored images or complete URLs, use them directly
-    if (posterPath.startsWith('/storage') || posterPath.startsWith('http')) {
-      const url = posterPath.startsWith('/storage') 
-        ? window.location.origin + posterPath 
-        : posterPath;
-      setImageSrc(url);
-    } else {
-      // For TMDB paths, use the full URL
-      const url = `https://image.tmdb.org/t/p/original${posterPath}`;
-      setImageSrc(url);
-    }
-    
+    const url = getPublicImageUrl(posterPath);
+    setImageSrc(url);
     setHasError(false);
   }, [movie.poster_path]);
   
@@ -67,7 +58,7 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
       setHasError(true);
       
       // Try a smaller image format for TMDB paths
-      if (movie.poster_path.startsWith('/')) {
+      if (movie.poster_path.startsWith('/') && !movie.poster_path.startsWith('/storage')) {
         const tmdbUrl = `https://image.tmdb.org/t/p/w342${movie.poster_path}`;
         console.log(`Trying smaller TMDB image: ${tmdbUrl}`);
         setImageSrc(tmdbUrl);

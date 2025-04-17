@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { parseUrlSlug } from '@/lib/urlUtils';
 import { getAdminMovieById, getMovieById, getSimilarMovies } from '@/lib/api';
 import { toast } from 'sonner';
-import type { MovieDetail, MovieOrShow } from '@/lib/types';
+import type { MovieDetail, MovieOrShow, CastMember } from '@/lib/types';
 
 export function useMovieData(id: string | undefined, slug?: string) {
   const [movie, setMovie] = useState<MovieDetail | null>(null);
@@ -31,8 +32,8 @@ export function useMovieData(id: string | undefined, slug?: string) {
           console.log('Film aus lokaler Datenbank geladen:', adminMovie);
           
           // Extrahiere Regie und Besetzung, falls vorhanden
-          let director = undefined;
-          let cast = [];
+          let director: CastMember | undefined = undefined;
+          let cast: CastMember[] = [];
           
           if (adminMovie.credits) {
             try {
@@ -69,8 +70,8 @@ export function useMovieData(id: string | undefined, slug?: string) {
               ...tmdbMovie,
               ...adminMovie,
               // Wir wollen die TMDB Bilder verwenden, daher übernehmen wir nicht die lokalen Pfade
-              poster_path: tmdbMovie.poster_path || adminMovie.poster_path,
-              backdrop_path: tmdbMovie.backdrop_path || adminMovie.backdrop_path,
+              poster_path: adminMovie.poster_path || tmdbMovie.poster_path,
+              backdrop_path: adminMovie.backdrop_path || tmdbMovie.backdrop_path,
               // Genres explizit von TMDB übernehmen
               genres: tmdbMovie.genres || [],
               // Lokale Cast/Crew Daten haben Priorität
@@ -78,12 +79,12 @@ export function useMovieData(id: string | undefined, slug?: string) {
               crew: director ? [director, ...(tmdbMovie.crew || [])] : (tmdbMovie.crew || []),
               runtime: tmdbMovie.runtime || adminMovie.runtime,
               // Andere wichtige Felder
-              hasTrailer: adminMovie.hasTrailer,
-              hasStream: adminMovie.hasStream,
-              streamUrl: adminMovie.streamUrl,
-              trailerUrl: adminMovie.trailerUrl,
-              isFreeMovie: adminMovie.isFreeMovie,
-              isNewTrailer: adminMovie.isNewTrailer,
+              hasTrailer: adminMovie.hasstream,
+              hasStream: adminMovie.hasstream,
+              streamUrl: adminMovie.streamurl,
+              trailerUrl: adminMovie.trailerurl,
+              isFreeMovie: adminMovie.isfreemovie,
+              isNewTrailer: adminMovie.isnewtrailer,
             };
             
             console.log('Kombinierte Filmdaten:', movieData);

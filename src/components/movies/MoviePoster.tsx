@@ -20,18 +20,8 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
       return;
     }
     
-    // For locally stored images or complete URLs, use them directly
-    if (posterPath.startsWith('/storage') || posterPath.startsWith('http')) {
-      const url = posterPath.startsWith('/storage') 
-        ? window.location.origin + posterPath 
-        : posterPath;
-      setImageSrc(url);
-    } else {
-      // For TMDB paths, use the full URL
-      const url = `https://image.tmdb.org/t/p/original${posterPath}`;
-      setImageSrc(url);
-    }
-    
+    const url = getPublicImageUrl(posterPath);
+    setImageSrc(url);
     setHasError(false);
   }, [posterPath]);
   
@@ -42,7 +32,7 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
       setHasError(true);
       
       // Fallback to a smaller image format for TMDB paths
-      if (posterPath.startsWith('/')) {
+      if (posterPath.startsWith('/') && !posterPath.startsWith('/storage')) {
         const tmdbUrl = `https://image.tmdb.org/t/p/w342${posterPath}`;
         console.log(`Trying smaller TMDB image: ${tmdbUrl}`);
         setImageSrc(tmdbUrl);
