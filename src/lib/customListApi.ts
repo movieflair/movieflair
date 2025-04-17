@@ -223,12 +223,16 @@ export const addMovieToList = async (listId: string, movie: MovieOrShow): Promis
   }
   
   // Add the movie to the list
-  const updatedMovies = [...movies, movie];
+  // We need to explicitly cast the movie as Json to ensure type compatibility
+  const updatedMovies = [...movies, movie as unknown as Json];
   
   // Update the list
   const { data: updatedList, error: updateError } = await supabase
     .from('custom_lists')
-    .update({ movies: updatedMovies, updated_at: new Date().toISOString() })
+    .update({ 
+      movies: updatedMovies as Json, 
+      updated_at: new Date().toISOString() 
+    })
     .eq('id', listId)
     .select('*')
     .single();
