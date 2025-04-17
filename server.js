@@ -31,25 +31,46 @@ async function startServer() {
     app.use(express.static(path.resolve(__dirname, 'dist/client')));
   }
   
-  // Sitemap.xml Route - Aktualisiert für korrekte XML-Ausgabe
+  // Sitemap.xml Route - Strikt konfiguriert für korrekte XML-Ausgabe
   app.get('/sitemap.xml', async (req, res) => {
     try {
-      res.removeHeader('X-Powered-By'); // Entferne unnötige Header
+      // Entferne unnötige Header
+      res.removeHeader('X-Powered-By');
       res.removeHeader('Connection');
       res.removeHeader('Keep-Alive');
       
-      // Setze Content-Type und keine Transformation
-      res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-      res.setHeader('X-Content-Type-Options', 'nosniff');
+      // Setze Content-Type und spezifische XML-Header
+      res.set({
+        'Content-Type': 'application/xml; charset=utf-8',
+        'X-Content-Type-Options': 'nosniff',
+        'Cache-Control': 'public, max-age=86400'
+      });
       
-      // Wichtig: Keine Leerzeichen vor der XML-Deklaration
-      const sitemap = await generateSitemapXml();
+      let sitemap;
+      try {
+        // Versuche, die dynamische Sitemap zu generieren
+        sitemap = await generateSitemapXml();
+      } catch (sitemapError) {
+        console.error('Error generating dynamic sitemap:', sitemapError);
+        
+        // Fallback zur statischen Sitemap, wenn die dynamische fehlschlägt
+        try {
+          sitemap = fs.readFileSync(
+            path.resolve(__dirname, isProduction ? 'dist/client/sitemap.xml' : 'public/sitemap.xml'),
+            'utf-8'
+          );
+        } catch (fallbackError) {
+          console.error('Error reading static sitemap:', fallbackError);
+          // Minimales gültiges XML als letzter Ausweg
+          sitemap = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
+        }
+      }
       
-      // Direkt senden ohne weitere Modifikationen
+      // Sende die Sitemap ohne weitere Manipulation
       return res.send(sitemap);
     } catch (error) {
-      console.error('Error generating sitemap:', error);
-      res.status(500).send('Error generating sitemap');
+      console.error('Error serving sitemap:', error);
+      return res.status(500).send('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
     }
   });
 
