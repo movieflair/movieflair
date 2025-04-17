@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Gift } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Shuffle } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
@@ -11,6 +10,7 @@ import { Seo } from '@/components/seo/Seo';
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     trackPageVisit('free-movies');
@@ -31,6 +31,14 @@ const FreeMovies = () => {
 
     fetchMovies();
   }, []);
+
+  const handleRandomMovie = () => {
+    if (movies.length > 0) {
+      const randomIndex = Math.floor(Math.random() * movies.length);
+      const randomMovie = movies[randomIndex];
+      navigate(`/film/${randomMovie.id}`);
+    }
+  };
 
   const seoTitle = "Kostenlose Filme Online anschauen | MovieFlair";
   const seoDescription = "Kostenlose Filme Online anschauen - Entdecke eine kuratierte Auswahl an Filmen, die du komplett kostenlos und legal streamen kannst.";
@@ -79,15 +87,14 @@ const FreeMovies = () => {
               </div>
               
               <Button 
-                asChild
                 variant="secondary"
                 size="sm"
-                className="flex items-center gap-1"
+                className="flex items-center gap-2 group"
+                onClick={handleRandomMovie}
+                disabled={movies.length === 0}
               >
-                <Link to="/entdecken">
-                  <Gift className="w-4 h-4" />
-                  Zurück zur Übersicht
-                </Link>
+                <Shuffle className="w-4 h-4 group-hover:animate-spin" />
+                Zufallsfilm starten
               </Button>
             </div>
           </div>
