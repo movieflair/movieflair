@@ -1,32 +1,23 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
-// Base URL der Website mit der korrekten Domain
-const BASE_URL = 'https://movieflair.co'; 
+const BASE_URL = 'https://movieflair.co';
 
-// Statische Routen
-const routes = [
-  '/',
-  '/neue-trailer',
-  '/kostenlose-filme',
-  '/genres',
-  '/quick-tipp',
-  '/entdecken',
-  '/ueber-uns',
-  '/filmlisten',
-  '/datenschutz',
-  '/nutzungsbedingungen',
+const staticRoutes = [
+  { path: '/', priority: '1.0', changefreq: 'daily' },
+  { path: '/neue-trailer', priority: '0.8', changefreq: 'weekly' },
+  { path: '/kostenlose-filme', priority: '0.8', changefreq: 'weekly' },
+  { path: '/genres', priority: '0.7', changefreq: 'monthly' },
+  { path: '/entdecken', priority: '0.8', changefreq: 'weekly' },
+  { path: '/filmlisten', priority: '0.7', changefreq: 'weekly' },
+  { path: '/quick-tipp', priority: '0.8', changefreq: 'weekly' },
+  { path: '/ueber-uns', priority: '0.5', changefreq: 'monthly' },
+  { path: '/datenschutz', priority: '0.3', changefreq: 'yearly' },
+  { path: '/nutzungsbedingungen', priority: '0.3', changefreq: 'yearly' },
 ];
 
-// Auszuschließende Routen
-const excludedRoutes = [
-  '/admin',
-  '/auth',
-  '/profil',
-  '/merkliste',
-];
+const excludedRoutes = ['/admin', '/auth', '/profil', '/merkliste'];
 
-// Funktion zum Abrufen von allen Filmen aus der Datenbank
 async function fetchAllMovies() {
   try {
     const { data, error } = await supabase
@@ -34,19 +25,14 @@ async function fetchAllMovies() {
       .select('id, title, updated_at')
       .order('updated_at', { ascending: false });
     
-    if (error) {
-      console.error('Error fetching movies for sitemap:', error);
-      return [];
-    }
-    
+    if (error) throw error;
     return data || [];
   } catch (e) {
-    console.error('Exception fetching movies for sitemap:', e);
+    console.error('Error fetching movies for sitemap:', e);
     return [];
   }
 }
 
-// Funktion zum Abrufen von allen TV-Shows aus der Datenbank
 async function fetchAllTvShows() {
   try {
     const { data, error } = await supabase
@@ -54,19 +40,14 @@ async function fetchAllTvShows() {
       .select('id, name, updated_at')
       .order('updated_at', { ascending: false });
     
-    if (error) {
-      console.error('Error fetching TV shows for sitemap:', error);
-      return [];
-    }
-    
+    if (error) throw error;
     return data || [];
   } catch (e) {
-    console.error('Exception fetching TV shows for sitemap:', e);
+    console.error('Error fetching TV shows for sitemap:', e);
     return [];
   }
 }
 
-// Funktion zum Abrufen aller benutzerdefinierten Listen aus der Datenbank
 async function fetchAllCustomLists() {
   try {
     const { data, error } = await supabase
@@ -74,125 +55,101 @@ async function fetchAllCustomLists() {
       .select('id, title, updated_at')
       .order('updated_at', { ascending: false });
     
-    if (error) {
-      console.error('Error fetching custom lists for sitemap:', error);
-      return [];
-    }
-    
+    if (error) throw error;
     return data || [];
   } catch (e) {
-    console.error('Exception fetching custom lists for sitemap:', e);
+    console.error('Error fetching custom lists for sitemap:', e);
     return [];
   }
 }
 
-// Funktion zum Erzeugen des Sitemap-XML-Inhalts
+function createUrlEntry(loc: string, lastmod: string, changefreq: string, priority: string) {
+  return `  <url>
+    <loc>${loc}</loc>
+    <lastmod>${lastmod}</lastmod>
+    <changefreq>${changefreq}</changefreq>
+    <priority>${priority}</priority>
+  </url>`;
+}
+
 export async function generateSitemapXml() {
   try {
-    // WICHTIG: Kein Leerzeichen vor der XML-Deklaration!
-    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-    
-    // Statische Routen hinzufügen mit aktuellem Datum
     const today = new Date().toISOString().split('T')[0];
-    routes.forEach(route => {
-      xml += '  <url>\n';
-      xml += `    <loc>${BASE_URL}${route}</loc>\n`;
-      xml += '    <changefreq>weekly</changefreq>\n';
-      xml += '    <priority>0.8</priority>\n';
-      xml += `    <lastmod>${today}</lastmod>\n`;
-      xml += '  </url>\n';
+    const urls: string[] = [];
+
+    // Add static routes
+    staticRoutes.forEach(route => {
+      urls.push(createUrlEntry(
+        `${BASE_URL}${route.path}`,
+        today,
+        route.changefreq,
+        route.priority
+      ));
     });
-    
-    // Filme aus der Datenbank hinzufügen
+
+    // Add movies
     const movies = await fetchAllMovies();
     movies.forEach(movie => {
       const slug = movie.title ? encodeURIComponent(movie.title.toLowerCase().replace(/\s+/g, '-')) : '';
-      xml += '  <url>\n';
-      xml += `    <loc>${BASE_URL}/film/${movie.id}${slug ? '/' + slug : ''}</loc>\n`;
-      xml += '    <changefreq>monthly</changefreq>\n';
-      xml += '    <priority>0.7</priority>\n';
-      if (movie.updated_at) {
-        xml += `    <lastmod>${new Date(movie.updated_at).toISOString().split('T')[0]}</lastmod>\n`;
-      }
-      xml += '  </url>\n';
+      const lastmod = movie.updated_at ? new Date(movie.updated_at).toISOString().split('T')[0] : today;
+      urls.push(createUrlEntry(
+        `${BASE_URL}/film/${movie.id}${slug ? '/' + slug : ''}`,
+        lastmod,
+        'monthly',
+        '0.7'
+      ));
     });
-    
-    // TV-Shows aus der Datenbank hinzufügen
+
+    // Add TV shows
     const tvShows = await fetchAllTvShows();
     tvShows.forEach(show => {
       const slug = show.name ? encodeURIComponent(show.name.toLowerCase().replace(/\s+/g, '-')) : '';
-      xml += '  <url>\n';
-      xml += `    <loc>${BASE_URL}/serie/${show.id}${slug ? '/' + slug : ''}</loc>\n`;
-      xml += '    <changefreq>monthly</changefreq>\n';
-      xml += '    <priority>0.7</priority>\n';
-      if (show.updated_at) {
-        xml += `    <lastmod>${new Date(show.updated_at).toISOString().split('T')[0]}</lastmod>\n`;
-      }
-      xml += '  </url>\n';
+      const lastmod = show.updated_at ? new Date(show.updated_at).toISOString().split('T')[0] : today;
+      urls.push(createUrlEntry(
+        `${BASE_URL}/serie/${show.id}${slug ? '/' + slug : ''}`,
+        lastmod,
+        'monthly',
+        '0.7'
+      ));
     });
-    
-    // Benutzerdefinierte Listen aus der Datenbank hinzufügen
+
+    // Add custom lists
     const customLists = await fetchAllCustomLists();
     customLists.forEach(list => {
       const slug = list.title ? encodeURIComponent(list.title.toLowerCase().replace(/\s+/g, '-')) : '';
-      xml += '  <url>\n';
-      xml += `    <loc>${BASE_URL}/liste/${list.id}/${slug}</loc>\n`;
-      xml += '    <changefreq>weekly</changefreq>\n';
-      xml += '    <priority>0.6</priority>\n';
-      if (list.updated_at) {
-        xml += `    <lastmod>${new Date(list.updated_at).toISOString().split('T')[0]}</lastmod>\n`;
-      }
-      xml += '  </url>\n';
+      const lastmod = list.updated_at ? new Date(list.updated_at).toISOString().split('T')[0] : today;
+      urls.push(createUrlEntry(
+        `${BASE_URL}/liste/${list.id}/${slug}`,
+        lastmod,
+        'weekly',
+        '0.6'
+      ));
     });
-    
-    xml += '</urlset>';
-    
+
+    // Generate final XML
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.join('\n')}
+</urlset>`;
+
     return xml;
   } catch (error) {
     console.error('Error generating sitemap:', error);
-    // Minimales gültiges XML im Fehlerfall zurückgeben
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>';
   }
 }
 
-// Synchrone Version für den Einsatz in der Entwicklung
-export function generateSitemapXmlSync() {
-  // Kein Leerzeichen vor der XML-Deklaration!
-  let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-  xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
-  
-  const today = new Date().toISOString().split('T')[0];
-  
-  // Statische Routen hinzufügen
-  routes.forEach(route => {
-    xml += '  <url>\n';
-    xml += `    <loc>${BASE_URL}${route}</loc>\n`;
-    xml += '    <changefreq>weekly</changefreq>\n';
-    xml += '    <priority>0.8</priority>\n';
-    xml += `    <lastmod>${today}</lastmod>\n`;
-    xml += '  </url>\n';
-  });
-  
-  xml += '</urlset>';
-  
-  return xml;
-}
-
-// Funktion zum Schreiben der Sitemap in eine Datei
+// Function to write sitemap to file (for development/testing)
 export function writeSitemapToFile() {
   const fs = require('fs');
   const path = require('path');
   
-  const sitemap = generateSitemapXmlSync();
-  const outputPath = path.resolve(process.cwd(), 'public', 'sitemap.xml');
-  
-  // Wichtig: UTF-8 ohne BOM verwenden
-  fs.writeFileSync(outputPath, sitemap, { encoding: 'utf8' });
-  console.log(`Sitemap written to ${outputPath}`);
+  generateSitemapXml().then(sitemap => {
+    const outputPath = path.resolve(process.cwd(), 'public', 'sitemap.xml');
+    fs.writeFileSync(outputPath, sitemap, { encoding: 'utf8' });
+    console.log(`Sitemap written to ${outputPath}`);
+  }).catch(error => {
+    console.error('Error writing sitemap to file:', error);
+  });
 }
 
-// Nur ausführen, wenn diese Datei direkt ausgeführt wird (nicht importiert)
-if (typeof require !== 'undefined' && require.main === module) {
-  writeSitemapToFile();
-}

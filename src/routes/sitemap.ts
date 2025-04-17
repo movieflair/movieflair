@@ -5,8 +5,7 @@ import { generateSitemapXml } from '../utils/generateSitemap';
 
 const router = Router();
 
-// TypeScript fix: Use the correct method signature
-router.get('/sitemap.xml', async function sitemapHandler(req: Request, res: Response) {
+router.get('/sitemap.xml', async (req: Request, res: Response) => {
   try {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -28,3 +27,4 @@ router.get('/sitemap.xml', async function sitemapHandler(req: Request, res: Resp
 });
 
 export default router;
+
