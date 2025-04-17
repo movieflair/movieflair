@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { searchTMDBMovies, importMovieFromTMDB } from '@/lib/api';
+import { fetchMovieFromTMDB } from '@/lib/cms/tmdbApi'; // Add this specific import
 import { MovieOrShow } from '@/lib/types';
 import { toast } from 'sonner';
 import { Search, Import, Film } from 'lucide-react';
@@ -53,7 +54,11 @@ const MovieSearchDialog: React.FC<MovieSearchDialogProps> = ({
     try {
       // First, fetch the movie details to get a MovieOrShow object
       const movieDetails = await fetchMovieFromTMDB(movieId);
-      await importMovie(movieDetails);
+      if (movieDetails) {
+        await importMovie(movieDetails);
+      } else {
+        toast.error('Film konnte nicht gefunden werden');
+      }
     } catch (error) {
       console.error('Error fetching movie details:', error);
       toast.error('Fehler beim Abrufen der Filmdetails');
