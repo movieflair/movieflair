@@ -4,8 +4,8 @@ import { generateSitemapXml } from '../utils/generateSitemap';
 
 const router = Router();
 
-// Specify correct route handler
-router.get('/sitemap.xml', async (req: Request, res: Response) => {
+// TypeScript was incorrectly interpreting the route handler
+router.get('/sitemap.xml', async function(req: Request, res: Response) {
   try {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     res.setHeader('X-Content-Type-Options', 'nosniff');

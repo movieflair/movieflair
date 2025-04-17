@@ -9,8 +9,8 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Specify correct route handler
-router.get('*', async (req: Request, res: Response, next: NextFunction) => {
+// TypeScript was incorrectly interpreting the route handler
+router.get('*', async function(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
 
   try {
