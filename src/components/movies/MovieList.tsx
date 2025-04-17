@@ -7,6 +7,13 @@ import { getPublicImageUrl } from '@/utils/imageUtils';
 import { Link } from 'react-router-dom';
 import { createUrlSlug } from '@/lib/urlUtils';
 
+// Update the MovieOrShow type for runtime
+declare module '@/lib/types' {
+  interface MovieOrShow {
+    runtime?: number;
+  }
+}
+
 interface MovieListProps {
   movies: MovieOrShow[];
 }

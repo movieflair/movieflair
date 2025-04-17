@@ -3,10 +3,12 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AdminSettings {
   amazonAffiliateId: string;
+  logoUrl: string; // Add the missing logoUrl property
 }
 
 const defaultSettings: AdminSettings = {
   amazonAffiliateId: 'movieflair-21',
+  logoUrl: '/movieflair-logo.svg', // Set a default value
 };
 
 const AdminSettingsContext = createContext<AdminSettings>(defaultSettings);

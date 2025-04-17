@@ -23,7 +23,7 @@ const MoviesPage = () => {
   
   const { data: movies = [], isLoading, error } = useQuery({
     queryKey: ['importedMovies'],
-    queryFn: () => getImportedMovies(100),
+    queryFn: () => getImportedMovies(), // Remove the parameter as it's not accepted
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
   

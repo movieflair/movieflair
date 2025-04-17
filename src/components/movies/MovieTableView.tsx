@@ -14,6 +14,8 @@ import { Eye, Star, Check, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { createUrlSlug } from '@/lib/urlUtils';
 
+// MovieOrShow type is updated in MovieList.tsx to include runtime
+
 interface MovieTableViewProps {
   movies: MovieOrShow[];
 }

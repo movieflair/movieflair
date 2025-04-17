@@ -3,6 +3,8 @@
 import { MovieOrShow, MovieDetail } from '../types';
 import { supabase } from '@/integrations/supabase/client';
 
+// Update the MovieOrShow type for runtime (done in MovieList.tsx)
+
 /**
  * Get all movies from our database
  */
@@ -28,7 +30,7 @@ export const getAllMovies = async (): Promise<MovieOrShow[]> => {
       trailerUrl: movie.trailerurl,
       isFreeMovie: movie.isfreemovie,
       isNewTrailer: movie.isnewtrailer,
-      runtime: movie.runtime // Include runtime
+      runtime: movie.runtime || null // Include runtime with fallback
     }));
   } catch (error) {
     console.error('Error fetching movies:', error);
@@ -64,7 +66,7 @@ export const getMovieById = async (id: number): Promise<MovieOrShow | null> => {
       trailerUrl: data.trailerurl,
       isFreeMovie: data.isfreemovie,
       isNewTrailer: data.isnewtrailer,
-      runtime: data.runtime // Include runtime
+      runtime: data.runtime || null // Include runtime with fallback
     };
   } catch (error) {
     console.error('Error fetching movie:', error);
