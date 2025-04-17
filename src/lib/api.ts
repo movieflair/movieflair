@@ -36,3 +36,16 @@ export {
   cleanAllCustomLists
 } from './customListApi';
 export * from './apiUtils';
+
+// Export the new movieCMS API functions
+export {
+  fetchMovieFromTMDB,
+  searchTMDBMovies,
+  getPopularTMDBMovies,
+  importMovieFromTMDB,
+  getAllMovies,
+  getMovieById as getAdminMovieById,
+  updateMovie,
+  deleteMovie,
+  downloadImageToStorage
+} from './movieCmsApi';

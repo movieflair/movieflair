@@ -1,11 +1,14 @@
 
-import { supabase } from '@/integrations/supabase/client';
+import { ensureMovieImagesBucketExists } from './storage';
 
 /**
- * Placeholder function to ensure storage buckets are set up
- * This will be rebuilt in the future
+ * Ensures all storage buckets are set up
  */
 export const ensureStorageBucketExists = async (): Promise<void> => {
-  console.log('ensureStorageBucketExists is currently disabled during rebuild');
-  return;
+  try {
+    await ensureMovieImagesBucketExists();
+    console.log('All storage buckets are set up');
+  } catch (error) {
+    console.error('Error setting up storage buckets:', error);
+  }
 };
