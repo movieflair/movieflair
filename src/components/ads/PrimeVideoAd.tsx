@@ -30,10 +30,10 @@ const PrimeVideoAd = ({ className = '' }: PrimeVideoAdProps) => {
               <div className="h-5 md:h-8">
                 {!logoError ? (
                   <img 
-                    src="https://m.media-amazon.com/images/G/01/digital/video/web/Logo-min.png" 
+                    src="/amazon-prime-logo.svg"  // Lokale SVG-Version mit Fallback
                     alt="Prime Video" 
                     className="h-full w-auto"
-                    onError={(e) => {
+                    onError={() => {
                       console.error('Error loading Prime Video logo');
                       setLogoError(true);
                     }}
