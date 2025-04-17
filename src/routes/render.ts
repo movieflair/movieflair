@@ -9,7 +9,7 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Fix: Use correct method for route handler
+// Specify correct route handler
 router.get('*', async (req: Request, res: Response, next: NextFunction) => {
   const url = req.originalUrl;
 
@@ -47,11 +47,13 @@ router.get('*', async (req: Request, res: Response, next: NextFunction) => {
       }
     } else {
       template = fs.readFileSync(path.resolve(__dirname, '../../../dist/client/index.html'), 'utf-8');
-      // In production mode, dynamically import the server-side entry point
-      // Note: This will be available after the server-side build
+      // In production mode, handle the import differently to avoid TypeScript errors
       try {
-        // Fix: Use dynamic import with proper error handling
-        const entryServer = await import('../../../dist/server/App.js');
+        // Use a dynamic import approach that works with TypeScript
+        const AppPath = '../../../dist/server/App.js';
+        // Using Function constructor to avoid TypeScript static analysis issues
+        const dynamicImport = new Function('path', 'return import(path)');
+        const entryServer = await dynamicImport(AppPath);
         App = entryServer.default;
       } catch (err) {
         console.error('Failed to import server App:', err);
