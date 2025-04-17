@@ -1,12 +1,11 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { cn } from '@/lib/utils';
-import { ModeToggle } from '@/components/ui/mode-toggle';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Settings, User, LogOut } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface NavItem {
   label: string;
@@ -15,7 +14,6 @@ interface NavItem {
 
 const Navbar = () => {
   const { user, signOut } = useAuth();
-  const { logoUrl } = useAdminSettings();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
@@ -30,16 +28,13 @@ const Navbar = () => {
   const NavItems: NavItem[] = [
     { label: 'Home', path: '/' },
     { label: 'Filme', path: '/movies' },
-    { label: 'Genres', path: '/genres' },
-    { label: 'Listen', path: '/lists' },
   ];
 
   return (
     <nav className="bg-background border-b">
       <div className="container-custom py-4 flex items-center justify-between">
-        {/* Logo and Brand */}
+        {/* Brand only without logo */}
         <Link to="/" className="flex items-center font-bold text-xl md:text-2xl" onClick={closeMobileMenu}>
-          <img src={logoUrl || "/movieflair-logo.svg"} alt="MovieFlix Logo" className="h-8 mr-2" />
           MovieFlix
         </Link>
 
@@ -68,9 +63,8 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Authentication and Theme Toggle */}
-        <div className="flex items-center space-x-4">
-          <ModeToggle />
+        {/* Authentication */}
+        <div className="flex items-center">
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

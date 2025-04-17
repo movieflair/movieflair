@@ -16,8 +16,6 @@ import MainLayout from '@/components/layout/MainLayout';
 
 // Let's create temporary components for pages that don't exist
 const HomePage = () => <MainLayout><div className="container-custom py-12"><h1>Home Page</h1></div></MainLayout>;
-const DiscoverPage = () => <MainLayout><div className="container-custom py-12"><h1>Discover Page</h1></div></MainLayout>;
-const GenrePage = () => <MainLayout><div className="container-custom py-12"><h1>Genre Page</h1></div></MainLayout>;
 const SearchPage = () => <MainLayout><div className="container-custom py-12"><h1>Search Page</h1></div></MainLayout>;
 const WatchlistPage = () => <MainLayout><div className="container-custom py-12"><h1>Watchlist Page</h1></div></MainLayout>;
 const AuthPage = () => <MainLayout><div className="container-custom py-12"><h1>Auth Page</h1></div></MainLayout>;
@@ -51,14 +49,6 @@ export const router = createBrowserRouter([
   {
     path: "/serie/:id/:slug",
     element: <TvShowDetails />,
-  },
-  {
-    path: "/entdecken",
-    element: <DiscoverPage />,
-  },
-  {
-    path: "/genres",
-    element: <GenrePage />,
   },
   {
     path: "/suche",
