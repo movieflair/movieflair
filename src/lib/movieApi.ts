@@ -304,14 +304,14 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
       videos: { results: videos.results },
       cast: credits.cast?.slice(0, 10),
       crew: credits.crew,
-      hasTrailer: adminMovie.hastrailer || videos.results?.some((v: any) => v.type === 'Trailer'),
-      hasStream: adminMovie.hasstream || false,
-      streamUrl: adminMovie.streamurl || '',
-      trailerUrl: adminMovie.trailerurl || '',
-      isFreeMovie: adminMovie.isfreemovie || false,
-      isNewTrailer: adminMovie.isnewtrailer || false,
-      poster_path: adminMovie.poster_path,
-      backdrop_path: adminMovie.backdrop_path,
+      hasTrailer: (updatedMovie || adminMovie).hastrailer || videos.results?.some((v: any) => v.type === 'Trailer'),
+      hasStream: (updatedMovie || adminMovie).hasstream || false,
+      streamUrl: (updatedMovie || adminMovie).streamurl || '',
+      trailerUrl: (updatedMovie || adminMovie).trailerurl || '',
+      isFreeMovie: (updatedMovie || adminMovie).isfreemovie || false,
+      isNewTrailer: (updatedMovie || adminMovie).isnewtrailer || false,
+      poster_path: updatedMovie?.poster_path || adminMovie.poster_path,
+      backdrop_path: updatedMovie?.backdrop_path || adminMovie.backdrop_path,
     };
   }
 

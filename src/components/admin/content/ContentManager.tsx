@@ -7,7 +7,7 @@ import MovieEditForm from '../MovieEditForm';
 import TvShowEditForm from '../TvShowEditForm';
 import AdminContentTabs from '../AdminContentTabs';
 import { supabase } from '@/integrations/supabase/client';
-import { getMovieById } from '@/lib/api';
+import { getMovieById, downloadMovieImagesToServer } from '@/lib/api';
 import { importMoviesFromLists } from '@/lib/customListApi';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
