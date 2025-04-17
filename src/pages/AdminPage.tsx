@@ -3,13 +3,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import AdminPanel from '@/components/admin/AdminPanel';
-import { trackPageVisit } from '@/lib/api';
 import { AdminSettingsProvider } from '@/hooks/useAdminSettings';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
-import { ensureStorageBucketExists } from '@/lib/setupStorage';
 
 const queryClient = new QueryClient();
 
@@ -17,7 +15,6 @@ const AdminPage = () => {
   const { user, loading: authLoading } = useAuth();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [storageInitialized, setStorageInitialized] = useState(false);
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -28,20 +25,41 @@ const AdminPage = () => {
       checkAdminAccess();
     }
 
-    // Create the storage bucket for movie images if needed
+    // Ensure the storage bucket exists
     const initStorage = async () => {
-      if (storageInitialized) return;
-      
       try {
-        await ensureStorageBucketExists();
-        setStorageInitialized(true);
+        // Check if bucket exists and create it if it doesn't
+        const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+        
+        if (listError) {
+          console.error('Error listing storage buckets:', listError);
+          return;
+        }
+        
+        const movieImagesBucket = buckets?.find(bucket => bucket.name === 'movie_images');
+        
+        if (!movieImagesBucket) {
+          console.log('Creating movie_images bucket...');
+          // Call our bucket creation edge function
+          const { error: createError } = await supabase.functions.invoke('create-storage-bucket', {
+            body: { name: 'movie_images' }
+          });
+          
+          if (createError) {
+            console.error('Error creating movie_images bucket:', createError);
+            toast.error('Fehler beim Erstellen des Speicher-Buckets');
+          } else {
+            console.log('movie_images bucket created successfully');
+          }
+        } else {
+          console.log('movie_images bucket already exists');
+        }
       } catch (error) {
         console.error('Error initializing storage:', error);
-        toast.error('Fehler bei der Initialisierung des Speicherbuckets');
       }
     };
 
-    if (user && !storageInitialized) {
+    if (user && isLoggedIn) {
       initStorage();
     }
 
@@ -49,7 +67,7 @@ const AdminPage = () => {
     return () => {
       localStorage.removeItem('isAdminLoggedIn');
     };
-  }, [user, storageInitialized, authLoading]);
+  }, [user, authLoading, isLoggedIn]);
 
   const checkAdminAccess = async () => {
     if (!user) {
@@ -60,33 +78,41 @@ const AdminPage = () => {
       return;
     }
 
-    const { data, error } = await supabase.rpc(
-      'has_role',
-      { 
-        _user_id: user.id,
-        _role: 'admin'
+    try {
+      const { data, error } = await supabase.rpc(
+        'has_role',
+        { 
+          _user_id: user.id,
+          _role: 'admin'
+        }
+      );
+
+      if (error) {
+        console.error('Error checking admin role:', error);
+        setIsLoading(false);
+        setIsLoggedIn(false);
+        toast.error("Fehler beim Überprüfen der Berechtigungen");
+        navigate('/');
+        return;
       }
-    );
 
-    if (error) {
-      console.error('Error checking admin role:', error);
+      if (!data) {
+        setIsLoading(false);
+        setIsLoggedIn(false);
+        toast.error("Keine Administrator-Rechte");
+        navigate('/');
+        return;
+      }
+
+      setIsLoggedIn(true);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Unexpected error checking admin status:', error);
       setIsLoading(false);
       setIsLoggedIn(false);
-      toast.error("Fehler beim Überprüfen der Berechtigungen");
+      toast.error("Ein unerwarteter Fehler ist aufgetreten");
       navigate('/');
-      return;
     }
-
-    if (!data) {
-      setIsLoading(false);
-      setIsLoggedIn(false);
-      toast.error("Keine Administrator-Rechte");
-      navigate('/');
-      return;
-    }
-
-    setIsLoggedIn(true);
-    setIsLoading(false);
   };
 
   if (isLoading || authLoading) {

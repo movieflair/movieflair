@@ -8,16 +8,16 @@ export async function callTMDB(path: string, searchParams: Record<string, any> =
     ...searchParams
   };
   
-  console.log(`Calling TMDB API: ${path} with params:`, finalParams);
-  
   try {
+    console.log(`Calling TMDB API: ${path} with params:`, finalParams);
+    
     const { data, error } = await supabase.functions.invoke('tmdb', {
       body: { path, searchParams: finalParams },
     });
 
     if (error) {
       console.error('Error from Supabase TMDB function:', error);
-      throw error;
+      throw new Error(`Supabase function error: ${error.message}`);
     }
     
     if (!data) {

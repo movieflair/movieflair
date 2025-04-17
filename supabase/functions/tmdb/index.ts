@@ -13,7 +13,10 @@ Deno.serve(async (req) => {
     
     if (!apiKey) {
       console.error('TMDB API key not found in environment variables');
-      throw new Error('TMDB API key not found')
+      return new Response(
+        JSON.stringify({ error: 'API configuration error', message: 'TMDB API key not found' }), 
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      );
     }
 
     // Build the URL with search parameters
@@ -41,7 +44,17 @@ Deno.serve(async (req) => {
     if (!response.ok) {
       const errorText = await response.text();
       console.error(`TMDB API responded with status ${response.status}: ${errorText}`);
-      throw new Error(`TMDB API error: ${response.status}`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'TMDB API error', 
+          status: response.status, 
+          message: errorText 
+        }), 
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, 
+          status: response.status 
+        }
+      );
     }
     
     const data = await response.json()
@@ -58,10 +71,17 @@ Deno.serve(async (req) => {
       status: 200,
     })
   } catch (error) {
-    console.error('Error in TMDB function:', error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 500,
-    })
+    console.error('Error in TMDB function:', error.message, error.stack);
+    return new Response(
+      JSON.stringify({ 
+        error: 'Internal server error', 
+        message: error.message,
+        stack: error.stack 
+      }), 
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      }
+    )
   }
 })
