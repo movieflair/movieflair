@@ -9,6 +9,7 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
+// Fix: Use correct method for route handler
 router.get('*', async (req: Request, res: Response, next: NextFunction) => {
   const url = req.originalUrl;
 
@@ -46,11 +47,16 @@ router.get('*', async (req: Request, res: Response, next: NextFunction) => {
       }
     } else {
       template = fs.readFileSync(path.resolve(__dirname, '../../../dist/client/index.html'), 'utf-8');
-      // In production, we use the built app
-      // Note: We're not checking for the actual file existence since this is a build-time check
-      // The actual file will be available at runtime after the server build
-      const { default: entryServer } = await import('../../../dist/server/App.js');
-      App = entryServer;
+      // In production mode, dynamically import the server-side entry point
+      // Note: This will be available after the server-side build
+      try {
+        // Fix: Use dynamic import with proper error handling
+        const entryServer = await import('../../../dist/server/App.js');
+        App = entryServer.default;
+      } catch (err) {
+        console.error('Failed to import server App:', err);
+        return res.status(500).send('Server error: Failed to load server components');
+      }
     }
 
     const helmetContext = {};
