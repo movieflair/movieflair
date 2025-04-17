@@ -1,16 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { ArrowLeft, Youtube } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Youtube, Shuffle } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import TrailerCard from '@/components/movies/TrailerCard';
-import { Seo } from '@/components/seo/Seo';
 import { Button } from '@/components/ui/button';
+import { Seo } from '@/components/seo/Seo';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     trackPageVisit('trailers');
@@ -31,6 +32,14 @@ const Trailers = () => {
 
     fetchTrailerItems();
   }, []);
+
+  const handleRandomTrailer = () => {
+    if (trailerItems.length > 0) {
+      const randomIndex = Math.floor(Math.random() * trailerItems.length);
+      const randomItem = trailerItems[randomIndex];
+      navigate(`/${randomItem.media_type === 'tv' ? 'serie' : 'film'}/${randomItem.id}`);
+    }
+  };
 
   const seoTitle = "Neue Film & Serien Trailer Online anschauen | MovieFlair";
   const seoDescription = "Neue Film & Serien Trailer Online anschauen - Entdecke die aktuellsten Trailer für kommende Filme und Serien";
@@ -78,20 +87,33 @@ const Trailers = () => {
                 </p>
               </div>
               
-              <Button 
-                asChild
-                variant="secondary"
-                className="flex items-center gap-2"
-              >
-                <a 
-                  href="https://www.youtube.com/@movieflair_trailer" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+              <div className="flex gap-3">
+                <Button 
+                  variant="secondary"
+                  size="sm"
+                  className="flex items-center gap-2 group"
+                  onClick={handleRandomTrailer}
+                  disabled={trailerItems.length === 0}
                 >
-                  <Youtube className="w-5 h-5" />
-                  MovieFlair Trailer
-                </a>
-              </Button>
+                  <Shuffle className="w-4 h-4 group-hover:animate-spin" />
+                  Zufallstrailer starten
+                </Button>
+                
+                <Button 
+                  asChild
+                  variant="secondary"
+                  className="flex items-center gap-2"
+                >
+                  <a 
+                    href="https://www.youtube.com/@movieflair_trailer" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                  >
+                    <Youtube className="w-5 h-5" />
+                    MovieFlair Trailer
+                  </a>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
