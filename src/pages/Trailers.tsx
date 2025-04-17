@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
@@ -24,11 +25,16 @@ const Trailers = () => {
           console.log('Trailers page: Sample trailer item:', data[0]);
         }
         
+        // Explizit nach updated_at sortieren, neueste zuerst
         const sortedData = [...data].sort((a, b) => {
+          // Stelle sicher, dass wir mit den aktuellsten Daten arbeiten
           const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
           const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
-          return dateB - dateA; // Neueste zuerst
+          return dateB - dateA; // Neueste Einträge zuerst
         });
+        
+        console.log('Trailers page: Sorted data, first item updated_at:', 
+                     sortedData.length > 0 ? sortedData[0].updated_at : 'no data');
         
         setTrailerItems(sortedData);
       } catch (error) {

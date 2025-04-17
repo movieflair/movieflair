@@ -1,3 +1,4 @@
+
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,7 +26,8 @@ const mapSupabaseMovieToMovieObject = (movie: any): MovieOrShow => {
     trailerUrl: movie.trailerurl || '',
     isFreeMovie: movie.isfreemovie || false,
     isNewTrailer: movie.isnewtrailer || false,
-    popularity: movie.popularity || 0
+    popularity: movie.popularity || 0,
+    updated_at: movie.updated_at || null
   };
 };
 
@@ -34,6 +36,7 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
   let trailerItems: any[] = [];
   
   try {
+    // Holen Sie Trailer-Filme mit expliziter Sortierung nach updated_at absteigend
     const { data: trailerMovies, error: moviesError } = await supabase
       .from('admin_movies')
       .select('*')
@@ -47,6 +50,7 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       console.log(`Found ${trailerMovies.length} trailer movies from Supabase`);
     }
     
+    // Holen Sie Trailer-Serien mit expliziter Sortierung nach updated_at absteigend
     const { data: trailerShows, error: showsError } = await supabase
       .from('admin_shows')
       .select('*')
@@ -60,15 +64,18 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       console.log(`Found ${trailerShows.length} TV shows with trailers from Supabase`);
     }
     
-    // Diese Sortierung ist vielleicht nicht mehr nötig, da wir bereits sortiert abfragen,
-    // aber zur Sicherheit behalten wir sie bei, falls die Daten aus unterschiedlichen Tabellen kommen
+    // Abschließende Sortierung aller Trailer-Items nach updated_at
     trailerItems.sort((a, b) => {
-      const dateA = new Date(a.updated_at || '');
-      const dateB = new Date(b.updated_at || '');
-      return dateB.getTime() - dateA.getTime();
+      const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+      const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+      return dateB - dateA; // Neueste zuerst
     });
     
     console.log(`Total trailer items: ${trailerItems.length}`);
+    if (trailerItems.length > 0) {
+      console.log(`First trailer item updated_at: ${trailerItems[0].updated_at}`);
+    }
+    
     return trailerItems as MovieOrShow[];
   } catch (e) {
     console.error('Error processing trailers:', e);
