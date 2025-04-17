@@ -1,3 +1,4 @@
+
 import { Router } from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import { renderApp } from '../utils/renderUtils';
@@ -9,7 +10,7 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-router.get('*', function renderHandler(req: Request, res: Response, next: NextFunction) {
+router.get('*', async function renderHandler(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
 
   try {
@@ -31,9 +32,8 @@ router.get('*', function renderHandler(req: Request, res: Response, next: NextFu
       return res.status(200).set({ 'Content-Type': 'text/html' }).end(indexHtml);
     }
 
-    // Load and transform template
-    let template;
-    let App;
+    // Wrap template and App loading in an async context
+    let template, App;
     
     if (!isProduction) {
       template = fs.readFileSync(path.resolve(__dirname, '../../../index.html'), 'utf-8');
@@ -46,18 +46,10 @@ router.get('*', function renderHandler(req: Request, res: Response, next: NextFu
       }
     } else {
       template = fs.readFileSync(path.resolve(__dirname, '../../../dist/client/index.html'), 'utf-8');
-      // In production mode, handle the import differently to avoid TypeScript errors
-      try {
-        // Use a dynamic import approach that works with TypeScript
-        const AppPath = '../../../dist/server/App.js';
-        // Using Function constructor to avoid TypeScript static analysis issues
-        const dynamicImport = new Function('path', 'return import(path)');
-        const entryServer = await dynamicImport(AppPath);
-        App = entryServer.default;
-      } catch (err) {
-        console.error('Failed to import server App:', err);
-        return res.status(500).send('Server error: Failed to load server components');
-      }
+      const AppPath = '../../../dist/server/App.js';
+      const dynamicImport = new Function('path', 'return import(path)');
+      const entryServer = await dynamicImport(AppPath);
+      App = entryServer.default;
     }
 
     const helmetContext = {};
@@ -72,3 +64,4 @@ router.get('*', function renderHandler(req: Request, res: Response, next: NextFu
 });
 
 export default router;
+
