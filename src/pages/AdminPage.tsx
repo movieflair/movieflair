@@ -23,6 +23,17 @@ const AdminPage = () => {
     localStorage.setItem('isAdminLoggedIn', 'true');
     checkAdminAccess();
 
+    // Create the storage bucket for movie images if needed
+    const ensureStorageBucket = async () => {
+      try {
+        await supabase.functions.invoke('create-storage-bucket');
+      } catch (error) {
+        console.error('Error creating storage bucket:', error);
+      }
+    };
+
+    ensureStorageBucket();
+
     // Clean up function to remove the flag when leaving the admin area
     return () => {
       localStorage.removeItem('isAdminLoggedIn');

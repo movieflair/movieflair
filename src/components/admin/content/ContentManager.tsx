@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MovieOrShow } from "@/lib/types";
 import AdminSearch from '../search/AdminSearch';
 import MovieGrid from '../movies/MovieGrid';
@@ -83,6 +83,43 @@ const ContentManager = ({
   setHasTrailer,
 }: ContentManagerProps) => {
   const [importingMovie, setImportingMovie] = useState(false);
+  const [processedMovies, setProcessedMovies] = useState<Record<number, boolean>>({});
+
+  useEffect(() => {
+    // Check which movies are already imported
+    const checkImportedMovies = async () => {
+      if (filteredMovies.length === 0) return;
+      
+      const movieIds = filteredMovies.map(movie => movie.id);
+      
+      try {
+        const { data, error } = await supabase
+          .from('admin_movies')
+          .select('id')
+          .in('id', movieIds);
+        
+        if (error) {
+          console.error('Error checking imported movies:', error);
+          return;
+        }
+        
+        const importedIds = new Set(data?.map(item => item.id) || []);
+        
+        // Update movies with isImported flag
+        const processed: Record<number, boolean> = {};
+        filteredMovies.forEach(movie => {
+          processed[movie.id] = importedIds.has(movie.id);
+          movie.isImported = importedIds.has(movie.id);
+        });
+        
+        setProcessedMovies(processed);
+      } catch (error) {
+        console.error('Error processing imported movies:', error);
+      }
+    };
+    
+    checkImportedMovies();
+  }, [filteredMovies]);
 
   // Funktion zum Importieren eines Films
   const handleImportMovie = async (movie: MovieOrShow) => {
@@ -124,6 +161,10 @@ const ContentManager = ({
         toast.error('Fehler beim Importieren des Films');
         return;
       }
+      
+      // Mark movie as imported
+      setProcessedMovies(prev => ({...prev, [movie.id]: true}));
+      movie.isImported = true;
       
       toast.dismiss();
       toast.success('Film erfolgreich importiert');
