@@ -42,6 +42,10 @@ export {
 } from './customListApi';
 export * from './apiUtils';
 
+// Import necessary types and functions for the getSimilarMovies function
+import { MovieOrShow } from './types';
+import { callTMDB, getAdminMovieSettings } from './apiUtils';
+
 // Add missing function for similar movies
 export const getSimilarMovies = async (movieId: number): Promise<MovieOrShow[]> => {
   try {
