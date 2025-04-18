@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Shuffle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Shuffle } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
@@ -57,6 +58,42 @@ const FreeMovies = () => {
       />
 
       <div className="container-custom py-12">
+        <div className="relative overflow-hidden rounded-2xl mb-10">
+          <div className="absolute inset-0 bg-gradient-to-r from-theme-accent-red/90 to-primary/50 mix-blend-multiply"></div>
+          
+          {movies.length > 0 && movies[0].backdrop_path && (
+            <div className="absolute inset-0">
+              <img 
+                src={`https://image.tmdb.org/t/p/w1280${movies[0].backdrop_path}`} 
+                alt="Kostenlose Filme"
+                className="w-full h-full object-cover opacity-20"
+              />
+            </div>
+          )}
+          
+          <div className="relative z-10 p-8 md:p-12">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Kostenlose Filme</h1>
+                <p className="text-white/80 max-w-2xl text-lg">
+                  Eine kuratierte Auswahl an Filmen, die du komplett kostenlos und legal streamen kannst.
+                </p>
+              </div>
+              
+              <Button 
+                variant="secondary"
+                size="sm"
+                className="flex items-center gap-2 group"
+                onClick={handleRandomMovie}
+                disabled={movies.length === 0}
+              >
+                <Shuffle className="w-4 h-4 group-hover:animate-spin" />
+                Zufallsfilm starten
+              </Button>
+            </div>
+          </div>
+        </div>
+        
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold">
