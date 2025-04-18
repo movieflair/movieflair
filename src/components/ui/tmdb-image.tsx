@@ -5,7 +5,7 @@ import { Skeleton } from './skeleton';
 
 interface TMDBImageProps {
   path?: string | null;
-  size?: 'w200' | 'w300' | 'w400' | 'w500' | 'w780' | 'original';
+  size?: 'w200' | 'w300' | 'w400' | 'w500' | 'w780' | 'w1280' | 'original';
   alt: string;
   className?: string;
   fallbackClassName?: string;

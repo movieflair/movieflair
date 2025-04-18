@@ -66,7 +66,7 @@ const FreeMovies = () => {
             <div className="absolute inset-0">
               <TMDBImage 
                 path={movies[0].backdrop_path}
-                size="w1280"
+                size="w780"
                 alt="Kostenlose Filme"
                 className="w-full h-full object-cover opacity-20"
                 priority={true}
