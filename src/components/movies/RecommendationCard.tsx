@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Star, Calendar, Clock } from 'lucide-react';
 import { MovieDetail } from '@/lib/api';
 import { createUrlSlug, getMediaTypeInGerman } from '@/lib/urlUtils';
+import { TMDBImage } from '@/components/ui/tmdb-image';
 
 interface RecommendationCardProps {
   movie: MovieDetail;
@@ -19,17 +20,12 @@ const RecommendationCard = ({ movie }: RecommendationCardProps) => {
     <div className="glass-card overflow-hidden rounded-xl">
       <div className="md:flex h-full">
         <div className="w-full md:w-[300px] h-[450px] flex-shrink-0">
-          {movie.poster_path ? (
-            <img
-              src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-              alt={title}
-              className="w-full h-full object-cover rounded-t-xl md:rounded-l-xl md:rounded-tr-none"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-t-xl md:rounded-l-xl md:rounded-tr-none">
-              <span className="text-gray-400">Kein Poster</span>
-            </div>
-          )}
+          <TMDBImage
+            path={movie.poster_path}
+            alt={title}
+            className="w-full h-full object-cover rounded-t-xl md:rounded-l-xl md:rounded-tr-none"
+            priority={true}
+          />
         </div>
         
         <div className="p-6 md:w-3/4 lg:w-4/5 flex flex-col">

@@ -9,7 +9,7 @@ interface TMDBImageProps {
   alt: string;
   className?: string;
   fallbackClassName?: string;
-  priority?: boolean; // New prop for priority loading
+  priority?: boolean; // For priority loading
 }
 
 /**
@@ -25,13 +25,13 @@ export const TMDBImage = ({
   alt,
   className = '',
   fallbackClassName = '',
-  priority = false // Default to false for non-critical images
+  priority = false
 }: TMDBImageProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const retryCount = useRef(0);
-  const maxRetries = 2;
+  const maxRetries = 3; // Increased from 2 to 3
   
   useEffect(() => {
     let isMounted = true;
@@ -47,26 +47,34 @@ export const TMDBImage = ({
 
     // Normalize path (remove leading slash if present)
     const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+    
+    // Use the image base domain that's stable and works with CORS
     const imageUrl = `https://image.tmdb.org/t/p/${size}/${normalizedPath}`;
     setImgSrc(imageUrl);
 
-    // If this is a priority image, we don't want to delay loading
-    const initialDelay = priority ? 0 : 50;
+    // For priority images, proactively hint to the browser
+    if (priority) {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = imageUrl;
+      link.crossOrigin = 'anonymous'; // Add CORS support
+      document.head.appendChild(link);
+      
+      // Clean up preload hint when component unmounts
+      return () => {
+        document.head.removeChild(link);
+        isMounted = false;
+      };
+    }
     
     const loadImage = () => {
       if (!isMounted) return;
       
       const img = new Image();
       
-      // For priority images, add preload hint
-      if (priority) {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'image';
-        link.href = imageUrl;
-        document.head.appendChild(link);
-      }
-      
+      // Set crossOrigin to help with CORS issues
+      img.crossOrigin = 'anonymous';
       img.src = imageUrl;
       
       img.onload = () => {
@@ -83,17 +91,37 @@ export const TMDBImage = ({
         
         if (retryCount.current < maxRetries) {
           retryCount.current += 1;
-          const retryDelay = Math.pow(3, retryCount.current) * 100;
+          // Increased backoff delay to give more time for recovery
+          const retryDelay = Math.pow(2, retryCount.current) * 300;
           
           console.log(`Retrying in ${retryDelay}ms...`);
           setTimeout(loadImage, retryDelay);
         } else {
           setLoading(false);
           setError(true);
+          
+          // Try a different TMDB CDN as last resort
+          if (imageUrl.includes('image.tmdb.org')) {
+            const altImageUrl = imageUrl.replace('image.tmdb.org', 'img.tmdb.org');
+            console.log(`Last attempt with alternate CDN: ${altImageUrl}`);
+            
+            const altImg = new Image();
+            altImg.crossOrigin = 'anonymous';
+            altImg.src = altImageUrl;
+            
+            altImg.onload = () => {
+              if (isMounted) {
+                setImgSrc(altImageUrl);
+                setError(false);
+              }
+            };
+          }
         }
       };
     };
 
+    // Immediate loading for priority images, slight delay for non-priority
+    const initialDelay = priority ? 0 : 50;
     setTimeout(loadImage, initialDelay);
 
     return () => {
@@ -123,7 +151,9 @@ export const TMDBImage = ({
       src={imgSrc} 
       alt={alt} 
       className={className}
-      loading={priority ? 'eager' : 'lazy'} // Use eager loading for priority images
+      loading={priority ? 'eager' : 'lazy'}
+      crossOrigin="anonymous"
+      decoding={priority ? 'sync' : 'async'}
     />
   );
 };

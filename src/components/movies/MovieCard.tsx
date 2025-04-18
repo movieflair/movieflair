@@ -10,9 +10,15 @@ interface MovieCardProps {
   movie: MovieOrShow;
   size?: 'small' | 'medium' | 'large';
   hideDetails?: boolean;
+  prioritizeImage?: boolean; // New prop for prioritizing images
 }
 
-const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardProps) => {
+const MovieCard = ({ 
+  movie, 
+  size = 'medium', 
+  hideDetails = false,
+  prioritizeImage = false
+}: MovieCardProps) => {
   const title = movie.title || movie.name || 'Unbekannter Titel';
   const releaseDate = movie.release_date || movie.first_air_date;
   const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
@@ -22,7 +28,7 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
   const imageSizes = {
     small: 'h-[250px] w-[170px]',
     medium: 'h-[250px] w-[170px]',
-    large: 'h-[270px] w-[190px]'  // Updated size for specific pages
+    large: 'h-[270px] w-[190px]'
   };
   
   const textSizes = {
@@ -46,6 +52,7 @@ const MovieCard = ({ movie, size = 'medium', hideDetails = false }: MovieCardPro
           path={movie.poster_path}
           alt={title}
           className="w-full h-full object-cover rounded-xl transition-transform duration-300 group-hover:scale-105"
+          priority={prioritizeImage}
         />
         
         <div className="absolute top-2 right-2 flex items-center bg-background/80 backdrop-blur-sm px-2 py-1 rounded-full">

@@ -67,6 +67,9 @@ const FreeMovies = () => {
                 src={`https://image.tmdb.org/t/p/w1280${movies[0].backdrop_path}`} 
                 alt="Kostenlose Filme"
                 className="w-full h-full object-cover opacity-20"
+                loading="eager"
+                crossOrigin="anonymous"
+                decoding="sync"
               />
             </div>
           )}
@@ -118,7 +121,7 @@ const FreeMovies = () => {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {movies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+                <MovieCard key={movie.id} movie={movie} prioritizeImage={true} />
               ))}
             </div>
           )}

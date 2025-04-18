@@ -46,6 +46,7 @@ const TrailerCard = ({ movie }: TrailerCardProps) => {
             size="w780"
             alt={title}
             className="w-full h-full object-cover"
+            priority={true} // Trailers should always be prioritized
           />
           
           <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
