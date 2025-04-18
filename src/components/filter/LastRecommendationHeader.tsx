@@ -39,7 +39,7 @@ const LastRecommendationHeader = ({ recommendation }: LastRecommendationHeaderPr
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Dein Film des Tages
+              Filmtipp
             </h2>
             <h3 className="text-xl text-white mb-2">{title}</h3>
             <p className="text-white/80 max-w-2xl">
