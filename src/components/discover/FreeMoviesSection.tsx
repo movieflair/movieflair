@@ -37,11 +37,7 @@ const FreeMoviesSection = ({ movies }: FreeMoviesSectionProps) => {
             whileHover={{ scale: 1.03 }}
             transition={{ duration: 0.2 }}
           >
-            <MovieCard 
-              movie={movie} 
-              size="medium" 
-              prioritizeImage={true} // Prioritize these images
-            />
+            <MovieCard movie={movie} size="medium" />
           </motion.div>
         ))}
       </div>

@@ -66,11 +66,7 @@ const FeaturedMovies = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
       {movies.slice(0, 4).map((movie: MovieOrShow) => (
-        <MovieCard 
-          key={movie.id} 
-          movie={movie} 
-          prioritizeImage={true} // Prioritize featured movies
-        />
+        <MovieCard key={movie.id} movie={movie} />
       ))}
     </div>
   );

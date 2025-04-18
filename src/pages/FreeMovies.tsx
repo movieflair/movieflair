@@ -7,7 +7,6 @@ import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { Button } from '@/components/ui/button';
 import { Seo } from '@/components/seo/Seo';
-import { TMDBImage } from '@/components/ui/tmdb-image';
 
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
@@ -64,12 +63,10 @@ const FreeMovies = () => {
           
           {movies.length > 0 && movies[0].backdrop_path && (
             <div className="absolute inset-0">
-              <TMDBImage 
-                path={movies[0].backdrop_path}
-                size="w780"
+              <img 
+                src={`https://image.tmdb.org/t/p/w1280${movies[0].backdrop_path}`} 
                 alt="Kostenlose Filme"
                 className="w-full h-full object-cover opacity-20"
-                priority={true}
               />
             </div>
           )}
@@ -121,7 +118,7 @@ const FreeMovies = () => {
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {movies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} prioritizeImage={true} />
+                <MovieCard key={movie.id} movie={movie} />
               ))}
             </div>
           )}

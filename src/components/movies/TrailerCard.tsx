@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import MovieTrailerDialog from './MovieTrailerDialog';
-import { TMDBImage } from '@/components/ui/tmdb-image';
 
 interface TrailerCardProps {
   movie: MovieOrShow;
@@ -41,13 +40,17 @@ const TrailerCard = ({ movie }: TrailerCardProps) => {
         <Link to={`/film/${movie.id}`}>
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10" />
           
-          <TMDBImage
-            path={movie.backdrop_path}
-            size="w780"
-            alt={title}
-            className="w-full h-full object-cover"
-            priority={true} // Trailers should always be prioritized
-          />
+          {movie.backdrop_path ? (
+            <img
+              src={`https://image.tmdb.org/t/p/w780${movie.backdrop_path}`}
+              alt={title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-card flex items-center justify-center">
+              <span className="text-muted-foreground">Kein Bild verfügbar</span>
+            </div>
+          )}
           
           <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
             <h3 className="text-white font-semibold truncate group-hover:text-primary transition-colors">
