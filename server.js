@@ -21,10 +21,10 @@ async function startServer() {
     });
   }
   
-  // Add a special middleware to always force server rendering for trailer page
+  // Add a special middleware to always force server rendering for specific routes
   app.use((req, res, next) => {
-    if (req.url === '/neue-trailer') {
-      console.log('🚨 EMERGENCY OVERRIDE: Forcing SSR for /neue-trailer route');
+    if (req.url === '/neue-trailer' || req.url === '/' || req.url === '/kostenlose-filme') {
+      console.log(`🚨 EMERGENCY OVERRIDE: Forcing SSR for ${req.url} route`);
       req.query.forceSSR = 'true';
       req.query.forceUpdate = 'true';
     }
@@ -56,7 +56,7 @@ async function startServer() {
     if (isProduction) {
       console.log('=======================================');
       console.log('PUBLIC DEPLOYMENT MODE ACTIVE');
-      console.log('Version: 2.0.6 - EMERGENCY PRODUCTION DEPLOYMENT');
+      console.log('Version: 2.0.7 - EMERGENCY PRODUCTION DEPLOYMENT');
       console.log('=======================================');
     }
   });
