@@ -1,6 +1,5 @@
-
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clapperboard } from 'lucide-react';
+import { ArrowRight, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MovieOrShow } from '@/lib/types';
 
@@ -43,7 +42,7 @@ const LastRecommendationHeader = ({ recommendation }: LastRecommendationHeaderPr
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-4">
-              <Clapperboard 
+              <Lightbulb 
                 className="text-white animate-pulse hover:animate-spin transition-transform duration-500" 
                 size={32} 
               />
@@ -75,4 +74,3 @@ const LastRecommendationHeader = ({ recommendation }: LastRecommendationHeaderPr
 };
 
 export default LastRecommendationHeader;
-
