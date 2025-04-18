@@ -12,13 +12,17 @@ const LastRecommendationHeader = ({ recommendation }: LastRecommendationHeaderPr
   if (!recommendation) return null;
 
   const title = recommendation.title || recommendation.name || '';
-  const getTruncatedOverview = (text: string) => {
-    const sentences = text.split(/[.!?]+/).filter(Boolean);
-    const limitedSentences = sentences.slice(0, 2);
-    return limitedSentences.join('. ') + '.';
+  const getTruncatedOverview = (text: string, maxLength: number = 160) => {
+    if (!text) return '';
+    const truncatedText = text.length > maxLength 
+      ? text.substring(0, maxLength) + '...' 
+      : text;
+    return truncatedText;
   };
   
-  const overview = recommendation.overview ? getTruncatedOverview(recommendation.overview) : '';
+  const overview = recommendation.overview 
+    ? getTruncatedOverview(recommendation.overview) 
+    : '';
   const detailPath = `/film/${recommendation.id}`;
 
   return (
@@ -47,16 +51,17 @@ const LastRecommendationHeader = ({ recommendation }: LastRecommendationHeaderPr
             </p>
           </div>
           
-          <Button 
-            asChild
-            variant="secondary"
-            className="md:self-start"
-          >
-            <Link to={detailPath} className="flex items-center gap-2">
-              Details ansehen
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Button>
+          <div className="flex justify-center md:justify-end w-full md:w-auto">
+            <Button 
+              asChild
+              variant="secondary"
+            >
+              <Link to={detailPath} className="flex items-center gap-2">
+                Details ansehen
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </div>
