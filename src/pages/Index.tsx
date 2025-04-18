@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import MainLayout from '@/components/layout/MainLayout';
@@ -25,7 +26,8 @@ const Index = () => {
         .single();
       
       if (data) {
-        setLastRecommendation(data.movie_data);
+        // Cast the JSON data to MovieOrShow type
+        setLastRecommendation(data.movie_data as unknown as MovieOrShow);
       }
     };
 

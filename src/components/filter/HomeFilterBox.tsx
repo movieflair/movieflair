@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Search, Sparkles } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -39,7 +40,8 @@ const HomeFilterBox = ({ onRecommendation }: HomeFilterBoxProps) => {
         .from('filter_recommendations')
         .insert({
           movie_id: movie.id,
-          movie_data: movie
+          // Cast movie to unknown first, then to JSON compatible object
+          movie_data: movie as unknown as Record<string, any>
         });
     } catch (error) {
       console.error('Error saving recommendation:', error);
