@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { parseUrlSlug } from '@/lib/urlUtils';
@@ -84,7 +83,6 @@ const MovieDetails = () => {
   const director = movie.crew?.find(person => person.job === 'Director');
   const releaseYear = movie.release_date ? new Date(movie.release_date).getFullYear().toString() : '';
   
-  // Verbesserte SEO-Daten mit den Hilfsfunktionen
   const seoTitle = formatMediaTitle(movie.title, releaseYear);
   const seoDescription = formatMediaDescription(movie.title, releaseYear, movie.overview, 160);
   const seoOgImage = getAbsoluteImageUrl(
@@ -120,11 +118,7 @@ const MovieDetails = () => {
   };
 
   const handleStreamClick = () => {
-    if (!movie?.streamUrl) return;
-    
-    if (movie?.streamUrl.includes('embed')) {
-      setShowTrailer(true);
-    } else {
+    if (movie?.streamUrl) {
       window.open(movie.streamUrl, '_blank');
     }
   };

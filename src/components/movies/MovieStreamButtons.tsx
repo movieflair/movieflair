@@ -40,7 +40,9 @@ const MovieStreamButtons = ({
 
   const handleStreamClick = () => {
     trackInteraction('free_movie_click');
-    onStreamClick();
+    if (streamUrl) {
+      window.open(streamUrl, '_blank');
+    }
   };
 
   return (
