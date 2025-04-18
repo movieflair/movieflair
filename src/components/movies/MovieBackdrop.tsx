@@ -1,4 +1,6 @@
 
+import { TMDBImage } from '@/components/ui/tmdb-image';
+
 interface MovieBackdropProps {
   backdropPath?: string;
   title: string;
@@ -7,18 +9,13 @@ interface MovieBackdropProps {
 const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
   return (
     <div className="relative h-[400px] overflow-hidden">
-      {backdropPath ? (
-        <>
-          <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
-          <img
-            src={`https://image.tmdb.org/t/p/original${backdropPath}`}
-            alt={title}
-            className="w-full h-full object-cover"
-          />
-        </>
-      ) : (
-        <div className="w-full h-full bg-gray-100" />
-      )}
+      <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10" />
+      <TMDBImage
+        path={backdropPath}
+        size="original"
+        alt={title}
+        className="w-full h-full object-cover"
+      />
     </div>
   );
 };
