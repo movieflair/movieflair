@@ -9,6 +9,7 @@ interface TMDBImageProps {
   alt: string;
   className?: string;
   fallbackClassName?: string;
+  priority?: boolean; // New prop for priority loading
 }
 
 /**
@@ -16,23 +17,24 @@ interface TMDBImageProps {
  * - Implements retry logic for transient failures
  * - Uses local state to track loading status
  * - Provides appropriate fallbacks
+ * - Supports priority loading for critical images
  */
 export const TMDBImage = ({
   path,
   size = 'w500',
   alt,
   className = '',
-  fallbackClassName = ''
+  fallbackClassName = '',
+  priority = false // Default to false for non-critical images
 }: TMDBImageProps) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const retryCount = useRef(0);
-  const maxRetries = 2; // Number of retry attempts
+  const maxRetries = 2;
   
   useEffect(() => {
     let isMounted = true;
-    // Reset states when path changes
     setLoading(true);
     setError(false);
     retryCount.current = 0;
@@ -47,12 +49,24 @@ export const TMDBImage = ({
     const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
     const imageUrl = `https://image.tmdb.org/t/p/${size}/${normalizedPath}`;
     setImgSrc(imageUrl);
+
+    // If this is a priority image, we don't want to delay loading
+    const initialDelay = priority ? 0 : 50;
     
     const loadImage = () => {
-      // Don't proceed if component unmounted
       if (!isMounted) return;
       
       const img = new Image();
+      
+      // For priority images, add preload hint
+      if (priority) {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = imageUrl;
+        document.head.appendChild(link);
+      }
+      
       img.src = imageUrl;
       
       img.onload = () => {
@@ -69,7 +83,6 @@ export const TMDBImage = ({
         
         if (retryCount.current < maxRetries) {
           retryCount.current += 1;
-          // Exponential backoff for retries (300ms, 900ms, etc.)
           const retryDelay = Math.pow(3, retryCount.current) * 100;
           
           console.log(`Retrying in ${retryDelay}ms...`);
@@ -81,13 +94,12 @@ export const TMDBImage = ({
       };
     };
 
-    // Add a small timeout before first attempt to avoid rapid failures
-    setTimeout(loadImage, 50);
+    setTimeout(loadImage, initialDelay);
 
     return () => {
       isMounted = false;
     };
-  }, [path, size]);
+  }, [path, size, priority]);
 
   if (loading) {
     return (
@@ -110,8 +122,8 @@ export const TMDBImage = ({
     <img 
       src={imgSrc} 
       alt={alt} 
-      className={className} 
-      loading="lazy"
+      className={className}
+      loading={priority ? 'eager' : 'lazy'} // Use eager loading for priority images
     />
   );
 };

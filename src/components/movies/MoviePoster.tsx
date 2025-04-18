@@ -19,6 +19,7 @@ const MoviePoster = ({ id, title, posterPath }: MoviePosterProps) => {
             alt={title}
             className="w-full aspect-[2/3]"
             fallbackClassName="aspect-[2/3] flex items-center justify-center"
+            priority={true} // Mark as priority since it's the main poster
           />
         </div>
       </div>

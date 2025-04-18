@@ -15,6 +15,7 @@ const MovieBackdrop = ({ backdropPath, title }: MovieBackdropProps) => {
         size="original"
         alt={title}
         className="w-full h-full object-cover"
+        priority={true} // Mark as priority since it's above the fold
       />
     </div>
   );
