@@ -1,37 +1,30 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
 import { Seo } from '@/components/seo/Seo';
-import { getRandomCustomLists } from '@/lib/api';
+import { getRandomCustomLists, getRandomMovie } from '@/lib/api';
 import { CustomList, MovieOrShow } from '@/lib/types';
 import CustomListCarousel from '@/components/movies/CustomListCarousel';
 import PrimeVideoAd from '@/components/ads/PrimeVideoAd';
 import LastRecommendationHeader from '@/components/filter/LastRecommendationHeader';
-import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [customList, setCustomList] = useState<CustomList | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [lastRecommendation, setLastRecommendation] = useState<MovieOrShow | null>(null);
+  const [randomMovie, setRandomMovie] = useState<MovieOrShow | null>(null);
 
   useEffect(() => {
-    const fetchLastRecommendation = async () => {
-      const { data } = await supabase
-        .from('filter_recommendations')
-        .select('movie_data')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
-      
-      if (data) {
-        // Cast the JSON data to MovieOrShow type
-        setLastRecommendation(data.movie_data as unknown as MovieOrShow);
+    const fetchRandomMovie = async () => {
+      try {
+        const movie = await getRandomMovie();
+        setRandomMovie(movie);
+      } catch (error) {
+        console.error('Error fetching random movie:', error);
       }
     };
 
-    fetchLastRecommendation();
+    fetchRandomMovie();
   }, []);
 
   useEffect(() => {
@@ -79,7 +72,7 @@ const Index = () => {
         <div className="absolute bottom-10 right-10 w-64 h-64 bg-theme-accent-red/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: "1s" }}></div>
 
         <div className="container-custom px-4 sm:px-6 lg:px-8">
-          <LastRecommendationHeader recommendation={lastRecommendation} />
+          <LastRecommendationHeader recommendation={randomMovie} />
           
           <motion.div 
             className="max-w-3xl mx-auto text-center mb-6 md:mb-8 relative"
@@ -108,7 +101,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            <HomeFilterBox onRecommendation={setLastRecommendation} />
+            <HomeFilterBox onRecommendation={setRandomMovie} />
           </motion.div>
           
           <PrimeVideoAd className="mt-6 md:mt-8" />
