@@ -48,13 +48,6 @@ const Trailers = () => {
       />
 
       <div className="container-custom py-12">
-        <div className="flex items-center gap-2 mb-6">
-          <Link to="/entdecken" className="inline-flex items-center text-muted-foreground hover:text-foreground">
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Zurück zu Entdecken
-          </Link>
-        </div>
-
         <div className="relative overflow-hidden rounded-2xl mb-10">
           <div className="absolute inset-0 bg-gradient-to-r from-theme-accent-red/90 to-primary/50 mix-blend-multiply"></div>
           
