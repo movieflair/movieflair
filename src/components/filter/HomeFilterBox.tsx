@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Sparkles } from 'lucide-react';
 import { Button } from '../ui/button';
 import FilterSelector from './FilterSelector';
@@ -8,8 +7,13 @@ import FilterRecommendation from './recommendation/FilterRecommendation';
 import MoodSelector from './filters/MoodSelector';
 import { useFilterSearch } from '@/hooks/useFilterSearch';
 import { genres, moods, decades } from './data/filterOptions';
+import { MovieOrShow } from '@/lib/types';
 
-const HomeFilterBox = () => {
+interface HomeFilterBoxProps {
+  onRecommendation?: (movie: MovieOrShow) => void;
+}
+
+const HomeFilterBox = ({ onRecommendation }: HomeFilterBoxProps) => {
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [selectedDecades, setSelectedDecades] = useState<string[]>([]);
@@ -37,6 +41,12 @@ const HomeFilterBox = () => {
       rating
     });
   };
+
+  useEffect(() => {
+    if (recommendation && onRecommendation) {
+      onRecommendation(recommendation);
+    }
+  }, [recommendation, onRecommendation]);
 
   return (
     <div className="bg-white/80 backdrop-blur-sm p-4 md:p-6 lg:p-8 rounded-2xl shadow-lg border border-gray-100 max-w-[800px] mx-auto">

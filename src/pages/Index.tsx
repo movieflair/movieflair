@@ -1,19 +1,23 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
 import { Seo } from '@/components/seo/Seo';
 import { getRandomCustomLists } from '@/lib/api';
-import { CustomList } from '@/lib/types';
+import { CustomList, MovieOrShow } from '@/lib/types';
 import CustomListCarousel from '@/components/movies/CustomListCarousel';
 import PrimeVideoAd from '@/components/ads/PrimeVideoAd';
 import { Film } from 'lucide-react';
+import LastRecommendationHeader from '@/components/filter/LastRecommendationHeader';
 
 const Index = () => {
   const [customList, setCustomList] = useState<CustomList | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+  const [lastRecommendation, setLastRecommendation] = useState<MovieOrShow | null>(() => {
+    const saved = localStorage.getItem('lastRecommendation');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   useEffect(() => {
     const fetchList = async () => {
       try {
@@ -52,16 +56,15 @@ const Index = () => {
 
   return (
     <MainLayout>
-      <Seo 
-        structuredData={websiteStructuredData} 
-        keywords="filmtipps, filmempfehlungen, filme entdecken, filmfinder, filme nach stimmung, was soll ich heute schauen, passende filme, streaming tipps, movieflair, bester film für jetzt, persönlicher filmvorschlag, filme für jede laune, emotional passende filme" 
-      />
+      <Seo structuredData={websiteStructuredData} keywords="filmtipps, filmempfehlungen, filme entdecken, filmfinder, filme nach stimmung, was soll ich heute schauen, passende filme, streaming tipps, movieflair, bester film für jetzt, persönlicher filmvorschlag, filme für jede laune, emotional passende filme" />
 
       <section className="py-8 md:py-24 bg-gradient-to-b from-blue-50/50 to-white relative overflow-hidden">
         <div className="absolute top-10 left-10 w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
         <div className="absolute bottom-10 right-10 w-64 h-64 bg-theme-accent-red/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: "1s" }}></div>
 
         <div className="container-custom px-4 sm:px-6 lg:px-8">
+          <LastRecommendationHeader recommendation={lastRecommendation} />
+          
           <motion.div 
             className="max-w-3xl mx-auto text-center mb-6 md:mb-8 relative"
             initial="hidden"
@@ -89,7 +92,10 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            <HomeFilterBox />
+            <HomeFilterBox onRecommendation={(movie) => {
+              setLastRecommendation(movie);
+              localStorage.setItem('lastRecommendation', JSON.stringify(movie));
+            }} />
           </motion.div>
           
           <PrimeVideoAd className="mt-6 md:mt-8" />
