@@ -25,7 +25,8 @@ export const getFreeMovies = async (): Promise<MovieOrShow[]> => {
     const mappedMovies = freeMovies.map(movie => ({
       id: movie.id,
       title: movie.title,
-      name: movie.name,
+      // The title is used as name property for consistency across movies and shows
+      name: movie.title, 
       poster_path: movie.poster_path,
       backdrop_path: movie.backdrop_path,
       overview: movie.overview,

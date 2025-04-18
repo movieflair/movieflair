@@ -2,6 +2,7 @@
 import { MovieDetail } from '../types';
 import { callTMDB } from '../apiUtils';
 import { getMovieById } from './movieDetails';
+import { getPopularMovies } from './popularMovies';
 
 export const getRandomMovie = async (): Promise<MovieDetail> => {
   console.log('Getting random movie with improved decade selection...');

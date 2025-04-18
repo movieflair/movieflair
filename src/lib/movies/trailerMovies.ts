@@ -19,7 +19,8 @@ export const getTrailerMovies = async (): Promise<MovieOrShow[]> => {
       trailerItems = [...trailerItems, ...trailerMovies.map(movie => ({
         id: movie.id,
         title: movie.title,
-        name: movie.name,
+        // Add name property using the title field
+        name: movie.title,
         poster_path: movie.poster_path,
         backdrop_path: movie.backdrop_path,
         overview: movie.overview,
