@@ -92,16 +92,20 @@ const Index = () => {
                          text-theme-black font-bold 
                          break-words leading-tight"
             >
-              Jeder Moment{" "}
-              <br className="block sm:hidden" />
-              hat seinen Film.{" "}
-              <br />
-              Wir finden ihn für dich!
+              <span className="block">Jeder Moment</span>
+              <span className="block text-theme-accent-blue">hat seinen Film.</span>
+              <span className="block text-sm sm:text-xl md:text-2xl mt-2 font-normal text-gray-600">
+                Wir finden ihn für dich!
+              </span>
             </motion.h1>
-            <motion.p className="text-sm md:text-xl text-gray-600 mb-4 md:mb-6 font-thin px-2 md:px-0" variants={fadeInUpVariants} transition={{
-            delay: 0.2
-          }}>
-              Entdecke Filmempfehlungen, die zu deinem Tag, deiner Laune, deinem Leben passen.
+            <motion.p 
+              className="text-base md:text-xl text-gray-700 mb-4 md:mb-6 font-medium px-2 md:px-0 
+                         bg-blue-50/50 rounded-xl py-3 shadow-sm" 
+              variants={fadeInUpVariants} 
+              transition={{ delay: 0.2 }}
+            >
+              Entdecke Filmempfehlungen, die deine Momente lebendig machen – 
+              passend zu deinem Tag, deiner Laune, deinem Leben.
             </motion.p>
           </motion.div>
           
@@ -136,3 +140,4 @@ const Index = () => {
 };
 
 export default Index;
+
