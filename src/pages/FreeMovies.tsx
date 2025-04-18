@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shuffle } from 'lucide-react';
@@ -57,7 +56,7 @@ const FreeMovies = () => {
         keywords="kostenlose Filme, gratis Filme, legale Streams, Filme kostenlos anschauen, Free Movies"
       />
 
-      <div className="container-custom py-8">
+      <div className="container-custom py-12">
         <div className="flex items-center gap-2 mb-6">
           <Link to="/entdecken" className="inline-flex items-center text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4 mr-1" />

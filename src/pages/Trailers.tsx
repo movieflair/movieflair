@@ -47,7 +47,7 @@ const Trailers = () => {
         keywords="Filmtrailer, Serientrailer, neue Trailer, Kinotrailer, Online Stream, Trailer anschauen"
       />
 
-      <div className="container-custom py-8">
+      <div className="container-custom py-12">
         <div className="flex items-center gap-2 mb-6">
           <Link to="/entdecken" className="inline-flex items-center text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-4 h-4 mr-1" />

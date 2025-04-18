@@ -67,7 +67,7 @@ const Index = () => {
     <MainLayout>
       <Seo structuredData={websiteStructuredData} />
 
-      <section className="py-8 md:py-24 bg-gradient-to-b from-blue-50/50 to-white relative overflow-hidden">
+      <section className="py-12 md:py-24 bg-gradient-to-b from-blue-50/50 to-white relative overflow-hidden">
         <div className="absolute top-10 left-10 w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
         <div className="absolute bottom-10 right-10 w-64 h-64 bg-theme-accent-red/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: "1s" }}></div>
 
