@@ -1,6 +1,7 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ImageOff } from 'lucide-react';
+import { Skeleton } from './skeleton';
 
 interface TMDBImageProps {
   path?: string | null;
@@ -12,6 +13,9 @@ interface TMDBImageProps {
 
 /**
  * A component for reliably loading TMDB images with proper error handling
+ * - Implements retry logic for transient failures
+ * - Uses local state to track loading status
+ * - Provides appropriate fallbacks
  */
 export const TMDBImage = ({
   path,
@@ -23,11 +27,15 @@ export const TMDBImage = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
-
+  const retryCount = useRef(0);
+  const maxRetries = 2; // Number of retry attempts
+  
   useEffect(() => {
+    let isMounted = true;
     // Reset states when path changes
     setLoading(true);
     setError(false);
+    retryCount.current = 0;
 
     if (!path) {
       setLoading(false);
@@ -38,32 +46,55 @@ export const TMDBImage = ({
     // Normalize path (remove leading slash if present)
     const normalizedPath = path.startsWith('/') ? path.substring(1) : path;
     const imageUrl = `https://image.tmdb.org/t/p/${size}/${normalizedPath}`;
-    
-    // Preload the image
-    const img = new Image();
-    img.src = imageUrl;
     setImgSrc(imageUrl);
     
-    img.onload = () => {
-      setLoading(false);
-    };
-    
-    img.onerror = () => {
-      console.error(`Failed to load TMDB image: ${imageUrl}`);
-      setLoading(false);
-      setError(true);
+    const loadImage = () => {
+      // Don't proceed if component unmounted
+      if (!isMounted) return;
+      
+      const img = new Image();
+      img.src = imageUrl;
+      
+      img.onload = () => {
+        if (isMounted) {
+          setLoading(false);
+          setError(false);
+        }
+      };
+      
+      img.onerror = () => {
+        if (!isMounted) return;
+        
+        console.warn(`Failed to load TMDB image: ${imageUrl}, retry: ${retryCount.current}`);
+        
+        if (retryCount.current < maxRetries) {
+          retryCount.current += 1;
+          // Exponential backoff for retries (300ms, 900ms, etc.)
+          const retryDelay = Math.pow(3, retryCount.current) * 100;
+          
+          console.log(`Retrying in ${retryDelay}ms...`);
+          setTimeout(loadImage, retryDelay);
+        } else {
+          setLoading(false);
+          setError(true);
+        }
+      };
     };
 
+    // Add a small timeout before first attempt to avoid rapid failures
+    setTimeout(loadImage, 50);
+
     return () => {
-      // Clean up
-      img.onload = null;
-      img.onerror = null;
+      isMounted = false;
     };
   }, [path, size]);
 
   if (loading) {
     return (
-      <div className={`animate-pulse bg-gray-200 ${className || 'w-full h-full'}`} aria-label={`Loading ${alt}`} />
+      <Skeleton 
+        className={`${className || 'w-full h-full'}`} 
+        aria-label={`Loading ${alt}`} 
+      />
     );
   }
 
@@ -75,5 +106,12 @@ export const TMDBImage = ({
     );
   }
 
-  return <img src={imgSrc} alt={alt} className={className} />;
+  return (
+    <img 
+      src={imgSrc} 
+      alt={alt} 
+      className={className} 
+      loading="lazy"
+    />
+  );
 };
