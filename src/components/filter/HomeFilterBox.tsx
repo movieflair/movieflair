@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Search, Sparkles } from 'lucide-react';
 import { Button } from '../ui/button';
 import FilterSelector from './FilterSelector';
@@ -8,6 +8,7 @@ import MoodSelector from './filters/MoodSelector';
 import { useFilterSearch } from '@/hooks/useFilterSearch';
 import { genres, moods, decades } from './data/filterOptions';
 import { MovieOrShow } from '@/lib/types';
+import { supabase } from '@/integrations/supabase/client';
 
 interface HomeFilterBoxProps {
   onRecommendation?: (movie: MovieOrShow) => void;
@@ -32,6 +33,19 @@ const HomeFilterBox = ({ onRecommendation }: HomeFilterBoxProps) => {
     );
   };
 
+  const saveRecommendation = async (movie: MovieOrShow) => {
+    try {
+      await supabase
+        .from('filter_recommendations')
+        .insert({
+          movie_id: movie.id,
+          movie_data: movie
+        });
+    } catch (error) {
+      console.error('Error saving recommendation:', error);
+    }
+  };
+
   const initiateSearch = () => {
     handleSearch({
       moods: selectedMoods,
@@ -42,9 +56,12 @@ const HomeFilterBox = ({ onRecommendation }: HomeFilterBoxProps) => {
     });
   };
 
-  useEffect(() => {
-    if (recommendation && onRecommendation) {
-      onRecommendation(recommendation);
+  React.useEffect(() => {
+    if (recommendation) {
+      saveRecommendation(recommendation);
+      if (onRecommendation) {
+        onRecommendation(recommendation);
+      }
     }
   }, [recommendation, onRecommendation]);
 

@@ -7,16 +7,30 @@ import { getRandomCustomLists } from '@/lib/api';
 import { CustomList, MovieOrShow } from '@/lib/types';
 import CustomListCarousel from '@/components/movies/CustomListCarousel';
 import PrimeVideoAd from '@/components/ads/PrimeVideoAd';
-import { Film } from 'lucide-react';
 import LastRecommendationHeader from '@/components/filter/LastRecommendationHeader';
+import { supabase } from '@/integrations/supabase/client';
 
 const Index = () => {
   const [customList, setCustomList] = useState<CustomList | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [lastRecommendation, setLastRecommendation] = useState<MovieOrShow | null>(() => {
-    const saved = localStorage.getItem('lastRecommendation');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [lastRecommendation, setLastRecommendation] = useState<MovieOrShow | null>(null);
+
+  useEffect(() => {
+    const fetchLastRecommendation = async () => {
+      const { data } = await supabase
+        .from('filter_recommendations')
+        .select('movie_data')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      
+      if (data) {
+        setLastRecommendation(data.movie_data);
+      }
+    };
+
+    fetchLastRecommendation();
+  }, []);
 
   useEffect(() => {
     const fetchList = async () => {
@@ -56,7 +70,7 @@ const Index = () => {
 
   return (
     <MainLayout>
-      <Seo structuredData={websiteStructuredData} keywords="filmtipps, filmempfehlungen, filme entdecken, filmfinder, filme nach stimmung, was soll ich heute schauen, passende filme, streaming tipps, movieflair, bester film für jetzt, persönlicher filmvorschlag, filme für jede laune, emotional passende filme" />
+      <Seo structuredData={websiteStructuredData} />
 
       <section className="py-8 md:py-24 bg-gradient-to-b from-blue-50/50 to-white relative overflow-hidden">
         <div className="absolute top-10 left-10 w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
@@ -92,10 +106,7 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
           >
-            <HomeFilterBox onRecommendation={(movie) => {
-              setLastRecommendation(movie);
-              localStorage.setItem('lastRecommendation', JSON.stringify(movie));
-            }} />
+            <HomeFilterBox onRecommendation={setLastRecommendation} />
           </motion.div>
           
           <PrimeVideoAd className="mt-6 md:mt-8" />

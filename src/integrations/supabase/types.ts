@@ -186,6 +186,27 @@ export type Database = {
         }
         Relationships: []
       }
+      filter_recommendations: {
+        Row: {
+          created_at: string
+          id: number
+          movie_data: Json
+          movie_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          movie_data: Json
+          movie_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          movie_data?: Json
+          movie_id?: number
+        }
+        Relationships: []
+      }
       interaction_stats: {
         Row: {
           country: string | null
