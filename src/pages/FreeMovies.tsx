@@ -7,6 +7,7 @@ import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
 import { Button } from '@/components/ui/button';
 import { Seo } from '@/components/seo/Seo';
+import { TMDBImage } from '@/components/ui/tmdb-image';
 
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
@@ -63,13 +64,12 @@ const FreeMovies = () => {
           
           {movies.length > 0 && movies[0].backdrop_path && (
             <div className="absolute inset-0">
-              <img 
-                src={`https://image.tmdb.org/t/p/w1280${movies[0].backdrop_path}`} 
+              <TMDBImage 
+                path={movies[0].backdrop_path}
+                size="w1280"
                 alt="Kostenlose Filme"
                 className="w-full h-full object-cover opacity-20"
-                loading="eager"
-                crossOrigin="anonymous"
-                decoding="sync"
+                priority={true}
               />
             </div>
           )}

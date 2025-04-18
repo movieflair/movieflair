@@ -31,7 +31,7 @@ export const TMDBImage = ({
   const [error, setError] = useState(false);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const retryCount = useRef(0);
-  const maxRetries = 3; // Increased from 2 to 3
+  const maxRetries = 3; // Max number of retries for failed images
   
   useEffect(() => {
     let isMounted = true;
@@ -63,7 +63,9 @@ export const TMDBImage = ({
       
       // Clean up preload hint when component unmounts
       return () => {
-        document.head.removeChild(link);
+        if (link.parentNode) {
+          document.head.removeChild(link);
+        }
         isMounted = false;
       };
     }
