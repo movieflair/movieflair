@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
@@ -8,10 +8,12 @@ import { CustomList, MovieOrShow } from '@/lib/types';
 import CustomListCarousel from '@/components/movies/CustomListCarousel';
 import PrimeVideoAd from '@/components/ads/PrimeVideoAd';
 import LastRecommendationHeader from '@/components/filter/LastRecommendationHeader';
+
 const Index = () => {
   const [customList, setCustomList] = useState<CustomList | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [randomMovie, setRandomMovie] = useState<MovieOrShow | null>(null);
+
   useEffect(() => {
     const fetchRandomMovie = async () => {
       try {
@@ -23,6 +25,7 @@ const Index = () => {
     };
     fetchRandomMovie();
   }, []);
+
   useEffect(() => {
     const fetchList = async () => {
       try {
@@ -36,6 +39,7 @@ const Index = () => {
     };
     fetchList();
   }, []);
+
   const fadeInUpVariants = {
     hidden: {
       opacity: 0,
@@ -49,6 +53,7 @@ const Index = () => {
       }
     }
   };
+
   const websiteStructuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -60,6 +65,7 @@ const Index = () => {
       "query-input": "required name=search_term_string"
     }
   };
+
   return <MainLayout>
       <Seo structuredData={websiteStructuredData} />
 
@@ -72,10 +78,24 @@ const Index = () => {
         <div className="container-custom px-4 sm:px-6 lg:px-8">
           <LastRecommendationHeader recommendation={randomMovie} />
           
-          <motion.div className="max-w-3xl mx-auto text-center mb-6 md:mb-8 relative" initial="hidden" animate="visible" variants={fadeInUpVariants}>
-            <motion.h1 variants={fadeInUpVariants} className="text-2xl lg:text-6xl tracking-tight mb-3 md:mb-6 text-theme-black font-bold px-2 md:px-0 md:text-4xl">
-              Jeder Moment hat seinen Film.{" "}
-              <br />Wir finden ihn für dich!
+          <motion.div 
+            className="max-w-3xl mx-auto text-center mb-6 md:mb-8 relative" 
+            initial="hidden" 
+            animate="visible" 
+            variants={fadeInUpVariants}
+          >
+            <motion.h1 
+              variants={fadeInUpVariants} 
+              className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 
+                         tracking-tight mb-3 md:mb-6 
+                         text-theme-black font-bold 
+                         break-words leading-tight"
+            >
+              Jeder Moment{" "}
+              <br className="block sm:hidden" />
+              hat seinen Film.{" "}
+              <br />
+              Wir finden ihn für dich!
             </motion.h1>
             <motion.p className="text-sm md:text-xl text-gray-600 mb-4 md:mb-6 font-thin px-2 md:px-0" variants={fadeInUpVariants} transition={{
             delay: 0.2
@@ -113,4 +133,5 @@ const Index = () => {
       </section>
     </MainLayout>;
 };
+
 export default Index;
