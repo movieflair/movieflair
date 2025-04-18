@@ -65,7 +65,7 @@ const AdminPanel = () => {
     isSearchTvLoading,
     handleSearch,
     handleViewChange
-  } = useAdminSearch();
+  } = useAdminSearch(activeTab);
 
   const handleLogout = () => {
     localStorage.removeItem('isAdminLoggedIn');

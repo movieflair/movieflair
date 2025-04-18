@@ -11,7 +11,7 @@ import {
   getTrailerMovies
 } from '@/lib/api';
 
-export const useAdminSearch = () => {
+export const useAdminSearch = (activeTab: string) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [currentView, setCurrentView] = useState<'all' | 'free' | 'trailers'>('all');
