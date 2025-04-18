@@ -1,20 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
+import { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAdminSettings } from '@/hooks/useAdminSettings';
-import { MovieOrShow } from "@/lib/types";
-import { 
-  getPopularMovies, 
-  getFreeMovies, 
-  getTrailerMovies,
-  searchMovies, 
-  searchTvShows,
-  getPopularTvShows 
-} from '@/lib/api';
+import { useAdminMovie } from '@/hooks/useAdminMovie';
+import { useAdminTvShow } from '@/hooks/useAdminTvShow';
+import { useAdminSearch } from '@/hooks/useAdminSearch';
 
 import AdminHeader from './header/AdminHeader';
 import AdminSettings from './settings/AdminSettings';
@@ -24,265 +14,62 @@ import AdminStats from './AdminStats';
 import AdminVisitorStats from './AdminVisitorStats';
 
 const AdminPanel = () => {
-  const [activeTab, setActiveTab] = useState('movies');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('content');
   const { 
     amazonAffiliateId, 
     setAmazonAffiliateId, 
     saveSettings 
   } = useAdminSettings();
-  const [streamUrl, setStreamUrl] = useState('');
-  const [trailerUrl, setTrailerUrl] = useState('');
-  const [hasStream, setHasStream] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState<MovieOrShow | null>(null);
-  const [selectedTvShow, setSelectedTvShow] = useState<MovieOrShow | null>(null);
-  const [filteredMovies, setFilteredMovies] = useState<MovieOrShow[]>([]);
-  const [filteredTvShows, setFilteredTvShows] = useState<MovieOrShow[]>([]);
-  const [streamType, setStreamType] = useState<'embed' | 'link'>('embed');
-  const [hasTrailer, setHasTrailer] = useState(false);
-  const [isFreeMovie, setIsFreeMovie] = useState(false);
-  const [isNewTrailer, setIsNewTrailer] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
-  const [currentView, setCurrentView] = useState<'all' | 'free' | 'trailers'>('all');
-  
-  const queryClient = useQueryClient();
 
-  const { data: movies = [], isLoading: isLoadingMovies } = useQuery({
-    queryKey: ['admin-movies'],
-    queryFn: getPopularMovies
-  });
-  
-  const { data: freeMovies = [], isLoading: isLoadingFreeMovies } = useQuery({
-    queryKey: ['admin-free-movies'],
-    queryFn: getFreeMovies
-  });
-  
-  const { data: trailerMovies = [], isLoading: isLoadingTrailerMovies } = useQuery({
-    queryKey: ['admin-trailer-movies'],
-    queryFn: getTrailerMovies
-  });
-  
-  const { data: tvShows = [], isLoading: isLoadingTvShows } = useQuery({
-    queryKey: ['admin-tv-shows'],
-    queryFn: getPopularTvShows
-  });
-  
-  const { data: searchResults = [], isLoading: isSearchLoading, refetch: refetchSearch } = useQuery({
-    queryKey: ['search-movies', searchQuery],
-    queryFn: () => searchMovies(searchQuery),
-    enabled: false,
-  });
-  
-  const { data: searchTvResults = [], isLoading: isSearchTvLoading, refetch: refetchTvSearch } = useQuery({
-    queryKey: ['search-tv-shows', searchQuery],
-    queryFn: () => searchTvShows(searchQuery),
-    enabled: false,
-  });
+  const {
+    selectedMovie,
+    isFreeMovie,
+    isNewTrailer,
+    streamUrl: movieStreamUrl,
+    streamType: movieStreamType,
+    trailerUrl: movieTrailerUrl,
+    setSelectedMovie,
+    setIsFreeMovie,
+    setIsNewTrailer,
+    setStreamUrl: setMovieStreamUrl,
+    setStreamType: setMovieStreamType,
+    setTrailerUrl: setMovieTrailerUrl,
+    handleEditMovie,
+    handleSaveMovie
+  } = useAdminMovie();
 
-  useEffect(() => {
-    if (activeTab === 'movies' && !isSearching) {
-      if (currentView === 'free') {
-        setFilteredMovies(freeMovies as MovieOrShow[]);
-      } else if (currentView === 'trailers') {
-        setFilteredMovies(trailerMovies as MovieOrShow[]);
-      } else {
-        if (!searchQuery.trim()) {
-          setFilteredMovies(movies as MovieOrShow[]);
-        } else {
-          const query = searchQuery.toLowerCase().trim();
-          const filtered = (movies as MovieOrShow[]).filter(movie => 
-            (movie.title?.toLowerCase() || '').includes(query)
-          );
-          setFilteredMovies(filtered);
-        }
-      }
-    } else if (activeTab === 'movies' && isSearching) {
-      setFilteredMovies(searchResults as MovieOrShow[]);
-    } else if (activeTab === 'shows' && !isSearching) {
-      if (!searchQuery.trim()) {
-        setFilteredTvShows(tvShows as MovieOrShow[]);
-      } else {
-        const query = searchQuery.toLowerCase().trim();
-        const filtered = (tvShows as MovieOrShow[]).filter(show => 
-          (show.name?.toLowerCase() || '').includes(query)
-        );
-        setFilteredTvShows(filtered);
-      }
-    } else if (activeTab === 'shows' && isSearching) {
-      setFilteredTvShows(searchTvResults as MovieOrShow[]);
-    }
-  }, [
-    searchQuery, 
-    movies, 
-    tvShows, 
-    activeTab, 
-    isSearching, 
-    searchResults, 
-    searchTvResults, 
-    currentView, 
-    freeMovies, 
-    trailerMovies
-  ]);
+  const {
+    selectedTvShow,
+    hasStream,
+    hasTrailer,
+    streamUrl: tvStreamUrl,
+    streamType: tvStreamType,
+    trailerUrl: tvTrailerUrl,
+    setSelectedTvShow,
+    setHasStream,
+    setHasTrailer,
+    setStreamUrl: setTvStreamUrl,
+    setStreamType: setTvStreamType,
+    setTrailerUrl: setTvTrailerUrl,
+    handleEditTvShow,
+    handleSaveTvShow
+  } = useAdminTvShow();
+
+  const {
+    searchQuery,
+    setSearchQuery,
+    currentView,
+    filteredMovies,
+    filteredTvShows,
+    isSearchLoading,
+    isSearchTvLoading,
+    handleSearch,
+    handleViewChange
+  } = useAdminSearch();
 
   const handleLogout = () => {
     localStorage.removeItem('isAdminLoggedIn');
     window.location.reload();
-  };
-
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (searchQuery.trim()) {
-      setIsSearching(true);
-      if (activeTab === 'movies') {
-        await refetchSearch();
-      } else if (activeTab === 'shows') {
-        await refetchTvSearch();
-      }
-    } else {
-      setIsSearching(false);
-      if (activeTab === 'movies') {
-        setFilteredMovies(currentView === 'free' ? freeMovies as MovieOrShow[] : 
-                         currentView === 'trailers' ? trailerMovies as MovieOrShow[] : movies as MovieOrShow[]);
-      } else if (activeTab === 'shows') {
-        setFilteredTvShows(tvShows as MovieOrShow[]);
-      }
-    }
-  };
-
-  const handleEditMovie = (movie: MovieOrShow) => {
-    setSelectedMovie(movie);
-    setSelectedTvShow(null);
-    setIsFreeMovie(movie.isFreeMovie || false);
-    setIsNewTrailer(movie.isNewTrailer || false);
-    setStreamUrl(movie.streamUrl || '');
-    setStreamType(movie.streamUrl?.includes('embed') ? 'embed' : 'link');
-    setTrailerUrl(movie.trailerUrl || '');
-    setHasStream(movie.isFreeMovie || false);
-    setHasTrailer(movie.isNewTrailer || false);
-  };
-  
-  const handleEditTvShow = (show: MovieOrShow) => {
-    setSelectedTvShow(show);
-    setSelectedMovie(null);
-    setHasStream(show.hasStream || false);
-    setStreamUrl(show.streamUrl || '');
-    setStreamType(show.streamUrl?.includes('embed') ? 'embed' : 'link');
-    setHasTrailer(show.hasTrailer || false);
-    setTrailerUrl(show.trailerUrl || '');
-  };
-
-  const handleSaveMovie = async () => {
-    if (!selectedMovie) return;
-
-    try {
-      const updatedMovie = {
-        id: selectedMovie.id,
-        title: selectedMovie.title,
-        poster_path: selectedMovie.poster_path,
-        backdrop_path: selectedMovie.backdrop_path,
-        overview: selectedMovie.overview,
-        release_date: selectedMovie.release_date,
-        vote_average: selectedMovie.vote_average,
-        vote_count: selectedMovie.vote_count,
-        popularity: selectedMovie.popularity,
-        media_type: selectedMovie.media_type,
-        isfreemovie: isFreeMovie,
-        isnewtrailer: isNewTrailer,
-        hasstream: isFreeMovie,
-        streamurl: isFreeMovie ? streamUrl : '',
-        hastrailer: isNewTrailer,
-        trailerurl: isNewTrailer ? trailerUrl : ''
-      };
-
-      const { error: checkError } = await supabase
-        .from('admin_movies')
-        .select('*')
-        .eq('id', selectedMovie.id)
-        .maybeSingle();
-        
-      if (checkError) {
-        console.error('Error checking if movie exists:', checkError);
-        toast.error("Fehler beim Überprüfen des Films");
-        return;
-      }
-      
-      const { error: saveError } = await supabase
-        .from('admin_movies')
-        .upsert(updatedMovie);
-      
-      if (saveError) {
-        console.error('Error saving movie to Supabase:', saveError);
-        toast.error("Fehler beim Speichern des Films");
-        return;
-      }
-      
-      queryClient.invalidateQueries({ queryKey: ['admin-movies'] });
-      queryClient.invalidateQueries({ queryKey: ['admin-free-movies'] });
-      queryClient.invalidateQueries({ queryKey: ['admin-trailer-movies'] });
-      queryClient.invalidateQueries({ queryKey: ['search-movies'] });
-      
-      toast.success("Änderungen gespeichert");
-      setSelectedMovie(null);
-    } catch (error) {
-      console.error('Error saving movie:', error);
-      toast.error("Fehler beim Speichern des Films");
-    }
-  };
-  
-  const handleSaveTvShow = async () => {
-    if (!selectedTvShow) return;
-
-    try {
-      const updatedShow = {
-        id: selectedTvShow.id,
-        name: selectedTvShow.name || selectedTvShow.title,
-        poster_path: selectedTvShow.poster_path,
-        backdrop_path: selectedTvShow.backdrop_path,
-        overview: selectedTvShow.overview,
-        first_air_date: selectedTvShow.first_air_date || selectedTvShow.release_date,
-        vote_average: selectedTvShow.vote_average,
-        vote_count: selectedTvShow.vote_count,
-        popularity: selectedTvShow.popularity,
-        media_type: selectedTvShow.media_type,
-        hasstream: hasStream,
-        streamurl: hasStream ? streamUrl : '',
-        hastrailer: hasTrailer,
-        trailerurl: hasTrailer ? trailerUrl : ''
-      };
-
-      const { error: saveError } = await supabase
-        .from('admin_shows')
-        .upsert(updatedShow);
-      
-      if (saveError) {
-        console.error('Error saving show to Supabase:', saveError);
-        toast.error("Fehler beim Speichern der Serie");
-        return;
-      }
-      
-      queryClient.invalidateQueries({ queryKey: ['admin-tv-shows'] });
-      queryClient.invalidateQueries({ queryKey: ['search-tv-shows'] });
-      
-      toast.success("Änderungen gespeichert");
-      setSelectedTvShow(null);
-    } catch (error) {
-      console.error('Error saving TV show:', error);
-      toast.error("Fehler beim Speichern der Serie");
-    }
-  };
-
-  const handleViewChange = (view: 'all' | 'free' | 'trailers') => {
-    setCurrentView(view);
-    setIsSearching(false);
-    
-    if (view === 'free') {
-      setFilteredMovies(freeMovies);
-    } else if (view === 'trailers') {
-      setFilteredMovies(trailerMovies);
-    } else {
-      setFilteredMovies(movies);
-    }
   };
 
   return (
@@ -321,22 +108,16 @@ const AdminPanel = () => {
             onTvShowCancel={() => setSelectedTvShow(null)}
             isNewTrailer={isNewTrailer}
             isFreeMovie={isFreeMovie}
-            streamUrl={streamUrl}
-            streamType={streamType}
-            trailerUrl={trailerUrl}
+            streamUrl={selectedMovie ? movieStreamUrl : tvStreamUrl}
+            streamType={selectedMovie ? movieStreamType : tvStreamType}
+            trailerUrl={selectedMovie ? movieTrailerUrl : tvTrailerUrl}
             hasStream={hasStream}
             hasTrailer={hasTrailer}
-            onTrailerChange={(checked) => {
-              setIsNewTrailer(checked);
-              setHasTrailer(checked);
-            }}
-            onFreeMovieChange={(checked) => {
-              setIsFreeMovie(checked);
-              setHasStream(checked);
-            }}
-            setStreamType={setStreamType}
-            setStreamUrl={setStreamUrl}
-            setTrailerUrl={setTrailerUrl}
+            onTrailerChange={setIsNewTrailer}
+            onFreeMovieChange={setIsFreeMovie}
+            setStreamType={selectedMovie ? setMovieStreamType : setTvStreamType}
+            setStreamUrl={selectedMovie ? setMovieStreamUrl : setTvStreamUrl}
+            setTrailerUrl={selectedMovie ? setMovieTrailerUrl : setTvTrailerUrl}
             setHasStream={setHasStream}
             setHasTrailer={setHasTrailer}
           />
