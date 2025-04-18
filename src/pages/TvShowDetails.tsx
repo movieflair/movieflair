@@ -120,7 +120,9 @@ const TvShowDetails = () => {
     }
   };
 
-  const truncateOverview = (text: string, maxLength: number = 500) => {
+  // Fixed function to handle potential undefined text
+  const truncateOverview = (text: string | undefined, maxLength: number = 500) => {
+    if (!text) return '';
     return text.length > maxLength 
       ? `${text.slice(0, maxLength)}...` 
       : text;
