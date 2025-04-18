@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Youtube } from 'lucide-react';
@@ -7,7 +6,6 @@ import { getTrailerMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import TrailerCard from '@/components/movies/TrailerCard';
 import { Seo } from '@/components/seo/Seo';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 
 const Trailers = () => {
   const [trailerItems, setTrailerItems] = useState<MovieOrShow[]>([]);
