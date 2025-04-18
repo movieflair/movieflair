@@ -76,18 +76,22 @@ export const useAdminSearch = (activeTab: string) => {
     if (searchQuery.trim()) {
       setIsSearching(true);
       if (activeTab === 'movies') {
-        await refetchSearch();
+        const results = await refetchSearch();
+        setFilteredMovies(results.data || []);
       } else if (activeTab === 'shows') {
-        await refetchTvSearch();
+        const results = await refetchTvSearch();
+        setFilteredTvShows(results.data || []);
       }
     } else {
       setIsSearching(false);
       if (activeTab === 'movies') {
-        setFilteredMovies(currentView === 'free' ? freeMovies as MovieOrShow[] : 
-                         currentView === 'trailers' ? trailerMovies as MovieOrShow[] : 
-                         movies as MovieOrShow[]);
+        setFilteredMovies(
+          currentView === 'free' ? freeMovies :
+          currentView === 'trailers' ? trailerMovies :
+          movies
+        );
       } else if (activeTab === 'shows') {
-        setFilteredTvShows(tvShows as MovieOrShow[]);
+        setFilteredTvShows(tvShows);
       }
     }
   };
@@ -95,6 +99,7 @@ export const useAdminSearch = (activeTab: string) => {
   const handleViewChange = (view: 'all' | 'free' | 'trailers') => {
     setCurrentView(view);
     setIsSearching(false);
+    setSearchQuery('');
     
     if (view === 'free') {
       setFilteredMovies(freeMovies);
