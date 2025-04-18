@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Shuffle } from 'lucide-react';
@@ -8,9 +7,13 @@ import MovieCard from '@/components/movies/MovieCard';
 import { Button } from '@/components/ui/button';
 import { Seo } from '@/components/seo/Seo';
 
+const MOVIES_PER_PAGE = 20;
+
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
+  const [displayedMovies, setDisplayedMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +26,7 @@ const FreeMovies = () => {
         const data = await getFreeMovies();
         console.log('FreeMovies page: Fetched free movies:', data.length);
         setMovies(data);
+        setDisplayedMovies(data.slice(0, MOVIES_PER_PAGE));
       } catch (error) {
         console.error('Error fetching free movies:', error);
       } finally {
@@ -33,6 +37,13 @@ const FreeMovies = () => {
     fetchMovies();
   }, []);
 
+  const handleLoadMore = () => {
+    const nextPage = currentPage + 1;
+    const endIndex = nextPage * MOVIES_PER_PAGE;
+    setDisplayedMovies(movies.slice(0, endIndex));
+    setCurrentPage(nextPage);
+  };
+
   const handleRandomMovie = () => {
     if (movies.length > 0) {
       const randomIndex = Math.floor(Math.random() * movies.length);
@@ -40,6 +51,8 @@ const FreeMovies = () => {
       navigate(`/film/${randomMovie.id}`);
     }
   };
+
+  const hasMoreMovies = displayedMovies.length < movies.length;
 
   const seoTitle = "Kostenlose Filme Online anschauen | MovieFlair";
   const seoDescription = "Kostenlose Filme Online anschauen - Entdecke eine kuratierte Auswahl an Filmen, die du komplett kostenlos und legal streamen kannst.";
@@ -111,16 +124,31 @@ const FreeMovies = () => {
                 </div>
               ))}
             </div>
-          ) : movies.length === 0 ? (
+          ) : displayedMovies.length === 0 ? (
             <div className="text-center py-16 border rounded-lg bg-background/50">
               <p className="text-muted-foreground">Keine kostenlosen Filme gefunden</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {movies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {displayedMovies.map((movie) => (
+                  <MovieCard key={movie.id} movie={movie} />
+                ))}
+              </div>
+              
+              {hasMoreMovies && (
+                <div className="flex justify-center mt-8">
+                  <Button 
+                    onClick={handleLoadMore}
+                    variant="outline"
+                    size="lg"
+                    className="min-w-[200px]"
+                  >
+                    Mehr anzeigen
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
