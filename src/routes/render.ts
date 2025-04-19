@@ -9,7 +9,7 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Use router.get instead of router.get with * pattern to correctly type the handler
+// Handle all routes for SSR
 router.get('*', async (req: Request, res: Response, next: NextFunction) => {
   const url = req.originalUrl;
 

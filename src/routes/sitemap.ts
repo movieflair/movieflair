@@ -4,7 +4,7 @@ import { generateSitemapXml } from '../utils/generateSitemap';
 
 const router = Router();
 
-// Use router.get method correctly
+// Handle sitemap.xml route
 router.get('/sitemap.xml', async (req: Request, res: Response) => {
   try {
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
