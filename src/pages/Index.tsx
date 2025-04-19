@@ -50,9 +50,7 @@ const Index = () => {
       <section className="py-8 md:py-32 bg-gradient-to-b from-blue-50/50 to-white relative">
         <div className="container-custom px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-6 md:mb-8 relative">
-            <div className="absolute right-0 md:right-[-50px] -top-10 md:-top-14 hidden md:block">
-              <img src="/lovable-uploads/3cbbc2d9-09d4-4965-abef-c43336adc68a.png" alt="MovieFlair M Logo" className="w-24 h-24" />
-            </div>
+            {/* Removed the div containing the M logo */}
             <h1 className="text-2xl lg:text-6xl tracking-tight mb-3 md:mb-6 text-theme-black font-bold md:text-5xl px-2 md:px-0">Jeder Moment hat seinen Film.
 Wir finden ihn für dich!</h1>
             <p className="text-sm md:text-xl text-gray-600 mb-4 md:mb-6 font-thin px-2 md:px-0">Entdecke Filmempfehlungen, die zu deinem Tag, deiner Laune, deinem Leben passen.</p>
