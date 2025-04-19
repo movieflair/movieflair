@@ -6,41 +6,7 @@ import React from 'react';
 import fs from 'fs';
 import path from 'path';
 
-export function renderApp(url: string, template: string, App: any, helmetContext: any, res: any) {
-  console.log(`🚨 EMERGENCY RENDERING: App for URL: ${url} in SSR mode - Version 2.0.6 EMERGENCY`);
-  
-  // For the trailers page, inject emergency notification directly into HTML
-  if (url === '/neue-trailer') {
-    console.log('🚨 EMERGENCY OVERRIDE: Injecting special content for trailer page');
-    template = template.replace('</head>', `
-      <style>
-        .emergency-banner {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          z-index: 9999;
-          background: #ff0000;
-          color: white;
-          text-align: center;
-          padding: 20px;
-          font-size: 24px;
-          font-weight: bold;
-        }
-      </style>
-      <script>
-        window.onload = function() {
-          if (!document.querySelector('.emergency-banner')) {
-            const banner = document.createElement('div');
-            banner.className = 'emergency-banner';
-            banner.innerHTML = '🚨 EMERGENCY UPDATE v2.0.6 🚨';
-            document.body.prepend(banner);
-          }
-        }
-      </script>
-    </head>`);
-  }
-  
+export async function renderApp(url: string, template: string, App: any, helmetContext: any, res: any) {
   const { pipe } = renderToPipeableStream(
     React.createElement(
       HelmetProvider,
@@ -62,19 +28,9 @@ export function renderApp(url: string, template: string, App: any, helmetContext
           ${helmet?.script?.toString() || ''}
         `);
         
-        // Add very visible comments to verify the version in the HTML output
-        const versionedHtml = htmlWithHelmet
-          .replace('</head>', `
-            <!-- 🚨 EMERGENCY SSR Version: 2.0.6 -->
-            <!-- 🚨 EMERGENCY DEPLOYMENT TIMESTAMP: ${new Date().toISOString()} -->
-            <!-- 🚨 FORCED UPDATE APPLIED -->
-          </head>`);
-        
         res.status(200).set({ 'Content-Type': 'text/html' });
-        res.write(versionedHtml.split('<!--app-html-->')[0]);
+        res.write(htmlWithHelmet.split('<!--app-html-->')[0]);
         pipe(res);
-        
-        console.log(`🚨 EMERGENCY SSR complete for: ${url} - Version 2.0.6 rendered successfully`);
       },
       onError(error: Error) {
         console.error('Rendering error:', error);

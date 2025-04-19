@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -74,6 +75,7 @@ const TvShowDetails = () => {
 
   const firstAirYear = show.first_air_date ? new Date(show.first_air_date).getFullYear().toString() : '';
   
+  // Verbesserte SEO-Daten mit den Hilfsfunktionen
   const seoTitle = formatMediaTitle(show.name || '', firstAirYear);
   const seoDescription = formatMediaDescription(show.name || '', firstAirYear, show.overview, 160);
   const seoOgImage = getAbsoluteImageUrl(
@@ -109,13 +111,16 @@ const TvShowDetails = () => {
   };
 
   const handleStreamClick = () => {
-    if (show?.streamUrl) {
+    if (!show?.streamUrl) return;
+    
+    if (show?.streamUrl.includes('embed')) {
+      setShowTrailer(true);
+    } else {
       window.open(show.streamUrl, '_blank');
     }
   };
 
-  const truncateOverview = (text: string | undefined, maxLength: number = 500) => {
-    if (!text) return '';
+  const truncateOverview = (text: string, maxLength: number = 500) => {
     return text.length > maxLength 
       ? `${text.slice(0, maxLength)}...` 
       : text;

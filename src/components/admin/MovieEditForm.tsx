@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { MovieOrShow } from "@/lib/types";
 import { LinkIcon, PlayCircle } from "lucide-react";
 import MovieCategories from "./MovieCategories";
-import { convertToYouTubeEmbed, isYouTubeUrl } from '@/utils/videoUtils';
 
 interface MovieEditFormProps {
   selectedMovie: MovieOrShow;
@@ -38,15 +38,6 @@ const MovieEditForm = ({
   onSave,
   onCancel,
 }: MovieEditFormProps) => {
-  const handleStreamUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newUrl = e.target.value;
-    if (isFreeMovie && isYouTubeUrl(newUrl)) {
-      setStreamUrl(convertToYouTubeEmbed(newUrl));
-    } else {
-      setStreamUrl(newUrl);
-    }
-  };
-
   return (
     <div className="border border-border rounded-md p-6 mb-6">
       <div className="flex justify-between items-center mb-4">
@@ -138,7 +129,7 @@ const MovieEditForm = ({
                 }
                 className="mt-1"
                 value={streamUrl}
-                onChange={handleStreamUrlChange}
+                onChange={(e) => setStreamUrl(e.target.value)}
               />
             </div>
           </div>

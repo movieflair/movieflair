@@ -1,20 +1,17 @@
+
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Shuffle } from 'lucide-react';
-import MainLayout from '@/components/layout/MainLayout';
+import EnhancedLayout from '@/components/layout/EnhancedLayout';
 import { getFreeMovies, MovieOrShow, trackPageVisit } from '@/lib/api';
 import MovieCard from '@/components/movies/MovieCard';
-import { Button } from '@/components/ui/button';
+import { Gift } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from 'sonner';
 import { Seo } from '@/components/seo/Seo';
-
-const MOVIES_PER_PAGE = 20;
 
 const FreeMovies = () => {
   const [movies, setMovies] = useState<MovieOrShow[]>([]);
-  const [displayedMovies, setDisplayedMovies] = useState<MovieOrShow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     trackPageVisit('free-movies');
@@ -25,10 +22,15 @@ const FreeMovies = () => {
         console.log('FreeMovies page: Fetching free movies...');
         const data = await getFreeMovies();
         console.log('FreeMovies page: Fetched free movies:', data.length);
+        if (data.length > 0) {
+          console.log('FreeMovies page: Sample free movie:', data[0]);
+        } else {
+          console.log('FreeMovies page: No free movies found');
+        }
         setMovies(data);
-        setDisplayedMovies(data.slice(0, MOVIES_PER_PAGE));
       } catch (error) {
         console.error('Error fetching free movies:', error);
+        toast.error('Fehler beim Laden der kostenlosen Filme');
       } finally {
         setIsLoading(false);
       }
@@ -37,122 +39,56 @@ const FreeMovies = () => {
     fetchMovies();
   }, []);
 
-  const handleLoadMore = () => {
-    const nextPage = currentPage + 1;
-    const endIndex = nextPage * MOVIES_PER_PAGE;
-    setDisplayedMovies(movies.slice(0, endIndex));
-    setCurrentPage(nextPage);
-  };
-
-  const handleRandomMovie = () => {
-    if (movies.length > 0) {
-      const randomIndex = Math.floor(Math.random() * movies.length);
-      const randomMovie = movies[randomIndex];
-      navigate(`/film/${randomMovie.id}`);
-    }
-  };
-
-  const hasMoreMovies = displayedMovies.length < movies.length;
-
   const seoTitle = "Kostenlose Filme Online anschauen | MovieFlair";
   const seoDescription = "Kostenlose Filme Online anschauen - Entdecke eine kuratierte Auswahl an Filmen, die du komplett kostenlos und legal streamen kannst.";
   const featuredBackdrop = movies[0]?.backdrop_path 
     ? `https://image.tmdb.org/t/p/original${movies[0].backdrop_path}` 
     : '/movieflair-logo.png';
+  const canonical = `${window.location.origin}/kostenlose-filme`;
 
   return (
-    <MainLayout>
+    <EnhancedLayout>
       <Seo 
         title={seoTitle}
         description={seoDescription}
         ogImage={featuredBackdrop}
         ogType="website"
+        canonical={canonical}
         keywords="kostenlose Filme, gratis Filme, legale Streams, Filme kostenlos anschauen, Free Movies"
       />
 
-      <div className="container-custom py-12">
-        <div className="relative overflow-hidden rounded-2xl mb-10">
-          <div className="absolute inset-0 bg-gradient-to-r from-theme-accent-red/90 to-primary/50 mix-blend-multiply"></div>
-          
-          {movies.length > 0 && movies[0].backdrop_path && (
-            <div className="absolute inset-0">
-              <img 
-                src={`https://image.tmdb.org/t/p/w1280${movies[0].backdrop_path}`} 
-                alt="Kostenlose Filme"
-                className="w-full h-full object-cover opacity-20"
-              />
-            </div>
-          )}
-          
-          <div className="relative z-10 p-8 md:p-12">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Kostenlose Filme</h1>
-                <p className="text-white/80 max-w-2xl text-lg">
-                  Eine kuratierte Auswahl an Filmen, die du komplett kostenlos und legal streamen kannst.
-                </p>
-              </div>
-              
-              <Button 
-                variant="secondary"
-                size="sm"
-                className="flex items-center gap-2 group"
-                onClick={handleRandomMovie}
-                disabled={movies.length === 0}
-              >
-                <Shuffle className="w-4 h-4 group-hover:animate-spin" />
-                Zufallsfilm starten
-              </Button>
-            </div>
-          </div>
+      <div className="container-custom py-12 px-4">
+        <div className="flex items-center mb-8">
+          <Gift className="w-6 h-6 text-red-500 mr-2" />
+          <h1 className="text-3xl font-semibold">Kostenlose Filme</h1>
         </div>
         
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold">
-              {isLoading ? 'Lade Filme...' : `${movies.length} kostenlose Filme`}
-            </h2>
-          </div>
-          
-          {isLoading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-              {[...Array(10)].map((_, index) => (
-                <div key={index} className="animate-pulse">
-                  <div className="bg-muted aspect-[2/3] rounded-lg mb-2"></div>
-                  <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-muted rounded w-1/2"></div>
-                </div>
-              ))}
-            </div>
-          ) : displayedMovies.length === 0 ? (
-            <div className="text-center py-16 border rounded-lg bg-background/50">
-              <p className="text-muted-foreground">Keine kostenlosen Filme gefunden</p>
-            </div>
-          ) : (
-            <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                {displayedMovies.map((movie) => (
-                  <MovieCard key={movie.id} movie={movie} />
-                ))}
+        {isLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[...Array(isMobile ? 2 : 4)].map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="bg-muted aspect-[2/3] rounded-lg mb-2 h-[270px]"></div>
+                <div className="h-4 bg-muted rounded w-3/4 mb-2"></div>
+                <div className="h-3 bg-muted rounded w-1/2"></div>
               </div>
-              
-              {hasMoreMovies && (
-                <div className="flex justify-center mt-8">
-                  <Button 
-                    onClick={handleLoadMore}
-                    variant="outline"
-                    size="lg"
-                    className="min-w-[200px]"
-                  >
-                    Mehr anzeigen
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+            ))}
+          </div>
+        ) : movies.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Keine kostenlosen Filme gefunden.</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Füge im Admin-Bereich kostenlose Filme hinzu, damit sie hier angezeigt werden.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {movies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} size="large" />
+            ))}
+          </div>
+        )}
       </div>
-    </MainLayout>
+    </EnhancedLayout>
   );
 };
 

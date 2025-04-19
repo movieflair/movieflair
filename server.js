@@ -21,23 +21,12 @@ async function startServer() {
     });
   }
   
-  // Add a special middleware to always force server rendering for specific routes
-  app.use((req, res, next) => {
-    if (req.url === '/neue-trailer' || req.url === '/' || req.url === '/kostenlose-filme') {
-      console.log(`🚨 EMERGENCY OVERRIDE: Forcing SSR for ${req.url} route`);
-      req.query.forceSSR = 'true';
-      req.query.forceUpdate = 'true';
-    }
-    next();
-  });
-  
   // Setup Vite middleware
   await setupViteMiddleware(app, vite, isProduction);
   
   // Add vite to request object for use in routes
   app.use((req, res, next) => {
     req.vite = vite;
-    console.log(`Processing request for: ${req.url}`);
     next();
   });
 
@@ -53,12 +42,6 @@ async function startServer() {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Mode: ${isProduction ? 'Production' : 'Development'}`);
-    if (isProduction) {
-      console.log('=======================================');
-      console.log('PUBLIC DEPLOYMENT MODE ACTIVE');
-      console.log('Version: 2.0.7 - EMERGENCY PRODUCTION DEPLOYMENT');
-      console.log('=======================================');
-    }
   });
 }
 
