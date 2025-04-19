@@ -1,3 +1,4 @@
+
 import { Router } from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import { renderApp } from '../utils/renderUtils';
@@ -63,7 +64,7 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
           App = entryServer;
           return renderApp(url, template, App, {}, res);
         } catch (error) {
-          if (req.vite) req.vite.ssrFixStacktrace(error);
+          if (req.vite) req.vite.ssrFixStacktrace(error as Error);
           throw error;
         }
       } else {
@@ -79,6 +80,12 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
           throw error;
         }
       }
+    }
+    
+    // EMERGENCY CHANGE: Force SSR for homepage too
+    if (url === '/') {
+      console.log('🚨 EMERGENCY RENDERING FOR HOMEPAGE');
+      req.query.forceSSR = 'true';
     }
     
     if ((!isCrawler && !isImportantRoute && !forceSSR) && !req.query.forceSSR && url !== '/neue-trailer') {
