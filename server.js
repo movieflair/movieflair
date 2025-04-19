@@ -56,7 +56,7 @@ async function startServer() {
     if (isProduction) {
       console.log('=======================================');
       console.log('PUBLIC DEPLOYMENT MODE ACTIVE');
-      console.log('Version: 2.0.8 - EMERGENCY PRODUCTION DEPLOYMENT');
+      console.log('Version: 2.0.9 - EMERGENCY PRODUCTION DEPLOYMENT');
       console.log('=======================================');
     }
   });

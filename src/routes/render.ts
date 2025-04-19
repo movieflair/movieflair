@@ -10,7 +10,7 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Using the correct handler pattern for Express 5
+// Define route handler
 router.get('*', (req: Request, res: Response, next: NextFunction) => {
   handleRender(req, res, next).catch(next);
 });
@@ -18,12 +18,13 @@ router.get('*', (req: Request, res: Response, next: NextFunction) => {
 // Separate the async logic into its own function
 async function handleRender(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
-  console.log(`Handling request for URL: ${url} - Version 2.0.6 EMERGENCY`);
+  console.log(`Handling request for URL: ${url} - Version 2.0.9 EMERGENCY`);
 
   try {
-    // CRITICAL CHANGE: Always force server rendering for trailer page
-    if (url === '/neue-trailer') {
-      console.log('🚨 EMERGENCY RENDERING PATH ACTIVATED FOR TRAILER PAGE');
+    // CRITICAL: Always force server rendering for important routes
+    const criticalRoutes = ['/neue-trailer', '/', '/kostenlose-filme', '/entdecken'];
+    if (criticalRoutes.includes(url)) {
+      console.log(`🚨 EMERGENCY RENDERING PATH ACTIVATED FOR: ${url}`);
       req.query.forceSSR = 'true';
       req.query.forceUpdate = 'true';
     }
@@ -36,20 +37,12 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
       url.match(/^\/film\/\d+/) || 
       url.match(/^\/serie\/\d+/) || 
       url.match(/^\/liste\//) ||
-      ['/', '/neue-trailer', '/kostenlose-filme', '/entdecken', '/filmlisten'].includes(url);
+      criticalRoutes.includes(url);
 
     console.log(`Route ${url} - isCrawler: ${isCrawler}, isImportantRoute: ${isImportantRoute}`);
 
-    // ALWAYS force SSR for the trailers page to ensure changes are deployed
-    const forcedSSRPaths = ['/neue-trailer', '/kostenlose-filme'];
-    const forceSSR = forcedSSRPaths.includes(url);
-    
-    if (forceSSR) {
-      console.log(`!!! FORCING SERVER-SIDE RENDERING FOR CRITICAL PATH: ${url} !!!`);
-    }
-    
     // For testing purposes, force SSR for all pages if the specific query param is present
-    if (req.query.forceUpdate === 'true' || url === '/neue-trailer') {
+    if (req.query.forceUpdate === 'true' || criticalRoutes.includes(url)) {
       console.log(`!!! EMERGENCY FORCE UPDATE REQUESTED FOR: ${url} !!!`);
       
       // Apply server-side rendering regardless of other conditions
@@ -82,13 +75,7 @@ async function handleRender(req: Request, res: Response, next: NextFunction) {
       }
     }
     
-    // EMERGENCY CHANGE: Force SSR for homepage too
-    if (url === '/') {
-      console.log('🚨 EMERGENCY RENDERING FOR HOMEPAGE');
-      req.query.forceSSR = 'true';
-    }
-    
-    if ((!isCrawler && !isImportantRoute && !forceSSR) && !req.query.forceSSR && url !== '/neue-trailer') {
+    if ((!isCrawler && !isImportantRoute) && !req.query.forceSSR) {
       console.log(`Serving client-side rendering for ${url}`);
       const indexHtml = fs.readFileSync(
         path.resolve(__dirname, isProduction ? '../../../dist/client/index.html' : '../../../index.html'),

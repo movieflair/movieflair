@@ -1,12 +1,12 @@
 
 import { Router } from 'express';
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { generateSitemapXml } from '../utils/generateSitemap';
 
 const router = Router();
 
-// Using the correct handler pattern for Express 5
-router.get('/sitemap.xml', function(req: Request, res: Response, next) {
+// Route handler for sitemap.xml
+router.get('/sitemap.xml', (req: Request, res: Response, next: NextFunction) => {
   handleSitemap(req, res).catch(next);
 });
 

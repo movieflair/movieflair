@@ -5,10 +5,10 @@ import { HelmetProvider } from 'react-helmet-async';
 import React from 'react';
 
 export function renderApp(url: string, template: string, App: any, helmetContext: any, res: any) {
-  console.log(`🚨 EMERGENCY RENDERING: App for URL: ${url} in SSR mode - Version 2.0.8 EMERGENCY`);
+  console.log(`🚨 EMERGENCY RENDERING: App for URL: ${url} in SSR mode - Version 2.0.9 EMERGENCY`);
   
   // For the trailers page, inject emergency notification directly into HTML
-  if (url === '/neue-trailer' || url === '/') {
+  if (url === '/neue-trailer' || url === '/' || url === '/kostenlose-filme') {
     console.log('🚨 EMERGENCY OVERRIDE: Injecting special content for page');
     template = template.replace('</head>', `
       <style>
@@ -31,7 +31,7 @@ export function renderApp(url: string, template: string, App: any, helmetContext
           if (!document.querySelector('.emergency-banner')) {
             const banner = document.createElement('div');
             banner.className = 'emergency-banner';
-            banner.innerHTML = '🚨 EMERGENCY UPDATE v2.0.8 🚨';
+            banner.innerHTML = '🚨 EMERGENCY UPDATE v2.0.9 🚨';
             document.body.prepend(banner);
             
             // Auto-remove banner after 5 seconds
@@ -70,7 +70,7 @@ export function renderApp(url: string, template: string, App: any, helmetContext
         // Add very visible comments to verify the version in the HTML output
         const versionedHtml = htmlWithHelmet
           .replace('</head>', `
-            <!-- 🚨 EMERGENCY SSR Version: 2.0.8 -->
+            <!-- 🚨 EMERGENCY SSR Version: 2.0.9 -->
             <!-- 🚨 EMERGENCY DEPLOYMENT TIMESTAMP: ${new Date().toISOString()} -->
             <!-- 🚨 FORCED UPDATE APPLIED -->
           </head>`);
@@ -79,7 +79,7 @@ export function renderApp(url: string, template: string, App: any, helmetContext
         res.write(versionedHtml.split('<!--app-html-->')[0]);
         pipe(res);
         
-        console.log(`🚨 EMERGENCY SSR complete for: ${url} - Version 2.0.8 rendered successfully`);
+        console.log(`🚨 EMERGENCY SSR complete for: ${url} - Version 2.0.9 rendered successfully`);
       },
       onError(error: Error) {
         console.error('Rendering error:', error);
