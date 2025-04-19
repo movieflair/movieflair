@@ -29,7 +29,8 @@ router.get('*', async (req: Request, res: Response, next: NextFunction) => {
         path.resolve(__dirname, isProduction ? '../../../dist/client/index.html' : '../../../index.html'),
         'utf-8'
       );
-      return res.status(200).set({ 'Content-Type': 'text/html' }).end(indexHtml);
+      res.status(200).set({ 'Content-Type': 'text/html' }).end(indexHtml);
+      return;
     }
 
     // Load and transform template

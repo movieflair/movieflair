@@ -18,11 +18,11 @@ router.get('/sitemap.xml', async (req: Request, res: Response) => {
     res.removeHeader('Transfer-Encoding');
     
     const sitemap = await generateSitemapXml();
-    return res.send(sitemap);
+    res.send(sitemap);
   } catch (error) {
     console.error('Error serving sitemap:', error);
     res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    return res.status(500).send('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
+    res.status(500).send('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
   }
 });
 
