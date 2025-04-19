@@ -1,8 +1,8 @@
-
 import { MovieOrShow, MovieDetail } from './types';
 import { getAdminMovieSettings, getAdminTvShowSettings } from './apiUtils';
 import { supabase } from '@/integrations/supabase/client';
 import { callTMDB } from './apiUtils';
+import { convertToYouTubeEmbed, isYouTubeUrl } from '@/utils/videoUtils';
 
 const mapSupabaseMovieToMovieObject = (movie: any): MovieOrShow => {
   const genres = movie.genre_ids || [];
@@ -176,6 +176,10 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
   // If we have admin settings, use those values
   if (adminMovie) {
     console.log('Found movie in admin_movies table:', adminMovie);
+    const streamUrl = adminMovie.streamurl && isYouTubeUrl(adminMovie.streamurl) 
+      ? convertToYouTubeEmbed(adminMovie.streamurl)
+      : adminMovie.streamurl;
+
     return {
       ...movieData,
       media_type: 'movie',
@@ -184,7 +188,7 @@ export const getMovieById = async (id: number): Promise<MovieDetail> => {
       crew: credits.crew,
       hasTrailer: adminMovie.hastrailer || videos.results?.some((v: any) => v.type === 'Trailer'),
       hasStream: adminMovie.hasstream || false,
-      streamUrl: adminMovie.streamurl || '',
+      streamUrl: streamUrl || '',
       trailerUrl: adminMovie.trailerurl || '',
       isFreeMovie: adminMovie.isfreemovie || false,
       isNewTrailer: adminMovie.isnewtrailer || false,

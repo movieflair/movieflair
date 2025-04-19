@@ -5,10 +5,10 @@ import renderRouter from './render';
 
 const router = Router();
 
-// Mount sitemap router first to handle /sitemap.xml
+// Mount sitemap router first so it handles /sitemap.xml before the catch-all route
 router.use(sitemapRouter);
 
-// Mount render router to handle all other paths
+// Mount render router for all paths (catch-all)
 router.use(renderRouter);
 
 export default router;

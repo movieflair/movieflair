@@ -8,8 +8,14 @@ import FilterRecommendation from './recommendation/FilterRecommendation';
 import MoodSelector from './filters/MoodSelector';
 import { useFilterSearch } from '@/hooks/useFilterSearch';
 import { genres, moods, decades } from './data/filterOptions';
+import { MovieOrShow } from '@/lib/types';
+import { supabase } from '@/integrations/supabase/client';
 
-const HomeFilterBox = () => {
+interface HomeFilterBoxProps {
+  onRecommendation?: (movie: MovieOrShow) => void;
+}
+
+const HomeFilterBox = ({ onRecommendation }: HomeFilterBoxProps) => {
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<number[]>([]);
   const [selectedDecades, setSelectedDecades] = useState<string[]>([]);
@@ -28,6 +34,20 @@ const HomeFilterBox = () => {
     );
   };
 
+  const saveRecommendation = async (movie: MovieOrShow) => {
+    try {
+      await supabase
+        .from('filter_recommendations')
+        .insert({
+          movie_id: movie.id,
+          // Cast movie to unknown first, then to JSON compatible object
+          movie_data: movie as unknown as Record<string, any>
+        });
+    } catch (error) {
+      console.error('Error saving recommendation:', error);
+    }
+  };
+
   const initiateSearch = () => {
     handleSearch({
       moods: selectedMoods,
@@ -37,6 +57,15 @@ const HomeFilterBox = () => {
       rating
     });
   };
+
+  React.useEffect(() => {
+    if (recommendation) {
+      saveRecommendation(recommendation);
+      if (onRecommendation) {
+        onRecommendation(recommendation);
+      }
+    }
+  }, [recommendation, onRecommendation]);
 
   return (
     <div className="bg-white/80 backdrop-blur-sm p-4 md:p-6 lg:p-8 rounded-2xl shadow-lg border border-gray-100 max-w-[800px] mx-auto">

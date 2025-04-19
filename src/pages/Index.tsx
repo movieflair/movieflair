@@ -1,21 +1,35 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import MainLayout from '@/components/layout/MainLayout';
 import HomeFilterBox from '@/components/filter/HomeFilterBox';
 import { Seo } from '@/components/seo/Seo';
-import { getRandomCustomLists } from '@/lib/api';
-import { CustomList } from '@/lib/types';
+import { getRandomCustomLists, getRandomMovie } from '@/lib/api';
+import { CustomList, MovieOrShow } from '@/lib/types';
 import CustomListCarousel from '@/components/movies/CustomListCarousel';
 import PrimeVideoAd from '@/components/ads/PrimeVideoAd';
+import LastRecommendationHeader from '@/components/filter/LastRecommendationHeader';
 
 const Index = () => {
   const [customList, setCustomList] = useState<CustomList | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+  const [randomMovie, setRandomMovie] = useState<MovieOrShow | null>(null);
+
+  useEffect(() => {
+    const fetchRandomMovie = async () => {
+      try {
+        const movie = await getRandomMovie();
+        setRandomMovie(movie);
+      } catch (error) {
+        console.error('Error fetching random movie:', error);
+      }
+    };
+    fetchRandomMovie();
+  }, []);
+
   useEffect(() => {
     const fetchList = async () => {
       try {
-        // Get a truly random list for the homepage
         const lists = await getRandomCustomLists(1, true);
         setCustomList(lists[0] || null);
       } catch (error) {
@@ -24,9 +38,22 @@ const Index = () => {
         setIsLoading(false);
       }
     };
-    
     fetchList();
   }, []);
+
+  const fadeInUpVariants = {
+    hidden: {
+      opacity: 0,
+      y: 20
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6
+      }
+    }
+  };
 
   const websiteStructuredData = {
     "@context": "https://schema.org",
@@ -40,32 +67,77 @@ const Index = () => {
     }
   };
 
-  return (
-    <MainLayout>
-      <Seo 
-        structuredData={websiteStructuredData} 
-        keywords="filmtipps, filmempfehlungen, filme entdecken, filmfinder, filme nach stimmung, was soll ich heute schauen, passende filme, streaming tipps, movieflair, bester film für jetzt, persönlicher filmvorschlag, filme für jede laune, emotional passende filme" 
-      />
+  return <MainLayout>
+      <Seo structuredData={websiteStructuredData} />
 
-      <section className="py-8 md:py-32 bg-gradient-to-b from-blue-50/50 to-white relative">
+      <section className="py-12 bg-gradient-to-b from-blue-50/50 to-white relative overflow-hidden">
+        <div className="absolute top-10 left-10 w-64 h-64 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-64 h-64 bg-theme-accent-red/10 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{
+        animationDelay: "1s"
+      }}></div>
+
         <div className="container-custom px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center mb-6 md:mb-8 relative">
-            {/* Removed the div containing the M logo */}
-            <h1 className="text-2xl lg:text-6xl tracking-tight mb-3 md:mb-6 text-theme-black font-bold md:text-5xl px-2 md:px-0">Jeder Moment hat seinen Film.
-Wir finden ihn für dich!</h1>
-            <p className="text-sm md:text-xl text-gray-600 mb-4 md:mb-6 font-thin px-2 md:px-0">Entdecke Filmempfehlungen, die zu deinem Tag, deiner Laune, deinem Leben passen.</p>
-          </div>
-          <HomeFilterBox />
+          <LastRecommendationHeader recommendation={randomMovie} />
+          
+          <motion.div 
+            className="max-w-3xl mx-auto text-center mb-6 md:mb-8 relative" 
+            initial="hidden" 
+            animate="visible" 
+            variants={fadeInUpVariants}
+          >
+            <motion.h1 
+              variants={fadeInUpVariants} 
+              className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 
+                         tracking-tight mb-3 md:mb-6 
+                         text-theme-black font-bold 
+                         break-words leading-tight"
+            >
+              <span className="block">Jeder Moment</span>
+              <span className="block text-theme-accent-blue">hat seinen Film.</span>
+              <span className="block text-sm sm:text-xl md:text-2xl mt-2 font-normal text-gray-600">
+                Wir finden ihn für dich!
+              </span>
+            </motion.h1>
+            <motion.p 
+              className="text-base md:text-xl text-gray-700 mb-4 md:mb-6 font-medium px-2 md:px-0 
+                         bg-blue-50/50 rounded-xl py-3 shadow-sm" 
+              variants={fadeInUpVariants} 
+              transition={{ delay: 0.2 }}
+            >
+              Entdecke Filmempfehlungen, die deine Momente lebendig machen – 
+              passend zu deinem Tag, deiner Laune, deinem Leben.
+            </motion.p>
+          </motion.div>
+          
+          <motion.div initial={{
+          opacity: 0,
+          y: 20
+        }} animate={{
+          opacity: 1,
+          y: 0
+        }} transition={{
+          delay: 0.3,
+          duration: 0.6
+        }}>
+            <HomeFilterBox onRecommendation={setRandomMovie} />
+          </motion.div>
+          
           <PrimeVideoAd className="mt-6 md:mt-8" />
-          {!isLoading && customList && (
-            <div className="mt-6 md:mt-8">
+          
+          {!isLoading && customList && <motion.div className="mt-8 md:mt-12" initial={{
+          opacity: 0
+        }} animate={{
+          opacity: 1
+        }} transition={{
+          delay: 0.6,
+          duration: 0.8
+        }}>
               <CustomListCarousel list={customList} />
-            </div>
-          )}
+            </motion.div>}
         </div>
       </section>
-    </MainLayout>
-  );
+    </MainLayout>;
 };
 
 export default Index;
+

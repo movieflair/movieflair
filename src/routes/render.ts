@@ -1,5 +1,6 @@
 
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { renderApp } from '../utils/renderUtils';
 import fs from 'fs';
 import path from 'path';
@@ -9,11 +10,24 @@ const router = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
 
-// Handle all routes for SSR
-router.get('*', async (req: Request, res: Response, next: NextFunction) => {
+// Using the correct handler pattern for Express 5
+router.get('*', function(req: Request, res: Response, next: NextFunction) {
+  handleRender(req, res, next).catch(next);
+});
+
+// Separate the async logic into its own function
+async function handleRender(req: Request, res: Response, next: NextFunction) {
   const url = req.originalUrl;
+  console.log(`Handling request for URL: ${url} - Version 2.0.6 EMERGENCY`);
 
   try {
+    // CRITICAL CHANGE: Always force server rendering for trailer page
+    if (url === '/neue-trailer') {
+      console.log('🚨 EMERGENCY RENDERING PATH ACTIVATED FOR TRAILER PAGE');
+      req.query.forceSSR = 'true';
+      req.query.forceUpdate = 'true';
+    }
+    
     const isCrawler = req.get('User-Agent')?.toLowerCase().includes('bot') ||
                      req.get('User-Agent')?.toLowerCase().includes('crawler') ||
                      req.query.forceSSR === 'true';
@@ -24,53 +38,103 @@ router.get('*', async (req: Request, res: Response, next: NextFunction) => {
       url.match(/^\/liste\//) ||
       ['/', '/neue-trailer', '/kostenlose-filme', '/entdecken', '/filmlisten'].includes(url);
 
-    if ((!isCrawler && !isImportantRoute) && !req.query.forceSSR) {
+    console.log(`Route ${url} - isCrawler: ${isCrawler}, isImportantRoute: ${isImportantRoute}`);
+
+    // ALWAYS force SSR for the trailers page to ensure changes are deployed
+    const forcedSSRPaths = ['/neue-trailer', '/kostenlose-filme'];
+    const forceSSR = forcedSSRPaths.includes(url);
+    
+    if (forceSSR) {
+      console.log(`!!! FORCING SERVER-SIDE RENDERING FOR CRITICAL PATH: ${url} !!!`);
+    }
+    
+    // For testing purposes, force SSR for all pages if the specific query param is present
+    if (req.query.forceUpdate === 'true' || url === '/neue-trailer') {
+      console.log(`!!! EMERGENCY FORCE UPDATE REQUESTED FOR: ${url} !!!`);
+      
+      // Apply server-side rendering regardless of other conditions
+      let template, App;
+      
+      if (!isProduction) {
+        template = fs.readFileSync(path.resolve(__dirname, '../../../index.html'), 'utf-8');
+        template = req.vite ? await req.vite.transformIndexHtml(url, template) : template;
+        
+        try {
+          const { default: entryServer } = await req.vite.ssrLoadModule('/src/App.tsx');
+          App = entryServer;
+          return renderApp(url, template, App, {}, res);
+        } catch (error) {
+          if (req.vite) req.vite.ssrFixStacktrace(error);
+          throw error;
+        }
+      } else {
+        template = fs.readFileSync(path.resolve(__dirname, '../../../dist/client/index.html'), 'utf-8');
+        
+        try {
+          const AppPath = '../../../dist/server/App.js';
+          const dynamicImport = new Function('path', 'return import(path)');
+          const entryServer = await dynamicImport(AppPath);
+          App = entryServer.default;
+          return renderApp(url, template, App, {}, res);
+        } catch (error) {
+          throw error;
+        }
+      }
+    }
+    
+    if ((!isCrawler && !isImportantRoute && !forceSSR) && !req.query.forceSSR && url !== '/neue-trailer') {
+      console.log(`Serving client-side rendering for ${url}`);
       const indexHtml = fs.readFileSync(
         path.resolve(__dirname, isProduction ? '../../../dist/client/index.html' : '../../../index.html'),
         'utf-8'
       );
-      res.status(200).set({ 'Content-Type': 'text/html' }).end(indexHtml);
-      return;
+      return res.status(200).set({ 'Content-Type': 'text/html' }).end(indexHtml);
     }
 
-    // Load and transform template
-    let template;
-    let App;
+    console.log(`Performing server-side rendering for ${url}`);
+    
+    // Wrap template and App loading in an async context
+    let template, App;
     
     if (!isProduction) {
       template = fs.readFileSync(path.resolve(__dirname, '../../../index.html'), 'utf-8');
       if (req.vite) {
-        template = await req.vite.transformIndexHtml(url, template);
-        const { default: entryServer } = await req.vite.ssrLoadModule('/src/App.tsx');
-        App = entryServer;
+        template = req.vite.transformIndexHtml(url, template);
+        try {
+          const { default: entryServer } = await req.vite.ssrLoadModule('/src/App.tsx');
+          App = entryServer;
+          renderApp(url, template, App, {}, res);
+        } catch (error) {
+          if (req.vite) {
+            req.vite.ssrFixStacktrace(error);
+          }
+          console.error('Render error:', error);
+          throw error;
+        }
       } else {
         throw new Error('Vite dev server not available');
       }
     } else {
       template = fs.readFileSync(path.resolve(__dirname, '../../../dist/client/index.html'), 'utf-8');
-      // In production mode, handle the import differently to avoid TypeScript errors
+      const AppPath = '../../../dist/server/App.js';
+      const dynamicImport = new Function('path', 'return import(path)');
+      
       try {
-        // Use a dynamic import approach that works with TypeScript
-        const AppPath = '../../../dist/server/App.js';
-        // Using Function constructor to avoid TypeScript static analysis issues
-        const dynamicImport = new Function('path', 'return import(path)');
         const entryServer = await dynamicImport(AppPath);
         App = entryServer.default;
-      } catch (err) {
-        console.error('Failed to import server App:', err);
-        return res.status(500).send('Server error: Failed to load server components');
+        renderApp(url, template, App, {}, res);
+      } catch (error) {
+        console.error('Render error:', error);
+        throw error;
       }
     }
-
-    const helmetContext = {};
-    await renderApp(url, template, App, helmetContext, res);
   } catch (error) {
     if (!isProduction && req.vite) {
       req.vite.ssrFixStacktrace(error);
     }
     console.error('Render error:', error);
-    next(error);
+    throw error;
   }
-});
+}
 
 export default router;
